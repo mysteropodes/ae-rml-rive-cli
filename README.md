@@ -27,7 +27,7 @@ flowchart LR
 ## Install (macOS)
 
 ```bash
-git clone <this repository> ae-rml-rive-cli && cd ae-rml-rive-cli
+git clone https://github.com/mysteropodes/ae-rml-rive-cli.git && cd ae-rml-rive-cli
 ./install.sh                      # everything
 ./install.sh rml2ae ae2rml        # or only some parts: rml2ae  ae2rml  review-kit  plugin  skills
 ```
