@@ -172,7 +172,7 @@ Everything needed to measure an effect is in the repository:
 
 What is still missing, effect by effect, is in [fxlib-roadmap.md](fxlib-roadmap.md).
 
-37 measured effects: 27 exact, 8 close, 2 approx, plus 63 unverified ones (below the table). "Auto" is whether ae2rml applies the effect without being asked; the two effects
+37 measured effects: 27 exact, 8 close, 2 approx, plus 73 unverified ones (below the table). "Auto" is whether ae2rml applies the effect without being asked; the two effects
 marked `no` are measured to be further from After Effects than leaving the effect out, so they remain a
 `<!-- ae: effect ... -->` comment plus an entry in `effects_todo.json`.
 
@@ -286,6 +286,16 @@ real parameter list, then `render_refs.py <slug>`), add held-out settings, and m
 | Dust & Scratches | `ADBE Dust & Scratches` | `dust_scratches` | Window and threshold test |
 | Noise Alpha | `ADBE Noise Alpha` | `noise_alpha` | Random pattern cannot match AE; modes |
 | Noise HLS | `ADBE Noise HLS2` | `noise_hls` | Random pattern cannot match AE; amounts |
+| CC Light Sweep | `CC Light Sweep` | `cc_light_sweep` | Band profiles; Edge Intensity |
+| Beam | `ADBE Laser` | `beam` | Length/Time window; 3D Perspective |
+| CC Jaws | `CC Jaws` | `cc_jaws` | Tooth shapes; travel distance |
+| CC Line Sweep | `CC Line Sweep` | `cc_line_sweep` | Staggering of the lines |
+| CC Light Wipe | `CC Light Wipe` | `cc_light_wipe` | Glow profile; shapes |
+| Bevel Edges | `ADBE Bevel Edges` | `bevel_edges` | Thickness reference; shading |
+| Linear Color Key | `ADBE Linear Color Key2` | `linear_color_key` | Parameter positions; distance |
+| Smart Blur | `ADBE Smart Blur` | `smart_blur` | Threshold test; edge modes |
+| Reduce Interlace Flicker | `ADBE Reduce Interlace Flicker` | `reduce_interlace_flicker` | Kernel |
+| Advanced Spill Suppressor | `ADBE Spill2` | `advanced_spill_suppressor` | Standard method only |
 Notes:
 
 - **Gaussian Blur (legacy)** and **Fast Blur (legacy)** share the same kernel (confirmed on a third setting).

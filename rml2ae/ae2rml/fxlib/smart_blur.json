@@ -1,0 +1,36 @@
+{
+ "slug": "smart_blur",
+ "aeMatchName": "ADBE Smart Blur",
+ "wgsl": "ae_smart_blur.wgsl",
+ "passes": 1,
+ "textures": {},
+ "params": [
+  {
+   "ae": 1,
+   "field": "radius",
+   "kind": "number",
+   "default": 3
+  },
+  {
+   "ae": 2,
+   "field": "threshold",
+   "kind": "number",
+   "default": 25
+  },
+  {
+   "ae": 3,
+   "field": "quality",
+   "kind": "enum",
+   "default": 1
+  },
+  {
+   "ae": 4,
+   "field": "mode",
+   "kind": "enum",
+   "default": 1
+  }
+ ],
+ "status": "unverified",
+ "auto": false,
+ "notes": "Not yet measured against After Effects.  Parameter indices follow the After Effects parameter order as documented by Adobe; `render_refs.py --params` records the real list."
+}

@@ -34,9 +34,9 @@ plug-in. Some can come later through the Rive scene itself rather than as a shad
 | Gaussian Blur | ✅ | |
 | Gaussian Blur (legacy) | ✅ | |
 | Radial Blur | 🟡 | lot 2 |
-| Reduce Interlace Flicker | ⬜ | |
+| Reduce Interlace Flicker | 🟡 | lot 7 |
 | Sharpen | 🟡 | lot 2 |
-| Smart Blur | ⬜ | |
+| Smart Blur | 🟡 | lot 7 |
 | Unsharp Mask | 🟡 | lot 2 |
 
 ## Channel
@@ -142,11 +142,11 @@ plug-in. Some can come later through the Rive scene itself rather than as a shad
 | 4-Color Gradient | ✅ | |
 | Advanced Lightning | ⬜ | random; seed law to measure |
 | Audio Spectrum, Audio Waveform | ⛔ | audio |
-| Beam | ⬜ | |
+| Beam | 🟡 | lot 7 |
 | CC Glue Gun | ⬜ | |
 | CC Light Burst 2.5 | 🟡 | lot 5 |
 | CC Light Rays | 🟡 | lot 5 |
-| CC Light Sweep | ⬜ | |
+| CC Light Sweep | 🟡 | lot 7 |
 | CC Threads | ⬜ | |
 | Cell Pattern | ⬜ | proprietary noise, like Fractal Noise |
 | Checkerboard | ✅ | |
@@ -166,7 +166,7 @@ plug-in. Some can come later through the Rive scene itself rather than as a shad
 
 | Effect | | Note |
 |---|---|---|
-| Advanced Spill Suppressor | ⬜ | |
+| Advanced Spill Suppressor | 🟡 | lot 7 |
 | CC Simple Wire Removal | ⬜ | |
 | Color Difference Key | ⬜ | |
 | Color Key | 🟡 | lot 3 |
@@ -175,7 +175,7 @@ plug-in. Some can come later through the Rive scene itself rather than as a shad
 | Extract | 🟡 | lot 3 |
 | Inner/Outer Key | ⛔ | mask-driven |
 | Key Cleaner | ⬜ | |
-| Linear Color Key | ⬜ | |
+| Linear Color Key | 🟡 | lot 7 |
 | Luma Key | ✅ | |
 | Spill Suppressor | 🟡 | lot 3 |
 
@@ -205,7 +205,7 @@ plug-in. Some can come later through the Rive scene itself rather than as a shad
 |---|---|---|
 | 3D Glasses | ⬜ | needs a second layer |
 | Bevel Alpha | 🟡 | lot 4 |
-| Bevel Edges | ⬜ | |
+| Bevel Edges | 🟡 | lot 7 |
 | CC Cylinder, CC Sphere | ⬜ | |
 | CC Spotlight | 🟡 | lot 5 |
 | Drop Shadow | ✅ | |
@@ -248,9 +248,9 @@ plug-in. Some can come later through the Rive scene itself rather than as a shad
 | Card Wipe | ⛔ | 3D cards |
 | CC Glass Wipe, CC Image Wipe | ⬜ | need a second layer |
 | CC Grid Wipe | ⬜ | |
-| CC Jaws | ⬜ | |
-| CC Light Wipe | ⬜ | |
-| CC Line Sweep | ⬜ | |
+| CC Jaws | 🟡 | lot 7 |
+| CC Light Wipe | 🟡 | lot 7 |
+| CC Line Sweep | 🟡 | lot 7 |
 | CC Radial ScaleWipe | 🟡 | lot 6 |
 | CC Scale Wipe | ✅ | |
 | CC Twister | ⬜ | |
@@ -267,6 +267,14 @@ Time effects (Echo, Posterize Time, Time Difference, Time Displacement, Timewarp
 Motion Blur, CC Wide Time), 3D effects (CC Particle World, Shatter, Caustics, Wave World, Foam, Card Dance), text and
 expression controls, audio effects and the Immersive Video effects are outside fxlib: they need several frames, 3D
 geometry or audio, or are not image effects.
+
+## Effects that read a second layer
+
+Blend, Calculations, Compound Arithmetic, Compound Blur, Difference Matte, 3D Glasses, Texturize, CC Glass Wipe,
+CC Image Wipe and Gradient Wipe with another layer need the shader's `mapTex` bound to that layer. The Rive node
+already has the input for it (`e<i>_mapSource`, an artboard drawn into a canvas), but ae2rml does not fill it yet:
+even Displacement Map, measured offline, gets no map layer in a real conversion. Wiring it (the referenced layer as
+a sub-artboard, as for `fxSource`) and a test project with a map layer come before these effects.
 
 ## How a batch goes
 

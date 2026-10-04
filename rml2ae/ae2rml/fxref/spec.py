@@ -123,6 +123,17 @@ SPEC = {
     "dust_scratches": ("ADBE Dust & Scratches", [({1: 3, 2: 20}, 0), ({1: 6, 2: 5}, 0)]),
     "noise_alpha": ("ADBE Noise Alpha", [({2: 50}, 0), ({1: 2, 2: 80, 3: 3}, 0)]),
     "noise_hls": ("ADBE Noise HLS2", [({2: 20, 3: 20, 4: 20}, 0), ({1: 3, 3: 40, 5: 4}, 0)]),
+    # lot 7 (unverified until rendered)
+    "cc_light_sweep": ("CC Light Sweep", [({}, 0), ({1: [200, 120], 2: 20, 3: 2, 4: 120, 5: 80, 8: [1, 0.8, 0.3, 1]}, 0), ({3: 3, 9: 3, 4: 80}, 0)]),
+    "beam": ("ADBE Laser", [({4: 70}, 0), ({1: [100, 300], 2: [550, 60], 3: 60, 4: 90, 7: 30, 9: [1, 0, 0, 1], 11: 1}, 0)]),
+    "cc_jaws": ("CC Jaws", [({1: 20}, 0), ({1: 35, 3: 90, 4: 100, 5: 30}, 0)]),
+    "cc_line_sweep": ("CC Line Sweep", [({1: 40}, 0), ({1: 60, 2: 45, 3: 12, 4: 20}, 0)]),
+    "cc_light_wipe": ("CC Light Wipe", [({1: 20}, 0), ({1: 30, 4: 2, 2: [200, 120]}, 0)]),
+    "bevel_edges": ("ADBE Bevel Edges", [({}, 0), ({1: 0.25, 2: 45, 4: 0.8, 3: [1, 0.9, 0.6, 1]}, 0)]),
+    "linear_color_key": ("ADBE Linear Color Key2", [({3: [1, 0, 0, 1], 5: 20, 6: 10}, 0), ({3: [0, 0.6, 1, 1], 4: 2, 5: 10, 6: 30}, 0), ({3: [1, 1, 0, 1], 7: 2, 5: 25}, 0)]),
+    "smart_blur": ("ADBE Smart Blur", [({1: 6, 2: 40}, 0), ({1: 4, 2: 20, 4: 2}, 0), ({1: 8, 2: 60, 4: 3}, 0)]),
+    "reduce_interlace_flicker": ("ADBE Reduce Interlace Flicker", [({1: 2}, 0), ({1: 8}, 0)]),
+    "advanced_spill_suppressor": ("ADBE Spill2", [({}, 0), ({2: 50}, 0)]),
     "color_emboss": ("ADBE Color Emboss", [({}, 0), ({1: 120, 2: 3, 3: 200}, 0)]),
 }
 NEEDS_MAP = {"displacement_map": {1: 2}}   # param 1 (map layer) = layer index 2 (the map footage)

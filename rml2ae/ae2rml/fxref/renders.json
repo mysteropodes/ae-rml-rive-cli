@@ -3521,6 +3521,308 @@
   "png": "ae/noise_hls_1.png"
  },
  {
+  "slug": "cc_light_sweep",
+  "mn": "CC Light Sweep",
+  "k": 0,
+  "vals": {},
+  "held": false,
+  "png": "ae/cc_light_sweep_0.png"
+ },
+ {
+  "slug": "cc_light_sweep",
+  "mn": "CC Light Sweep",
+  "k": 1,
+  "vals": {
+   "1": [
+    200,
+    120
+   ],
+   "2": 20,
+   "3": 2,
+   "4": 120,
+   "5": 80,
+   "8": [
+    1,
+    0.8,
+    0.3,
+    1
+   ]
+  },
+  "held": false,
+  "png": "ae/cc_light_sweep_1.png"
+ },
+ {
+  "slug": "cc_light_sweep",
+  "mn": "CC Light Sweep",
+  "k": 2,
+  "vals": {
+   "3": 3,
+   "9": 3,
+   "4": 80
+  },
+  "held": false,
+  "png": "ae/cc_light_sweep_2.png"
+ },
+ {
+  "slug": "beam",
+  "mn": "ADBE Laser",
+  "k": 0,
+  "vals": {
+   "4": 70
+  },
+  "held": false,
+  "png": "ae/beam_0.png"
+ },
+ {
+  "slug": "beam",
+  "mn": "ADBE Laser",
+  "k": 1,
+  "vals": {
+   "1": [
+    100,
+    300
+   ],
+   "2": [
+    550,
+    60
+   ],
+   "3": 60,
+   "4": 90,
+   "7": 30,
+   "9": [
+    1,
+    0,
+    0,
+    1
+   ],
+   "11": 1
+  },
+  "held": false,
+  "png": "ae/beam_1.png"
+ },
+ {
+  "slug": "cc_jaws",
+  "mn": "CC Jaws",
+  "k": 0,
+  "vals": {
+   "1": 20
+  },
+  "held": false,
+  "png": "ae/cc_jaws_0.png"
+ },
+ {
+  "slug": "cc_jaws",
+  "mn": "CC Jaws",
+  "k": 1,
+  "vals": {
+   "1": 35,
+   "3": 90,
+   "4": 100,
+   "5": 30
+  },
+  "held": false,
+  "png": "ae/cc_jaws_1.png"
+ },
+ {
+  "slug": "cc_line_sweep",
+  "mn": "CC Line Sweep",
+  "k": 0,
+  "vals": {
+   "1": 40
+  },
+  "held": false,
+  "png": "ae/cc_line_sweep_0.png"
+ },
+ {
+  "slug": "cc_line_sweep",
+  "mn": "CC Line Sweep",
+  "k": 1,
+  "vals": {
+   "1": 60,
+   "2": 45,
+   "3": 12,
+   "4": 20
+  },
+  "held": false,
+  "png": "ae/cc_line_sweep_1.png"
+ },
+ {
+  "slug": "cc_light_wipe",
+  "mn": "CC Light Wipe",
+  "k": 0,
+  "vals": {
+   "1": 20
+  },
+  "held": false,
+  "png": "ae/cc_light_wipe_0.png"
+ },
+ {
+  "slug": "cc_light_wipe",
+  "mn": "CC Light Wipe",
+  "k": 1,
+  "vals": {
+   "1": 30,
+   "4": 2,
+   "2": [
+    200,
+    120
+   ]
+  },
+  "held": false,
+  "png": "ae/cc_light_wipe_1.png"
+ },
+ {
+  "slug": "bevel_edges",
+  "mn": "ADBE Bevel Edges",
+  "k": 0,
+  "vals": {},
+  "held": false,
+  "png": "ae/bevel_edges_0.png"
+ },
+ {
+  "slug": "bevel_edges",
+  "mn": "ADBE Bevel Edges",
+  "k": 1,
+  "vals": {
+   "1": 0.25,
+   "2": 45,
+   "4": 0.8,
+   "3": [
+    1,
+    0.9,
+    0.6,
+    1
+   ]
+  },
+  "held": false,
+  "png": "ae/bevel_edges_1.png"
+ },
+ {
+  "slug": "linear_color_key",
+  "mn": "ADBE Linear Color Key2",
+  "k": 0,
+  "vals": {
+   "3": [
+    1,
+    0,
+    0,
+    1
+   ],
+   "5": 20,
+   "6": 10
+  },
+  "held": false,
+  "png": "ae/linear_color_key_0.png"
+ },
+ {
+  "slug": "linear_color_key",
+  "mn": "ADBE Linear Color Key2",
+  "k": 1,
+  "vals": {
+   "3": [
+    0,
+    0.6,
+    1,
+    1
+   ],
+   "4": 2,
+   "5": 10,
+   "6": 30
+  },
+  "held": false,
+  "png": "ae/linear_color_key_1.png"
+ },
+ {
+  "slug": "linear_color_key",
+  "mn": "ADBE Linear Color Key2",
+  "k": 2,
+  "vals": {
+   "3": [
+    1,
+    1,
+    0,
+    1
+   ],
+   "7": 2,
+   "5": 25
+  },
+  "held": false,
+  "png": "ae/linear_color_key_2.png"
+ },
+ {
+  "slug": "smart_blur",
+  "mn": "ADBE Smart Blur",
+  "k": 0,
+  "vals": {
+   "1": 6,
+   "2": 40
+  },
+  "held": false,
+  "png": "ae/smart_blur_0.png"
+ },
+ {
+  "slug": "smart_blur",
+  "mn": "ADBE Smart Blur",
+  "k": 1,
+  "vals": {
+   "1": 4,
+   "2": 20,
+   "4": 2
+  },
+  "held": false,
+  "png": "ae/smart_blur_1.png"
+ },
+ {
+  "slug": "smart_blur",
+  "mn": "ADBE Smart Blur",
+  "k": 2,
+  "vals": {
+   "1": 8,
+   "2": 60,
+   "4": 3
+  },
+  "held": false,
+  "png": "ae/smart_blur_2.png"
+ },
+ {
+  "slug": "reduce_interlace_flicker",
+  "mn": "ADBE Reduce Interlace Flicker",
+  "k": 0,
+  "vals": {
+   "1": 2
+  },
+  "held": false,
+  "png": "ae/reduce_interlace_flicker_0.png"
+ },
+ {
+  "slug": "reduce_interlace_flicker",
+  "mn": "ADBE Reduce Interlace Flicker",
+  "k": 1,
+  "vals": {
+   "1": 8
+  },
+  "held": false,
+  "png": "ae/reduce_interlace_flicker_1.png"
+ },
+ {
+  "slug": "advanced_spill_suppressor",
+  "mn": "ADBE Spill2",
+  "k": 0,
+  "vals": {},
+  "held": false,
+  "png": "ae/advanced_spill_suppressor_0.png"
+ },
+ {
+  "slug": "advanced_spill_suppressor",
+  "mn": "ADBE Spill2",
+  "k": 1,
+  "vals": {
+   "2": 50
+  },
+  "held": false,
+  "png": "ae/advanced_spill_suppressor_1.png"
+ },
+ {
   "slug": "color_emboss",
   "mn": "ADBE Color Emboss",
   "k": 0,

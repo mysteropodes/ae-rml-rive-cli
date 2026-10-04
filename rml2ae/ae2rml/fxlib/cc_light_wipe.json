@@ -1,0 +1,68 @@
+{
+ "slug": "cc_light_wipe",
+ "aeMatchName": "CC Light Wipe",
+ "wgsl": "ae_cc_light_wipe.wgsl",
+ "passes": 1,
+ "textures": {},
+ "params": [
+  {
+   "ae": 1,
+   "field": "completion",
+   "kind": "number",
+   "default": 0
+  },
+  {
+   "ae": 2,
+   "field": "center",
+   "kind": "point",
+   "default": [
+    320,
+    180
+   ]
+  },
+  {
+   "ae": 3,
+   "field": "intensity",
+   "kind": "number",
+   "default": 100
+  },
+  {
+   "ae": 4,
+   "field": "shape",
+   "kind": "enum",
+   "default": 1
+  },
+  {
+   "ae": 5,
+   "field": "direction",
+   "kind": "angle",
+   "default": 0
+  },
+  {
+   "ae": 6,
+   "field": "fromSource",
+   "kind": "bool",
+   "default": 0
+  },
+  {
+   "ae": 7,
+   "field": "color",
+   "kind": "color",
+   "default": [
+    1,
+    1,
+    1,
+    1
+   ]
+  },
+  {
+   "ae": 8,
+   "field": "reverse",
+   "kind": "bool",
+   "default": 0
+  }
+ ],
+ "status": "unverified",
+ "auto": false,
+ "notes": "Not yet measured against After Effects.  Parameter indices follow the After Effects parameter order as documented by Adobe; `render_refs.py --params` records the real list."
+}
