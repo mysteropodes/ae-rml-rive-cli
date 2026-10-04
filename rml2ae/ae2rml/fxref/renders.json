@@ -4386,5 +4386,264 @@
   },
   "held": false,
   "png": "ae/cc_block_load_2.png"
+ },
+ {
+  "slug": "blend",
+  "mn": "ADBE Blend",
+  "k": 0,
+  "vals": {},
+  "held": false,
+  "png": "ae/blend_0.png"
+ },
+ {
+  "slug": "blend",
+  "mn": "ADBE Blend",
+  "k": 1,
+  "vals": {
+   "2": 2
+  },
+  "held": false,
+  "png": "ae/blend_1.png"
+ },
+ {
+  "slug": "blend",
+  "mn": "ADBE Blend",
+  "k": 2,
+  "vals": {
+   "2": 4,
+   "3": 30
+  },
+  "held": false,
+  "png": "ae/blend_2.png"
+ },
+ {
+  "slug": "blend",
+  "mn": "ADBE Blend",
+  "k": 3,
+  "vals": {
+   "2": 5
+  },
+  "held": false,
+  "png": "ae/blend_3.png"
+ },
+ {
+  "slug": "calculations",
+  "mn": "ADBE Calculations",
+  "k": 0,
+  "vals": {
+   "5": 50
+  },
+  "held": false,
+  "png": "ae/calculations_0.png"
+ },
+ {
+  "slug": "calculations",
+  "mn": "ADBE Calculations",
+  "k": 1,
+  "vals": {
+   "8": 4
+  },
+  "held": false,
+  "png": "ae/calculations_1.png"
+ },
+ {
+  "slug": "calculations",
+  "mn": "ADBE Calculations",
+  "k": 2,
+  "vals": {
+   "1": 2,
+   "8": 8,
+   "5": 80
+  },
+  "held": false,
+  "png": "ae/calculations_2.png"
+ },
+ {
+  "slug": "calculations",
+  "mn": "ADBE Calculations",
+  "k": 3,
+  "vals": {
+   "4": 3,
+   "8": 18
+  },
+  "held": false,
+  "png": "ae/calculations_3.png"
+ },
+ {
+  "slug": "compound_arithmetic",
+  "mn": "ADBE Compound Arithmetic",
+  "k": 0,
+  "vals": {
+   "2": 2
+  },
+  "held": false,
+  "png": "ae/compound_arithmetic_0.png"
+ },
+ {
+  "slug": "compound_arithmetic",
+  "mn": "ADBE Compound Arithmetic",
+  "k": 1,
+  "vals": {
+   "2": 5
+  },
+  "held": false,
+  "png": "ae/compound_arithmetic_1.png"
+ },
+ {
+  "slug": "compound_arithmetic",
+  "mn": "ADBE Compound Arithmetic",
+  "k": 2,
+  "vals": {
+   "2": 3,
+   "4": 3
+  },
+  "held": false,
+  "png": "ae/compound_arithmetic_2.png"
+ },
+ {
+  "slug": "compound_arithmetic",
+  "mn": "ADBE Compound Arithmetic",
+  "k": 3,
+  "vals": {
+   "2": 8,
+   "4": 2,
+   "6": 25
+  },
+  "held": false,
+  "png": "ae/compound_arithmetic_3.png"
+ },
+ {
+  "slug": "difference_matte",
+  "mn": "ADBE Difference Matte2",
+  "k": 0,
+  "vals": {},
+  "held": false,
+  "png": "ae/difference_matte_0.png"
+ },
+ {
+  "slug": "difference_matte",
+  "mn": "ADBE Difference Matte2",
+  "k": 1,
+  "vals": {
+   "4": 25,
+   "5": 10
+  },
+  "held": false,
+  "png": "ae/difference_matte_1.png"
+ },
+ {
+  "slug": "difference_matte",
+  "mn": "ADBE Difference Matte2",
+  "k": 2,
+  "vals": {
+   "1": 3,
+   "4": 15,
+   "5": 20
+  },
+  "held": false,
+  "png": "ae/difference_matte_2.png"
+ },
+ {
+  "slug": "texturize",
+  "mn": "ADBE Texturize",
+  "k": 0,
+  "vals": {},
+  "held": false,
+  "png": "ae/texturize_0.png"
+ },
+ {
+  "slug": "texturize",
+  "mn": "ADBE Texturize",
+  "k": 1,
+  "vals": {
+   "2": 45,
+   "3": 2
+  },
+  "held": false,
+  "png": "ae/texturize_1.png"
+ },
+ {
+  "slug": "compound_blur",
+  "mn": "ADBE Compound Blur",
+  "k": 0,
+  "vals": {},
+  "held": false,
+  "png": "ae/compound_blur_0.png"
+ },
+ {
+  "slug": "compound_blur",
+  "mn": "ADBE Compound Blur",
+  "k": 1,
+  "vals": {
+   "2": 10,
+   "4": 1
+  },
+  "held": false,
+  "png": "ae/compound_blur_1.png"
+ },
+ {
+  "slug": "cc_image_wipe",
+  "mn": "CC Image Wipe",
+  "k": 0,
+  "vals": {
+   "1": 40
+  },
+  "held": false,
+  "png": "ae/cc_image_wipe_0.png"
+ },
+ {
+  "slug": "cc_image_wipe",
+  "mn": "CC Image Wipe",
+  "k": 1,
+  "vals": {
+   "1": 60,
+   "2": 20,
+   "8": 1
+  },
+  "held": false,
+  "png": "ae/cc_image_wipe_1.png"
+ },
+ {
+  "slug": "three_d_glasses",
+  "mn": "ADBE 3D Glasses2",
+  "k": 0,
+  "vals": {
+   "3": 12
+  },
+  "held": false,
+  "png": "ae/three_d_glasses_0.png"
+ },
+ {
+  "slug": "three_d_glasses",
+  "mn": "ADBE 3D Glasses2",
+  "k": 1,
+  "vals": {
+   "7": 4,
+   "3": -8
+  },
+  "held": false,
+  "png": "ae/three_d_glasses_1.png"
+ },
+ {
+  "slug": "three_d_glasses",
+  "mn": "ADBE 3D Glasses2",
+  "k": 2,
+  "vals": {
+   "7": 1
+  },
+  "held": false,
+  "png": "ae/three_d_glasses_2.png"
+ },
+ {
+  "slug": "three_d_glasses",
+  "mn": "ADBE 3D Glasses2",
+  "k": 3,
+  "vals": {
+   "7": 5,
+   "8": 5,
+   "3": 6
+  },
+  "held": false,
+  "png": "ae/three_d_glasses_3.png"
  }
 ]

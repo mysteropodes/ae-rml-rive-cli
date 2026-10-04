@@ -149,8 +149,26 @@ SPEC = {
     "lens_flare": ("ADBE Lens Flare", [({}, 0), ({1: [500, 100], 2: 140, 3: 2}, 0), ({1: [200, 250], 3: 3, 4: 30}, 0)]),
     "cc_grid_wipe": ("CC Grid Wipe", [({1: 40}, 0), ({1: 50, 3: 30, 6: 2, 5: 8}, 0), ({1: 60, 6: 3, 4: 4, 2: [100, 80], 7: 1}, 0)]),
     "cc_block_load": ("CC Block Load", [({1: 30}, 0), ({1: 65, 4: 1}, 0), ({1: 10, 3: 0}, 0)]),
+    # lot 9: effects that read a second layer (unverified until rendered; the map footage is layer 2, NEEDS_MAP)
+    "blend": ("ADBE Blend", [({}, 0), ({2: 2}, 0), ({2: 4, 3: 30}, 0), ({2: 5}, 0)]),
+    "calculations": ("ADBE Calculations", [({5: 50}, 0), ({8: 4}, 0), ({1: 2, 8: 8, 5: 80}, 0), ({4: 3, 8: 18}, 0)]),
+    "compound_arithmetic": ("ADBE Compound Arithmetic", [({2: 2}, 0), ({2: 5}, 0), ({2: 3, 4: 3}, 0), ({2: 8, 4: 2, 6: 25}, 0)]),
+    "difference_matte": ("ADBE Difference Matte2", [({}, 0), ({4: 25, 5: 10}, 0), ({1: 3, 4: 15, 5: 20}, 0)]),
+    "texturize": ("ADBE Texturize", [({}, 0), ({2: 45, 3: 2}, 0)]),
+    "compound_blur": ("ADBE Compound Blur", [({}, 0), ({2: 10, 4: 1}, 0)]),
+    "cc_image_wipe": ("CC Image Wipe", [({1: 40}, 0), ({1: 60, 2: 20, 8: 1}, 0)]),
+    "three_d_glasses": ("ADBE 3D Glasses2", [({3: 12}, 0), ({7: 4, 3: -8}, 0), ({7: 1}, 0), ({7: 5, 8: 5, 3: 6}, 0)]),
 }
-NEEDS_MAP = {"displacement_map": {1: 2}}   # param 1 (map layer) = layer index 2 (the map footage)
+NEEDS_MAP = {"displacement_map": {1: 2},   # param 1 (map layer) = layer index 2 (the map footage)
+             "blend": {1: 2},
+             "calculations": {1: 2},
+             "compound_arithmetic": {1: 2},
+             "difference_matte": {1: 2},
+             "texturize": {1: 2},
+             "compound_blur": {1: 2},
+             "cc_image_wipe": {5: 2},
+             "three_d_glasses": {2: 2},
+             }
 
 
 def renders():

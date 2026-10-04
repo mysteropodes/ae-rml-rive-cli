@@ -1,0 +1,35 @@
+{
+ "slug": "blend",
+ "aeMatchName": "ADBE Blend",
+ "wgsl": "ae_blend.wgsl",
+ "passes": 1,
+ "textures": {
+  "mapTex": "map"
+ },
+ "params": [
+  {
+   "ae": 2,
+   "field": "mode",
+   "kind": "enum",
+   "default": 1
+  },
+  {
+   "ae": 3,
+   "field": "original",
+   "kind": "number",
+   "default": 0
+  },
+  {
+   "ae": 4,
+   "field": "sizes",
+   "kind": "enum",
+   "default": 2
+  }
+ ],
+ "status": "unverified",
+ "auto": false,
+ "notes": "Not yet measured against After Effects. The second layer comes from the Rive node's map input (ae2rml binds the referenced layer, PR 7). Parameter indices follow the After Effects parameter order as documented by Adobe; `render_refs.py --params` records the real list.",
+ "textureParams": {
+  "mapTex": 1
+ }
+}

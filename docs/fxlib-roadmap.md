@@ -28,7 +28,7 @@ plug-in. Some can come later through the Rive scene itself rather than as a shad
 | CC Radial Fast Blur | ✅ | |
 | CC Vector Blur | 🟡 | lot 8; the layer itself as vector map |
 | Channel Blur | 🟡 | lot 4 |
-| Compound Blur | ⬜ | needs a blur layer |
+| Compound Blur | 🟡 | lot 9 (second layer) |
 | Directional Blur | ✅ | |
 | Fast Blur (legacy) | ✅ | |
 | Gaussian Blur | ✅ | |
@@ -44,11 +44,11 @@ plug-in. Some can come later through the Rive scene itself rather than as a shad
 | Effect | | Note |
 |---|---|---|
 | Arithmetic | 🟡 | lot 3 |
-| Blend | ⬜ | needs a second layer |
-| Calculations | ⬜ | needs a second layer |
+| Blend | 🟡 | lot 9 (second layer) |
+| Calculations | 🟡 | lot 9 (second layer) |
 | CC Composite | ⬜ | parameter list already measured |
 | Channel Combiner | 🟡 | lot 8; the layer itself as source |
-| Compound Arithmetic | ⬜ | needs a second layer |
+| Compound Arithmetic | 🟡 | lot 9 (second layer) |
 | Invert | ✅ | |
 | Minimax | ✅ | |
 | Remove Color Matting | 🟡 | lot 3 |
@@ -172,7 +172,7 @@ plug-in. Some can come later through the Rive scene itself rather than as a shad
 | Color Difference Key | ⬜ | |
 | Color Key | 🟡 | lot 3 |
 | Color Range | 🟡 | lot 8 |
-| Difference Matte | ⬜ | needs a second layer |
+| Difference Matte | 🟡 | lot 9 (second layer) |
 | Extract | 🟡 | lot 3 |
 | Inner/Outer Key | ⛔ | mask-driven |
 | Key Cleaner | ⬜ | |
@@ -204,7 +204,7 @@ plug-in. Some can come later through the Rive scene itself rather than as a shad
 
 | Effect | | Note |
 |---|---|---|
-| 3D Glasses | ⬜ | needs a second layer |
+| 3D Glasses | 🟡 | lot 9 (right view = second layer, left = this layer) |
 | Bevel Alpha | 🟡 | lot 4 |
 | Bevel Edges | 🟡 | lot 7 |
 | CC Cylinder, CC Sphere | ⬜ | |
@@ -238,7 +238,7 @@ plug-in. Some can come later through the Rive scene itself rather than as a shad
 | Roughen Edges | ⬜ | parameter list already measured; proprietary noise |
 | Scatter | 🟡 | lot 5 (random pattern differs from AE) |
 | Strobe Light | ⛔ | depends on time |
-| Texturize | ⬜ | needs a texture layer |
+| Texturize | 🟡 | lot 9 (second layer) |
 | Threshold | 🟡 | lot 2 |
 
 ## Transition
@@ -247,7 +247,8 @@ plug-in. Some can come later through the Rive scene itself rather than as a shad
 |---|---|---|
 | Block Dissolve | 🟡 | lot 5 (random pattern differs from AE) |
 | Card Wipe | ⛔ | 3D cards |
-| CC Glass Wipe, CC Image Wipe | ⬜ | need a second layer |
+| CC Image Wipe | 🟡 | lot 9 (second layer) |
+| CC Glass Wipe | ⬜ | needs two other layers (reveal + gradient) |
 | CC Grid Wipe | 🟡 | lot 8 |
 | CC Jaws | 🟡 | lot 7 |
 | CC Light Wipe | 🟡 | lot 7 |
@@ -276,9 +277,12 @@ CC Image Wipe and Gradient Wipe with another layer read the shader's `mapTex` fr
 `textureParams.mapTex` = its AE position). ae2rml binds it to the Rive node's `e<i>_mapSource` input: a precomp
 gives its comp artboard, a still image a sub-artboard with the image, the layer itself (AE's default) the effect's
 own source artboard; other layer kinds (shapes, text, solids, video) leave the map empty and are reported.
-Displacement Map uses it today; `rml2ae/tests/test_map_layer.py` checks the binding, and
-`examples/make_fx_map_aep.jsx` builds a test project (to make in After Effects) with the three kinds of map layer.
-The effects listed above come next.
+`rml2ae/tests/test_map_layer.py` checks the binding, and `examples/make_fx_map_aep.jsx` builds a test project (to
+make in After Effects) with the three kinds of map layer. Displacement Map (measured) and lot 9 (Blend, Calculations,
+Compound Arithmetic, Compound Blur, Difference Matte, 3D Glasses, Texturize, CC Image Wipe) use it. In the node the
+second layer is rendered at the layer's size, so AE's "If Layer Sizes Differ" / "Stretch to Fit" options have nothing
+left to choose. Still to do: CC Glass Wipe (two other layers: the one revealed and the gradient) and Gradient Wipe
+with another layer (today it uses the layer itself).
 
 ## How a batch goes
 

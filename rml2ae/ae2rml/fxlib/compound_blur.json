@@ -1,0 +1,35 @@
+{
+ "slug": "compound_blur",
+ "aeMatchName": "ADBE Compound Blur",
+ "wgsl": "ae_compound_blur.wgsl",
+ "passes": 1,
+ "textures": {
+  "mapTex": "map"
+ },
+ "params": [
+  {
+   "ae": 2,
+   "field": "maxBlur",
+   "kind": "number",
+   "default": 20
+  },
+  {
+   "ae": 3,
+   "field": "stretch",
+   "kind": "bool",
+   "default": 1
+  },
+  {
+   "ae": 4,
+   "field": "invert",
+   "kind": "bool",
+   "default": 0
+  }
+ ],
+ "status": "unverified",
+ "auto": false,
+ "notes": "Not yet measured against After Effects. The second layer comes from the Rive node's map input (ae2rml binds the referenced layer, PR 7). Parameter indices follow the After Effects parameter order as documented by Adobe; `render_refs.py --params` records the real list.",
+ "textureParams": {
+  "mapTex": 1
+ }
+}

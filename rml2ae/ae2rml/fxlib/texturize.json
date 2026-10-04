@@ -1,0 +1,35 @@
+{
+ "slug": "texturize",
+ "aeMatchName": "ADBE Texturize",
+ "wgsl": "ae_texturize.wgsl",
+ "passes": 1,
+ "textures": {
+  "mapTex": "map"
+ },
+ "params": [
+  {
+   "ae": 2,
+   "field": "light",
+   "kind": "angle",
+   "default": 135
+  },
+  {
+   "ae": 3,
+   "field": "contrast",
+   "kind": "number",
+   "default": 1
+  },
+  {
+   "ae": 4,
+   "field": "placement",
+   "kind": "enum",
+   "default": 1
+  }
+ ],
+ "status": "unverified",
+ "auto": false,
+ "notes": "Not yet measured against After Effects. The second layer comes from the Rive node's map input (ae2rml binds the referenced layer, PR 7). Parameter indices follow the After Effects parameter order as documented by Adobe; `render_refs.py --params` records the real list.",
+ "textureParams": {
+  "mapTex": 1
+ }
+}

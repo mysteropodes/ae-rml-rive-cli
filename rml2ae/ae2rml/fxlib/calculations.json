@@ -1,0 +1,65 @@
+{
+ "slug": "calculations",
+ "aeMatchName": "ADBE Calculations",
+ "wgsl": "ae_calculations.wgsl",
+ "passes": 1,
+ "textures": {
+  "mapTex": "map"
+ },
+ "params": [
+  {
+   "ae": 1,
+   "field": "inChan",
+   "kind": "enum",
+   "default": 1
+  },
+  {
+   "ae": 2,
+   "field": "inInvert",
+   "kind": "bool",
+   "default": 0
+  },
+  {
+   "ae": 4,
+   "field": "secChan",
+   "kind": "enum",
+   "default": 1
+  },
+  {
+   "ae": 5,
+   "field": "secOpacity",
+   "kind": "number",
+   "default": 100
+  },
+  {
+   "ae": 6,
+   "field": "secInvert",
+   "kind": "bool",
+   "default": 0
+  },
+  {
+   "ae": 7,
+   "field": "stretch",
+   "kind": "bool",
+   "default": 1
+  },
+  {
+   "ae": 8,
+   "field": "mode",
+   "kind": "enum",
+   "default": 1
+  },
+  {
+   "ae": 9,
+   "field": "preserve",
+   "kind": "bool",
+   "default": 0
+  }
+ ],
+ "status": "unverified",
+ "auto": false,
+ "notes": "Not yet measured against After Effects. The second layer comes from the Rive node's map input (ae2rml binds the referenced layer, PR 7). Parameter indices follow the After Effects parameter order as documented by Adobe; `render_refs.py --params` records the real list.",
+ "textureParams": {
+  "mapTex": 1
+ }
+}
