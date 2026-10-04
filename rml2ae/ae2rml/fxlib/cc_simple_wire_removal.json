@@ -1,0 +1,60 @@
+{
+ "slug": "cc_simple_wire_removal",
+ "aeMatchName": "CC Simple Wire Removal",
+ "wgsl": "ae_cc_simple_wire_removal.wgsl",
+ "passes": 1,
+ "textures": {},
+ "params": [
+  {
+   "ae": 1,
+   "field": "a",
+   "kind": "point",
+   "default": [
+    160,
+    0
+   ]
+  },
+  {
+   "ae": 2,
+   "field": "b",
+   "kind": "point",
+   "default": [
+    480,
+    360
+   ]
+  },
+  {
+   "ae": 3,
+   "field": "style",
+   "kind": "enum",
+   "default": 1
+  },
+  {
+   "ae": 4,
+   "field": "thickness",
+   "kind": "number",
+   "default": 10
+  },
+  {
+   "ae": 5,
+   "field": "slope",
+   "kind": "number",
+   "default": 0
+  },
+  {
+   "ae": 6,
+   "field": "mirror",
+   "kind": "number",
+   "default": 0
+  },
+  {
+   "ae": 7,
+   "field": "frameOffset",
+   "kind": "number",
+   "default": 0
+  }
+ ],
+ "status": "unverified",
+ "auto": false,
+ "notes": "Not yet measured against After Effects.  Parameter indices follow the After Effects parameter order as documented by Adobe; `render_refs.py --params` records the real list."
+}

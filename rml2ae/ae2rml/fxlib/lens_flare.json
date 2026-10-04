@@ -1,0 +1,39 @@
+{
+ "slug": "lens_flare",
+ "aeMatchName": "ADBE Lens Flare",
+ "wgsl": "ae_lens_flare.wgsl",
+ "passes": 1,
+ "textures": {},
+ "params": [
+  {
+   "ae": 1,
+   "field": "center",
+   "kind": "point",
+   "default": [
+    128,
+    72
+   ]
+  },
+  {
+   "ae": 2,
+   "field": "brightness",
+   "kind": "number",
+   "default": 100
+  },
+  {
+   "ae": 3,
+   "field": "lens",
+   "kind": "enum",
+   "default": 1
+  },
+  {
+   "ae": 4,
+   "field": "blend",
+   "kind": "number",
+   "default": 0
+  }
+ ],
+ "status": "unverified",
+ "auto": false,
+ "notes": "Not yet measured against After Effects.  Parameter indices follow the After Effects parameter order as documented by Adobe; `render_refs.py --params` records the real list."
+}

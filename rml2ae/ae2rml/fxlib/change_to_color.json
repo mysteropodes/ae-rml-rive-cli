@@ -1,0 +1,76 @@
+{
+ "slug": "change_to_color",
+ "aeMatchName": "ADBE Change To Color",
+ "wgsl": "ae_change_to_color.wgsl",
+ "passes": 1,
+ "textures": {},
+ "params": [
+  {
+   "ae": 1,
+   "field": "fromC",
+   "kind": "color",
+   "default": [
+    1,
+    0,
+    0,
+    1
+   ]
+  },
+  {
+   "ae": 2,
+   "field": "toC",
+   "kind": "color",
+   "default": [
+    0,
+    1,
+    0,
+    1
+   ]
+  },
+  {
+   "ae": 3,
+   "field": "change",
+   "kind": "enum",
+   "default": 1
+  },
+  {
+   "ae": 4,
+   "field": "changeBy",
+   "kind": "enum",
+   "default": 1
+  },
+  {
+   "ae": 6,
+   "field": "tolH",
+   "kind": "number",
+   "default": 5
+  },
+  {
+   "ae": 7,
+   "field": "tolL",
+   "kind": "number",
+   "default": 50
+  },
+  {
+   "ae": 8,
+   "field": "tolS",
+   "kind": "number",
+   "default": 50
+  },
+  {
+   "ae": 9,
+   "field": "softness",
+   "kind": "number",
+   "default": 50
+  },
+  {
+   "ae": 10,
+   "field": "matte",
+   "kind": "bool",
+   "default": 0
+  }
+ ],
+ "status": "unverified",
+ "auto": false,
+ "notes": "Not yet measured against After Effects.  Parameter indices follow the After Effects parameter order as documented by Adobe; `render_refs.py --params` records the real list."
+}

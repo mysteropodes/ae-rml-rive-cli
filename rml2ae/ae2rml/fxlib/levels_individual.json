@@ -1,0 +1,180 @@
+{
+ "slug": "levels_individual",
+ "aeMatchName": "ADBE Pro Levels2",
+ "wgsl": "ae_levels_individual.wgsl",
+ "passes": 1,
+ "textures": {},
+ "params": [
+  {
+   "ae": 1,
+   "field": "channel",
+   "kind": "enum",
+   "default": 1
+  },
+  {
+   "ae": 4,
+   "field": "rgbInBlack",
+   "kind": "number",
+   "default": 0
+  },
+  {
+   "ae": 5,
+   "field": "rgbInWhite",
+   "kind": "number",
+   "default": 1
+  },
+  {
+   "ae": 6,
+   "field": "rgbGamma",
+   "kind": "number",
+   "default": 1
+  },
+  {
+   "ae": 7,
+   "field": "rgbOutBlack",
+   "kind": "number",
+   "default": 0
+  },
+  {
+   "ae": 8,
+   "field": "rgbOutWhite",
+   "kind": "number",
+   "default": 1
+  },
+  {
+   "ae": 10,
+   "field": "redInBlack",
+   "kind": "number",
+   "default": 0
+  },
+  {
+   "ae": 11,
+   "field": "redInWhite",
+   "kind": "number",
+   "default": 1
+  },
+  {
+   "ae": 12,
+   "field": "redGamma",
+   "kind": "number",
+   "default": 1
+  },
+  {
+   "ae": 13,
+   "field": "redOutBlack",
+   "kind": "number",
+   "default": 0
+  },
+  {
+   "ae": 14,
+   "field": "redOutWhite",
+   "kind": "number",
+   "default": 1
+  },
+  {
+   "ae": 16,
+   "field": "greenInBlack",
+   "kind": "number",
+   "default": 0
+  },
+  {
+   "ae": 17,
+   "field": "greenInWhite",
+   "kind": "number",
+   "default": 1
+  },
+  {
+   "ae": 18,
+   "field": "greenGamma",
+   "kind": "number",
+   "default": 1
+  },
+  {
+   "ae": 19,
+   "field": "greenOutBlack",
+   "kind": "number",
+   "default": 0
+  },
+  {
+   "ae": 20,
+   "field": "greenOutWhite",
+   "kind": "number",
+   "default": 1
+  },
+  {
+   "ae": 22,
+   "field": "blueInBlack",
+   "kind": "number",
+   "default": 0
+  },
+  {
+   "ae": 23,
+   "field": "blueInWhite",
+   "kind": "number",
+   "default": 1
+  },
+  {
+   "ae": 24,
+   "field": "blueGamma",
+   "kind": "number",
+   "default": 1
+  },
+  {
+   "ae": 25,
+   "field": "blueOutBlack",
+   "kind": "number",
+   "default": 0
+  },
+  {
+   "ae": 26,
+   "field": "blueOutWhite",
+   "kind": "number",
+   "default": 1
+  },
+  {
+   "ae": 28,
+   "field": "alphaInBlack",
+   "kind": "number",
+   "default": 0
+  },
+  {
+   "ae": 29,
+   "field": "alphaInWhite",
+   "kind": "number",
+   "default": 1
+  },
+  {
+   "ae": 30,
+   "field": "alphaGamma",
+   "kind": "number",
+   "default": 1
+  },
+  {
+   "ae": 31,
+   "field": "alphaOutBlack",
+   "kind": "number",
+   "default": 0
+  },
+  {
+   "ae": 32,
+   "field": "alphaOutWhite",
+   "kind": "number",
+   "default": 1
+  },
+  {
+   "ae": 33,
+   "field": "clipBlack",
+   "kind": "enum",
+   "default": 3
+  },
+  {
+   "ae": 34,
+   "field": "clipWhite",
+   "kind": "enum",
+   "default": 3
+  }
+ ],
+ "status": "unverified",
+ "auto": false,
+ "notes": "Not yet measured against After Effects.  Parameter indices follow the After Effects parameter order as documented by Adobe; `render_refs.py --params` records the real list."
+}

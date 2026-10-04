@@ -1,0 +1,42 @@
+{
+ "slug": "cc_griddler",
+ "aeMatchName": "CC Griddler",
+ "wgsl": "ae_cc_griddler.wgsl",
+ "passes": 1,
+ "textures": {},
+ "params": [
+  {
+   "ae": 1,
+   "field": "hScale",
+   "kind": "number",
+   "default": 100
+  },
+  {
+   "ae": 2,
+   "field": "vScale",
+   "kind": "number",
+   "default": 100
+  },
+  {
+   "ae": 3,
+   "field": "tile",
+   "kind": "number",
+   "default": 10
+  },
+  {
+   "ae": 4,
+   "field": "rotation",
+   "kind": "angle",
+   "default": 0
+  },
+  {
+   "ae": 5,
+   "field": "cut",
+   "kind": "bool",
+   "default": 0
+  }
+ ],
+ "status": "unverified",
+ "auto": false,
+ "notes": "Not yet measured against After Effects.  Parameter indices follow the After Effects parameter order as documented by Adobe; `render_refs.py --params` records the real list."
+}
