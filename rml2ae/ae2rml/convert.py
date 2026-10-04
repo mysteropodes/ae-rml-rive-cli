@@ -255,7 +255,7 @@ class Converter:
         scene = os.path.join(self.out_dir, "scene.rml")
         open(scene, "w", encoding="utf-8").write(document(roots))
         yml = os.path.join(self.out_dir, "rive.yaml")
-        open(yml, "w").write(f"name: {self.name}\nmain: {self.main.ab.name}\nlogs:\n  file: build/rive.log\n"
+        open(yml, "w", encoding="utf-8").write(f"name: {self.name}\nmain: {self.main.ab.name}\nlogs:\n  file: build/rive.log\n"
                              f"  problems: build/problems.log\n")
         if self.media_bytes > 8e6:
             self.report.add("project", "info", "image sequences",
@@ -316,11 +316,11 @@ class Converter:
 
     def write_side_files(self):
         todo = os.path.join(self.build_dir, "effects_todo.json")
-        json.dump(self.report.todo_effects, open(todo, "w"), indent=1, ensure_ascii=False)
+        json.dump(self.report.todo_effects, open(todo, "w", encoding="utf-8"), indent=1, ensure_ascii=False)
         failed = os.path.join(self.build_dir, "expressions_failed.json")
         if self.failed_expr:
             json.dump([{"comp": c, "property": w, "expression": e, "error": m} for c, w, e, m in self.failed_expr],
-                      open(failed, "w"), indent=1, ensure_ascii=False)
+                      open(failed, "w", encoding="utf-8"), indent=1, ensure_ascii=False)
         elif os.path.exists(failed):
             os.remove(failed)
         self.write_tag_jsx()

@@ -9,7 +9,7 @@ import os
 
 from .util import PKG, argb, esc, fmt
 
-SCHEMA = json.load(open(os.path.join(PKG, "schema.json")))
+SCHEMA = json.load(open(os.path.join(PKG, "schema.json"), encoding="utf-8"))
 TYPES = SCHEMA["types"]
 _PK = {}
 

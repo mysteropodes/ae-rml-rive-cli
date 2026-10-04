@@ -14,7 +14,7 @@ for f in ("Montserrat-Bold.ttf", "sample_a.png", "sample_b.png"):
     src = os.path.join(OUT, f)
     if not os.path.exists(src) and f.endswith(".ttf"):
         shutil.copy(os.path.join(ROOT, "figma2rml", "fonts", f), OUT)
-open(os.path.join(OUT, "rive.yaml"), "w").write("name: features\nlogs:\n  file: build/rive.log\n  problems: build/problems.log\n")
+open(os.path.join(OUT, "rive.yaml"), "w", encoding="utf-8").write("name: features\nlogs:\n  file: build/rive.log\n  problems: build/problems.log\n")
 
 n = [100]
 
@@ -136,5 +136,5 @@ rml = f'''<Rive version="1" kind="fragment">
 <ImageAsset file="sample_a.png" name="sample_a" id="{I["img1"]}"/>
 <ImageAsset file="sample_b.png" name="sample_b" id="{I["img2"]}"/>
 </Rive>'''
-open(os.path.join(OUT, "scene.rml"), "w").write(rml)
+open(os.path.join(OUT, "scene.rml"), "w", encoding="utf-8").write(rml)
 print("wrote", os.path.join(OUT, "scene.rml"))

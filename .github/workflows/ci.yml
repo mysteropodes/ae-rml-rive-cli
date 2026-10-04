@@ -154,8 +154,9 @@ jobs:
       - run: pip install -e ".[ae2rml]" "wgpu==0.32.0"
       - name: ae2rml on the demo (.aep -> Rive CLI project)
         run: |
-          ae2rml examples/demo.aep out/demo | Tee-Object -FilePath out-demo.txt
-          if (-not (Select-String -Path out-demo.txt -Pattern "unsupported: 0" -Quiet)) { exit 1 }
+          ae2rml examples/demo.aep out/demo
+          if ($LASTEXITCODE -ne 0) { exit 1 }
+          if (-not (Select-String -Path out/demo/build/ae2rml/report.md -Pattern "unsupported: 0" -Quiet)) { exit 1 }
       - run: python -m rml2ae.tests.test_map_layer
       - run: python -m rml2ae.tests.sim_incremental
       - name: rml2ae finds no After Effects here, and says so

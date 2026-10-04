@@ -115,7 +115,7 @@ def cmd_templates(args, flags):
     tmp = os.path.join(os.path.expanduser("~/.cache/rml2ae"), "templates.txt")
     os.makedirs(os.path.dirname(tmp), exist_ok=True)
     jsx = tmp + ".jsx"
-    open(jsx, "w").write(f'''var out = []; try {{ app.beginUndoGroup("ae templates"); var comp = app.project.items.addComp("__ae_tpl", 16, 16, 1, 1, 25);
+    open(jsx, "w", encoding="utf-8").write(f'''var out = []; try {{ app.beginUndoGroup("ae templates"); var comp = app.project.items.addComp("__ae_tpl", 16, 16, 1, 1, 25);
 var item = app.project.renderQueue.items.add(comp); out.push("render settings: " + item.templates.join(" | ")); out.push("output modules: " + item.outputModule(1).templates.join(" | "));
 item.remove(); comp.remove(); app.endUndoGroup(); }} catch (e) {{ out.push("ERR " + e.toString()); }}
 var f = new File({js(tmp)}); f.open("w"); f.write(out.join("\\n")); f.close();''')
@@ -127,7 +127,7 @@ var f = new File({js(tmp)}); f.open("w"); f.write(out.join("\\n")); f.close();''
         if os.path.exists(tmp):
             break
         time.sleep(1)
-    print(open(tmp).read() if os.path.exists(tmp) else "no answer from AE")
+    print(open(tmp, encoding="utf-8").read() if os.path.exists(tmp) else "no answer from AE")
     return 0
 
 
@@ -149,13 +149,13 @@ def build(project, flags, replace=False, incremental=False):
         for l in conv.stats_lines():
             print(l)
     jsx = os.path.join(out_dir, proj.name + ".jsx")
-    open(jsx, "w").write(text)
-    open(os.path.join(out_dir, proj.name + ".ae-report.md"), "w").write(conv.rep.markdown())
+    open(jsx, "w", encoding="utf-8").write(text)
+    open(os.path.join(out_dir, proj.name + ".ae-report.md"), "w", encoding="utf-8").write(conv.rep.markdown())
     t0 = time.time()
     log = runner.run(jsx, conv.log)
     for l in log.splitlines():
         if l.startswith("project "):
-            open(os.path.join(out_dir, proj.name + ".project.txt"), "w").write(l[8:].strip())
+            open(os.path.join(out_dir, proj.name + ".project.txt"), "w", encoding="utf-8").write(l[8:].strip())
     tail = [l for l in log.splitlines() if "FAILED" in l or "DONE" in l or "saved" in l]
     print(f"build {proj.name}: {time.time() - t0:.0f}s — " + ("; ".join(tail[-3:]) if tail else log[-300:]))
     return 0 if "DONE" in log and "FAILED" not in log else 1
@@ -199,7 +199,7 @@ def cmd_render(args, flags, single=None):
     aep = os.path.join(project, "build", "rml2ae", proj.name + ".aep")
     pf = os.path.join(project, "build", "rml2ae", proj.name + ".project.txt")
     if os.path.exists(pf):                       # the last build's AE project (the open one in --replace / watch mode)
-        last = open(pf).read().strip()
+        last = open(pf, encoding="utf-8").read().strip()
         if last == "unsaved":
             print("the AE project of the last build is unsaved: save it in AE (Cmd-S), then render again")
             return 1
@@ -208,7 +208,7 @@ def cmd_render(args, flags, single=None):
         print(f"no {aep}: run `ae build` first")
         return 1
     topf = os.path.join(project, "build", "rml2ae", proj.name + ".topcomp.txt")
-    comp = flags.get("comp") or (open(topf).read().strip() if os.path.exists(topf) else proj.default_artboard().name)
+    comp = flags.get("comp") or (open(topf, encoding="utf-8").read().strip() if os.path.exists(topf) else proj.default_artboard().name)
     fps = 25.0
     try:
         chain, _, _ = proj.entry_chain(proj.default_artboard())
@@ -272,7 +272,7 @@ def cmd_diff(args, flags):
         print("After Effects must be running (frames come from the open project)")
         return 1
     topf = os.path.join(project, "build", "rml2ae", proj.name + ".topcomp.txt")
-    top = open(topf).read().strip() if os.path.exists(topf) else main_ab.name
+    top = open(topf, encoding="utf-8").read().strip() if os.path.exists(topf) else main_ab.name
     for p in runner.shots(project, os.path.join(project, "build", "rml2ae"), top, main_ab.name, flags.get("times", [1.0])):
         print("wrote", p)
     return 0

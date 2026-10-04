@@ -138,14 +138,14 @@ def config_path(project):
 def load_config(project):
     p = config_path(project)
     if os.path.exists(p):
-        with open(p) as f:
+        with open(p, encoding="utf-8") as f:
             return json.load(f)
     return {}
 
 
 def save_config(project, cfg):
     os.makedirs(os.path.dirname(config_path(project)), exist_ok=True)
-    with open(config_path(project), "w") as f:
+    with open(config_path(project), "w", encoding="utf-8") as f:
         json.dump(cfg, f, ensure_ascii=False, indent=1)
 
 

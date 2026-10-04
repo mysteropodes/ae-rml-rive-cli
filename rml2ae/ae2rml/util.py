@@ -75,7 +75,7 @@ class IdPool:
         self.map = {}
         if path and os.path.exists(path):
             try:
-                self.map = json.load(open(path))
+                self.map = json.load(open(path, encoding="utf-8"))
             except Exception:
                 self.map = {}
         self.used = set()
@@ -108,7 +108,7 @@ class IdPool:
         if self.path:
             os.makedirs(os.path.dirname(self.path), exist_ok=True)
             keep = {k: v for k, v in self.map.items() if v in self.used}
-            json.dump(keep, open(self.path, "w"), indent=0, sort_keys=True)
+            json.dump(keep, open(self.path, "w", encoding="utf-8"), indent=0, sort_keys=True)
 
 
 # ------------------------------------------------------------------ report
@@ -242,7 +242,7 @@ def _font_index():
                         files.append(os.path.join(root, f))
     stamp = len(files)
     try:
-        c = json.load(open(cache))
+        c = json.load(open(cache, encoding="utf-8"))
         if c.get("stamp") == stamp:
             _FONT_INDEX = c["index"]
             return _FONT_INDEX
@@ -266,7 +266,7 @@ def _font_index():
     _FONT_INDEX = index
     try:
         os.makedirs(os.path.dirname(cache), exist_ok=True)
-        json.dump({"stamp": stamp, "index": index}, open(cache, "w"))
+        json.dump({"stamp": stamp, "index": index}, open(cache, "w", encoding="utf-8"))
     except Exception:
         pass
     return index

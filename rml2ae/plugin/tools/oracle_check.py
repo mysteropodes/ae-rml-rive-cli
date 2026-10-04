@@ -50,7 +50,7 @@ def main(argv):
         i = rest.index("--max-diff")
         max_diff = int(rest[i + 1])
         rest = rest[:i] + rest[i + 2:]
-    renders = json.load(open(os.path.join(ROOT, "rml2ae", "ae2rml", "fxref", "renders.json")))
+    renders = json.load(open(os.path.join(ROOT, "rml2ae", "ae2rml", "fxref", "renders.json"), encoding="utf-8"))
     src = Image.open(SRC)
     tmp = tempfile.mkdtemp(prefix="oracle_")
     src_raw = os.path.join(tmp, "src.rgba")

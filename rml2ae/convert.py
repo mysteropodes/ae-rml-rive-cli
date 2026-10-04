@@ -585,13 +585,13 @@ class Converter:
         self.old_manifest = {}
         if self.incremental_mode and os.path.exists(self.manifest_path):
             try:
-                self.old_manifest = _json.load(open(self.manifest_path))
+                self.old_manifest = _json.load(open(self.manifest_path, encoding="utf-8"))
             except Exception:
                 self.old_manifest = {}
         text, self.manifest = self.render(self.W.text(), self.old_manifest, full=not self.incremental_mode)
         try:
             import json as _json2
-            with open(os.path.join(self.out_dir, self.p.name + ".groups.json"), "w") as gf:
+            with open(os.path.join(self.out_dir, self.p.name + ".groups.json"), "w", encoding="utf-8") as gf:
                 _json2.dump({"layout": self.layout, "groups": self.group_map, "folds": self.fold_opacity, "chains": self.chains, "offsets": self.offsets}, gf)
         except OSError:
             pass
@@ -1889,7 +1889,7 @@ class Converter:
         if os.path.exists(side) and ab is self.main_artboard() and not getattr(self, "_audio_done", False):
             self._audio_done = True
             import json as _json
-            for item in _json.load(open(side)):
+            for item in _json.load(open(side, encoding="utf-8")):
                 if item.get("comp", ab.name) != ab.name:
                     continue
                 path = os.path.join(self.p.dir, item["file"])
@@ -2231,7 +2231,7 @@ fn fs_main(in: VSOut) -> @location(0) vec4<f32> {{
 }}
 """
         shader_path = os.path.join(self.out_dir, f"mesh_{tag}.wgsl")
-        open(shader_path, "w").write(wgsl)
+        open(shader_path, "w", encoding="utf-8").write(wgsl)
         sid = RS.register(shader_path)
         pc = J.var("mpc")
         J(f'var {pc} = app.project.items.addComp({js(el.name + " (mesh)")}, {W}, {H}, 1, {js(max(n - 1, 1) / self.fps)}, FPS); {pc}.parentFolder = SUBS;')

@@ -63,7 +63,7 @@ def main(folder):
                     own.add(p["key"])
     out = {"source": "rive-app/rive-runtime include/rive/generated (MIT)", "types": types, "keys": {str(k): list(v) for k, v in keys.items()}}
     here = os.path.dirname(os.path.abspath(__file__))
-    json.dump(out, open(os.path.join(here, "..", "schema.json"), "w"), indent=0)
+    json.dump(out, open(os.path.join(here, "..", "schema.json"), "w", encoding="utf-8"), indent=0)
     print(len(types), "types,", len(keys), "property keys")
 
 
