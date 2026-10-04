@@ -3,8 +3,10 @@
 Aller-retour entre **Adobe After Effects** et **Rive**, en ligne de commande, via le format texte du
 [Rive CLI](https://rive.app) (`scene.rml`) :
 
-- **ae2rml** — un projet After Effects (`.aep`) devient un projet Rive CLI, sans After Effects (lecture du `.aep` par
-  [py-aep](https://github.com/forticheprod/py-aep) de Fortiche).
+- **ae2rml** — un projet After Effects (`.aep`) devient un projet Rive CLI sans lancer After Effects (lecture du `.aep`
+  par [py-aep](https://github.com/forticheprod/py-aep) de Fortiche). After Effects reste nécessaire une fois pour les
+  expressions aléatoires (`random()`, `wiggle()`, `noise()`) ou compilées (`bake_expressions.jsx`), les projets CS6 à
+  réenregistrer, et le marquage du projet avant `ae pull` (`tag_ae_project.jsx`).
 - **rml2ae** — un projet Rive CLI devient un projet After Effects (une comp par artboard, vraies clés, calques de
   forme, textes, mattes), reconstruit de façon incrémentale ; les retouches faites dans AE reviennent par `ae pull`.
   Un fichier du **Rive Editor** (`.rev`) passe dans After Effects de la même façon, une fois transformé en projet par

@@ -5,8 +5,11 @@
 Round-trip between **Adobe After Effects** and **Rive**, driven from the command line through the
 [Rive CLI](https://rive.app) text format (`scene.rml`):
 
-- **ae2rml** — an After Effects project (`.aep`) becomes a Rive CLI project, without After Effects (the `.aep` is read
-  by [py-aep](https://github.com/forticheprod/py-aep)).
+- **ae2rml** — an After Effects project (`.aep`) becomes a Rive CLI project without launching After Effects (the `.aep`
+  is read by [py-aep](https://github.com/forticheprod/py-aep)). Some things still need After Effects once: expressions
+  using `random()`, `wiggle()`, `noise()` or compiled code are sampled by `bake_expressions.jsx`, projects from CS6 may
+  need re-saving, and `ae pull` needs the project tagged by `tag_ae_project.jsx` (see
+  [ae2rml limits](docs/ae2rml.md#known-limits)).
 - **rml2ae** — a Rive CLI project becomes an After Effects project (one comp per artboard, real keys, shape layers,
   text, mattes), rebuilt incrementally; edits made in AE come back with `ae pull`. A file from the **Rive Editor**
   (`.rev`, or a file in your Rive account) goes to After Effects the same way, once the Rive CLI has turned it into a
@@ -32,7 +35,7 @@ flowchart LR
   RIV["signed .riv<br/>apps and games"]
   WEB["hosted web page"]
 
-  AEP -->|"ae2rml<br/>no AE needed"| RML
+  AEP -->|"ae2rml<br/>reads the .aep"| RML
   COMPS <-->|"rml2ae<br/>ae build / ae pull"| RML
   FX -.-> RML
   FX -.-> SH
@@ -64,7 +67,7 @@ git clone https://github.com/mysteropodes/ae-rml-rive-cli.git && cd ae-rml-rive-
 ## Use
 
 ```bash
-# After Effects -> Rive (no After Effects needed)
+# After Effects -> Rive (After Effects not launched)
 .venv/bin/python -m rml2ae.ae2rml examples/demo.aep out/demo --verify --shot 1 3.5
 rive out/demo                                  # open it in the Rive Viewer
 

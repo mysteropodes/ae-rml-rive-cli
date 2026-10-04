@@ -56,7 +56,7 @@ Verify with `ae doctor` (line "Rive Shader plugin") and, in After Effects, the e
 ```bash
 ae doctor                      # environment
 ae doctor my_project           # plus the project: scene.rml, fonts, artboards
-.venv/bin/python -m rml2ae.ae2rml examples/demo.aep out/demo --verify    # ae2rml, no After Effects needed
+.venv/bin/python -m rml2ae.ae2rml examples/demo.aep out/demo --verify    # ae2rml, After Effects not launched
 ```
 
 Every line should read `[ok]`. Typical fixes: a missing `rive` (see step 2), a missing `ffmpeg`, After Effects not running (only needed for build, watch, pull, diff).
