@@ -31,11 +31,33 @@ def strings(data):
             yield data[off:].decode(enc, "replace")
 
 
+def png_text(data):
+    """A PNG's metadata chunks only (tEXt / iTXt / zTXt): its compressed pixels are random bytes that can look like an
+    e-mail address (a reference render failed on 'jmp@8.wy')."""
+    import struct
+    import zlib
+    out, i = [], 8
+    while i + 8 <= len(data):
+        n, kind = struct.unpack(">I4s", data[i:i + 8])
+        body = data[i + 8:i + 8 + n]
+        if kind in (b"tEXt", b"iTXt"):
+            out.append(body)
+        elif kind == b"zTXt":
+            try:
+                out.append(body.split(b"\0", 1)[0] + b" " + zlib.decompress(body.split(b"\0", 1)[1][1:]))
+            except Exception:
+                out.append(body)
+        i += 12 + n
+    return b"\n".join(out)
+
+
 def scan(path):
     try:
         data = open(path, "rb").read()
     except OSError:
         return []
+    if data[:8] == b"\x89PNG\r\n\x1a\n":
+        data = png_text(data)
     hits = set()
     for text in strings(data):
         for label, pat in PATTERNS:
