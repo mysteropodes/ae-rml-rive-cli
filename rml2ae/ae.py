@@ -326,5 +326,10 @@ def main(argv):
         return 0
 
 
-if __name__ == "__main__":
+def cli():
+    """Console-script entry point (pyproject.toml)."""
     sys.exit(main(sys.argv[1:]))
+
+
+if __name__ == "__main__":
+    cli()

@@ -63,10 +63,18 @@ Every line should read `[ok]`. Typical fixes: a missing `rive` (see step 2), a m
 
 ## Running without the installer
 
+The repository is a Python package (`pyproject.toml`), so `pip` can install it with its commands:
+
 ```bash
-python3 -m venv .venv && .venv/bin/pip install pillow numpy fonttools py-aep
-.venv/bin/python -m rml2ae my_project            # converter only: writes the .jsx and the report
+python3 -m venv .venv && .venv/bin/pip install -e ".[ae2rml]"
+.venv/bin/ae2rml examples/demo.aep out/demo      # .aep -> Rive CLI project (same as python -m rml2ae.ae2rml)
+.venv/bin/rml2ae my_project                      # converter only: writes the .jsx and the report
+.venv/bin/ae doctor                              # the `ae` command (same as rml2ae/bin/ae)
 ```
+
+Extras: `ae2rml` (py-aep, to read `.aep` files), `wgpu` (offline checks of the WGSL effect library), `dev` (py-aep and
+ruff, what the CI runs). `-e` keeps the install pointing at the repository, so edits and `git pull` take effect at once;
+the installer (`./install.sh`) is unchanged and does not need this.
 
 The `ae` wrapper (`rml2ae/bin/ae`) uses `.venv/bin/python` at the repository root if present, otherwise `python3`.
 

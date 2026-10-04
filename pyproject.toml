@@ -1,0 +1,43 @@
+[build-system]
+requires = ["setuptools>=64"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "ae-rml-rive-cli"
+version = "0.1.0"
+description = "After Effects <-> Rive round trip from the command line, through the Rive CLI text format (scene.rml)"
+readme = "README.md"
+license = { text = "MIT" }
+requires-python = ">=3.9"
+dependencies = ["pillow", "numpy", "fonttools"]
+
+[project.optional-dependencies]
+# .aep reading for ae2rml (no After Effects needed)
+ae2rml = ["py-aep"]
+# offline checks of the WGSL effect library (python -m rml2ae.ae2rml.fxlib check)
+wgpu = ["wgpu"]
+dev = ["py-aep", "ruff"]
+
+[project.scripts]
+ae = "rml2ae.ae:cli"
+ae2rml = "rml2ae.ae2rml.__main__:cli"
+rml2ae = "rml2ae.__main__:cli"
+
+[project.urls]
+Homepage = "https://github.com/mysteropodes/ae-rml-rive-cli"
+
+[tool.setuptools.packages.find]
+include = ["rml2ae*"]
+
+[tool.setuptools.package-data]
+rml2ae = [
+  "schema.json",
+  "ae2rml/fxlib/*.wgsl",
+  "ae2rml/fxlib/*.json",
+  "ae2rml/luau/*.luau",
+  "panel/*.jsx",
+  "tests/cases/features/*",
+]
+
+[tool.ruff]
+target-version = "py39"
