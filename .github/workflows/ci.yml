@@ -161,9 +161,29 @@ jobs:
       - run: python -m rml2ae.tests.sim_incremental
       - name: rml2ae finds no After Effects here, and says so
         run: python -m rml2ae.ae doctor; exit 0
-      # what Rive publishes: install.ps1 uses a Windows build of the CLI when the manifest has one
-      - name: Rive CLI platforms in releases.rive.app
-        run: (Invoke-RestMethod https://releases.rive.app/cli/latest/manifest.json).artifacts.PSObject.Properties.Name
+      # the Rive CLI for Windows, fetched the way install.ps1 does (manifest, sha256, tar), then --verify on the demo
+      - name: Install the Rive CLI (windows-x64) from releases.rive.app
+        run: |
+          $man = Invoke-RestMethod https://releases.rive.app/cli/latest/manifest.json
+          $man.artifacts.PSObject.Properties.Name
+          $key = $man.artifacts.PSObject.Properties.Name | Where-Object { $_ -match "^win" -and $_ -match "x64|x86_64|amd64" } | Select-Object -First 1
+          if (-not $key) { throw "no Windows build in Rive's manifest" }
+          $art = $man.artifacts.$key
+          $file = Join-Path $env:RUNNER_TEMP (Split-Path $art.path -Leaf)
+          Invoke-WebRequest -Uri "https://releases.rive.app/cli/$($art.path)" -OutFile $file -UseBasicParsing
+          $got = (Get-FileHash -Algorithm SHA256 $file).Hash.ToLower()
+          if ($got -ne $art.sha256.ToLower()) { throw "sha256 $got differs from the manifest" }
+          $dir = Join-Path $env:RUNNER_TEMP "rive"
+          New-Item -ItemType Directory -Force -Path $dir | Out-Null
+          tar -xf $file -C $dir
+          $exe = Get-ChildItem -Path $dir -Recurse -Filter "rive.exe" | Select-Object -First 1
+          if (-not $exe) { Get-ChildItem -Recurse $dir | Select-Object -First 20 FullName; throw "no rive.exe in the archive" }
+          $exe.DirectoryName | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
+      - run: rive --version
+      - name: ae2rml --verify on the demo with the Windows Rive CLI
+        run: |
+          python -m rml2ae.ae2rml examples/demo.aep out/demo-verify --verify | Tee-Object -FilePath out-verify.txt
+          if (-not (Select-String -Path out-verify.txt -Pattern "rive --verify: ok" -Quiet)) { exit 1 }
       # the plugin's GPU module built with MSVC by build.ps1 (wgpu-native downloaded, sha256 checked), then the same
       # comparison as on Linux, on the software Direct3D 12 adapter (WARP): the runner has no GPU
       - name: build.ps1 -GpuOnly (MSVC, wgpu-native)
