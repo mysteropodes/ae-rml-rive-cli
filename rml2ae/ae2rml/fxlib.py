@@ -576,6 +576,10 @@ def check(slug, rive=False, holdout=False, keep=False):
         name = f"{slug}_{r['k']}"
         o = os.path.join(outd, name + ".png")
         row = {"setting": name, "held": r["held"], "vals": r["vals"]}
+        if not os.path.exists(ref):                      # spec'd, not rendered in After Effects yet
+            row["missing"] = True
+            rows.append(row)
+            continue
         try:
             run_offline(slug, r["vals"], src, o, map_png=mp)
             row["offline"] = compare(ref, o)
@@ -641,7 +645,13 @@ def regress(slugs=None, update=False, summary=None):
         problems += manifest_problems(slug)
         new[slug] = {}
         for row in check(slug, holdout=True):
-            got, name = row["offline"], row["setting"]
+            name = row["setting"]
+            if row.get("missing"):
+                line = f"| {slug} | {name}{' (held out)' if row['held'] else ''} | - | - | - | no After Effects reference yet |"
+                rows_md.append(line)
+                print(line, flush=True)
+                continue
+            got = row["offline"]
             new[slug][name] = got
             ref = base.get(slug, {}).get(name)
             verdict = "ok"

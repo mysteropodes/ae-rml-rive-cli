@@ -1,0 +1,27 @@
+{
+ "slug": "offset",
+ "aeMatchName": "ADBE Offset",
+ "wgsl": "ae_offset.wgsl",
+ "passes": 1,
+ "textures": {},
+ "params": [
+  {
+   "ae": 1,
+   "field": "shift",
+   "kind": "point",
+   "default": [
+    320,
+    180
+   ]
+  },
+  {
+   "ae": 2,
+   "field": "blend",
+   "kind": "number",
+   "default": 0
+  }
+ ],
+ "status": "unverified",
+ "auto": false,
+ "notes": "Not yet measured against After Effects: written from the effect's definition. Status stays 'unverified' and auto false until fxref renders are measured (fxlib check <slug> --rive --holdout). Parameter indices come from the After Effects parameter order as documented by Adobe; `render_refs.py --params` records the real list."
+}

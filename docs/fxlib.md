@@ -169,7 +169,7 @@ Everything needed to measure an effect is in the repository:
 
 ## Effect table
 
-37 effects: 27 exact, 8 close, 2 approx. "Auto" is whether ae2rml applies the effect without being asked; the two effects
+37 measured effects: 27 exact, 8 close, 2 approx, plus 7 unverified ones (below the table). "Auto" is whether ae2rml applies the effect without being asked; the two effects
 marked `no` are measured to be further from After Effects than leaving the effect out, so they remain a
 `<!-- ae: effect ... -->` comment plus an entry in `effects_todo.json`.
 
@@ -212,6 +212,21 @@ marked `no` are measured to be further from After Effects than leaving the effec
 | Tint | `ADBE Tint` | `tint` | 1 | exact | yes |  |
 | Tritone | `ADBE Tritone` | `tritone` | 1 | exact | yes |  |
 | Turbulent Displace | `ADBE Turbulent Displace` | `turbulent_displace` | 1 | approx | no | After Effects noise is proprietary: same scale and strength, different pattern |
+
+**Unverified effects.** Written from each effect's definition and checked to compile and run, but not yet measured
+against After Effects renders: `"status": "unverified"`, `"auto": false` (ae2rml leaves them out unless asked). Their
+visible settings are in `fxref/spec.py`; render them on a Mac (`render_refs.py --params <slug>` first, to record the
+real parameter list, then `render_refs.py <slug>`), add held-out settings, and measure.
+
+| Effect | Match name | Slug | Open questions to measure |
+|---|---|---|---|
+| Channel Mixer | `ADBE Channel Mixer` | `channel_mixer` | Parameter order; rounding of the constants |
+| Set Channels | `ADBE Set Channels` | `set_channels` | Only the layer itself as source; Luminance weights, HLS of greys |
+| Offset | `ADBE Offset` | `offset` | Sub-pixel filtering of fractional shifts |
+| Radial Wipe | `ADBE Radial Wipe` | `radial_wipe` | Feather law (distance to the edge ray here) |
+| Venetian Blinds | `ADBE Venetian Blinds` | `venetian_blinds` | Stripe origin and direction convention, feather law |
+| Photo Filter | `ADBE Photo Filter` | `photo_filter` | Menu index of Custom; preset colours; luminosity law |
+| Vibrance | `ADBE Vibrance` | `vibrance` | Approximation: Adobe's vibrance law is undocumented |
 Notes:
 
 - **Gaussian Blur (legacy)** and **Fast Blur (legacy)** share the same kernel (confirmed on a third setting).

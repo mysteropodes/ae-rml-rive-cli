@@ -1525,5 +1525,252 @@
   },
   "held": true,
   "png": "ae_holdout/cc_scale_wipe_2.png"
+ },
+ {
+  "slug": "channel_mixer",
+  "mn": "ADBE Channel Mixer",
+  "k": 0,
+  "vals": {
+   "1": 50,
+   "2": 50,
+   "6": 80,
+   "12": 20
+  },
+  "held": false,
+  "png": "ae/channel_mixer_0.png"
+ },
+ {
+  "slug": "channel_mixer",
+  "mn": "ADBE Channel Mixer",
+  "k": 1,
+  "vals": {
+   "13": 1,
+   "1": 30,
+   "2": 59,
+   "3": 11
+  },
+  "held": false,
+  "png": "ae/channel_mixer_1.png"
+ },
+ {
+  "slug": "channel_mixer",
+  "mn": "ADBE Channel Mixer",
+  "k": 2,
+  "vals": {
+   "5": -50,
+   "9": 120,
+   "4": 10
+  },
+  "held": false,
+  "png": "ae/channel_mixer_2.png"
+ },
+ {
+  "slug": "set_channels",
+  "mn": "ADBE Set Channels",
+  "k": 0,
+  "vals": {
+   "2": 2,
+   "4": 3,
+   "6": 1
+  },
+  "held": false,
+  "png": "ae/set_channels_0.png"
+ },
+ {
+  "slug": "set_channels",
+  "mn": "ADBE Set Channels",
+  "k": 1,
+  "vals": {
+   "2": 5,
+   "4": 6,
+   "6": 7,
+   "8": 9
+  },
+  "held": false,
+  "png": "ae/set_channels_1.png"
+ },
+ {
+  "slug": "set_channels",
+  "mn": "ADBE Set Channels",
+  "k": 2,
+  "vals": {
+   "2": 8,
+   "4": 10,
+   "6": 4
+  },
+  "held": false,
+  "png": "ae/set_channels_2.png"
+ },
+ {
+  "slug": "offset",
+  "mn": "ADBE Offset",
+  "k": 0,
+  "vals": {
+   "1": [
+    400,
+    250
+   ]
+  },
+  "held": false,
+  "png": "ae/offset_0.png"
+ },
+ {
+  "slug": "offset",
+  "mn": "ADBE Offset",
+  "k": 1,
+  "vals": {
+   "1": [
+    100.5,
+    40.25
+   ],
+   "2": 30
+  },
+  "held": false,
+  "png": "ae/offset_1.png"
+ },
+ {
+  "slug": "radial_wipe",
+  "mn": "ADBE Radial Wipe",
+  "k": 0,
+  "vals": {
+   "1": 30
+  },
+  "held": false,
+  "png": "ae/radial_wipe_0.png"
+ },
+ {
+  "slug": "radial_wipe",
+  "mn": "ADBE Radial Wipe",
+  "k": 1,
+  "vals": {
+   "1": 50,
+   "2": 45,
+   "4": 2,
+   "5": 20
+  },
+  "held": false,
+  "png": "ae/radial_wipe_1.png"
+ },
+ {
+  "slug": "radial_wipe",
+  "mn": "ADBE Radial Wipe",
+  "k": 2,
+  "vals": {
+   "1": 40,
+   "3": [
+    200,
+    120
+   ],
+   "4": 3
+  },
+  "held": false,
+  "png": "ae/radial_wipe_2.png"
+ },
+ {
+  "slug": "venetian_blinds",
+  "mn": "ADBE Venetian Blinds",
+  "k": 0,
+  "vals": {
+   "1": 40
+  },
+  "held": false,
+  "png": "ae/venetian_blinds_0.png"
+ },
+ {
+  "slug": "venetian_blinds",
+  "mn": "ADBE Venetian Blinds",
+  "k": 1,
+  "vals": {
+   "1": 60,
+   "2": 30,
+   "3": 25,
+   "4": 5
+  },
+  "held": false,
+  "png": "ae/venetian_blinds_1.png"
+ },
+ {
+  "slug": "venetian_blinds",
+  "mn": "ADBE Venetian Blinds",
+  "k": 2,
+  "vals": {
+   "1": 50,
+   "2": 90,
+   "3": 16
+  },
+  "held": false,
+  "png": "ae/venetian_blinds_2.png"
+ },
+ {
+  "slug": "photo_filter",
+  "mn": "ADBE Photo Filter",
+  "k": 0,
+  "vals": {},
+  "held": false,
+  "png": "ae/photo_filter_0.png"
+ },
+ {
+  "slug": "photo_filter",
+  "mn": "ADBE Photo Filter",
+  "k": 1,
+  "vals": {
+   "1": 12,
+   "3": 60
+  },
+  "held": false,
+  "png": "ae/photo_filter_1.png"
+ },
+ {
+  "slug": "photo_filter",
+  "mn": "ADBE Photo Filter",
+  "k": 2,
+  "vals": {
+   "1": 4,
+   "3": 80,
+   "4": 0
+  },
+  "held": false,
+  "png": "ae/photo_filter_2.png"
+ },
+ {
+  "slug": "vibrance",
+  "mn": "ADBE Vibrance",
+  "k": 0,
+  "vals": {
+   "1": 60
+  },
+  "held": false,
+  "png": "ae/vibrance_0.png"
+ },
+ {
+  "slug": "vibrance",
+  "mn": "ADBE Vibrance",
+  "k": 1,
+  "vals": {
+   "1": -50
+  },
+  "held": false,
+  "png": "ae/vibrance_1.png"
+ },
+ {
+  "slug": "vibrance",
+  "mn": "ADBE Vibrance",
+  "k": 2,
+  "vals": {
+   "1": 30,
+   "2": 40
+  },
+  "held": false,
+  "png": "ae/vibrance_2.png"
+ },
+ {
+  "slug": "vibrance",
+  "mn": "ADBE Vibrance",
+  "k": 3,
+  "vals": {
+   "2": -80
+  },
+  "held": false,
+  "png": "ae/vibrance_3.png"
  }
 ]

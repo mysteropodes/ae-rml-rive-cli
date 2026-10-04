@@ -3796,7 +3796,7 @@ class LayerBuild:
         lib = fxlib_effects()
         for fx in fxs:
             m = lib[fx.match_name]
-            self.note("approx" if m.get("status") == "approx" else "converted", clean(fx.name),
+            self.note("approx" if m.get("status") in ("approx", "unverified") else "converted", clean(fx.name),
                       f"adjustment layer {fx.match_name} → WGSL ({m['slug']}, {m.get('status', 'unverified')} vs AE) over "
                       f"the layers below (opacity / in-out → mix" + (f", blend {bm.lower()}" if blend else "") + ")")
         if self.mask_items():
@@ -3860,7 +3860,7 @@ class LayerBuild:
         node = self.fx_node(fxs, sub, ("layer",), pad=self.fx_grow(fxs))
         for fx in fxs:
             m = lib[fx.match_name]
-            self.note("approx" if m.get("status") == "approx" else "converted", clean(fx.name),
+            self.note("approx" if m.get("status") in ("approx", "unverified") else "converted", clean(fx.name),
                       f"{fx.match_name} → WGSL ({m['slug']}, {m.get('status', 'unverified')} vs AE) in the layer's effect "
                       f"node ({len(fxs)} effect{'s' if len(fxs) > 1 else ''}, AE order) over a sub-artboard of its content")
         if self.blend and self.blend != "srcOver":
