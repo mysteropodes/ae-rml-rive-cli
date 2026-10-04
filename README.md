@@ -1,5 +1,7 @@
 # AE RML via CLI Rive
 
+[![CI](https://github.com/mysteropodes/ae-rml-rive-cli/actions/workflows/ci.yml/badge.svg)](https://github.com/mysteropodes/ae-rml-rive-cli/actions/workflows/ci.yml)
+
 Round-trip between **Adobe After Effects** and **Rive**, driven from the command line through the
 [Rive CLI](https://rive.app) text format (`scene.rml`):
 
@@ -75,6 +77,14 @@ Known limits: After Effects' noise-based and some third-party effects have no ex
 renderers, tracking and audio mixing are not converted; Luau-scripted Rive content is replayed into After Effects as
 image sequences; the plugin is not signed with an Apple Developer ID (allow it once in System Settings › Privacy &
 Security). A prebuilt plugin is attached to the GitHub releases.
+
+## Checks
+
+GitHub Actions (Linux, no After Effects) runs on every pull request: `python -m rml2ae.tests.sim_incremental`, the
+conversion of `examples/demo.aep` and `rive --verify` on the result, `ruff` (errors only), and
+`python3 tools/check_private.py`, which fails on local user paths (`/Users/…`, `/Volumes/…`) or e-mail addresses in
+any tracked file — `.aep` files included, since After Effects stores absolute footage paths in them. Run it before
+adding an example.
 
 ## Agent skills
 
