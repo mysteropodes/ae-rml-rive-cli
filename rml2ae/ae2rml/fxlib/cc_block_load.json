@@ -1,0 +1,36 @@
+{
+ "slug": "cc_block_load",
+ "aeMatchName": "CC Block Load",
+ "wgsl": "ae_cc_block_load.wgsl",
+ "passes": 1,
+ "textures": {},
+ "params": [
+  {
+   "ae": 1,
+   "field": "completion",
+   "kind": "number",
+   "default": 0
+  },
+  {
+   "ae": 2,
+   "field": "scanlines",
+   "kind": "bool",
+   "default": 0
+  },
+  {
+   "ae": 3,
+   "field": "cleared",
+   "kind": "bool",
+   "default": 1
+  },
+  {
+   "ae": 4,
+   "field": "bilinear",
+   "kind": "bool",
+   "default": 0
+  }
+ ],
+ "status": "unverified",
+ "auto": false,
+ "notes": "Not yet measured against After Effects.  Parameter indices follow the After Effects parameter order as documented by Adobe; `render_refs.py --params` records the real list."
+}

@@ -173,7 +173,7 @@ Everything needed to measure an effect is in the repository:
 
 What is still missing, effect by effect, is in [fxlib-roadmap.md](fxlib-roadmap.md).
 
-37 measured effects: 27 exact, 8 close, 2 approx, plus 73 unverified ones (below the table). "Auto" is whether ae2rml applies the effect without being asked; the two effects
+37 measured effects: 27 exact, 8 close, 2 approx, plus 86 unverified ones (below the table). "Auto" is whether ae2rml applies the effect without being asked; the two effects
 marked `no` are measured to be further from After Effects than leaving the effect out, so they remain a
 `<!-- ae: effect ... -->` comment plus an entry in `effects_todo.json`.
 
@@ -297,6 +297,20 @@ real parameter list, then `render_refs.py <slug>`), add held-out settings, and m
 | Smart Blur | `ADBE Smart Blur` | `smart_blur` | Threshold test; edge modes |
 | Reduce Interlace Flicker | `ADBE Reduce Interlace Flicker` | `reduce_interlace_flicker` | Kernel |
 | Advanced Spill Suppressor | `ADBE Spill2` | `advanced_spill_suppressor` | Standard method only |
+| Levels (Individual Controls) | `ADBE Pro Levels2` | `levels_individual` | Parameter indices of the channel groups; order of channel and master levels |
+| Change to Color | `ADBE Change To Color` | `change_to_color` | Tolerance and softness law in HLS; Change modes |
+| Channel Combiner | `ADBE Channel Combiner` | `channel_combiner` | From / To menu order; YUV constants; the layer itself as source only |
+| Color Range | `ADBE Color Range` | `color_range` | Lab scaling; Fuzziness law; parameter positions |
+| Matte Choker | `ADBE Matte Choker` | `matte_choker` | Softness to sigma; choke threshold law; Iterations |
+| CC Kernel | `CC Kernel` | `cc_kernel` | Parameter list (Divider, Absolute Value); edge handling |
+| CC Vector Blur | `CC Vector Blur` | `cc_vector_blur` | Direction per Type; length law; the layer itself as vector map only |
+| CC Bend It | `CC Bend It` | `cc_bend_it` | Bend units; what happens past End; Distort modes |
+| CC Griddler | `CC Griddler` | `cc_griddler` | Tile size reference; overlaps without Cut Tiles |
+| CC Simple Wire Removal | `CC Simple Wire Removal` | `cc_simple_wire_removal` | Removal styles; Slope law; Frame Offset (time) not modelled |
+| Lens Flare | `ADBE Lens Flare` | `lens_flare` | A stylised flare: AE's elements are not reproduced |
+| CC Grid Wipe | `CC Grid Wipe` | `cc_grid_wipe` | Order of the cells; shapes; Border |
+| CC Block Load | `CC Block Load` | `cc_block_load` | Block levels and fill order; Scanlines |
+
 Notes:
 
 - **Gaussian Blur (legacy)** and **Fast Blur (legacy)** share the same kernel (confirmed on a third setting).

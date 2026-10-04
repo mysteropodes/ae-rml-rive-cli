@@ -26,7 +26,7 @@ plug-in. Some can come later through the Rive scene itself rather than as a shad
 | CC Cross Blur | 🟡 | lot 4 |
 | CC Radial Blur | ✅ | |
 | CC Radial Fast Blur | ✅ | |
-| CC Vector Blur | ⬜ | |
+| CC Vector Blur | 🟡 | lot 8; the layer itself as vector map |
 | Channel Blur | 🟡 | lot 4 |
 | Compound Blur | ⬜ | needs a blur layer |
 | Directional Blur | ✅ | |
@@ -47,7 +47,7 @@ plug-in. Some can come later through the Rive scene itself rather than as a shad
 | Blend | ⬜ | needs a second layer |
 | Calculations | ⬜ | needs a second layer |
 | CC Composite | ⬜ | parameter list already measured |
-| Channel Combiner | ⬜ | |
+| Channel Combiner | 🟡 | lot 8; the layer itself as source |
 | Compound Arithmetic | ⬜ | needs a second layer |
 | Invert | ✅ | |
 | Minimax | ✅ | |
@@ -67,10 +67,10 @@ plug-in. Some can come later through the Rive scene itself rather than as a shad
 | Broadcast Colors | 🟡 | lot 5 |
 | CC Color Neutralizer | ⬜ | |
 | CC Color Offset | 🟡 | lot 3 |
-| CC Kernel | ⬜ | |
+| CC Kernel | 🟡 | lot 8 |
 | CC Toner | 🟡 | lot 3 |
 | Change Color | 🟡 | lot 3 |
-| Change to Color | ⬜ | tolerance is a parameter group |
+| Change to Color | 🟡 | lot 8 |
 | Channel Mixer | 🟡 | lot 1 |
 | Color Balance | 🟡 | lot 3 |
 | Color Balance (HLS) | ✅ | |
@@ -84,7 +84,7 @@ plug-in. Some can come later through the Rive scene itself rather than as a shad
 | Hue/Saturation | ✅ | |
 | Leave Color | 🟡 | lot 2 |
 | Levels | ✅ | |
-| Levels (Individual Controls) | ⬜ | same maths as Levels, one parameter per channel |
+| Levels (Individual Controls) | 🟡 | lot 8 (the measured Levels law per channel) |
 | Lumetri Color | ⛔ | too large for now (LUTs, curves, wheels); later |
 | Photo Filter | 🟡 | lot 1 |
 | PS Arbitrary Map | ⬜ | |
@@ -100,10 +100,11 @@ plug-in. Some can come later through the Rive scene itself rather than as a shad
 |---|---|---|
 | Bezier Warp | ⬜ | |
 | Bulge | 🟡 | lot 2 |
-| CC Bend It, CC Bender | ⬜ | |
+| CC Bend It | 🟡 | lot 8 |
+| CC Bender | ⬜ | |
 | CC Blobbylize | ⬜ | |
 | CC Flo Motion | ⬜ | |
-| CC Griddler | ⬜ | |
+| CC Griddler | 🟡 | lot 8 |
 | CC Lens | 🟡 | lot 6 |
 | CC Page Turn | ⬜ | |
 | CC Power Pin | 🟡 | lot 6 (the measured Corner Pin law) |
@@ -157,7 +158,7 @@ plug-in. Some can come later through the Rive scene itself rather than as a shad
 | Fractal | ⬜ | |
 | Gradient Ramp | ✅ | |
 | Grid | 🟡 | lot 4 |
-| Lens Flare | ⬜ | |
+| Lens Flare | 🟡 | lot 8 (stylised: AE's flare elements are not reproduced) |
 | Paint Bucket | ⬜ | flood fill |
 | Radio Waves | ⛔ | particles over time |
 | Scribble, Stroke, Vegas, Write-on | ⛔ | mask- or path-driven |
@@ -167,10 +168,10 @@ plug-in. Some can come later through the Rive scene itself rather than as a shad
 | Effect | | Note |
 |---|---|---|
 | Advanced Spill Suppressor | 🟡 | lot 7 |
-| CC Simple Wire Removal | ⬜ | |
+| CC Simple Wire Removal | 🟡 | lot 8 (Frame Offset needs other frames) |
 | Color Difference Key | ⬜ | |
 | Color Key | 🟡 | lot 3 |
-| Color Range | ⬜ | |
+| Color Range | 🟡 | lot 8 |
 | Difference Matte | ⬜ | needs a second layer |
 | Extract | 🟡 | lot 3 |
 | Inner/Outer Key | ⛔ | mask-driven |
@@ -183,7 +184,7 @@ plug-in. Some can come later through the Rive scene itself rather than as a shad
 
 | Effect | | Note |
 |---|---|---|
-| Matte Choker | ⬜ | |
+| Matte Choker | 🟡 | lot 8 |
 | Refine Hard Matte, Refine Soft Matte | ⛔ | motion-aware |
 | Simple Choker | ✅ | close; more renders requested |
 
@@ -217,7 +218,7 @@ plug-in. Some can come later through the Rive scene itself rather than as a shad
 |---|---|---|
 | Brush Strokes | ⬜ | random strokes |
 | Cartoon | ⬜ | |
-| CC Block Load | ⬜ | |
+| CC Block Load | 🟡 | lot 8 |
 | CC Burn Film | ⬜ | |
 | CC Glass | ⬜ | |
 | CC HexTile | ⬜ | |
@@ -247,7 +248,7 @@ plug-in. Some can come later through the Rive scene itself rather than as a shad
 | Block Dissolve | 🟡 | lot 5 (random pattern differs from AE) |
 | Card Wipe | ⛔ | 3D cards |
 | CC Glass Wipe, CC Image Wipe | ⬜ | need a second layer |
-| CC Grid Wipe | ⬜ | |
+| CC Grid Wipe | 🟡 | lot 8 |
 | CC Jaws | 🟡 | lot 7 |
 | CC Light Wipe | 🟡 | lot 7 |
 | CC Line Sweep | 🟡 | lot 7 |
