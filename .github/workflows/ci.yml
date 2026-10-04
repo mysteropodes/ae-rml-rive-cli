@@ -1,0 +1,95 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  private-data:
+    name: No private data
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: python tools/check_private.py
+
+  lint:
+    name: Lint (ruff, errors only)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install ruff
+      # syntax errors, invalid comparisons, misplaced statements, undefined names
+      - run: ruff check --select E9,F63,F7,F82 --target-version py39 --output-format=github .
+
+  tests:
+    name: Tests (Python ${{ matrix.python }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python: ["3.9", "3.12"]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python }}
+      - run: pip install pillow numpy fonttools py-aep
+      - name: rml2ae incremental rebuild (dry run, no After Effects)
+        run: python -m rml2ae.tests.sim_incremental
+      - name: ae2rml converts examples/demo.aep
+        run: |
+          python -m rml2ae.ae2rml examples/demo.aep out/demo
+          test -s out/demo/scene.rml
+          grep -q "unsupported: 0" out/demo/build/ae2rml/report.md
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: demo-rive-py${{ matrix.python }}
+          path: out/demo
+
+  rive-verify:
+    name: Rive CLI --verify
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install pillow numpy fonttools py-aep
+      # The Rive CLI is never stored in this repository: it comes from Rive's public manifest, sha256 checked
+      # (the same source as rml2ae/install.sh and the Homebrew cask).
+      - name: Install the Rive CLI (linux-x64) from releases.rive.app
+        run: |
+          set -euo pipefail
+          man="$(curl -fsSL https://releases.rive.app/cli/latest/manifest.json)"
+          path="$(printf '%s' "$man" | python -c "import json,sys; print(json.load(sys.stdin)['artifacts']['linux-x64']['path'])")"
+          sum="$(printf '%s' "$man" | python -c "import json,sys; print(json.load(sys.stdin)['artifacts']['linux-x64']['sha256'])")"
+          tmp="$(mktemp -d)"
+          curl -fsSL "https://releases.rive.app/cli/$path" -o "$tmp/rive.tar.gz"
+          echo "$sum  $tmp/rive.tar.gz" | sha256sum -c -
+          tar -xzf "$tmp/rive.tar.gz" -C "$tmp"
+          mkdir -p "$HOME/.rive/bin"
+          install -m 755 "$(find "$tmp" -type f -name rive | head -1)" "$HOME/.rive/bin/rive"
+          echo "$HOME/.rive/bin" >> "$GITHUB_PATH"
+      # the Linux build links EGL/GL even headless; Mesa provides them (and software Vulkan, lavapipe) on the runner
+      - name: Rive CLI runtime libraries (Mesa)
+        run: |
+          sudo apt-get update -q
+          sudo apt-get install -y -q --no-install-recommends libegl1 libgl1 libgles2 libvulkan1 mesa-vulkan-drivers libegl-mesa0
+          ldd "$HOME/.rive/bin/rive" | grep "not found" && exit 1 || true
+      - run: rive --version
+      - name: Convert examples/demo.aep and verify it with the Rive CLI
+        run: |
+          python -m rml2ae.ae2rml examples/demo.aep out/demo --verify | tee out-verify.txt
+          grep -q "rive --verify: ok" out-verify.txt
