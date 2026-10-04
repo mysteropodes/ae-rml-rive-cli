@@ -1280,11 +1280,63 @@ class CompBuild:
                                   propertyValue=float(d[0] if isinstance(d, list) else d)))
                     if ap is not None:
                         lb.put(el, "propertyValue", ap, None, force=True)
+            if "map" in m.get("textures", {}).values():
+                self.bind_map_layer(sd, lb, fx, m, i, sub, key)
             if m.get("notes"):
                 sd.comments.append(f"fxlib {m['slug']}: {m['notes']}")
         if animated_colors:
             self.conv.report.add(self.scope, "approx", owner.name, f"animated colour ({', '.join(animated_colors)}): its first value is used")
         return sd
+
+    def bind_map_layer(self, sd, lb, fx, m, i, sub, key):
+        """an effect that reads a second layer (the shader's `mapTex`; manifest `textureParams.mapTex` = the AE position of
+        its layer parameter): bind the node's e<i>_mapSource to an artboard showing that layer's SOURCE (AE effects read a
+        layer's source, before its masks, effects and transform). A precomp -> its comp artboard; a still image -> a
+        sub-artboard with the image; the layer itself (AE's default) -> the effect's own source artboard."""
+        from .fxlib import param_match_name
+        conv = self.conv
+        idx = (m.get("textureParams") or {}).get("mapTex")
+        if idx is None:
+            return
+        try:
+            num = int(param_match_name(fx.match_name, idx).split("-")[-1])
+        except ValueError:
+            num = int(idx)
+        P = {int(getattr(p, "match_name", "0-0").split("-")[-1]): p for p in lb.fx_params(fx)
+             if getattr(p, "match_name", "").startswith(fx.match_name + "-")}
+        q = P.get(num)
+        try:
+            ref = int(round(tonum(q.value))) if q is not None else 0
+        except Exception:
+            ref = 0
+        layers = self.layers
+        target = layers[ref - 1] if 1 <= ref <= len(layers) else None
+        what, aid = None, None
+        if target is None or target is lb.L:
+            aid, what = sub.ab.id, "the layer itself"
+        else:
+            src = getattr(target, "source", None)
+            if src is not None and hasattr(src, "layers"):
+                aid, what = conv.comp_build(src).ab.id, f"precomp '{clean(target.name)}'"
+            elif src is not None and type(getattr(src, "main_source", None)).__name__ == "FileSource" \
+                    and getattr(src.main_source, "is_still", True):
+                res = conv.image_asset(src, target)
+                if res:
+                    w, h = float(getattr(src, "width", 0) or res[1]), float(getattr(src, "height", 0) or res[2])
+                    fa = FxArtboard(self, (lb.L.id, "map", i, *key), f"{self.scope} · {clean(target.name)} · map", w, h)
+                    img = E("Image", id=conv.ids.key("comp", self.kid, "fxmap", lb.L.id, i, *key), name=clean(target.name),
+                            assetId=res[0], originX=0.0, originY=0.0)
+                    if res[1] and abs(res[1] - w) > 0.5:
+                        img.set("scaleX", w / res[1]).set("scaleY", h / res[2] if res[2] else 1.0)
+                    fa.ab.add(img)
+                    aid, what = fa.ab.id, f"image '{clean(target.name)}'"
+        if aid is None:
+            conv.report.add(self.scope, "approx", clean(fx.name),
+                            f"map layer '{clean(target.name)}' ({type(getattr(target, 'source', None)).__name__}): only "
+                            "precomps, still images and the layer itself can be bound; the map is empty")
+            return
+        sd.add(E("ScriptInputArtboard", id=lb.id("wgsl", *key, "e", i, "map"), name=f"e{i}_mapSource", artboardId=aid))
+        conv.report.add(self.scope, "converted", clean(fx.name), f"map layer: {what}")
 
     def is_audio(self, L):
         src = getattr(L, "source", None)

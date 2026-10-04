@@ -630,6 +630,8 @@ def manifest_problems(slug):
         for p in m.get("params", []):
             if p.get("ae") not in idx:
                 out.append(f"{slug}: param ae {p.get('ae')} is not a parameter of {m['aeMatchName']}")
+    if "map" in m.get("textures", {}).values() and not isinstance((m.get("textureParams") or {}).get("mapTex"), int):
+        out.append(f"{slug}: reads a second layer (mapTex) but has no textureParams.mapTex (the AE position of its layer parameter)")
     if m.get("status") not in ("exact", "close", "approx", "unverified"):
         out.append(f"{slug}: unknown status {m.get('status')!r}")
     return out
