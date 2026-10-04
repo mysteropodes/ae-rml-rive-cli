@@ -1,31 +1,31 @@
 #!/usr/bin/env python3
-"""riv_measure — mesurer un `.riv` de référence : timing, jeu, interactions.
+"""riv_measure — measure a reference `.riv`: timing, acting, interactions.
 
-Pourquoi du Python ici : le CLI Rive **compile** RML → `.riv` et `rive inspect` lit un *projet* RML
-(`rive <fichier>.riv --verify` répond « no Rive project … (no rive.yaml) »). Il n'y a pas de commande
-`decode`/`dump` : pour mesurer un `.riv` étranger il faut un lecteur du format, et ce lecteur est
-`rml2ae.tools.riv_curves`. Ce module est la couche de **mesure** posée dessus — il ne produit pas de scène,
-il ne sert qu'à lire un fichier de référence pour en tirer des principes (RML, courbes, durées).
+Why Python here: the Rive CLI **compiles** RML → `.riv` and `rive inspect` reads an RML *project*
+(`rive <file>.riv --verify` answers "no Rive project … (no rive.yaml)"). There is no
+`decode`/`dump` command: to measure a foreign `.riv` you need a reader for the format, and that reader is
+`rml2ae.tools.riv_curves`. This module is the **measurement** layer on top of it — it produces no scene,
+it only reads a reference file to draw principles from it (RML, curves, durations).
 
-Trois lectures, un seul parse par fichier :
+Three readings, a single parse per file:
 
-  · `timing`   — quelles courbes, quelles durées, quels staggers, sparse vs baké
-  · `acting`   — posé vs glissé, cadence de poses, temps tenu, anticipation, rebonds, déformation, scripts
-  · `interact` — listeners, types d'entrée, entrées SM/ViewModel, fondus, exit time, paires in/out
+  · `timing`   — which curves, which durations, which staggers, sparse vs baked
+  · `acting`   — posed vs tweened, pose rate, held time, anticipation, rebounds, deformation, scripts
+  · `interact` — listeners, input types, SM/ViewModel inputs, blends, exit time, in/out pairs
 
-Usage (depuis la racine du dépôt, venv activé) :
+Usage (from the repository root, venv activated):
 
-    python -m rml2ae.tools.riv_measure <fichier.riv> [...] [options]
+    python -m rml2ae.tools.riv_measure <file.riv> [...] [options]
     python -m rml2ae.tools.riv_measure 01_RIV_LIBRARY/studies/*/source/*.riv --per-file --json 01_RIV_LIBRARY/studies
 
-  --mode timing|acting|interact|all   ce qu'on mesure (défaut : all)
-  --per-file                          écrit survey.txt / acting.txt / interact.txt dans le dossier de l'étude
-                                      (le dossier parent de `source/`)
-  --json <dir|fichier>                JSON brut : un fichier par mode si c'est un dossier
-  --top N                             nombre d'entrées affichées dans le tableau d'eases (timing)
+  --mode timing|acting|interact|all   what to measure (default: all)
+  --per-file                          writes survey.txt / acting.txt / interact.txt in the study folder
+                                      (the parent folder of `source/`)
+  --json <dir|file>                   raw JSON: one file per mode if it is a folder
+  --top N                             number of entries shown in the eases table (timing)
 
-Les sorties et les fiches restent dans `01_RIV_LIBRARY/studies/<slug>/` ; la leçon distillée remonte dans
-`motion/MOTION_PRINCIPLES.md` (§13 timing, §14–§15 jeu, §16 interactions).
+Outputs and notes stay in `01_RIV_LIBRARY/studies/<slug>/`; the distilled lesson goes up into
+`motion/MOTION_PRINCIPLES.md` (§13 timing, §14–§15 acting, §16 interactions).
 """
 import json
 import os
@@ -37,7 +37,7 @@ from collections import Counter, defaultdict
 HERE = os.path.dirname(os.path.abspath(__file__))
 try:
     from rml2ae.tools import riv_curves as rc
-except ImportError:                      # lancé comme script, pas comme module
+except ImportError:                      # run as a script, not as a module
     sys.path.insert(0, os.path.abspath(os.path.join(HERE, "..", "..")))
     from rml2ae.tools import riv_curves as rc
 
@@ -55,7 +55,7 @@ LOOP_RE = re.compile(r"(?i)(?:_|^|\s)(loop|idle|cycle|pingpong|wait)(?:_|\s|$)")
 
 
 def is_baked(keys):
-    """Une piste bakée (une clé toutes les ~2 frames) est une **valeur**, pas une courbe posée."""
+    """A baked track (a key every ~2 frames) is a **value**, not an authored curve."""
     span = keys[-1][0] - keys[0][0]
     return len(keys) >= 6 and len(keys) / max(1, span + 1) >= 0.5
 
@@ -100,8 +100,8 @@ def timing_of(riv, arts, name, top=12):
                     out["baked"] += 1
                     if len(out["baked_examples"]) < 6 and t["prop"] in MOVABLE:
                         out["baked_examples"].append(
-                            f"{t['object'] or t['type']}.{t['prop']} @ {a['name']} ({len(ks)} clés / {span} f)")
-                    continue                      # baké : hors du vocabulaire
+                            f"{t['object'] or t['type']}.{t['prop']} @ {a['name']} ({len(ks)} keys / {span} f)")
+                    continue                      # baked: outside the vocabulary
                 out["sparse"] += 1
                 out["props"][f"{t['type']}.{t['prop']}"] += 1
                 for j in range(len(ks) - 1):
@@ -109,7 +109,7 @@ def timing_of(riv, arts, name, top=12):
                     f1 = ks[j + 1][0]
                     out["eases"][ease_label(ease, interp)] += 1
                     out["seg_ms"][int(round((f1 - f0) / fps * 1000 / 10) * 10)] += 1
-                # staggers : mêmes segments relatifs sur ≥ 3 objets de la même animation
+                # staggers: same relative segments on >= 3 objects of the same animation
                 if t["prop"] in MOVABLE and 2 <= len(ks) <= 6 and all(isinstance(k[1], (int, float)) for k in ks):
                     vals = [k[1] for k in ks]
                     span_v = max(vals) - min(vals)
@@ -132,30 +132,30 @@ def timing_report(o, top=12):
     L = [f"== {o['file']}  (v{o['version']}, {o['artboards']} artboards, {o['animations']} animations)"]
     L.append("fps " + ", ".join(f"{k}:{v}" for k, v in o["fps"].most_common()) +
              "  |  timelines " + ", ".join(f"{k}:{v}" for k, v in o["loops"].most_common()))
-    L.append(f"pistes {o['tracks']} — sparse {o['sparse']} (vocabulaire) / baké {o['baked']}")
+    L.append(f"tracks {o['tracks']} — sparse {o['sparse']} (vocabulary) / baked {o['baked']}")
     if o["eases"]:
         total = sum(o["eases"].values())
         kinds = Counter()
         for label, n in o["eases"].items():
             kinds["hold" if label == "hold" else "linear" if label == "linear" else
                   "elastic" if label.startswith("elastic") else "≈défaut" if label.endswith("≈défaut") else "choisie"] += n
-        L.append("types de segment : " + ", ".join(f"{k} {v} ({v * 100 // max(1, total)} %)" for k, v in kinds.most_common()))
+        L.append("segment types: " + ", ".join(f"{k} {v} ({v * 100 // max(1, total)} %)" for k, v in kinds.most_common()))
         L.append("eases (pistes sparse) :")
         for label, n in o["eases"].most_common(top):
             L.append(f"    {n:5d}  {label}")
-    L.append("durées de segment (ms → count, sparse) : " +
+    L.append("segment durations (ms → count, sparse): " +
              ", ".join(f"{k}:{v}" for k, v in sorted(o["seg_ms"].items())[:20]))
     if o["staggers"]:
-        L.append("staggers mesurés (ms → count) : " + ", ".join(f"{k}:{v}" for k, v in o["staggers"].most_common(10)))
-    L.append("propriétés animées (sparse) : " + ", ".join(f"{k}:{v}" for k, v in o["props"].most_common(12)))
+        L.append("measured staggers (ms → count): " + ", ".join(f"{k}:{v}" for k, v in o["staggers"].most_common(10)))
+    L.append("animated properties (sparse): " + ", ".join(f"{k}:{v}" for k, v in o["props"].most_common(12)))
     if o["baked_examples"]:
-        L.append("exemples de baké (à ne PAS lire comme courbes) : " + " ; ".join(o["baked_examples"]))
+        L.append("baked examples (do NOT read as curves): " + " ; ".join(o["baked_examples"]))
     return "\n".join(L)
 
 
-# ─────────────────────────────── jeu ───────────────────────────────
+# ─────────────────────────────── acting ───────────────────────────────
 def classify(t):
-    """node = le nœud agit (jeu lisible) · deform = sommet/os/poids · rig = contrainte."""
+    """node = the node acts (readable acting) · deform = vertex/bone/weight · rig = constraint."""
     if "Constraint" in t["type"]:
         return "rig"
     if any(k in t["type"] for k in DEFORM_TYPES):
@@ -210,7 +210,7 @@ def acting_of(riv, arts, name):
                     o["tween"] += 1
                 else:
                     o["poses_per_s"].append(len(ks) / max(0.001, dur / fps))
-                # temps tenu : clés consécutives de même valeur (ou interpolation hold)
+                # held time: consecutive keys with the same value (or hold interpolation)
                 for j in range(len(ks) - 1):
                     if abs(vals[j + 1] - vals[j]) < 1e-6 or ks[j][2] == "hold":
                         o["hold_frames"] += frames[j + 1] - frames[j]
@@ -220,18 +220,18 @@ def acting_of(riv, arts, name):
                 if 3 <= len(ks) <= 8:
                     rng = max(vals) - min(vals)
                     if rng > 1e-6:
-                        # anticipation : une clé part à l'opposé du sens général avant de partir
+                        # anticipation: a key goes against the general direction before setting off
                         for j in range(1, len(ks) - 1):
                             if s and (vals[j] - vals[0]) * s < -0.02 * rng:
                                 o["anticipation"] += 1
                                 break
-                        # rebonds : nombre d'inversions de sens (settle décroissant)
+                        # rebounds: number of direction reversals (decaying settle)
                         dirs = [(vals[j + 1] - vals[j]) > 0 for j in range(len(ks) - 1)
                                 if abs(vals[j + 1] - vals[j]) > 1e-6]
                         inv = sum(1 for j in range(1, len(dirs)) if dirs[j] != dirs[j - 1])
                         if inv:
                             o["rebounds"].append(inv)
-                        # dépassement : une clé va au-delà de la valeur d'arrivée puis revient
+                        # overshoot: a key goes past the end value then comes back
                         over = max(max(vals) - vals[-1], vals[-1] - min(vals)) / rng
                         if 0.02 < over and inv:
                             o["overshoot"] += 1
@@ -244,29 +244,29 @@ def acting_report(o):
     pps = sorted(o["poses_per_s"])
     med = pps[len(pps) // 2] if pps else 0
     L = [f"== {o['file']}"]
-    L.append(f"pistes de jeu {o['tracks']} · 2 clés (glissé pur) {o['tween']} ({o['tween'] * 100 // tot} %) · "
-             f"{o['tracks'] - o['tween']} posées ({100 - o['tween'] * 100 // tot} %) · poses/s médianes {med:.1f}")
-    L.append(f"temps tenu {held * 100:.0f} % de la durée totale · plus long hold {o['longest_hold_ms']} ms")
-    L.append("clés par piste " + ", ".join(f"{k}:{v}" for k, v in sorted(o["poses"].items())))
-    L.append(f"anticipation {o['anticipation']} · rebond+retour {o['overshoot']} · pistes à rebonds "
-             f"{len(o['rebounds'])} · rebonds max {max(o['rebounds']) if o['rebounds'] else 0}")
-    L.append("ce qui agit : " + ", ".join(f"{k} {v}" for k, v in o["parts"].most_common()))
-    fams = ", ".join(f"{k} {v}" + (f" (dont {o['fam_baked'][k]} bakées)" if o["fam_baked"][k] else "")
+    L.append(f"acting tracks {o['tracks']} · 2 keys (pure tween) {o['tween']} ({o['tween'] * 100 // tot} %) · "
+             f"{o['tracks'] - o['tween']} posed ({100 - o['tween'] * 100 // tot} %) · median poses/s {med:.1f}")
+    L.append(f"held time {held * 100:.0f} % of the total duration · longest hold {o['longest_hold_ms']} ms")
+    L.append("keys per track " + ", ".join(f"{k}:{v}" for k, v in sorted(o["poses"].items())))
+    L.append(f"anticipation {o['anticipation']} · rebound+return {o['overshoot']} · tracks with rebounds "
+             f"{len(o['rebounds'])} · max rebounds {max(o['rebounds']) if o['rebounds'] else 0}")
+    L.append("what acts: " + ", ".join(f"{k} {v}" for k, v in o["parts"].most_common()))
+    fams = ", ".join(f"{k} {v}" + (f" (of which {o['fam_baked'][k]} baked)" if o["fam_baked"][k] else "")
                      for k, v in o["fam"].most_common())
-    L.append(f"familles de pistes : {fams}")
+    L.append(f"track families: {fams}")
     if o["deform_eases"]:
         de = o["deform_eases"]
         t = sum(de.values()) or 1
-        L.append("déformation (sparse) : " + ", ".join(f"{k} {v * 100 // t} %" for k, v in de.most_common()))
+        L.append("deformation (sparse): " + ", ".join(f"{k} {v * 100 // t} %" for k, v in de.most_common()))
     if o["scripts"]:
-        L.append("scripts : " + ", ".join(f"{k} ×{v}" for k, v in o["scripts"].most_common()) +
-                 "  (surface lisible ; le code embarqué n'est pas extractible au CLI — voir le corpus)")
+        L.append("scripts: " + ", ".join(f"{k} ×{v}" for k, v in o["scripts"].most_common()) +
+                 "  (readable surface; the embedded code cannot be extracted with the CLI — see the corpus)")
     return "\n".join(L)
 
 
 # ─────────────────────────── interactions ───────────────────────────
 def pair_key(name):
-    """Nom d'anim → (radical, sens) pour rapprocher « Icon hover » de « Icon hover out »."""
+    """Anim name → (stem, direction) to pair \"Icon hover\" with \"Icon hover out\"."""
     n = name.strip()
     m = OUT_RE.search(n)
     if m:
@@ -310,7 +310,7 @@ def interact_of(riv, arts, name):
             o["blend"][f"{d}%" if p.get("flags", 0) & 2 else f"{d}ms"] += 1
             if p.get("flags", 0) & 8:
                 o["exit_time"] += 1
-    # par artboard : le protocole de nommage des timelines d'entrée/sortie
+    # per artboard: the naming protocol of the in/out timelines
     for ab in arts:
         anims = rc.curves_of(ab)
         if any(x["type"] == "StateMachine" for x in ab["objs"]):
@@ -339,34 +339,34 @@ def interact_report(o):
     L = [f"== {o['file']}"]
     sm = o["sm"]
     if sm["machines"] or sm["layers"] or sm["states"]:
-        L.append(f"état : {o['artboards_with_sm']} artboards avec SM · couches {sm['layers']} · états {sm['states']} · "
+        L.append(f"state: {o['artboards_with_sm']} artboards with SM · layers {sm['layers']} · states {sm['states']} · "
                  f"transitions {sm['transitions']} · exit time {o['exit_time']}")
         if o["blend"]:
-            L.append("  fondus de transition : " + ", ".join(f"{k}×{v}" for k, v in o["blend"].most_common(8)))
+            L.append("  transition blends: " + ", ".join(f"{k}×{v}" for k, v in o["blend"].most_common(8)))
     if o["conditions"] or o["comparators"]:
-        L.append("déclencheurs : " + ", ".join(f"{k.replace('Transition', '')} {v}" for k, v in o["conditions"].most_common()) +
-                 ("  | comparateurs : " + ", ".join(f"{k.replace('TransitionProperty', '').replace('TransitionValue', '')} {v}"
+        L.append("triggers: " + ", ".join(f"{k.replace('Transition', '')} {v}" for k, v in o["conditions"].most_common()) +
+                 ("  | comparators: " + ", ".join(f"{k.replace('TransitionProperty', '').replace('TransitionValue', '')} {v}"
                                                     for k, v in o["comparators"].most_common()) if o["comparators"] else ""))
     if o["sm_inputs"] or o["vm"]:
-        L.append("  entrées SM : " + (", ".join(f"{k.replace('StateMachine', '')} {v}" for k, v in o["sm_inputs"].most_common()) or "—") +
-                 " · ViewModel : " + (", ".join(f"{k} {v}" for k, v in sorted(o["vm"].items())) or "—"))
+        L.append("  SM inputs: " + (", ".join(f"{k.replace('StateMachine', '')} {v}" for k, v in o["sm_inputs"].most_common()) or "—") +
+                 " · ViewModel: " + (", ".join(f"{k} {v}" for k, v in sorted(o["vm"].items())) or "—"))
     if o["listeners"]:
-        L.append("écoute : " + ", ".join(f"{k} {v}" for k, v in o["listeners"].most_common()))
+        L.append("listening: " + ", ".join(f"{k} {v}" for k, v in o["listeners"].most_common()))
     if o["input_types"]:
-        L.append("  types d'entrée : " + ", ".join(f"{k} {v}" for k, v in o["input_types"].most_common()))
+        L.append("  input types: " + ", ".join(f"{k} {v}" for k, v in o["input_types"].most_common()))
     elif o["listeners"]:
-        L.append("  types d'entrée : aucun `ListenerInputType` — le pointeur est poussé dans un input de SM (forme dépréciée)")
+        L.append("  input types: no `ListenerInputType` — the pointer is pushed into an SM input (deprecated form)")
     if o["semantic"]:
-        L.append(f"mode sémantique : {o['semantic']} objet(s)")
+        L.append(f"semantic mode: {o['semantic']} object(s)")
     if o["pairs"]:
-        L.append(f"paires in/out nommées : {o['pairs']} · durée in médiane {int(st.median(o['ms_in']))} ms / "
-                 f"out médiane {int(st.median(o['ms_out']))} ms")
+        L.append(f"named in/out pairs: {o['pairs']} · median in duration {int(st.median(o['ms_in']))} ms / "
+                 f"median out {int(st.median(o['ms_out']))} ms")
         for e in o["pair_examples"][:3]:
             L.append(f"    {e}")
     return "\n".join(L)
 
 
-# ─────────────────────────────── pilote ───────────────────────────────
+# ─────────────────────────────── driver ───────────────────────────────
 MODES = ("timing", "acting", "interact")
 SUFFIX = {"timing": "survey", "acting": "acting", "interact": "interact"}
 
@@ -390,7 +390,7 @@ def measure(path, modes, top=12):
 
 
 def study_dir(path):
-    """`…/studies/<slug>/source/x.riv` → `…/studies/<slug>` (sinon le dossier du fichier)."""
+    """`…/studies/<slug>/source/x.riv` → `…/studies/<slug>` (otherwise the file's folder)."""
     d = os.path.dirname(os.path.abspath(path))
     return os.path.dirname(d) if os.path.basename(d) == "source" else d
 
@@ -403,7 +403,7 @@ def main(argv):
             v = argv[i + 1].lower()
             modes = list(MODES) if v == "all" else [m for m in MODES if m.startswith(v)]
             if not modes:
-                sys.exit(f"mode inconnu : {v} (timing | acting | interact | all)")
+                sys.exit(f"unknown mode: {v} (timing | acting | interact | all)")
             if argv[i + 1] in files:
                 files.remove(argv[i + 1])
         elif a == "--per-file":

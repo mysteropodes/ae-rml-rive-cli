@@ -1531,6 +1531,26 @@ class Converter:
         J(f'var {var} = {ctx.comp}.layers.add({var}F); {var}.name = {js("[replay] " + el.name)}; resetTf({var}, 0, 0, 0, 0);')
         # world space: above everything the element was above in Rive is not knowable after flattening -> keep z-order
         J(f'{var}.moveBefore({nul});')
+        # the frames were rendered with the ViewModel's DEFAULT values: an opacity bound on the element or an ancestor
+        # (a render pass hiding photos, a visibility toggle) must still act on the sequence, which has no parent
+        # (film test: the replayed photo stayed in the text-only pass and darkened the card through the shader)
+        factors = []
+        cur = el
+        while cur is not None and cur.tag != "Artboard":
+            for prop, d in self.binds_quiet(cur):
+                if prop not in ("opacity", "isVisible"):
+                    continue
+                for p2, dd in self.binds(cur):
+                    if p2 != prop or dd.get("expr") is None:
+                        continue
+                    v0 = dd.get("value")
+                    if dd["kind"] == "boolean":
+                        factors.append(f"(({dd['expr']}) == 1 ? 1 : 0)" + ("" if v0 else " * 0"))
+                    elif isinstance(v0, (int, float)) and abs(v0) > 1e-9:
+                        factors.append(f"({dd['expr']}) / {js(float(v0))}")
+            cur = cur.parent
+        if factors:
+            J(f'tr({var}, "ADBE Opacity").expression = {js("value * " + " * ".join(dict.fromkeys(factors)))};')
         self.rep.add(ab.name, "approx", el, f"{sname} replayed by the CLI as a {n}-frame PNG sequence (element + ancestors, two-pass alpha)")
         return var
 
@@ -2048,6 +2068,13 @@ class Converter:
             self.rep.add(ab, "unsupported", el, f"mesh needs PIL to slice the image ({e})")
             return self.emit_image(El(el.tag, el.attrs, el.parent), parent, ctx)
         iw, ih = src.size
+        mv = J.var("mesh")
+        J(f"var {mv} = null;")
+        J("if (RIVE_SHADER) {")
+        ok = self.emit_mesh_shader(el, parent, ctx, mesh, ft, iw, ih, mv)
+        J("} else {")
+        if ok:
+            self.rep.add(ab, "info", el, "without the Rive Shader plugin: row strips + Corner Pin instead (below)")
         x, y = el.num("x"), el.num("y")
         sx, sy = el.num("scaleX", 1), el.num("scaleY", 1)
         cols, rows = len(us) - 1, len(vs) - 1
@@ -2084,7 +2111,139 @@ class Converter:
                 J(f'keys(cp.property("ADBE Corner Pin-{slot}"), {js(rws)});')
             first = first or var
         self.rep.add(ab, "approx", el, f"mesh {cols}x{rows}: {rows} row strips + Corner Pin (exact on row edges, bilinear inside)")
-        return first
+        J(f"{mv} = {first};")
+        J("}")
+        return mv
+
+    def emit_mesh_shader(self, el, parent, ctx, mesh, ft, iw, ih, mv):
+        """Mesh on an image -> EXACT deformation with the Rive Shader plugin: a generated WGSL draws the triangles
+        (Rive's per-triangle affine texture mapping, painter's order) and reads the vertex positions of every comp
+        frame from a data image (16 bits per coordinate) plugged into its Texture 1. The image sits in a precomp large
+        enough for every pose. Returns False (nothing written) when the mesh cannot be read."""
+        import base64
+        import struct
+        J = self.W
+        ab = ctx.artboard
+        verts = [v for v in mesh.children if v.tag in ("MeshVertex", "ContourMeshVertex")]
+        nv = len(verts)
+        try:
+            raw = base64.b64decode(mesh.get("triangleIndexBytes") or "")
+        except Exception:
+            raw = b""
+        idx = list(raw) if nv <= 255 else list(struct.unpack("<%dH" % (len(raw) // 2), raw[: len(raw) // 2 * 2]))
+        if nv < 3 or len(idx) < 3 or max(idx) >= nv:
+            self.rep.add(ab.name, "approx", el, "mesh triangles unreadable: row strips only")
+            J(f"{mv} = null;")
+            return False
+        idx = idx[: len(idx) // 3 * 3]
+        ox, oy = -el.num("originX", 0.5) * iw, -el.num("originY", 0.5) * ih      # image top-left, image-local
+        n = max(1, int(round(self.duration_of(ab, ctx.anim) * self.fps))) + 1
+        fs = ctx.fscale or 1.0
+        keyed = [(ctx.keys(v.id, "x"), ctx.keys(v.id, "y")) for v in verts]
+        pos = []
+        for fc in range(n):
+            fa = fc / fs
+            pos.append([(value_at(kx, fa) if kx else v.num("x"), value_at(ky, fa) if ky else v.num("y"))
+                        for v, (kx, ky) in zip(verts, keyed)])
+        xs = [p[0] for row in pos for p in row] + [ox, ox + iw]
+        ys = [p[1] for row in pos for p in row] + [oy, oy + ih]
+        minx, miny = math.floor(min(xs)) - 2, math.floor(min(ys)) - 2
+        W, H = int(math.ceil(max(xs) - minx)) + 2, int(math.ceil(max(ys) - miny)) + 2
+        # data image: row = comp frame, two pixels per vertex (x then y), R = high byte, G = low byte of round(c / W * 65535)
+        from PIL import Image
+        img = Image.new("RGBA", (2 * nv, n), (0, 0, 0, 255))
+        px = img.load()
+        for f, row in enumerate(pos):
+            for i, (vx, vy) in enumerate(row):
+                for k, (c, span) in enumerate(((vx - minx, W), (vy - miny, H))):
+                    q = max(0, min(65535, int(round(c / span * 65535))))
+                    px[2 * i + k, f] = (q >> 8, q & 255, 0, 255)
+        tag = re.sub(r"[^A-Za-z0-9_]+", "_", f"{ab.name}_{el.name}_{el.id}")
+        data_png = os.path.join(self.out_dir, f"mesh_{tag}.png")
+        img.save(data_png)
+        tri = ", ".join(f"{i}u" for i in idx)
+        uvs = ", ".join(f"vec2<f32>({v.num('u'):.6f}, {v.num('v'):.6f})" for v in verts)
+        wgsl = f"""// generated by rml2ae: Rive image mesh '{el.name}' ({nv} vertices, {len(idx) // 3} triangles), Rive Shader plugin
+struct Params {{
+    size: vec2<f32>,
+    tick: f32,
+    pad0: f32,
+}};
+@group(0) @binding(0) var srcTex: texture_2d<f32>;
+@group(0) @binding(1) var srcSamp: sampler;
+@group(0) @binding(2) var<uniform> P: Params;
+@group(0) @binding(3) var vertTex: texture_2d<f32>;   // vertex positions per frame (data image)
+
+const NV: u32 = {nv}u;
+const NI: u32 = {len(idx)}u;
+const SPAN = vec2<f32>({W}.0, {H}.0);
+const IMG = vec4<f32>({ox - minx:.4f}, {oy - miny:.4f}, {iw}.0, {ih}.0);   // image rect in the precomp (left, top, w, h)
+const TRI = array<u32, {len(idx)}>({tri});
+const UV = array<vec2<f32>, {nv}>({uvs});
+
+struct VSOut {{ @builtin(position) pos: vec4<f32>, @location(0) uv: vec2<f32> }};
+@vertex
+fn vs_main(@builtin(vertex_index) vid: u32) -> VSOut {{
+    var positions = array<vec2<f32>, 3>(vec2<f32>(-1.0, -1.0), vec2<f32>(3.0, -1.0), vec2<f32>(-1.0, 3.0));
+    var uvs = array<vec2<f32>, 3>(vec2<f32>(0.0, 1.0), vec2<f32>(2.0, 1.0), vec2<f32>(0.0, -1.0));
+    var o: VSOut;
+    o.pos = vec4<f32>(positions[vid], 0.0, 1.0);
+    o.uv = uvs[vid];
+    return o;
+}}
+
+fn vert(i: u32, row: i32) -> vec2<f32> {{
+    let a = textureLoad(vertTex, vec2<i32>(i32(2u * i), row), 0);
+    let b = textureLoad(vertTex, vec2<i32>(i32(2u * i + 1u), row), 0);
+    let qx = round(a.r * 255.0) * 256.0 + round(a.g * 255.0);
+    let qy = round(b.r * 255.0) * 256.0 + round(b.g * 255.0);
+    return vec2<f32>(qx, qy) / 65535.0 * SPAN;
+}}
+
+@fragment
+fn fs_main(in: VSOut) -> @location(0) vec4<f32> {{
+    let p = in.uv * P.size;
+    let rows = i32(textureDimensions(vertTex).y);
+    let row = clamp(i32(P.tick), 0, rows - 1);
+    var hit = false;
+    var tuv = vec2<f32>(0.0);
+    for (var t: u32 = 0u; t < NI; t = t + 3u) {{
+        let i0 = TRI[t];
+        let i1 = TRI[t + 1u];
+        let i2 = TRI[t + 2u];
+        let a = vert(i0, row);
+        let b = vert(i1, row);
+        let c = vert(i2, row);
+        let d = (b.y - c.y) * (a.x - c.x) + (c.x - b.x) * (a.y - c.y);
+        if (abs(d) < 1e-9) {{ continue; }}
+        let w0 = ((b.y - c.y) * (p.x - c.x) + (c.x - b.x) * (p.y - c.y)) / d;
+        let w1 = ((c.y - a.y) * (p.x - c.x) + (a.x - c.x) * (p.y - c.y)) / d;
+        let w2 = 1.0 - w0 - w1;
+        if (w0 >= -1e-4 && w1 >= -1e-4 && w2 >= -1e-4) {{
+            hit = true;                                     // painter's order: the last triangle drawn wins
+            tuv = UV[i0] * w0 + UV[i1] * w1 + UV[i2] * w2;
+        }}
+    }}
+    let src = (IMG.xy + tuv * IMG.zw) / P.size;
+    let col = textureSampleLevel(srcTex, srcSamp, src, 0.0);
+    if (!hit) {{ return vec4<f32>(0.0); }}
+    return col;
+}}
+"""
+        shader_path = os.path.join(self.out_dir, f"mesh_{tag}.wgsl")
+        open(shader_path, "w").write(wgsl)
+        sid = RS.register(shader_path)
+        pc = J.var("mpc")
+        J(f'var {pc} = app.project.items.addComp({js(el.name + " (mesh)")}, {W}, {H}, 1, {js(max(n - 1, 1) / self.fps)}, FPS); {pc}.parentFolder = SUBS;')
+        J(f'var mim = {pc}.layers.add({ft}); resetTf(mim, 0, 0, 0, 0); tr(mim, "ADBE Position").setValue([{js(ox - minx)}, {js(oy - miny)}]);')
+        J(f'var {mv} = {ctx.comp}.layers.add({pc}); {mv}.name = {js(el.name)};')
+        if parent:
+            J(f"{mv}.parent = {parent};")
+        self.base_transform(mv, el, ctx, anchor=[-minx, -miny])
+        J(f'var mdl = {ctx.comp}.layers.add(importFile({js(data_png)})); mdl.name = {js(el.name + " · mesh data")}; mdl.enabled = false; mdl.moveToEnd();')
+        J(f'var mfx = {mv}.property("ADBE Effect Parade").addProperty("{RS.MATCH_NAME}"); mfx.name = "Rive mesh"; mfx.property({RS.IDX_SHADER}).setValue({sid}); mfx.property({RS.IDX_TEX1}).setValue(mdl.index);')
+        self.rep.add(ab.name, "converted", el, f"mesh ({nv} vertices, {len(idx) // 3} triangles) → Rive Shader plugin: exact per-triangle deformation, vertices per frame in a data image")
+        return True
 
     # ---- Shape
     def path_shape(self, pp, offset=(0.0, 0.0), ctx=None, frame=None):

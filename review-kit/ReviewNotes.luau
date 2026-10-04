@@ -1,89 +1,89 @@
 --!strict
--- ReviewNotes — la couche d'annotation de la relecture : dessiner sur l'image, taper une note, la
--- poser à l'instant courant du film, et la rendre à l'agent. Voir README.md § « Annoter ».
+-- ReviewNotes: the annotation layer of the review player. Draw on the frame, type a note,
+-- pin it to the current time of the film, and hand it back to the agent. See README.md, "Annoter" section.
 --
--- Pourquoi un ScriptedLayout et pas un drawable : le clavier n'arrive qu'à un script qui a un
--- <FocusData/> en enfant direct, et le player du CLI ne focalise que celui d'un ScriptedLayout
--- (mesuré). `textEvent` livre le texte composé, accents compris ; `keyboardEvent` sert aux touches
--- de contrôle. La couche est le PREMIER enfant de l'artboard : elle dessine au-dessus et voit les
--- événements pointeur avant le lecteur.
+-- Why a ScriptedLayout and not a drawable: keyboard input only reaches a script that has a
+-- <FocusData/> as a direct child, and the CLI player only focuses the one of a ScriptedLayout
+-- (measured). `textEvent` delivers the composed text, accents included; `keyboardEvent` is used for
+-- control keys. The layer is the FIRST child of the artboard: it draws on top and sees pointer
+-- events before the player does.
 --
--- Sortie : une ligne par note sur la sortie standard du viewer (le seul canal d'un script), relue
--- par review_notes.py :
---     #ANN {"id":3,"t":12.34,"text":"la main part trop tôt","color":4,"pts":[x,y,x,y,…]}
---     #ANNDEL 3       (la croix d'une ligne, ou une note vidée)
---     #ANNRES 3 1     (la coche : traitée / à faire)
--- Les coordonnées sont celles de l'artboard de relecture (origine en haut à gauche, image en haut).
+-- Output: one line per note on the viewer's standard output (the only channel a script has), read
+-- back by review_notes.py:
+--     #ANN {"id":3,"t":12.34,"text":"the hand starts too early","color":4,"pts":[x,y,x,y,…]}
+--     #ANNDEL 3       (a row's cross, or a note that was emptied)
+--     #ANNRES 3 1     (the check mark: resolved / to do)
+-- Coordinates are those of the review artboard (origin at the top left, frame at the top).
 --
--- Modes : idle -> (frappe, clic dans le champ, ou clic sur une couleur / la brosse) -> arm : le film se met en pause, on dessine au
--- doigt/souris sur l'image, on tape la note, Entrée valide, Échap annule, ⌫ efface une lettre (et,
--- sur un texte vide, le dernier trait).
+-- Modes: idle -> (typing, a click in the field, or a click on a colour / the brush) -> arm: the film pauses,
+-- you draw on the frame with finger/mouse, type the note, Enter posts it, Esc cancels, Backspace deletes a letter (and,
+-- on an empty text, the last stroke).
 
--- pts = x1,y1,x2,y2,… aplati, -1 = fin de trait ; done = traitée ; c = la couleur du trait (1-4)
+-- pts = x1,y1,x2,y2,… flattened, -1 = end of stroke; done = resolved; c = the stroke colour (1-4)
 type Note = { id: number, t: number, text: string, pts: { number }, done: boolean, c: number }
 
 type Notes = {
     duration: Input<number>,
-    filmBottom: Input<number>,     -- l'image du film s'arrête là : au-dessus on dessine, en dessous c'est la barre
+    filmBottom: Input<number>,     -- the film frame ends here: above it you draw, below it is the bar
     barX0: Input<number>,
     barX1: Input<number>,
-    barY: Input<number>,           -- l'axe de la barre : les repères des notes se posent dessus
-    penX: Input<number>,           -- le bouton brosse, dans la barre d'outils du champ
+    barY: Input<number>,           -- the bar's axis: note markers sit on it
+    penX: Input<number>,           -- the brush button, in the field's toolbar
     penY: Input<number>,
     penR: Input<number>,
-    textX: Input<number>,          -- le texte du champ : bord gauche, ligne du bas, largeur utile
+    textX: Input<number>,          -- the field's text: left edge, bottom line, usable width
     textBase: Input<number>,
     fieldW: Input<number>,
-    boxBgH: Property<number>?,     -- le fond du champ grandit avec le texte (le bas reste en place)
+    boxBgH: Property<number>?,     -- the field's background grows with the text (the bottom stays in place)
     boxBgY: Property<number>?,
-    boxAtY: Property<number>?,     -- le timecode monte avec lui
-    lines: number,                 -- le nombre de lignes que le texte occupe
-    dotX: Input<number>,           -- les 4 pastilles de couleur : première, pas, rayon
+    boxAtY: Property<number>?,     -- the timecode moves up with it
+    lines: number,                 -- the number of lines the text occupies
+    dotX: Input<number>,           -- the 4 colour dots: first one, step, radius
     dotGap: Input<number>,
     dotR: Input<number>,
-    colX: Input<number>,           -- la colonne « Notes » : bord gauche, largeur, première ligne, pas, nombre de lignes
+    colX: Input<number>,           -- the "Notes" column: left edge, width, first row, step, number of rows
     colW: Input<number>,
     rowY0: Input<number>,
     rowH: Input<number>,
     rows: Input<number>,
-    fps: Input<number>,             -- pour l'image par image (flèches)
-    saved: Input<string>,          -- les notes déjà prises, rechargées au démarrage (review_notes.json)
+    fps: Input<number>,             -- for frame stepping (arrow keys)
+    saved: Input<string>,          -- notes already taken, reloaded at startup (review_notes.json)
 
     context: Context,
     bound: boolean,
-    progress: Property<number>?,   -- écrit par ReviewPlayer, lu ici pour dater la note
-    annOn: Property<number>?,      -- 1 = mode annotation (ReviewPlayer lâche le pointeur et se met en pause)
-    noteText: Property<string>?,   -- le texte en cours de frappe (affiché par un Text du panneau)
-    inDown: boolean,               -- un appui est en cours : on ne rend pas le pointeur au lecteur
-    unlock: boolean,               -- une libération attend le relâcher
-    noteHint: Property<string>?,   -- la ligne d'aide / le compte
-    phA: Property<number>?,        -- l'invite « Écrire un commentaire… » (1 = visible)
-    noteAt: Property<string>?,     -- le timecode affiché dans le champ
-    sendA: Property<number>?,      -- le bouton d'envoi : 1 = actif, 0,25 = éteint
-    holdPlay: Property<number>?,   -- 1 = on écrit : le film reste figé (le pointeur, lui, reste au lecteur)
-    pen: boolean,                  -- l'outil brosse : lui seul prend le pointeur sur l'image
-    col: number,                   -- la couleur choisie (1-4)
-    noteCount: Property<string>?,  -- « 3 notes » en tête de colonne
-    boxY: Input<number>,           -- le champ de saisie : haut, hauteur (clic = commencer à écrire)
+    progress: Property<number>?,   -- written by ReviewPlayer, read here to timestamp the note
+    annOn: Property<number>?,      -- 1 = annotation mode (ReviewPlayer releases the pointer and pauses)
+    noteText: Property<string>?,   -- the text being typed (shown by a Text in the panel)
+    inDown: boolean,               -- a press is in progress: the pointer is not given back to the player
+    unlock: boolean,               -- a release is waiting for the pointer-up
+    noteHint: Property<string>?,   -- the help line / the count
+    phA: Property<number>?,        -- the prompt "Write a comment…" (1 = visible)
+    noteAt: Property<string>?,     -- the timecode shown in the field
+    sendA: Property<number>?,      -- the send button: 1 = active, 0.25 = dimmed
+    holdPlay: Property<number>?,   -- 1 = writing: the film stays frozen (the pointer itself stays with the player)
+    pen: boolean,                  -- the brush tool: only it takes the pointer on the frame
+    col: number,                   -- the chosen colour (1-4)
+    noteCount: Property<string>?,  -- "3 notes" at the head of the column
+    boxY: Input<number>,           -- the input field: top, height (click = start writing)
     boxH: Input<number>,
-    sendX: Input<number>,          -- le bouton « Envoyer »
+    sendX: Input<number>,          -- the "Send" button
     sendY: Input<number>,
     sendW: Input<number>,
     sendH: Input<number>,
-    cmd: Property<number>?,        -- 1 = lecture/pause, 2 = image précédente, 3 = image suivante (le lecteur exécute puis remet 0)
-    seekTo: Property<number>?,     -- le lecteur y saute puis remet -1 (clic sur une ligne du fil)
-    selY: Property<number>?,       -- le surlignage de la ligne choisie
+    cmd: Property<number>?,        -- 1 = play/pause, 2 = previous frame, 3 = next frame (the player runs it then resets to 0)
+    seekTo: Property<number>?,     -- the player jumps there then resets to -1 (click on a thread row)
+    selY: Property<number>?,       -- the highlight of the chosen row
     selA: Property<number>?,
-    rowT: { Property<string>? },   -- le fil : texte, temps affiché, opacité par ligne
+    rowT: { Property<string>? },   -- the thread: text, displayed time, opacity per row
     rowX: { Property<string>? },
     rowA: { Property<number>? },
-    sel: number,                   -- la note choisie dans le fil (id), 0 = aucune
-    hover: number,                 -- la ligne survolée (index d'affichage), 0 = aucune
-    editing: number,               -- la note en cours de correction (id), 0 = nouvelle
-    top: number,                   -- première note affichée (défilement du fil)
+    sel: number,                   -- the chosen note in the thread (id), 0 = none
+    hover: number,                 -- the hovered row (display index), 0 = none
+    editing: number,               -- the note being corrected (id), 0 = new
+    top: number,                   -- first note displayed (thread scrolling)
     notes: { Note },
-    dirty: boolean,                -- le fil doit être réécrit
-    cur: { number },               -- les traits de la note en cours
+    dirty: boolean,                -- the thread must be rewritten
+    cur: { number },               -- the strokes of the current note
     drawing: boolean,
     arm: boolean,
     text: string,
@@ -91,11 +91,11 @@ type Notes = {
     t: number,
     path: Path,
     path2: Path,
-    inks: { Paint },               -- le trait en cours, par couleur
-    inksOld: { Paint },            -- le trait d'une note déjà posée, par couleur
-    fills: { Paint },              -- la pastille pleine, par couleur
-    okInk: Paint,                  -- la coche d'une note traitée
-    dim: Paint,                    -- les actions au repos (coche grise, croix)
+    inks: { Paint },               -- the stroke being drawn, per colour
+    inksOld: { Paint },            -- the stroke of an already posted note, per colour
+    fills: { Paint },              -- the solid dot, per colour
+    okInk: Paint,                  -- the check mark of a resolved note
+    dim: Paint,                    -- the idle actions (grey check mark, cross)
     ink: Paint,
     inkOld: Paint,
     dot: Paint,
@@ -105,11 +105,11 @@ type Notes = {
     ringOn: Paint,
     penRing: Paint,
     penDisc: Paint,
-    penInk: Paint,        -- le crayon dessiné dans le bouton : rouge au repos, sombre sur le disque plein
+    penInk: Paint,        -- the pencil drawn in the button: red when idle, dark on the solid disc
 }
 
 local INK, INK_OLD, DOT = 0xFFFF4D6A, 0x66FF4D6A, 0xFFFF4D6A
--- la palette de la brosse : une seule brosse, quatre couleurs (la 4e est celle de l'interface)
+-- the brush palette: a single brush, four colours (the 4th is the interface colour)
 local PALETTE = { 0xFF38BDF8, 0xFF34D399, 0xFFF59E0B, 0xFFFF4D6A }
 local PALETTE_SOFT = { 0x9938BDF8, 0x9934D399, 0x99F59E0B, 0x99FF4D6A }
 local function colorOf(n: number): number
@@ -149,7 +149,7 @@ local function bindVM(self: Notes)
     self.dirty = true
 end
 
--- une seconde -> « 12.3 s »
+-- seconds -> "m:ss.xx"
 local function stamp(t: number): string
     local m = math.floor(t / 60)
     local sec = t - m * 60
@@ -163,8 +163,8 @@ local function short(s: string, n: number): string
     return string.sub(s, 1, n - 1) .. "…"
 end
 
--- le fil de notes de la colonne : une ligne par note (les plus récentes d'abord dans le temps du
--- film), la note choisie surlignée. Réécrit seulement quand quelque chose a bougé.
+-- the column's note thread: one row per note (in film-time order),
+-- the chosen note highlighted. Rewritten only when something changed.
 local function writeRows(self: Notes)
     if not self.dirty then
         return
@@ -199,9 +199,9 @@ local function writeRows(self: Notes)
     end
 end
 
--- la ligne sous la boîte : ce qu'on peut faire là, maintenant (comme le « Leave a comment » de Frame.io)
--- combien de lignes le texte occupe : la largeur d'un signe est estimée (un script n'a pas les
--- métriques de la police), mais l'erreur ne change que le moment où la boîte grandit
+-- the line under the box: what can be done there right now (like Frame.io's "Leave a comment")
+-- how many lines the text occupies: a character's width is estimated (a script has no
+-- font metrics), but the error only changes the moment at which the box grows
 local LINE_H, CHAR_W = 22, 7.6
 
 local function layout(self: Notes)
@@ -210,7 +210,7 @@ local function layout(self: Notes)
     local run = 0
     for _, cp in utf8.codes(self.text) do
         run += 1
-        if cp == 32 and run > per - 6 then      -- on coupe au mot quand la ligne est pleine
+        if cp == 32 and run > per - 6 then      -- break at a word when the line is full
             n += 1
             run = 0
         elseif run > per then
@@ -232,7 +232,7 @@ local function layout(self: Notes)
     end
 end
 
--- le curseur est un signe DANS le texte : il suit le retour à la ligne, et ne peut pas se décaler
+-- the cursor is a character INSIDE the text: it follows the line wrap and cannot drift
 local function paintText(self: Notes)
     local p = self.noteText
     if p == nil then
@@ -253,7 +253,7 @@ local function hint(self: Notes)
     end
     local ph, at = self.phA, self.noteAt
     if ph then
-        ph.value = if self.text == "" then 1 else 0        -- « Écrire un commentaire… »
+        ph.value = if self.text == "" then 1 else 0        -- "Write a comment…"
     end
     if at then
         local prog2 = self.progress
@@ -269,7 +269,7 @@ local function hint(self: Notes)
     if nc then
         nc.value = if n == 0 then "" else string.format("%d", n)
     end
-    -- court : l'aide tient à gauche du bouton « Envoyer »
+    -- short: the help fits to the left of the "Send" button
     if self.arm and self.pen then
         p.value = "draw on the frame · Enter to post"
     elseif self.arm then
@@ -279,10 +279,10 @@ local function hint(self: Notes)
     end
 end
 
--- Rendre la main au lecteur au milieu d'un clic, c'est lui offrir ce clic-là : la couche est
--- appelée AVANT lui, il verrait un clic ordinaire sur l'image et relancerait le film (la note
--- posée aurait l'air de s'effacer). On ne relâche donc jamais pendant un appui : `unlock` retient
--- la baisse, `pointerUp` la applique.
+-- Handing control back to the player in the middle of a click means giving it that click: the layer is
+-- called BEFORE it, so it would see an ordinary click on the frame and restart the film (the posted
+-- note would look like it vanished). So we never release during a press: `unlock` holds
+-- the release back, `pointerUp` applies it.
 local function locks(self: Notes, allowRelease: boolean)
     local a, h = self.annOn, self.holdPlay
     local wantA = if self.pen then 1 else 0
@@ -306,7 +306,7 @@ end
 local function setPen(self: Notes, on: boolean)
     self.pen = on
     self.drawing = false
-    locks(self, not self.inDown)           -- seul le crayon prend le pointeur au lecteur
+    locks(self, not self.inDown)           -- only the pencil takes the pointer from the player
 end
 
 local function setArm(self: Notes, on: boolean)
@@ -317,19 +317,19 @@ local function setArm(self: Notes, on: boolean)
         self.text = ""
         setPen(self, false)
     end
-    locks(self, not self.inDown)            -- on écrit : le film ne repart pas tout seul
+    locks(self, not self.inDown)            -- we are writing: the film does not restart on its own
     paintText(self)
     hint(self)
 end
 
--- la note en cours part sur la sortie standard, puis reste en mémoire pour être redessinée
+-- the current note goes to standard output, then stays in memory to be redrawn
 local function commit(self: Notes)
     if not self.arm then
         return
     end
     local id = if self.editing > 0 then self.editing else self.nextId
     if #self.cur == 0 and self.text == "" then
-        if self.editing > 0 then                -- vidée : on la supprime
+        if self.editing > 0 then                -- emptied: delete it
             for k, n in self.notes do
                 if n.id == id then
                     table.remove(self.notes, k)
@@ -354,7 +354,7 @@ local function commit(self: Notes)
     end
     local note: Note = { id = id, t = t, text = self.text, pts = pts, done = false, c = self.col }
     if slot > 0 then
-        self.notes[slot] = note                -- correction d'une note existante
+        self.notes[slot] = note                -- correction of an existing note
     else
         table.insert(self.notes, note)
         self.nextId += 1
@@ -374,7 +374,7 @@ local function commit(self: Notes)
     setArm(self, false)
 end
 
--- « id|t|texte|x,y,x,y,… » par ligne -> la liste des notes (ce que le générateur a relu du JSON)
+-- "id|t|text|x,y,x,y,…" per line -> the list of notes (what the generator read back from the JSON)
 local function restore(self: Notes)
     local src = self.saved
     if src == "" then
@@ -426,7 +426,7 @@ end
 local function advance(self: Notes, dt: number): boolean
     bindVM(self)
     self.t += dt
-    -- le fil suit la tête de lecture : la note de l'instant se surligne et défile dans la vue
+    -- the thread follows the playhead: the note at the current time is highlighted and scrolls into view
     if not self.arm then
         local prog = self.progress
         local now = (if prog then prog.value else 0) * self.duration
@@ -434,8 +434,8 @@ local function advance(self: Notes, dt: number): boolean
         local at = 0
         for k, n in self.notes do
             local d = math.abs(n.t - now)
-            -- la note déjà choisie garde la main tant qu'elle est dans la fenêtre : deux notes
-            -- posées au même instant ne doivent pas se voler le surlignage
+            -- the already chosen note keeps priority as long as it is in the window: two notes
+            -- posted at the same instant must not steal each other's highlight
             if d < bestD or (d <= 0.3 and n.id == self.sel) then
                 best, bestD, at = n.id, (if n.id == self.sel then -1 else d), k
             end
@@ -474,7 +474,7 @@ local function rowAt(self: Notes, x: number, y: number): number
     return r
 end
 
--- ouvrir une note pour la corriger : son texte et ses traits reviennent dans l'éditeur
+-- open a note to correct it: its text and strokes come back into the editor
 local function edit(self: Notes, id: number)
     for _, n in self.notes do
         if n.id == id then
@@ -495,7 +495,7 @@ local function edit(self: Notes, id: number)
     end
 end
 
--- quitter le champ : ce qui est écrit ou dessiné est posé, un brouillon vide est jeté
+-- leave the field: what is written or drawn is posted, an empty draft is discarded
 local function blur(self: Notes)
     if not self.arm then
         return
@@ -510,7 +510,7 @@ end
 local function down(self: Notes, event: PointerEvent)
     bindVM(self)
     local x, y = event.position.x, event.position.y
-    -- les quatre couleurs de la brosse
+    -- the brush's four colours
     if math.abs(y - self.penY) <= self.dotR + 6 then
         for k = 1, 4 do
             if math.abs(x - (self.dotX + (k - 1) * self.dotGap)) <= self.dotR + 6 then
@@ -519,14 +519,14 @@ local function down(self: Notes, event: PointerEvent)
                     self.editing = 0
                     setArm(self, true)
                 end
-                setPen(self, true)           -- choisir une couleur, c'est prendre la brosse
+                setPen(self, true)           -- choosing a colour means picking up the brush
                 self.dirty = true
                 event:hit()
                 return
             end
         end
     end
-    -- un point de la bande des commentaires : y aller et choisir la note (marqueur Frame.io)
+    -- a dot on the comment strip: go there and choose the note (Frame.io marker)
     if math.abs(y - self.barY) <= 14 then
         local span = math.max(self.barX1 - self.barX0, 1)
         for _, n in self.notes do
@@ -544,7 +544,7 @@ local function down(self: Notes, event: PointerEvent)
             end
         end
     end
-    -- la brosse : un outil, pas un mode ; elle ouvre le commentaire s'il n'y en a pas
+    -- the brush: a tool, not a mode; it opens the comment if there is none
     if inPen(self, x, y) then
         if not self.arm then
             self.editing = 0
@@ -554,7 +554,7 @@ local function down(self: Notes, event: PointerEvent)
         event:hit()
         return
     end
-    -- le bouton « Envoyer »
+    -- the "Send" button
     if x >= self.sendX and x <= self.sendX + self.sendW and y >= self.sendY and y <= self.sendY + self.sendH then
         if self.arm then
             commit(self)
@@ -562,7 +562,7 @@ local function down(self: Notes, event: PointerEvent)
         event:hit()
         return
     end
-    -- le champ de saisie : cliquer dedans ouvre le commentaire (comme Frame.io)
+    -- the input field: clicking in it opens the comment (like Frame.io)
     if x >= self.colX and y >= self.boxY - (self.lines - 1) * LINE_H and y <= self.boxY + self.boxH then
         if not self.arm then
             self.editing = 0
@@ -571,18 +571,18 @@ local function down(self: Notes, event: PointerEvent)
         event:hit()
         return
     end
-    -- la colonne : le timecode = y aller, la ligne choisie = la rouvrir, la pastille = traitée
+    -- the column: the timecode = go there, the chosen row = reopen it, the dot = resolved
     if x >= self.colX then
         local r = rowAt(self, x, y)
         if r == 0 then
-            blur(self)          -- le vide de la colonne, sous le fil : on sort de la saisie
+            blur(self)          -- the empty area of the column, under the thread: leave the input
             event:hit()
             return
         end
         local note = self.notes[self.top + r - 1]
-        local id, t = note.id, note.t                  -- blur() peut retrier les notes : on garde l'id
+        local id, t = note.id, note.t                  -- blur() may re-sort the notes: keep the id
         if note.id == self.sel and x >= self.colX + self.colW - 46 then
-            for k, n in self.notes do                  -- la croix : supprimer la note
+            for k, n in self.notes do                  -- the cross: delete the note
                 if n.id == id then
                     table.remove(self.notes, k)
                     break
@@ -596,13 +596,13 @@ local function down(self: Notes, event: PointerEvent)
             end
             self.dirty = true
         elseif note.id == self.sel and x >= self.colX + self.colW - 82 then
-            note.done = not note.done                  -- la coche : traitée / à faire
+            note.done = not note.done                  -- the check mark: resolved / to do
             print(string.format("#ANNRES %d %d", id, if note.done then 1 else 0))
             self.dirty = true
         else
             local was = self.arm
             if was then
-                blur(self)                             -- le brouillon en cours est posé avant de changer de note
+                blur(self)                             -- the current draft is posted before switching notes
             end
             if self.sel == id and not was then
                 edit(self, id)
@@ -625,7 +625,7 @@ local function down(self: Notes, event: PointerEvent)
         event:hit()
         return
     end
-    blur(self)      -- clic ailleurs (image sans crayon, barre, panneau) : on sort de la saisie
+    blur(self)      -- click elsewhere (frame without pencil, bar, panel): leave the input
 end
 
 local function pointerMove(self: Notes, event: PointerEvent)
@@ -653,7 +653,7 @@ local function pointerDown(self: Notes, event: PointerEvent)
     self.inDown = false
 end
 
--- le relâcher : c'est ici que le lecteur récupère le pointeur, jamais avant
+-- the release: this is where the player gets the pointer back, never before
 local function letGo(self: Notes)
     if self.unlock then
         self.unlock = false
@@ -664,7 +664,7 @@ end
 local function pointerUp(self: Notes, event: PointerEvent)
     if self.pen and self.drawing then
         self.drawing = false
-        table.insert(self.cur, -1)          -- fin de trait
+        table.insert(self.cur, -1)          -- end of stroke
         table.insert(self.cur, -1)
         event:hit()
     end
@@ -686,16 +686,16 @@ local function keyboardEvent(self: Notes, event: KeyboardEvent)
     end
     bindVM(self)
     local k = event.key
-    if k == 256 then                        -- échap
+    if k == 256 then                        -- escape
         setArm(self, false)
-    elseif k == 257 or k == 335 then        -- entrée
+    elseif k == 257 or k == 335 then        -- enter
         commit(self)
-    elseif k == 259 then                    -- retour arrière
+    elseif k == 259 then                    -- backspace
         if not self.arm then
             return
         end
         if self.text ~= "" then
-            -- une lettre : en UTF-8 on retire aussi les octets de continuation
+            -- one letter: in UTF-8 we also remove the continuation bytes
             local i = #self.text
             while i > 1 and bit32.band(string.byte(self.text, i), 0xC0) == 0x80 do
                 i -= 1
@@ -706,7 +706,7 @@ local function keyboardEvent(self: Notes, event: KeyboardEvent)
                 p.value = self.text
             end
         else
-            -- texte vide : on efface le dernier trait
+            -- empty text: delete the last stroke
             local n = #self.cur
             if n >= 2 then
                 local i = n - 2
@@ -719,15 +719,15 @@ local function keyboardEvent(self: Notes, event: KeyboardEvent)
             end
         end
     elseif not self.arm then
-        -- hors saisie, le clavier pilote la lecture (espace, image par image)
+        -- outside input, the keyboard drives playback (space, frame stepping)
         local c = self.cmd
         if c then
             if k == 32 then
-                c.value = 1                 -- lecture / pause
+                c.value = 1                 -- play / pause
             elseif k == 263 then
-                c.value = 2                 -- image précédente
+                c.value = 2                 -- previous frame
             elseif k == 262 then
-                c.value = 3                 -- image suivante
+                c.value = 3                 -- next frame
             end
         end
     end
@@ -736,7 +736,7 @@ end
 local function textEvent(self: Notes, event: TextInput)
     bindVM(self)
     if not self.arm then
-        -- Frame.io : on tape, ça ouvre le commentaire à l'image affichée et ça met en pause
+        -- Frame.io: typing opens the comment at the displayed frame and pauses
         self.editing = 0
         setArm(self, true)
     end
@@ -775,7 +775,7 @@ local function strokes(self: Notes, pts: { number }, renderer: Renderer, paint: 
 end
 
 local function draw(self: Notes, renderer: Renderer)
-    -- les notes déjà posées : leur repère sur la barre, et leur tracé quand la tête est dessus
+    -- the notes already posted: their marker on the bar, and their stroke when the playhead is on them
     local prog = self.progress
     local now = (if prog then prog.value else 0) * self.duration
     for _, n in self.notes do
@@ -783,19 +783,19 @@ local function draw(self: Notes, renderer: Renderer)
         local here = math.abs(now - n.t) < 0.25
         local big = here or n.id == self.sel
         circle(self.path, x, self.barY, if big then 11 else 8)
-        renderer:drawPath(self.path, self.fills[colorOf(n.c)])                 -- la pastille, couleur de la note
-        renderer:drawPath(self.path, if big then self.ringOn else self.ring)   -- son cercle blanc
+        renderer:drawPath(self.path, self.fills[colorOf(n.c)])                 -- the dot, in the note's colour
+        renderer:drawPath(self.path, if big then self.ringOn else self.ring)   -- its white circle
         if here then
-            -- le tracé n'apparaît qu'à l'endroit où la note a été posée (un clic sur la ligne
-            -- y emmène la tête de lecture, donc il revient en cliquant la note)
+            -- the stroke only appears where the note was posted (a click on the row
+            -- takes the playhead there, so it comes back by clicking the note)
             strokes(self, n.pts, renderer, self.inksOld[colorOf(n.c)])
         end
     end
-    -- la note en cours
+    -- the current note
     if self.arm and #self.cur > 0 then
         strokes(self, self.cur, renderer, self.inks[self.col])
     end
-    -- la ligne choisie porte un liseré rouge à gauche (lisible sans couvrir le texte)
+    -- the chosen row has a red edge on the left (readable without covering the text)
     local selRow = 0
     for r = 1, self.rows do
         local k = self.top + r - 1
@@ -811,22 +811,22 @@ local function draw(self: Notes, renderer: Renderer)
         qe:lineTo(Vector.xy(self.colX + 16, ey + 20))
         renderer:drawPath(qe, self.edge)
     end
-    -- la colonne : le trait « dessin » près du timecode, et à droite les deux actions de la ligne
-    -- (coche = traitée, croix = supprimer) — dessinées ici, la police d'un projet n'a pas ces signes
+    -- the column: the "drawing" mark near the timecode, and on the right the row's two actions
+    -- (check = resolved, cross = delete), drawn here because a project's font lacks these glyphs
     local q2 = self.path2
     for r = 1, self.rows do
         local k = self.top + r - 1
         if k <= #self.notes then
             local note = self.notes[k]
             local cy2 = self.rowY0 + (r - 1) * self.rowH
-            if #note.pts > 0 then          -- ce petit trait dit : cette note porte un dessin
+            if #note.pts > 0 then          -- this small mark says: this note carries a drawing
                 q2:reset()
                 q2:moveTo(Vector.xy(self.colX + 104, cy2 - 6))
                 q2:lineTo(Vector.xy(self.colX + 114, cy2 - 16))
                 renderer:drawPath(q2, self.inksOld[colorOf(note.c)])
             end
             local sel = note.id == self.sel
-            if note.done or sel then       -- la coche
+            if note.done or sel then       -- the check mark
                 local cx2 = self.colX + self.colW - 64
                 q2:reset()
                 q2:moveTo(Vector.xy(cx2 - 5, cy2))
@@ -834,7 +834,7 @@ local function draw(self: Notes, renderer: Renderer)
                 q2:lineTo(Vector.xy(cx2 + 6, cy2 - 5))
                 renderer:drawPath(q2, if note.done then self.okInk else self.dim)
             end
-            if sel then                    -- la croix : supprimer
+            if sel then                    -- the cross: delete
                 local cx3 = self.colX + self.colW - 32
                 q2:reset()
                 q2:moveTo(Vector.xy(cx3 - 5, cy2 - 5))
@@ -845,8 +845,8 @@ local function draw(self: Notes, renderer: Renderer)
             end
         end
     end
-    -- le champ : cadre allumé et curseur clignotant quand on écrit (la largeur du texte est estimée :
-    -- un script n'a pas les métriques de la police)
+    -- the field: lit frame and blinking cursor while writing (the text width is estimated:
+    -- a script has no font metrics)
     do
         local q3 = self.path2
         local grow = (self.lines - 1) * LINE_H
@@ -859,30 +859,30 @@ local function draw(self: Notes, renderer: Renderer)
         q3:close()
         renderer:drawPath(q3, if self.arm then self.edge else self.frame)
     end
-    -- la barre d'outils du champ : les quatre couleurs, puis la brosse (une seule, inchangée)
+    -- the field's toolbar: the four colours, then the brush (a single one, unchanged)
     do
         local q4 = self.path2
         for k = 1, 4 do
             local cx4 = self.dotX + (k - 1) * self.dotGap
             circle(self.path, cx4, self.penY, self.dotR)
             renderer:drawPath(self.path, self.fills[k])
-            if k == self.col then                      -- la couleur choisie porte un anneau
+            if k == self.col then                      -- the chosen colour has a ring
                 circle(q4, cx4, self.penY, self.dotR + 4)
                 renderer:drawPath(q4, self.ring)
             end
         end
     end
-    -- le bouton brosse : un disque, plein quand elle dessine
+    -- the brush button: a disc, solid when it is drawing
     local r = self.penR
     local cx, cy = self.penX, self.penY
     circle(self.path, cx, cy, r)
     renderer:drawPath(self.path, if self.pen then self.fills[self.col] else self.penRing)
-    -- la brosse elle-même (son propre Path : deux drawPath d'un même Path dans une frame se marchent dessus)
+    -- the brush itself (its own Path: two drawPath calls of the same Path in a frame step on each other)
     local q = self.path2
     q:reset()
-    q:moveTo(Vector.xy(cx - 8, cy + 8))      -- la pointe
-    q:lineTo(Vector.xy(cx + 7, cy - 7))      -- le corps
-    q:moveTo(Vector.xy(cx - 4, cy + 1))      -- la bague
+    q:moveTo(Vector.xy(cx - 8, cy + 8))      -- the tip
+    q:lineTo(Vector.xy(cx + 7, cy - 7))      -- the body
+    q:moveTo(Vector.xy(cx - 4, cy + 1))      -- the ferrule
     q:lineTo(Vector.xy(cx + 1, cy + 5))
     renderer:drawPath(q, if self.pen then self.penInk else self.inks[self.col])
 end

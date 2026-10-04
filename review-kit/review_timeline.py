@@ -1,29 +1,29 @@
-"""Artboard de relecture pour un film Rive CLI : le film en boucle + une barre de timeline scrubbable (parties nommées,
-graduations, accents musicaux), lecture / pause, compteur, bande-son synchronisée. Autonome : pas de dépendance au
-générateur du projet, seulement des ids et deux fichiers (ReviewPlayer.luau, une police).
+"""Review artboard for a Rive CLI film: the film on a loop + a scrubbable timeline bar (named parts,
+ruler marks, musical accents), play / pause, counter, synchronized soundtrack. Self-contained: no dependency on the
+project's generator, only ids and two files (ReviewPlayer.luau, a font).
 
-Usage (dans le générateur d'un projet) :
+Usage (inside a project's generator):
 
     import sys; sys.path.insert(0, ".../01_RIV_LIBRARY/review")
     from review_timeline import review_rml, install_player
-    install_player(project_dir)                      # copie ReviewPlayer.luau dans le projet (scanné par le CLI)
+    install_player(project_dir)                      # copies ReviewPlayer.luau into the project (scanned by the CLI)
     artboard_xml, roots_xml = review_rml(
-        next_id=ids.next,                            # fonction qui rend un id RML neuf ("900:123")
-        film_id=film.id, film_anim_id=film.anim.id,  # l'artboard du film et SA timeline (celle que la relecture scrubbe)
+        next_id=ids.next,                            # function returning a fresh RML id ("900:123")
+        film_id=film.id, film_anim_id=film.anim.id,  # the film's artboard and ITS timeline (the one the review scrubs)
         width=1200, height=1460, duration=43.97,
-        parts=[(0, "Intro"), (7.06, "Site"), ...],   # (début en s, nom)
-        accents=[4.53, 13.6, ...],                   # optionnel : losanges dorés (coups de musique)
+        parts=[(0, "Intro"), (7.06, "Verse"), ...],   # (start in s, name)
+        accents=[4.53, 13.6, ...],                   # optional: gold diamonds (music hits)
         font_file="../tools/src/fonts/Poppins-Medium.ttf",
-        audio_file="../tools/audio/soundtrack.mp3",  # optionnel ; mp3/wav, chemin relatif au projet
+        audio_file="../tools/audio/soundtrack.mp3",  # optional; mp3/wav, path relative to the project
         name="Film Review")
     scene = scene.replace("</Rive>", artboard_xml + roots_xml + "</Rive>")
 
-Puis : `rive <projet> --artboard="Film Review" --fit=contain` (viewer : boucle + son).
+Then: `rive <project> --artboard="Film Review" --fit=contain` (viewer: loop + sound).
 
-CONTRAT : le film doit être une fonction de sa timeline principale. Tout ce qui y est imbriqué et doit suivre le scrub
-(actes, plans) passe par une NestedRemapAnimation dont le `time` (fraction 0..1) est keyé linéairement 0 -> 1 dans
-cette timeline — pas par une NestedStateMachine (qui avance sur l'horloge réelle et ne suivrait pas le scrub).
-Les personnages imbriqués en NestedStateMachine continuent leur boucle d'ambiance, même en pause : c'est voulu.
+CONTRACT: the film must be a function of its main timeline. Everything nested in it that must follow the scrub
+(acts, shots) goes through a NestedRemapAnimation whose `time` (fraction 0..1) is keyed linearly 0 -> 1 in
+that timeline — not through a NestedStateMachine (which advances on the real clock and would not follow the scrub).
+Characters nested in a NestedStateMachine keep running their ambient loop, even when paused: this is intended.
 """
 import json
 import os
@@ -32,8 +32,8 @@ import shutil
 HERE = os.path.dirname(os.path.abspath(__file__))
 
 PANEL_H = 240
-COL_W, ROWS, ROW_H, ROW_Y0 = 380, 10, 62, 96      # la colonne « Notes » : largeur, lignes, pas, première ligne
-NOTES = os.environ.get('REVIEW_NOTES', '1') != '0'   # debug: REVIEW_NOTES=0 enlève la couche d'annotation
+COL_W, ROWS, ROW_H, ROW_Y0 = 380, 10, 62, 96      # the "Notes" column: width, rows, step, first row
+NOTES = os.environ.get('REVIEW_NOTES', '1') != '0'   # debug: REVIEW_NOTES=0 removes the annotation layer
 BG, BAR_TEXT, DIM, TICK, GOLD, WHITE = "FF151216", "FFFFFFFF", "FFB8AEC0", "FF6E6475", "FFF2C94C", "FFFFFFFF"
 PART_COLORS = ["FF6557A2", "FF8E2A5E", "FFA30F1B", "FF4B3B8C", "FFB0406E", "FF7A1E3A", "FF5A4D97", "FF9C2230", "FF3E2F72"]
 
@@ -54,13 +54,13 @@ def _esc(s):
 
 
 def load_notes(project_dir):
-    """les notes deja prises (<projet>/.review/notes.json) en une chaine que ReviewNotes relit :
-    une note par ligne, `id|t|texte|x,y,x,y,...` (-1,-1 = fin d'un trait).
-    Le dossier est caché exprès : le viewer reconstruit la scène dès qu'un fichier du projet bouge,
-    donc poser une note à la racine ferait recharger le film (retour à 0, fil perdu)."""
+    """the notes already taken (<project>/.review/notes.json) as a string that ReviewNotes reads back:
+    one note per line, `id|t|text|x,y,x,y,...` (-1,-1 = end of a stroke).
+    The folder is hidden on purpose: the viewer rebuilds the scene as soon as a file of the project changes,
+    so putting a note at the root would reload the film (back to 0, place lost)."""
     p = os.path.join(project_dir, ".review", "notes.json")
     if not os.path.exists(p):
-        p = os.path.join(project_dir, "review_notes.json")     # ancien emplacement
+        p = os.path.join(project_dir, "review_notes.json")     # old location
     if not os.path.exists(p):
         return ""
     try:
@@ -82,8 +82,8 @@ def review_rml(next_id, film_id, film_anim_id, width, height, duration, parts, f
                font_id=None, audio_declared=False):
     """returns (artboard_xml, roots_xml) — roots = ViewModel + ScriptAsset + FontAsset (+ AudioAsset).
 
-    font_id / audio_declared : la scène déclare déjà cette police (on réutilise son id) ou cet audio
-    (on ne le redéclare pas) — le cas d'une pose sur un projet existant, voir review_install.py."""
+    font_id / audio_declared: the scene already declares this font (its id is reused) or this audio
+    (it is not redeclared) — the case of an install on an existing project, see review_install.py."""
     W, H = width, height
     i = next_id
     # ---- roots
@@ -91,7 +91,7 @@ def review_rml(next_id, film_id, film_anim_id, width, height, duration, parts, f
     names = ["progress", "headX", "timeText", "playOp", "pauseOp", "annOn", "noteText", "noteHint", "seekTo", "selY", "selA", "cmd", "phA", "noteAt", "sendA", "noteCount", "holdPlay", "boxBgH", "boxBgY", "boxAtY"]
     if NOTES:
         for r in range(1, ROWS + 1):
-            names += [f"rowT{r}", f"rowX{r}", f"rowA{r}"]        # texte de la ligne, temps affiché, opacité (0 = ligne vide)
+            names += [f"rowT{r}", f"rowX{r}", f"rowA{r}"]        # row text, displayed time, opacity (0 = empty row)
     props = {n: i() for n in names}
     kinds = {"timeText": "String", "noteText": "String", "noteHint": "String"}
     kinds["noteAt"] = "String"
@@ -134,8 +134,8 @@ def review_rml(next_id, film_id, film_anim_id, width, height, duration, parts, f
                 f'<Fill name="F"><SolidColor colorValue="{color}" name="C"/></Fill></Shape>')
 
     def text(s, size, color, cx, cy, ox=0.5, name=None, run_extra="", wrap_w=None, oy=0.5):
-        """wrap_w : une largeur fixe fait revenir le texte à la ligne (autoWidth ne le fait jamais) ;
-        avec oy=1 la boîte pousse vers le HAUT, ce qu'il faut pour un champ posé en bas de colonne"""
+        """wrap_w: a fixed width makes the text wrap (autoWidth never does);
+        with oy=1 the box grows UPWARD, which is what a field placed at the bottom of a column needs"""
         sid = i()
         size_attr = (f'sizingValue="autoHeight" width="{_f(wrap_w)}" wrapValue="wrap"'
                      if wrap_w else 'sizingValue="autoWidth"')
@@ -144,15 +144,15 @@ def review_rml(next_id, film_id, film_anim_id, width, height, duration, parts, f
                 f'<TextValueRun styleId="{sid}" text="{_esc(s)}" name="Run" id="{i()}">{run_extra}</TextValueRun></Text>')
 
     # ---- panel geometry
-    # +98 avec les notes : leur bande propre sous les blocs (34) + la ligne d'aide (64)
+    # +98 with notes: their own strip under the blocks (34) + the help line (64)
     panel_h = PANEL_H + (98 if NOTES else 0)
     x0, x1 = 40.0, W - 40.0
     bw = x1 - x0
     px = lambda t: x0 + bw * t / duration
     row_y = H + 40
     bar_y, bar_h = H + 124, 44
-    # la bande des commentaires : sous les blocs, au-dessus des graduations (sinon les pastilles
-    # se posent au milieu des blocs et mangent leurs libellés)
+    # the comments strip: under the blocks, above the ruler marks (otherwise the dots
+    # land in the middle of the blocks and eat their labels)
     note_y = bar_y + bar_h / 2 + (30 if NOTES else 0)
     ruler = 34 + (34 if NOTES else 0)
     btn_x, btn_r = x0 + 24, 24
@@ -200,23 +200,23 @@ def review_rml(next_id, film_id, film_anim_id, width, height, duration, parts, f
     # the note line and the hint, in the panel under the bar
     kids.append(text("space = play · arrows = step one frame · type to comment · click a time to jump there",
                      14, DIM, x0, H + panel_h - (34 if NOTES else 0) - 34, ox=0, name="Aide"))
-    # ---- la colonne des commentaires (à droite du film) : en-tête, fil, champ + barre d'outils
+    # ---- the comments column (right of the film): header, thread, field + toolbar
     col_x = W
     PAD, SURF, FIELD, MUTED, LINE = 24, "FF1A171E", "FF23202A", "FF8F8698", "FF2E2936"
-    TXT_X = col_x + PAD + 14                              # le texte du champ ; le curseur du script s'y cale
+    TXT_X = col_x + PAD + 14                              # the field's text; the script's cursor aligns to it
     box_h, send_w, send_h = 158, 76, 30
-    box_y = H + panel_h - box_h - 24                      # le champ, posé en bas de la colonne
+    box_y = H + panel_h - box_h - 24                      # the field, placed at the bottom of the column
     send_x, send_y = col_x + COL_W - PAD - send_w - 12, box_y + box_h - send_h - 16
-    tool_y = send_y + send_h / 2                          # la barre d'outils : 4 couleurs + la brosse
+    tool_y = send_y + send_h / 2                          # the toolbar: 4 colours + the brush
     dot_x, dot_gap, dot_r = TXT_X + 10, 28, 8
     pen_x, pen_y, pen_r = dot_x + 3 * dot_gap + 46, tool_y, 15
     if NOTES:
-        # en-tête
+        # header
         kids.append(text("COMMENTS", 12, MUTED, col_x + PAD, 46, ox=0, name="Col titre"))
         kids.append(text("", 12, MUTED, col_x + COL_W - PAD, 46, ox=1, name="Col compte", run_extra=bind("noteCount", 268)))
         kids.append(rect(COL_W - PAD * 2, 1, LINE, col_x + COL_W / 2, 66, 0, "Col filet"))
-        # le fil : un timecode en pastille, le texte dessous ; les actions (coche, croix) sont dessinées
-        # par le script sur la ligne choisie
+        # the thread: a timecode as a pill, the text below; the actions (check, cross) are drawn
+        # by the script on the chosen row
         for r in range(1, ROWS + 1):
             ry = ROW_Y0 + (r - 1) * ROW_H
             kids.append(f'<Node x="0" y="0" name="Ligne {r}" id="{i()}">{bind(f"rowA{r}", 18)}'
@@ -224,12 +224,12 @@ def review_rml(next_id, film_id, film_anim_id, width, height, duration, parts, f
                         + text("", 15, WHITE, col_x + PAD, ry + 14, ox=0, name=f"Note {r}", run_extra=bind(f"rowT{r}", 268))
                         + rect(62, 22, "FF2A2430", col_x + PAD + 31, ry - 11, 6, f"Temps fond {r}")
                         + "</Node>")
-        # le surlignage de la ligne choisie : APRÈS les lignes, donc dessous (premier enfant = dessus)
+        # the highlight of the chosen row: AFTER the rows, hence underneath (first child = on top)
         kids.append(f'<Node x="{_f(col_x + PAD - 12)}" y="0" name="Sel" id="{i()}">{bind("selY", 14)}{bind("selA", 18)}'
                     + rect(COL_W - PAD * 2 + 24, ROW_H - 6, "FF252029", (COL_W - PAD * 2 + 24) / 2, 0, 10, "Sel fond") + "</Node>")
-        # le champ de commentaire
+        # the comment field
         field_w = COL_W - PAD * 2 - 28
-        text_base = box_y + 70                      # le bas du texte : les lignes s'empilent vers le haut
+        text_base = box_y + 70                      # the bottom of the text: lines stack upward
         kids.append(f'<Node x="0" y="0" name="Boite temps" id="{i()}">{bind("boxAtY", 14)}'
                     + text("", 12, "FFFF4D6A", TXT_X, box_y + 28, ox=0, name="Temps", run_extra=bind("noteAt", 268))
                     + "</Node>")
@@ -241,10 +241,10 @@ def review_rml(next_id, film_id, film_anim_id, width, height, duration, parts, f
         kids.append(text("Send", 13, WHITE, send_x + send_w / 2, send_y + send_h / 2, name="Envoyer"))
         kids.append(f'<Node x="0" y="0" name="Envoyer fond" id="{i()}">{bind("sendA", 18)}'
                     + rect(send_w, send_h, "FFFF4D6A", send_x + send_w / 2, send_y + send_h / 2, 15, "Envoyer pilule") + "</Node>")
-        # l'aide, sur sa propre ligne au-dessus de la barre d'outils (les phrases du script sont courtes)
+        # the help, on its own line above the toolbar (the script's phrases are short)
         kids.append(text("", 11, MUTED, TXT_X, box_y + 92, ox=0, name="Boite aide", run_extra=bind("noteHint", 268)))
         kids.append(rect(COL_W - PAD * 2 - 28, 1, LINE, col_x + COL_W / 2, box_y + 108, 0, "Boite filet 2"))
-        # le fond suit la hauteur du texte : le script écrit boxBgH / boxBgY (le bas reste en place)
+        # the background follows the text height: the script writes boxBgH / boxBgY (the bottom stays in place)
         kids.append(rect(COL_W - PAD * 2, box_h, FIELD, col_x + COL_W / 2, box_y + box_h / 2, 14, "Boite fond",
                          extra=bind("boxBgY", 14), path_extra=bind("boxBgH", 21)))
         kids.append(rect(COL_W - PAD * 2, 1, LINE, col_x + COL_W / 2, box_y - 18, 0, "Boite filet"))

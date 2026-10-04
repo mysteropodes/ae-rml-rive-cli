@@ -56,18 +56,25 @@ python3 review-kit/review_install.py out/demo
 
 `examples/make_demo_aep.jsx` rebuilds `examples/demo.aep` in an empty After Effects project.
 
-## What converts, and how well
+## Documentation
 
-Every conversion writes a report (`build/ae2rml/report.md`, `build/rml2ae/<name>.ae-report.md`) listing what was
-converted exactly, approximated, or left out. Details, measurements and known limits:
+| | |
+|---|---|
+| [docs/install.md](docs/install.md) | installing everything or one part |
+| [docs/ae2rml.md](docs/ae2rml.md) | After Effects → Rive: options, what converts, limits |
+| [docs/rml2ae.md](docs/rml2ae.md) | Rive → After Effects: the `ae` command, incremental builds, `ae pull`, limits |
+| [docs/fxlib.md](docs/fxlib.md) | the WGSL library of After Effects effects and how each one is measured |
+| [docs/rive-shader-plugin.md](docs/rive-shader-plugin.md) | the After Effects plugin, WGSL conventions, image meshes |
+| [docs/review-kit.md](docs/review-kit.md) | review notes in the Rive CLI viewer |
+| [docs/agents.md](docs/agents.md) | using the tools from a coding agent |
 
-- `rml2ae/README.md` — both converters, the effect library, the plugin (French, technical).
-- `rml2ae/INSTALL.md`, `rml2ae/LLM_SETUP.md` — setup, and how to configure a coding agent.
-- `review-kit/README.md` — the review kit.
+Every conversion also writes a report (`build/ae2rml/report.md`, `build/rml2ae/<name>.ae-report.md`) listing what was
+converted exactly, approximated, or left out.
 
-Known limits (also in the reports): After Effects' noise-based and some third-party effects have no exact
-equivalent; motion blur, 3D renderers, tracking and audio mixing are not converted; Luau-scripted Rive content is
-replayed into After Effects as image sequences.
+Known limits: After Effects' noise-based and some third-party effects have no exact equivalent; motion blur, 3D
+renderers, tracking and audio mixing are not converted; Luau-scripted Rive content is replayed into After Effects as
+image sequences; the plugin is not signed with an Apple Developer ID (allow it once in System Settings › Privacy &
+Security). A prebuilt plugin is attached to the GitHub releases.
 
 ## Agent skills
 
@@ -77,5 +84,5 @@ replayed into After Effects as image sequences.
 ## Credits and licenses
 
 MIT — see `LICENSE`. Third parties (not redistributed): Rive CLI and runtime (Rive Inc.), py-aep (Fortiche Prod, MIT),
-Adobe After Effects SDK, wgpu-native — see `rml2ae/THIRD_PARTY.md`. This project is independent and not affiliated
+Adobe After Effects SDK, wgpu-native — see `THIRD_PARTY.md`. This project is independent and not affiliated
 with Rive Inc. or Adobe Inc.

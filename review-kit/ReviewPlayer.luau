@@ -1,16 +1,16 @@
 --!strict
--- ReviewPlayer — lecteur de relecture pour un film Rive CLI : boucle, lecture / pause, tête de lecture qu'on
--- clique ou qu'on glisse, compteur, bande-son recalée sur la position.
+-- ReviewPlayer: review player for a Rive CLI film. Loop, play / pause, a playhead you
+-- click or drag, counter, soundtrack re-synced to the position.
 --
--- Contrat (voir README.md) : tout le film est une fonction d'UN nombre, le `time` (fraction 0..1) de la
--- NestedRemapAnimation du film imbriqué dans l'artboard de relecture, lié à la propriété de ViewModel `progress`.
--- Ce script écrit `progress` à chaque frame, plus ce que la barre affiche : `headX` (x de la tête), `timeText`,
--- `playOp` / `pauseOp` (opacité des icônes). Il reçoit tous les événements pointeur de l'artboard :
---   barre (entre barY0 et barY1)          -> clic = aller là, glisser = scrubber (la lecture reprend au relâcher)
---   bouton (cercle btnX, btnY, btnR)      -> lecture / pause
---   image du film (au-dessus de filmBottom) -> lecture / pause
--- Le son : AudioAsset nommé `audio` (vide = muet). Audio.play rend nil en headless (--screenshot) : tout reste
--- silencieux et le reste fonctionne.
+-- Contract (see README.md): the whole film is a function of ONE number, the `time` (fraction 0..1) of the
+-- NestedRemapAnimation of the film nested in the review artboard, bound to the ViewModel property `progress`.
+-- This script writes `progress` every frame, plus what the bar displays: `headX` (x of the head), `timeText`,
+-- `playOp` / `pauseOp` (icon opacity). It receives all the artboard's pointer events:
+--   bar (between barY0 and barY1)         -> click = go there, drag = scrub (playback resumes on release)
+--   button (circle btnX, btnY, btnR)      -> play / pause
+--   film frame (above filmBottom)         -> play / pause
+-- Sound: AudioAsset named `audio` (empty = muted). Audio.play returns nil in headless mode (--screenshot): everything stays
+-- silent and the rest works.
 
 type Review = {
     duration: Input<number>,
@@ -67,10 +67,10 @@ local function bindVM(self: Review)
     self.timeText = vm:getString("timeText")
     self.playOp = vm:getNumber("playOp")
     self.pauseOp = vm:getNumber("pauseOp")
-    self.annOn = vm:getNumber("annOn")        -- 1 = le crayon dessine : le lecteur lâche le pointeur
-    self.holdPlay = vm:getNumber("holdPlay")  -- 1 = on écrit une note : le film reste figé
-    self.seekTo = vm:getNumber("seekTo")      -- le temps d'une note : on y va, puis -1
-    self.cmd = vm:getNumber("cmd")            -- 1 = lecture/pause, 2 = image -1, 3 = image +1
+    self.annOn = vm:getNumber("annOn")        -- 1 = the pencil is drawing: the player releases the pointer
+    self.holdPlay = vm:getNumber("holdPlay")  -- 1 = a note is being written: the film stays frozen
+    self.seekTo = vm:getNumber("seekTo")      -- the time of a note: go there, then -1
+    self.cmd = vm:getNumber("cmd")            -- 1 = play/pause, 2 = frame -1, 3 = frame +1
     self.bound = true
 end
 
@@ -179,19 +179,19 @@ function advance(self: Review, seconds: number): boolean
     if sk and sk.value >= 0 then
         self.t = clamp(sk.value, 0, self.duration)
         sk.value = -1
-        -- aller sur une note, c'est se poser sur SON image : on s'y arrête (le dessin de la note
-        -- n'est visible qu'à cet instant, il filerait en une demi-seconde si la lecture continuait)
+        -- going to a note means landing on ITS frame: we stop there (the note's drawing
+        -- is only visible at that instant, it would be gone in half a second if playback continued)
         stopSound(self)
         self.playing = false
         self.dragging = false
         self.wasPlaying = false
     end
-    -- en mode annotation le film est figé : la note appartient à l'image qu'on regarde
+    -- in annotation mode the film is frozen: the note belongs to the frame being looked at
     local hp = self.holdPlay
     local a = self.annOn
     if (a ~= nil and a.value >= 0.5) or (hp ~= nil and hp.value >= 0.5) then
         if self.playing or self.sound ~= nil then
-            stopSound(self)          -- pas un pause : la piste est relâchée, elle ne peut plus filer toute seule
+            stopSound(self)          -- not a pause: the track is released, it can no longer run away on its own
             self.playing = false
         end
         self.dragging = false
@@ -217,9 +217,9 @@ function advance(self: Review, seconds: number): boolean
     return true
 end
 
--- le mode annotation (ReviewNotes) prend la main sur le pointeur : le lecteur ne scrubbe ni ne bascule.
--- ÉCRIRE compte autant que DESSINER : sans `holdPlay` ici, le clic qui sort du champ (sur l'image,
--- sur la barre) arrivait aussi au lecteur, qui relançait le film — la note posée semblait s'effacer.
+-- annotation mode (ReviewNotes) takes over the pointer: the player neither scrubs nor toggles.
+-- WRITING counts as much as DRAWING: without `holdPlay` here, the click leaving the field (on the frame,
+-- on the bar) also reached the player, which restarted the film, so the posted note seemed to vanish.
 local function annotating(self: Review): boolean
     local a, h = self.annOn, self.holdPlay
     return (a ~= nil and a.value >= 0.5) or (h ~= nil and h.value >= 0.5)
@@ -271,7 +271,7 @@ end
 function pointerUp(self: Review, event: PointerEvent)
     if annotating(self) then
         self.dragging = false
-        self.wasPlaying = false      -- on est en train d'annoter : rien ne redémarre au relâcher
+        self.wasPlaying = false      -- we are annotating: nothing restarts on release
         return
     end
     if self.dragging then

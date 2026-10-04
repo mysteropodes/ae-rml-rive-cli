@@ -1,23 +1,23 @@
-"""Poser l'outil de relecture sur un projet Rive CLI qui n'a rien prévu pour.
+"""Install the review tool on a Rive CLI project that made no provision for it.
 
-Le générateur `review_timeline.py` s'appelle depuis un gen_scene.py maison ; ce module-ci fait le
-même travail sur un `scene.rml` déjà écrit : il y lit l'artboard du film, son animation, sa police,
-son audio, puis ajoute (ou remplace) un artboard « <Film> Review » entre deux marqueurs.
+The generator `review_timeline.py` is called from a custom gen_scene.py; this module does the
+same job on an already written `scene.rml`: it reads the film's artboard, its animation, its font,
+its audio, then adds (or replaces) a "<Film> Review" artboard between two markers.
 
-    python3 review_install.py <projet>                       # installe, devine tout
-    python3 review_install.py <projet> --artboard="Mon film" --parts "0:Intro,7.1:Refrain"
-    python3 review_install.py <projet> --refresh             # recharge les notes prises depuis
-    python3 review_install.py <projet> --remove              # enlève l'artboard de relecture
+    python3 review_install.py <project>                      # installs, guesses everything
+    python3 review_install.py <project> --artboard="My film" --parts "0:Intro,7.1:Chorus"
+    python3 review_install.py <project> --refresh            # reloads the notes taken since
+    python3 review_install.py <project> --remove             # removes the review artboard
 
-Ce que la commande touche dans le projet :
-    scene.rml            l'artboard de relecture, entre <!-- review-kit:start --> et :end
-    ReviewPlayer.luau    copiés depuis ce dossier (le CLI compile tous les .luau du projet)
+What the command touches in the project:
+    scene.rml            the review artboard, between <!-- review-kit:start --> and :end
+    ReviewPlayer.luau    copied from this folder (the CLI compiles every .luau of the project)
     ReviewNotes.luau
-    .review/config.json  les réglages, pour rejouer l'installation avec --refresh
+    .review/config.json  the settings, to replay the installation with --refresh
 
-Le bloc est délimité : réinstaller ne duplique rien, et --remove rend le projet à son état d'avant.
-Les ids sont pris dans un préfixe libre (« 7777:N » par défaut), donc sans collision possible avec
-ceux du projet.
+The block is delimited: reinstalling duplicates nothing, and --remove returns the project to its previous state.
+Ids are taken from a free prefix ("7777:N" by default), so there can be no collision with
+those of the project.
 """
 import argparse
 import json
@@ -38,7 +38,7 @@ def _attr(tag, name):
 
 
 def artboards(rml):
-    """[(tag, span_debut, span_fin_du_bloc)] — un artboard par entrée, dans l'ordre du fichier"""
+    """[(tag, start_pos)] — one artboard per entry, in file order"""
     out = []
     for m in re.finditer(r"<Artboard\b[^>]*>", rml):
         out.append((m.group(0), m.start()))
@@ -46,7 +46,7 @@ def artboards(rml):
 
 
 def artboard_body(rml, start):
-    """le texte de l'artboard qui commence à `start`, jusqu'à son </Artboard> (imbrication comprise)"""
+    """the text of the artboard starting at `start`, up to its </Artboard> (nesting included)"""
     depth, i = 0, start
     for m in re.finditer(r"</?Artboard\b", rml[start:]):
         if m.group(0).startswith("</"):
@@ -61,11 +61,11 @@ def artboard_body(rml, start):
 def pick_artboard(rml, name=None):
     for tag, pos in artboards(rml):
         if _attr(tag, "includeInExport") == "false":
-            continue                                  # un artboard de travail, pas un film
+            continue                                  # a working artboard, not a film
         nm = _attr(tag, "name")
         if name is None or nm == name:
             return tag, pos, nm
-    raise SystemExit(f"artboard introuvable : {name!r}" if name else "aucun artboard dans scene.rml")
+    raise SystemExit(f"artboard not found: {name!r}" if name else "no artboard in scene.rml")
 
 
 def pick_animation(body, name=None):
@@ -76,9 +76,9 @@ def pick_animation(body, name=None):
             continue
         dur = float(_attr(tag, "duration") or 0)
         if best is None or dur > float(_attr(best, "duration") or 0):
-            best = tag                                # la plus longue : c'est le film, pas un cycle
+            best = tag                                # the longest: that is the film, not a cycle
     if best is None:
-        raise SystemExit("cet artboard n'a pas de LinearAnimation : rien à relire")
+        raise SystemExit("this artboard has no LinearAnimation: nothing to review")
     return best
 
 
@@ -107,7 +107,7 @@ def strip_block(rml):
 
 
 def parse_parts(spec, duration, fallback):
-    """« 0:Intro,7.1:Refrain » -> [(0.0, "Intro"), (7.1, "Refrain")] ; sinon un seul bloc"""
+    """\"0:Intro,7.1:Chorus\" -> [(0.0, \"Intro\"), (7.1, \"Chorus\")]; otherwise a single block"""
     if not spec:
         return [(0.0, fallback)]
     out = []
@@ -116,13 +116,13 @@ def parse_parts(spec, duration, fallback):
         try:
             out.append((float(t), label.strip() or f"{float(t):.1f}s"))
         except ValueError:
-            raise SystemExit(f"--parts : « {chunk} » n'est pas « seconde:nom »")
+            raise SystemExit(f"--parts: \"{chunk}\" is not \"second:name\"")
     out.sort()
     return out
 
 
 def find_font(project):
-    """une police posée dans le projet (hors build/) : chemin relatif au projet, comme dans le RML"""
+    """a font placed in the project (outside build/): path relative to the project, as in the RML"""
     for root, dirs, files in os.walk(project):
         dirs[:] = [d for d in dirs if d not in ("build", ".review", ".git")]
         for f in sorted(files):
@@ -152,7 +152,7 @@ def save_config(project, cfg):
 def install(project, cfg):
     scene = os.path.join(project, "scene.rml")
     if not os.path.exists(scene):
-        raise SystemExit(f"pas de scene.rml dans {project}")
+        raise SystemExit(f"no scene.rml in {project}")
     rml = open(scene, encoding="utf-8").read()
     rml, had = strip_block(rml)
 
@@ -165,33 +165,33 @@ def install(project, cfg):
     frames = float(_attr(anim, "duration") or 0)
     duration = frames / fps
     if not (w and h and duration):
-        raise SystemExit(f"artboard {film_name!r} : largeur/hauteur/durée illisibles")
+        raise SystemExit(f"artboard {film_name!r}: width/height/duration unreadable")
 
     font, font_id = cfg.get("font"), None
     if not font:
         m = re.search(r'<FontAsset\b[^>]*\bfile="([^"]*)"[^>]*\bid="([^"]*)"', rml)
         if m:
-            font, font_id = m.group(1), m.group(2)   # déjà déclarée : on réutilise son id
+            font, font_id = m.group(1), m.group(2)   # already declared: reuse its id
     if not font:
-        font = find_font(project)                    # une .ttf posée dans le projet fait l'affaire
+        font = find_font(project)                    # a .ttf placed in the project will do
     if not font:
-        raise SystemExit("le panneau a besoin d'une police et la scène n'en déclare aucune :\n"
-                         "  --font=<chemin vers une .ttf, relatif au projet>")
+        raise SystemExit("the panel needs a font and the scene declares none:\n"
+                         "  --font=<path to a .ttf, relative to the project>")
 
     audio, audio_name = cfg.get("audio"), cfg.get("audio_name") or "soundtrack"
     audio_declared = False
-    silent = audio == ""                             # --no-audio : le projet joue son son lui-même
+    silent = audio == ""                             # --no-audio: the project plays its own sound
     if silent:
         audio = None
     elif audio is None:
         m = re.search(r'<AudioAsset\b[^>]*\bfile="([^"]*)"[^>]*\bname="([^"]*)"', rml)
         if m:
             audio, audio_name, audio_declared = m.group(1), m.group(2), True
-    # la police et l'audio sont déjà déclarés dans la scène : les redéclarer ferait deux assets
+    # the font and audio are already declared in the scene: redeclaring them would create two assets
     parts = parse_parts(cfg.get("parts"), duration, film_name or "Film")
     name = cfg.get("name") or f"{film_name} Review"
 
-    # un artboard ne peut être imbriqué que promu composant (inspect : nested-artboard-not-component)
+    # an artboard can only be nested once promoted to a component (inspect: nested-artboard-not-component)
     promoted = False
     if 'isComponent="true"' not in tag:
         rml = rml[:pos] + tag.replace("<Artboard", '<Artboard isComponent="true"', 1) + rml[pos + len(tag):]
@@ -208,17 +208,17 @@ def install(project, cfg):
     block = f"\n{START}\n{art}\n{roots}\n{component}\n{END}\n"
     end = rml.rfind("</Rive>")
     if end == -1:
-        raise SystemExit("scene.rml : pas de </Rive> — fichier inattendu")
+        raise SystemExit("scene.rml: no </Rive> — unexpected file")
     open(scene, "w", encoding="utf-8").write(rml[:end] + block + rml[end:])
 
     cfg.update({"promoted": promoted or cfg.get("promoted", False),
                 "artboard": film_name, "name": name, "font": font, "audio": "" if silent else audio,
                 "audio_name": audio_name, "fps": fps})
     save_config(project, cfg)
-    print(f"{'remplacé' if had else 'installé'} : artboard « {name} » "
-          f"({film_name}, {w:.0f}x{h:.0f}, {duration:.1f} s, {len(parts)} bloc(s)"
+    print(f"{'replaced' if had else 'installed'}: artboard \"{name}\" "
+          f"({film_name}, {w:.0f}x{h:.0f}, {duration:.1f} s, {len(parts)} block(s)"
           f"{', audio' if audio else ''})")
-    print(f"  rive {project} --artboard=\"{name}\"      # ou, pour ramasser les notes :")
+    print(f"  rive {project} --artboard=\"{name}\"      # or, to collect the notes:")
     print(f"  python3 {os.path.join(HERE, 'review_notes.py')} open {project} \"{name}\"")
 
 
@@ -226,10 +226,10 @@ def remove(project):
     scene = os.path.join(project, "scene.rml")
     rml, had = strip_block(open(scene, encoding="utf-8").read())
     if not had:
-        print("rien à enlever")
+        print("nothing to remove")
         return
     cfg = load_config(project)
-    if cfg.get("promoted"):                      # l'artboard n'était pas un composant avant nous
+    if cfg.get("promoted"):                      # the artboard was not a component before us
         try:
             tag, pos, _ = pick_artboard(rml, cfg.get("artboard"))
             rml = rml[:pos] + tag.replace(' isComponent="true"', "", 1) + rml[pos + len(tag):]
@@ -240,21 +240,21 @@ def remove(project):
         p = os.path.join(project, f)
         if os.path.exists(p):
             os.remove(p)
-    print("artboard de relecture et scripts retirés (les notes restent dans .review/)")
+    print("review artboard and scripts removed (the notes stay in .review/)")
 
 
 def main(argv=None):
     ap = argparse.ArgumentParser(description=__doc__.split("\n")[0])
     ap.add_argument("project")
-    ap.add_argument("--artboard", help="le film à relire (par défaut : le premier exporté)")
-    ap.add_argument("--animation", help="son animation (par défaut : la plus longue)")
-    ap.add_argument("--name", help="nom de l'artboard de relecture (par défaut « <Film> Review »)")
-    ap.add_argument("--parts", help='les blocs de la barre : "0:Intro,7.1:Refrain"')
-    ap.add_argument("--font", help="la police du panneau (par défaut : la première de la scène)")
-    ap.add_argument("--audio", help="la bande-son à jouer (par défaut : celle de la scène)")
-    ap.add_argument("--no-audio", action="store_true", help="ne rien jouer (une scène dont le son est piloté par script)")
+    ap.add_argument("--artboard", help="the film to review (default: the first exported one)")
+    ap.add_argument("--animation", help="its animation (default: the longest)")
+    ap.add_argument("--name", help="name of the review artboard (default \"<Film> Review\")")
+    ap.add_argument("--parts", help='blocks of the bar: "0:Intro,7.1:Chorus"')
+    ap.add_argument("--font", help="the panel font (default: the first one in the scene)")
+    ap.add_argument("--audio", help="the soundtrack to play (default: the scene's)")
+    ap.add_argument("--no-audio", action="store_true", help="play nothing (a scene whose sound is driven by script)")
     ap.add_argument("--fps", type=float)
-    ap.add_argument("--refresh", action="store_true", help="réinstalle avec les réglages gardés (recharge les notes)")
+    ap.add_argument("--refresh", action="store_true", help="reinstall with the saved settings (reloads the notes)")
     ap.add_argument("--remove", action="store_true")
     a = ap.parse_args(argv)
     if a.remove:

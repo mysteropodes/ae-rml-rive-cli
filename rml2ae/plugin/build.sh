@@ -59,6 +59,8 @@ if [[ "${1:-}" == "install" ]]; then
         echo "install: quit After Effects first (the plugin is loaded)"; exit 1
     fi
     mkdir -p "$AE_PLUG" && rsync -a --delete "$PLUGIN/" "$AE_PLUG/" && echo "installed: $AE_PLUG"
+    # a second copy in the staging folder (scanned again through the RiveDev link) would load the effect twice
+    rm -rf "$STAGE/RiveShader.plugin"
 fi
 
 # 4. optional distributable zip

@@ -366,7 +366,9 @@ static PF_Err PreRender(PF_InData* in_data, PF_OutData* out_data, PF_PreRenderEx
     if (!err) {
         prd->inRect = in_result.result_rect;
         prd->layerRect = layer;
-        prd->outRect = Union(layer, in_result.result_rect);
+        // AE: the result rect must not exceed the request rect (error 25::237 when only part of the layer is asked
+        // for, e.g. a layer partly outside its comp). The shader still runs on the whole layer; only this part is output.
+        prd->outRect = Intersect(Union(layer, in_result.result_rect), extra->input->output_request.rect);
         extra->output->result_rect = prd->outRect;
         extra->output->max_result_rect = Union(layer, probe.max_result_rect);
         extra->output->solid = FALSE;
@@ -533,7 +535,7 @@ static PF_Err SmartRender(PF_InData* in_data, PF_OutData* out_data, PF_SmartRend
         rs::Gpu* G = (!err && src) ? gpu() : nullptr;
         if (!err && src && !G) problem = "GPU unavailable: " + g_gpuError;
 
-        const bool hasLayer = prd->layerRect.right > prd->layerRect.left && prd->layerRect.bottom > prd->layerRect.top;
+        const bool hasLayer = prd->layerRect.right > prd->layerRect.left && prd->layerRect.bottom > prd->layerRect.top && outW->width > 0 && outW->height > 0;
         if (!err && src && G && hasLayer) {
             // the shader's frame = the layer rect (uv 0..1, `size`, points in layer px), not the buffer
             const int w = (int)(prd->layerRect.right - prd->layerRect.left), h = (int)(prd->layerRect.bottom - prd->layerRect.top);
