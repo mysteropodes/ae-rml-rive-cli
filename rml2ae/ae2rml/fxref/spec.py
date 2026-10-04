@@ -196,6 +196,13 @@ SPEC = {
     "advanced_lightning": ("ADBE Lightning 2", [({}, 0), ({4: 25, 6: 3, 10: 50, 14: 2.5}, 0)]),
     "brush_strokes": ("ADBE Brush Strokes", [({2: 6, 3: 20}, 0), ({1: 45, 2: 10, 3: 40, 4: 2, 6: 3}, 0)]),
     "noise_hls_auto": ("ADBE Noise HLS Auto", [({2: 20, 3: 20, 4: 20}, 0), ({1: 3, 3: 40, 5: 4}, 0)]),
+    # lot 13 (unverified until rendered)
+    "cc_composite": ("CC Composite", [({1: 50}, 0), ({2: 6}, 0), ({2: 1, 3: 0}, 0)]),
+    "paint_bucket": ("ADBE Paint Bucket", [({1: [600, 340], 3: 10}, 0), ({1: [380, 330], 2: 2, 3: 40, 10: [0, 0.4, 1, 1]}, 0), ({1: [5, 5], 2: 3, 4: 1}, 0)]),
+    "cc_mr_smoothie": ("CC Mr. Smoothie", [({}, 0), ({4: [60, 330], 5: [600, 40], 7: 3, 6: 90}, 0)]),
+    "cc_warpomatic": ("CC WarpoMatic", [({1: 40}, 0), ({1: 60, 6: 60, 7: 3, 8: 40}, 0)]),
+    "cc_glue_gun": ("CC Glue Gun", [({}, 0), ({1: [200, 120], 2: 120, 6: 100}, 0)]),
+    "key_cleaner": ("ADBE KeyCleaner", [({1: 6, 3: 100}, 0), ({1: 2, 3: 300, 4: 60}, 0)]),
 }
 NEEDS_MAP = {"displacement_map": {1: 2},   # param 1 (map layer) = layer index 2 (the map footage)
              "blend": {1: 2},
@@ -207,6 +214,7 @@ NEEDS_MAP = {"displacement_map": {1: 2},   # param 1 (map layer) = layer index 2
              "cc_image_wipe": {5: 2},
              "three_d_glasses": {2: 2},
              "cc_glass_wipe": {2: 2},
+             "cc_warpomatic": {2: 2},
              }
 
 

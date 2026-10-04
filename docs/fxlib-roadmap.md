@@ -46,7 +46,7 @@ plug-in. Some can come later through the Rive scene itself rather than as a shad
 | Arithmetic | 🟡 | lot 3 |
 | Blend | 🟡 | lot 9 (second layer) |
 | Calculations | 🟡 | lot 9 (second layer) |
-| CC Composite | ⬜ | parameter list already measured |
+| CC Composite | 🟡 | lot 13 (texture role "layer": the layer before its effects) |
 | Channel Combiner | 🟡 | lot 8; the layer itself as source |
 | Compound Arithmetic | 🟡 | lot 9 (second layer) |
 | Invert | ✅ | |
@@ -144,7 +144,7 @@ plug-in. Some can come later through the Rive scene itself rather than as a shad
 | Advanced Lightning | 🟡 | lot 12 (one bolt; random, differs from AE) |
 | Audio Spectrum, Audio Waveform | ⛔ | audio |
 | Beam | 🟡 | lot 7 |
-| CC Glue Gun | ⬜ | |
+| CC Glue Gun | 🟡 | lot 13 (the blob at the current position only, no trail) |
 | CC Light Burst 2.5 | 🟡 | lot 5 |
 | CC Light Rays | 🟡 | lot 5 |
 | CC Light Sweep | 🟡 | lot 7 |
@@ -159,7 +159,7 @@ plug-in. Some can come later through the Rive scene itself rather than as a shad
 | Gradient Ramp | ✅ | |
 | Grid | 🟡 | lot 4 |
 | Lens Flare | 🟡 | lot 8 (stylised: AE's flare elements are not reproduced) |
-| Paint Bucket | ⬜ | flood fill |
+| Paint Bucket | 🟡 | lot 13 (multi-pass flood fill) |
 | Radio Waves | ⛔ | particles over time |
 | Scribble, Stroke, Vegas, Write-on | ⛔ | mask- or path-driven |
 
@@ -175,7 +175,7 @@ plug-in. Some can come later through the Rive scene itself rather than as a shad
 | Difference Matte | 🟡 | lot 9 (second layer) |
 | Extract | 🟡 | lot 3 |
 | Inner/Outer Key | ⛔ | mask-driven |
-| Key Cleaner | ⬜ | |
+| Key Cleaner | 🟡 | lot 13 (no Reduce Chatter: other frames) |
 | Linear Color Key | 🟡 | lot 7 |
 | Luma Key | ✅ | |
 | Spill Suppressor | 🟡 | lot 3 |
@@ -223,7 +223,7 @@ plug-in. Some can come later through the Rive scene itself rather than as a shad
 | CC Glass | 🟡 | lot 11 (the layer itself as bump map) |
 | CC HexTile | 🟡 | lot 11 |
 | CC Kaleida | 🟡 | lot 6 |
-| CC Mr. Smoothie | ⬜ | |
+| CC Mr. Smoothie | 🟡 | lot 13 |
 | CC Plastic | 🟡 | lot 12 |
 | CC RepeTile | 🟡 | lot 11 |
 | CC Threshold, CC Threshold RGB | 🟡 | lot 3 |
@@ -256,7 +256,7 @@ plug-in. Some can come later through the Rive scene itself rather than as a shad
 | CC Radial ScaleWipe | 🟡 | lot 6 |
 | CC Scale Wipe | ✅ | |
 | CC Twister | 🟡 | lot 10 |
-| CC WarpoMatic | ⬜ | |
+| CC WarpoMatic | 🟡 | lot 13 (revealed layer = second layer) |
 | Gradient Wipe | 🟡 | lot 5 (the layer itself as gradient) |
 | Iris Wipe | 🟡 | lot 2 |
 | Linear Wipe | ✅ | |

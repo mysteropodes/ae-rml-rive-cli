@@ -17,6 +17,9 @@ Each effect = `fxlib/ae_<slug>.wgsl` + `fxlib/<slug>.json` (manifest). Contract:
     "default": <AE default>}], "notes", "measured": {...}}
   * Multi-pass: the same shader runs N times; pass i reads the previous pass output as srcTex (pass 0 reads the
     content) and `P.passIndex = i`; `origTex` always holds the untouched content.
+  * Texture roles: "original" = this effect's input (what the effects above it produced), "layer" = the layer before
+    any of its effects (the effect group's input: CC Composite's "original"), "map" = a second layer (mapTex, bound
+    from the AE layer parameter in textureParams).
 
 CLI:
   python -m rml2ae.ae2rml.fxlib check <slug> [--rive] [--holdout] [--keep]   AE refs vs offline wgpu (and Rive CLI)
@@ -134,7 +137,7 @@ def run_offline(slug, ae_vals, src_png, out_png, map_png=None):
             vals["passIndex"] = float(i)
             textures = {}
             for name, role in tex_roles.items():
-                if role == "original":
+                if role in ("original", "layer"):          # offline: one effect, so its input is the layer
                     textures[name] = src_png
                 elif role == "map" and map_png:
                     textures[name] = map_png
@@ -204,7 +207,7 @@ def _schedule(effects, groups):
             e_in = prev = inp
             for p in range(e["passes"]):
                 dst = free(g_in, e_in, prev)
-                steps.append(("fx", ei, p, prev, dst, e_in))
+                steps.append(("fx", ei, p, prev, dst, e_in, g_in))
                 prev = dst
             inp = prev
         dst = free(g_in, inp)
@@ -299,14 +302,14 @@ def luau_for(slugs, groups=None):
         return "cv" if b == 0 else f"self.gpus[{b}].image:view()"
     for s_idx, st in enumerate(steps, 1):
         if st[0] == "fx":
-            _k, ei, p, rd, dst, orig = st
+            _k, ei, p, rd, dst, orig, layer_in = st
             e = by_i[ei]
             tex = [f"{{ slot = 0, view = {view(rd)} }}"]
             for b, name in e["binds"]:
                 if b == 0:
                     continue
                 role = e["tex"].get(name)
-                v = view(orig) if role == "original" else (f"(self.e{ei}_mapCanvas :: Canvas).image:view()" if role == "map" else view(orig))
+                v = view(layer_in) if role == "layer" else (f"(self.e{ei}_mapCanvas :: Canvas).image:view()" if role == "map" else view(orig))
                 tex.append(f"{{ slot = {b}, view = {v} }}")
             groups_code.append(f"    self.ubos[{s_idx}] = GPUBuffer.new({{ size = {e['ubo']}, usage = \"uniform\" }})\n"
                                f"    self.groups[{s_idx}] = GPUBindGroup.new({{\n        layout = self.pipes[{ei}]:getBindGroupLayout(0),\n"

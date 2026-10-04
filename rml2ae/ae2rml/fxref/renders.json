@@ -5751,5 +5751,182 @@
   },
   "held": false,
   "png": "ae/noise_hls_auto_1.png"
+ },
+ {
+  "slug": "cc_composite",
+  "mn": "CC Composite",
+  "k": 0,
+  "vals": {
+   "1": 50
+  },
+  "held": false,
+  "png": "ae/cc_composite_0.png"
+ },
+ {
+  "slug": "cc_composite",
+  "mn": "CC Composite",
+  "k": 1,
+  "vals": {
+   "2": 6
+  },
+  "held": false,
+  "png": "ae/cc_composite_1.png"
+ },
+ {
+  "slug": "cc_composite",
+  "mn": "CC Composite",
+  "k": 2,
+  "vals": {
+   "2": 1,
+   "3": 0
+  },
+  "held": false,
+  "png": "ae/cc_composite_2.png"
+ },
+ {
+  "slug": "paint_bucket",
+  "mn": "ADBE Paint Bucket",
+  "k": 0,
+  "vals": {
+   "1": [
+    600,
+    340
+   ],
+   "3": 10
+  },
+  "held": false,
+  "png": "ae/paint_bucket_0.png"
+ },
+ {
+  "slug": "paint_bucket",
+  "mn": "ADBE Paint Bucket",
+  "k": 1,
+  "vals": {
+   "1": [
+    380,
+    330
+   ],
+   "2": 2,
+   "3": 40,
+   "10": [
+    0,
+    0.4,
+    1,
+    1
+   ]
+  },
+  "held": false,
+  "png": "ae/paint_bucket_1.png"
+ },
+ {
+  "slug": "paint_bucket",
+  "mn": "ADBE Paint Bucket",
+  "k": 2,
+  "vals": {
+   "1": [
+    5,
+    5
+   ],
+   "2": 3,
+   "4": 1
+  },
+  "held": false,
+  "png": "ae/paint_bucket_2.png"
+ },
+ {
+  "slug": "cc_mr_smoothie",
+  "mn": "CC Mr. Smoothie",
+  "k": 0,
+  "vals": {},
+  "held": false,
+  "png": "ae/cc_mr_smoothie_0.png"
+ },
+ {
+  "slug": "cc_mr_smoothie",
+  "mn": "CC Mr. Smoothie",
+  "k": 1,
+  "vals": {
+   "4": [
+    60,
+    330
+   ],
+   "5": [
+    600,
+    40
+   ],
+   "7": 3,
+   "6": 90
+  },
+  "held": false,
+  "png": "ae/cc_mr_smoothie_1.png"
+ },
+ {
+  "slug": "cc_warpomatic",
+  "mn": "CC WarpoMatic",
+  "k": 0,
+  "vals": {
+   "1": 40
+  },
+  "held": false,
+  "png": "ae/cc_warpomatic_0.png"
+ },
+ {
+  "slug": "cc_warpomatic",
+  "mn": "CC WarpoMatic",
+  "k": 1,
+  "vals": {
+   "1": 60,
+   "6": 60,
+   "7": 3,
+   "8": 40
+  },
+  "held": false,
+  "png": "ae/cc_warpomatic_1.png"
+ },
+ {
+  "slug": "cc_glue_gun",
+  "mn": "CC Glue Gun",
+  "k": 0,
+  "vals": {},
+  "held": false,
+  "png": "ae/cc_glue_gun_0.png"
+ },
+ {
+  "slug": "cc_glue_gun",
+  "mn": "CC Glue Gun",
+  "k": 1,
+  "vals": {
+   "1": [
+    200,
+    120
+   ],
+   "2": 120,
+   "6": 100
+  },
+  "held": false,
+  "png": "ae/cc_glue_gun_1.png"
+ },
+ {
+  "slug": "key_cleaner",
+  "mn": "ADBE KeyCleaner",
+  "k": 0,
+  "vals": {
+   "1": 6,
+   "3": 100
+  },
+  "held": false,
+  "png": "ae/key_cleaner_0.png"
+ },
+ {
+  "slug": "key_cleaner",
+  "mn": "ADBE KeyCleaner",
+  "k": 1,
+  "vals": {
+   "1": 2,
+   "3": 300,
+   "4": 60
+  },
+  "held": false,
+  "png": "ae/key_cleaner_1.png"
  }
 ]

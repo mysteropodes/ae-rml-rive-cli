@@ -1,0 +1,64 @@
+{
+ "slug": "paint_bucket",
+ "aeMatchName": "ADBE Paint Bucket",
+ "wgsl": "ae_paint_bucket.wgsl",
+ "passes": 24,
+ "textures": {
+  "origTex": "original"
+ },
+ "params": [
+  {
+   "ae": 1,
+   "field": "point",
+   "kind": "point",
+   "default": [
+    320,
+    180
+   ]
+  },
+  {
+   "ae": 2,
+   "field": "selector",
+   "kind": "enum",
+   "default": 1
+  },
+  {
+   "ae": 3,
+   "field": "tolerance",
+   "kind": "number",
+   "default": 10
+  },
+  {
+   "ae": 4,
+   "field": "viewThr",
+   "kind": "bool",
+   "default": 0
+  },
+  {
+   "ae": 9,
+   "field": "invert",
+   "kind": "bool",
+   "default": 0
+  },
+  {
+   "ae": 10,
+   "field": "color",
+   "kind": "color",
+   "default": [
+    1,
+    0,
+    0,
+    1
+   ]
+  },
+  {
+   "ae": 11,
+   "field": "opacity",
+   "kind": "number",
+   "default": 100
+  }
+ ],
+ "status": "unverified",
+ "auto": false,
+ "notes": "Not yet measured against After Effects.  Parameter indices follow the After Effects parameter order as documented by Adobe; `render_refs.py --params` records the real list."
+}
