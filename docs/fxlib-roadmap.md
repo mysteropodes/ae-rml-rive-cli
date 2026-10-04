@@ -55,7 +55,7 @@ plug-in. Some can come later through the Rive scene itself rather than as a shad
 | Set Channels | 🟡 | lot 1; the layer itself as source |
 | Set Matte | ✅ | converted natively by ae2rml (clip from the source layer), no shader needed |
 | Shift Channels | ✅ | |
-| Solid Composite | ⬜ | |
+| Solid Composite | 🟡 | lot 6 |
 
 ## Color Correction
 
@@ -104,13 +104,14 @@ plug-in. Some can come later through the Rive scene itself rather than as a shad
 | CC Blobbylize | ⬜ | |
 | CC Flo Motion | ⬜ | |
 | CC Griddler | ⬜ | |
-| CC Lens | ⬜ | |
+| CC Lens | 🟡 | lot 6 |
 | CC Page Turn | ⬜ | |
-| CC Power Pin | ⬜ | close to Corner Pin |
+| CC Power Pin | 🟡 | lot 6 (the measured Corner Pin law) |
 | CC Ripple Pulse | ⬜ | |
-| CC Slant | ⬜ | |
+| CC Slant | 🟡 | lot 6 |
 | CC Smear | ⬜ | |
-| CC Split, CC Split 2 | ⬜ | |
+| CC Split | 🟡 | lot 6 |
+| CC Split 2 | ⬜ | |
 | CC Tiler | 🟡 | lot 4 |
 | Corner Pin | ✅ | |
 | Detail-preserving Upscale | ⛔ | learned upscaler |
@@ -191,11 +192,12 @@ plug-in. Some can come later through the Rive scene itself rather than as a shad
 | Effect | | Note |
 |---|---|---|
 | Add Grain, Match Grain, Remove Grain | ⛔ | grain models and sampling over time |
-| Dust & Scratches | ⬜ | |
+| Dust & Scratches | 🟡 | lot 6 |
 | Fractal Noise, Turbulent Noise | ⬜ | proprietary noise: like Turbulent Displace, approx at best |
 | Median | 🟡 | lot 3 |
 | Noise | 🟡 | lot 5 (random pattern differs from AE) |
-| Noise Alpha, Noise HLS, Noise HLS Auto | ⬜ | random; seed law to measure |
+| Noise Alpha, Noise HLS | 🟡 | lot 6 (random pattern differs from AE) |
+| Noise HLS Auto | ⬜ | random; animated |
 
 ## Perspective
 
@@ -219,7 +221,7 @@ plug-in. Some can come later through the Rive scene itself rather than as a shad
 | CC Burn Film | ⬜ | |
 | CC Glass | ⬜ | |
 | CC HexTile | ⬜ | |
-| CC Kaleida | ⬜ | |
+| CC Kaleida | 🟡 | lot 6 |
 | CC Mr. Smoothie | ⬜ | |
 | CC Plastic | ⬜ | |
 | CC RepeTile | ⬜ | |
@@ -249,7 +251,7 @@ plug-in. Some can come later through the Rive scene itself rather than as a shad
 | CC Jaws | ⬜ | |
 | CC Light Wipe | ⬜ | |
 | CC Line Sweep | ⬜ | |
-| CC Radial ScaleWipe | ⬜ | |
+| CC Radial ScaleWipe | 🟡 | lot 6 |
 | CC Scale Wipe | ✅ | |
 | CC Twister | ⬜ | |
 | CC WarpoMatic | ⬜ | |

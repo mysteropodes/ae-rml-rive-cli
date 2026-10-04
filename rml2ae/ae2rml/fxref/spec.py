@@ -112,6 +112,17 @@ SPEC = {
     "noise": ("ADBE Noise", [({1: 30}, 0), ({1: 60, 2: 0}, 0)]),
     "scatter": ("ADBE Scatter", [({1: 5}, 0), ({1: 12, 2: 2}, 0)]),
     "broadcast_colors": ("ADBE Broadcast Colors", [({3: 90}, 0), ({2: 2, 3: 85}, 0), ({1: 2, 2: 3, 3: 95}, 0)]),
+    # lot 6 (unverified until rendered)
+    "cc_power_pin": ("CC Power Pin", [({1: [60, 20], 2: [600, 40], 3: [20, 340], 4: [620, 300]}, 0), ({1: [0, 60], 2: [640, 0], 3: [100, 360], 4: [560, 330]}, 0)]),
+    "cc_radial_scalewipe": ("CC Radial ScaleWipe", [({1: 30}, 0), ({1: 50, 2: [200, 120]}, 0), ({1: 40, 3: 1}, 0)]),
+    "cc_slant": ("CC Slant", [({1: 30}, 0), ({1: -20, 3: 60, 4: 300, 5: 1, 6: [0.2, 0.2, 0.2, 1]}, 0)]),
+    "cc_split": ("CC Split", [({3: 60}, 0), ({1: [100, 60], 2: [500, 300], 3: 100}, 0)]),
+    "cc_lens": ("CC Lens", [({}, 0), ({2: 80, 3: 50}, 0), ({1: [200, 120], 3: -40}, 0)]),
+    "cc_kaleida": ("CC Kaleida", [({2: 50}, 0), ({1: [200, 120], 2: 30, 4: 25}, 0)]),
+    "solid_composite": ("ADBE Solid Composite", [({2: [0.2, 0.4, 0.8, 1]}, 0), ({1: 50, 2: [1, 0.8, 0, 1], 3: 70}, 0)]),
+    "dust_scratches": ("ADBE Dust & Scratches", [({1: 3, 2: 20}, 0), ({1: 6, 2: 5}, 0)]),
+    "noise_alpha": ("ADBE Noise Alpha", [({2: 50}, 0), ({1: 2, 2: 80, 3: 3}, 0)]),
+    "noise_hls": ("ADBE Noise HLS2", [({2: 20, 3: 20, 4: 20}, 0), ({1: 3, 3: 40, 5: 4}, 0)]),
     "color_emboss": ("ADBE Color Emboss", [({}, 0), ({1: 120, 2: 3, 3: 200}, 0)]),
 }
 NEEDS_MAP = {"displacement_map": {1: 2}}   # param 1 (map layer) = layer index 2 (the map footage)

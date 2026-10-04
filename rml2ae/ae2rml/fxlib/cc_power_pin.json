@@ -1,0 +1,48 @@
+{
+ "slug": "cc_power_pin",
+ "aeMatchName": "CC Power Pin",
+ "wgsl": "ae_cc_power_pin.wgsl",
+ "passes": 1,
+ "textures": {},
+ "params": [
+  {
+   "ae": 1,
+   "field": "ul",
+   "kind": "point",
+   "default": [
+    0,
+    0
+   ]
+  },
+  {
+   "ae": 2,
+   "field": "ur",
+   "kind": "point",
+   "default": [
+    640,
+    0
+   ]
+  },
+  {
+   "ae": 3,
+   "field": "ll",
+   "kind": "point",
+   "default": [
+    0,
+    360
+   ]
+  },
+  {
+   "ae": 4,
+   "field": "lr",
+   "kind": "point",
+   "default": [
+    640,
+    360
+   ]
+  }
+ ],
+ "status": "unverified",
+ "auto": false,
+ "notes": "Not yet measured against After Effects.  Parameter indices follow the After Effects parameter order as documented by Adobe; `render_refs.py --params` records the real list."
+}

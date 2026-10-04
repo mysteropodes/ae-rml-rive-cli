@@ -1,0 +1,33 @@
+{
+ "slug": "cc_lens",
+ "aeMatchName": "CC Lens",
+ "wgsl": "ae_cc_lens.wgsl",
+ "passes": 1,
+ "textures": {},
+ "params": [
+  {
+   "ae": 1,
+   "field": "center",
+   "kind": "point",
+   "default": [
+    320,
+    180
+   ]
+  },
+  {
+   "ae": 2,
+   "field": "lensSize",
+   "kind": "number",
+   "default": 50
+  },
+  {
+   "ae": 3,
+   "field": "convergence",
+   "kind": "number",
+   "default": 0
+  }
+ ],
+ "status": "unverified",
+ "auto": false,
+ "notes": "Not yet measured against After Effects.  Parameter indices follow the After Effects parameter order as documented by Adobe; `render_refs.py --params` records the real list."
+}

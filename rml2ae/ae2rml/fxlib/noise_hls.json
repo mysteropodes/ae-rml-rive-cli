@@ -1,0 +1,48 @@
+{
+ "slug": "noise_hls",
+ "aeMatchName": "ADBE Noise HLS2",
+ "wgsl": "ae_noise_hls.wgsl",
+ "passes": 1,
+ "textures": {},
+ "params": [
+  {
+   "ae": 1,
+   "field": "kind",
+   "kind": "enum",
+   "default": 1
+  },
+  {
+   "ae": 2,
+   "field": "hue",
+   "kind": "number",
+   "default": 0
+  },
+  {
+   "ae": 3,
+   "field": "light",
+   "kind": "number",
+   "default": 0
+  },
+  {
+   "ae": 4,
+   "field": "sat",
+   "kind": "number",
+   "default": 0
+  },
+  {
+   "ae": 5,
+   "field": "grain",
+   "kind": "number",
+   "default": 1
+  },
+  {
+   "ae": 6,
+   "field": "phase",
+   "kind": "number",
+   "default": 0
+  }
+ ],
+ "status": "unverified",
+ "auto": false,
+ "notes": "Not yet measured against After Effects.  Parameter indices follow the After Effects parameter order as documented by Adobe; `render_refs.py --params` records the real list."
+}

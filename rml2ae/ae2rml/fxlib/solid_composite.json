@@ -1,0 +1,41 @@
+{
+ "slug": "solid_composite",
+ "aeMatchName": "ADBE Solid Composite",
+ "wgsl": "ae_solid_composite.wgsl",
+ "passes": 1,
+ "textures": {},
+ "params": [
+  {
+   "ae": 1,
+   "field": "srcOpacity",
+   "kind": "number",
+   "default": 100
+  },
+  {
+   "ae": 2,
+   "field": "color",
+   "kind": "color",
+   "default": [
+    1,
+    1,
+    1,
+    1
+   ]
+  },
+  {
+   "ae": 3,
+   "field": "opacity",
+   "kind": "number",
+   "default": 100
+  },
+  {
+   "ae": 4,
+   "field": "blendMode",
+   "kind": "enum",
+   "default": 1
+  }
+ ],
+ "status": "unverified",
+ "auto": false,
+ "notes": "Not yet measured against After Effects.  Parameter indices follow the After Effects parameter order as documented by Adobe; `render_refs.py --params` records the real list."
+}

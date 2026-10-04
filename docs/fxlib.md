@@ -172,7 +172,7 @@ Everything needed to measure an effect is in the repository:
 
 What is still missing, effect by effect, is in [fxlib-roadmap.md](fxlib-roadmap.md).
 
-37 measured effects: 27 exact, 8 close, 2 approx, plus 53 unverified ones (below the table). "Auto" is whether ae2rml applies the effect without being asked; the two effects
+37 measured effects: 27 exact, 8 close, 2 approx, plus 63 unverified ones (below the table). "Auto" is whether ae2rml applies the effect without being asked; the two effects
 marked `no` are measured to be further from After Effects than leaving the effect out, so they remain a
 `<!-- ae: effect ... -->` comment plus an entry in `effects_todo.json`.
 
@@ -276,6 +276,16 @@ real parameter list, then `render_refs.py <slug>`), add held-out settings, and m
 | Noise | `ADBE Noise` | `noise` | Random pattern cannot match AE; amount law |
 | Scatter | `ADBE Scatter` | `scatter` | Random pattern cannot match AE |
 | Broadcast Colors | `ADBE Broadcast Colors` | `broadcast_colors` | Signal amplitude formula per locale |
+| CC Power Pin | `CC Power Pin` | `cc_power_pin` | The measured Corner Pin law; Perspective < 100 % and Expansion |
+| CC Radial ScaleWipe | `CC Radial ScaleWipe` | `cc_radial_scalewipe` | Push-out law; Reverse |
+| CC Slant | `CC Slant` | `cc_slant` | Shear origin; Stretching |
+| CC Split | `CC Split` | `cc_split` | Slit taper |
+| CC Lens | `CC Lens` | `cc_lens` | Lens law and size reference |
+| CC Kaleida | `CC Kaleida` | `cc_kaleida` | Wedge count; Mirroring modes |
+| Solid Composite | `ADBE Solid Composite` | `solid_composite` | Blending modes |
+| Dust & Scratches | `ADBE Dust & Scratches` | `dust_scratches` | Window and threshold test |
+| Noise Alpha | `ADBE Noise Alpha` | `noise_alpha` | Random pattern cannot match AE; modes |
+| Noise HLS | `ADBE Noise HLS2` | `noise_hls` | Random pattern cannot match AE; amounts |
 Notes:
 
 - **Gaussian Blur (legacy)** and **Fast Blur (legacy)** share the same kernel (confirmed on a third setting).
