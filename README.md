@@ -67,8 +67,7 @@ powershell -ExecutionPolicy Bypass -File install.ps1 rml2ae ae2rml    # or only 
 ```
 
 - The **Rive CLI is not part of this repository**: the installer gets it from Rive (Homebrew tap `rive-app/tap`, or
-  `releases.rive.app` with its sha256 checked). On Windows it uses the manifest's Windows build when Rive publishes
-  one, and says so otherwise.
+  `releases.rive.app` with its sha256 checked; Rive publishes a `windows-x64` build there).
 - Python 3.9+ (a `.venv` is created at the root). Without the installer: `pip install -e ".[ae2rml]"` gives the
   `ae`, `ae2rml` and `rml2ae` commands (see [docs/install.md](docs/install.md#running-without-the-installer)).
 - After Effects 2024+ for rml2ae and the plugin.

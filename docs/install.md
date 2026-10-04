@@ -98,7 +98,7 @@ powershell -ExecutionPolicy Bypass -File install.ps1 rml2ae ae2rml review-kit pl
 | Step | Windows |
 |---|---|
 | Python | Python 3.9+ from python.org (tick "Add python.exe to PATH") or `winget install Python.Python.3.12`. The installer creates `.venv` and runs `pip install -e ".[ae2rml]"`: the `ae`, `ae2rml` and `rml2ae` commands land in `.venv\Scripts`, and it offers to add that folder to your user PATH. |
-| Rive CLI | Read from the same `releases.rive.app` manifest, sha256 checked, into `%USERPROFILE%\.rive\bin`. If the manifest has no Windows build, the installer says so and lists the platforms it has. |
+| Rive CLI | Rive publishes a Windows build (`windows-x64` in the `releases.rive.app` manifest): downloaded, sha256 checked, into `%USERPROFILE%\.rive\bin`. Should the manifest ever lack it, the installer says so and lists the platforms it has. |
 | ffmpeg | Optional: `winget install Gyan.FFmpeg`. |
 | Panel | `Rive.jsx` with the repository path written in, copied to `<After Effects>\Support Files\Scripts\ScriptUI Panels` (one administrator prompt). |
 | Plugin | `rml2ae\plugin\build.ps1 install` when the After Effects SDK is found (see below). |
@@ -125,8 +125,10 @@ The plugin renders with Direct3D 12 (any other backend wgpu finds if Direct3D 12
 
 | Part | Checked | How |
 |---|---|---|
-| Python package, `ae2rml` on the demo | yes | CI on a Windows runner (`windows` job) |
-| The plugin's GPU module (`rs_apply`, built with MSVC) | yes | CI: it renders every single-pass fxlib setting like `wgsl_apply.py` (software Direct3D 12) |
+| Python package, `ae2rml` on the demo, the unit tests | yes | CI on a Windows runner (`windows` job) |
+| The Rive CLI for Windows (fetched as `install.ps1` does) and `--verify` on the demo | yes | CI |
+| Every fxlib effect compiles and runs on Direct3D 12 (FXC) | yes | CI: `oracle_check.py --compile-all`, 123 effects; Motion Tile, Corner Pin and CC Power Pin were rewritten for it (pixel-identical) |
+| The plugin's GPU module (`rs_apply`, built with MSVC by `build.ps1`) | yes | CI: the 292 single-pass fxlib settings render exactly like `wgsl_apply.py` (software Direct3D 12, WARP) |
 | The plugin in After Effects, the PiPL resource, the file dialog | no | needs a Windows machine with After Effects and the SDK |
 | The panel, `ae build` / `ae pull` through `AfterFX.exe -r` | no | needs a Windows machine with After Effects |
 | `install.ps1` end to end | no | parsed by PowerShell 7 only |
