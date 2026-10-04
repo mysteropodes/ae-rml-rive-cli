@@ -4645,5 +4645,382 @@
   },
   "held": false,
   "png": "ae/three_d_glasses_3.png"
+ },
+ {
+  "slug": "cc_bender",
+  "mn": "CC Bender",
+  "k": 0,
+  "vals": {
+   "1": 40
+  },
+  "held": false,
+  "png": "ae/cc_bender_0.png"
+ },
+ {
+  "slug": "cc_bender",
+  "mn": "CC Bender",
+  "k": 1,
+  "vals": {
+   "1": -60,
+   "2": 2
+  },
+  "held": false,
+  "png": "ae/cc_bender_1.png"
+ },
+ {
+  "slug": "cc_bender",
+  "mn": "CC Bender",
+  "k": 2,
+  "vals": {
+   "1": 50,
+   "2": 3,
+   "4": [
+    100,
+    180
+   ],
+   "5": [
+    540,
+    180
+   ]
+  },
+  "held": false,
+  "png": "ae/cc_bender_2.png"
+ },
+ {
+  "slug": "cc_split2",
+  "mn": "CC Split 2",
+  "k": 0,
+  "vals": {
+   "3": 40,
+   "4": 120
+  },
+  "held": false,
+  "png": "ae/cc_split2_0.png"
+ },
+ {
+  "slug": "cc_split2",
+  "mn": "CC Split 2",
+  "k": 1,
+  "vals": {
+   "1": [
+    0,
+    180
+   ],
+   "2": [
+    640,
+    200
+   ],
+   "3": 100,
+   "4": 10
+  },
+  "held": false,
+  "png": "ae/cc_split2_1.png"
+ },
+ {
+  "slug": "cc_smear",
+  "mn": "CC Smear",
+  "k": 0,
+  "vals": {},
+  "held": false,
+  "png": "ae/cc_smear_0.png"
+ },
+ {
+  "slug": "cc_smear",
+  "mn": "CC Smear",
+  "k": 1,
+  "vals": {
+   "1": [
+    200,
+    100
+   ],
+   "2": [
+    420,
+    260
+   ],
+   "3": 70,
+   "4": 80
+  },
+  "held": false,
+  "png": "ae/cc_smear_1.png"
+ },
+ {
+  "slug": "cc_ripple_pulse",
+  "mn": "CC Ripple Pulse",
+  "k": 0,
+  "vals": {
+   "2": 25
+  },
+  "held": false,
+  "png": "ae/cc_ripple_pulse_0.png"
+ },
+ {
+  "slug": "cc_ripple_pulse",
+  "mn": "CC Ripple Pulse",
+  "k": 1,
+  "vals": {
+   "2": 40,
+   "4": 40,
+   "1": [
+    200,
+    120
+   ]
+  },
+  "held": false,
+  "png": "ae/cc_ripple_pulse_1.png"
+ },
+ {
+  "slug": "cc_flo_motion",
+  "mn": "CC Flo Motion",
+  "k": 0,
+  "vals": {
+   "2": 60,
+   "4": -40
+  },
+  "held": false,
+  "png": "ae/cc_flo_motion_0.png"
+ },
+ {
+  "slug": "cc_flo_motion",
+  "mn": "CC Flo Motion",
+  "k": 1,
+  "vals": {
+   "2": -80,
+   "4": 80,
+   "5": 1,
+   "7": 3
+  },
+  "held": false,
+  "png": "ae/cc_flo_motion_1.png"
+ },
+ {
+  "slug": "cc_twister",
+  "mn": "CC Twister",
+  "k": 0,
+  "vals": {
+   "1": 50
+  },
+  "held": false,
+  "png": "ae/cc_twister_0.png"
+ },
+ {
+  "slug": "cc_twister",
+  "mn": "CC Twister",
+  "k": 1,
+  "vals": {
+   "1": 80,
+   "5": 90,
+   "3": 0
+  },
+  "held": false,
+  "png": "ae/cc_twister_1.png"
+ },
+ {
+  "slug": "cc_page_turn",
+  "mn": "CC Page Turn",
+  "k": 0,
+  "vals": {},
+  "held": false,
+  "png": "ae/cc_page_turn_0.png"
+ },
+ {
+  "slug": "cc_page_turn",
+  "mn": "CC Page Turn",
+  "k": 1,
+  "vals": {
+   "2": [
+    400,
+    200
+   ],
+   "3": 100,
+   "4": 40,
+   "8": 30
+  },
+  "held": false,
+  "png": "ae/cc_page_turn_1.png"
+ },
+ {
+  "slug": "cc_page_turn",
+  "mn": "CC Page Turn",
+  "k": 2,
+  "vals": {
+   "6": 2
+  },
+  "held": false,
+  "png": "ae/cc_page_turn_2.png"
+ },
+ {
+  "slug": "cc_sphere",
+  "mn": "CC Sphere",
+  "k": 0,
+  "vals": {},
+  "held": false,
+  "png": "ae/cc_sphere_0.png"
+ },
+ {
+  "slug": "cc_sphere",
+  "mn": "CC Sphere",
+  "k": 1,
+  "vals": {
+   "2": 60,
+   "1": 20,
+   "4": 150
+  },
+  "held": false,
+  "png": "ae/cc_sphere_1.png"
+ },
+ {
+  "slug": "cc_sphere",
+  "mn": "CC Sphere",
+  "k": 2,
+  "vals": {
+   "6": 3,
+   "3": 30
+  },
+  "held": false,
+  "png": "ae/cc_sphere_2.png"
+ },
+ {
+  "slug": "cc_cylinder",
+  "mn": "CC Cylinder",
+  "k": 0,
+  "vals": {},
+  "held": false,
+  "png": "ae/cc_cylinder_0.png"
+ },
+ {
+  "slug": "cc_cylinder",
+  "mn": "CC Cylinder",
+  "k": 1,
+  "vals": {
+   "1": 60,
+   "4": 90
+  },
+  "held": false,
+  "png": "ae/cc_cylinder_1.png"
+ },
+ {
+  "slug": "cc_cylinder",
+  "mn": "CC Cylinder",
+  "k": 2,
+  "vals": {
+   "6": 3,
+   "4": 45
+  },
+  "held": false,
+  "png": "ae/cc_cylinder_2.png"
+ },
+ {
+  "slug": "warp",
+  "mn": "ADBE WRPMESH",
+  "k": 0,
+  "vals": {
+   "1": 1
+  },
+  "held": false,
+  "png": "ae/warp_0.png"
+ },
+ {
+  "slug": "warp",
+  "mn": "ADBE WRPMESH",
+  "k": 1,
+  "vals": {
+   "1": 5,
+   "3": 60
+  },
+  "held": false,
+  "png": "ae/warp_1.png"
+ },
+ {
+  "slug": "warp",
+  "mn": "ADBE WRPMESH",
+  "k": 2,
+  "vals": {
+   "1": 8,
+   "3": 40,
+   "2": 2
+  },
+  "held": false,
+  "png": "ae/warp_2.png"
+ },
+ {
+  "slug": "warp",
+  "mn": "ADBE WRPMESH",
+  "k": 3,
+  "vals": {
+   "1": 15,
+   "3": 70
+  },
+  "held": false,
+  "png": "ae/warp_3.png"
+ },
+ {
+  "slug": "warp",
+  "mn": "ADBE WRPMESH",
+  "k": 4,
+  "vals": {
+   "1": 4,
+   "3": -50,
+   "4": 30
+  },
+  "held": false,
+  "png": "ae/warp_4.png"
+ },
+ {
+  "slug": "bezier_warp",
+  "mn": "ADBE BEZMESH",
+  "k": 0,
+  "vals": {
+   "2": [
+    213.3,
+    80
+   ],
+   "3": [
+    426.7,
+    -80
+   ],
+   "8": [
+    426.7,
+    280
+   ],
+   "9": [
+    213.3,
+    440
+   ]
+  },
+  "held": false,
+  "png": "ae/bezier_warp_0.png"
+ },
+ {
+  "slug": "bezier_warp",
+  "mn": "ADBE BEZMESH",
+  "k": 1,
+  "vals": {
+   "1": [
+    60,
+    40
+   ],
+   "4": [
+    600,
+    0
+   ],
+   "7": [
+    640,
+    320
+   ],
+   "10": [
+    20,
+    360
+   ],
+   "5": [
+    560,
+    120
+   ],
+   "11": [
+    80,
+    240
+   ]
+  },
+  "held": false,
+  "png": "ae/bezier_warp_1.png"
  }
 ]

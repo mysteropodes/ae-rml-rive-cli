@@ -1,0 +1,42 @@
+{
+ "slug": "warp",
+ "aeMatchName": "ADBE WRPMESH",
+ "wgsl": "ae_warp.wgsl",
+ "passes": 1,
+ "textures": {},
+ "params": [
+  {
+   "ae": 1,
+   "field": "style",
+   "kind": "enum",
+   "default": 1
+  },
+  {
+   "ae": 2,
+   "field": "axis",
+   "kind": "enum",
+   "default": 1
+  },
+  {
+   "ae": 3,
+   "field": "bend",
+   "kind": "number",
+   "default": 50
+  },
+  {
+   "ae": 4,
+   "field": "hDist",
+   "kind": "number",
+   "default": 0
+  },
+  {
+   "ae": 5,
+   "field": "vDist",
+   "kind": "number",
+   "default": 0
+  }
+ ],
+ "status": "unverified",
+ "auto": false,
+ "notes": "Not yet measured against After Effects.  Parameter indices follow the After Effects parameter order as documented by Adobe; `render_refs.py --params` records the real list."
+}

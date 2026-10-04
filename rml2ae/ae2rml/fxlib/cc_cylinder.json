@@ -1,0 +1,81 @@
+{
+ "slug": "cc_cylinder",
+ "aeMatchName": "CC Cylinder",
+ "wgsl": "ae_cc_cylinder.wgsl",
+ "passes": 1,
+ "textures": {},
+ "params": [
+  {
+   "ae": 1,
+   "field": "radius",
+   "kind": "number",
+   "default": 100
+  },
+  {
+   "ae": 2,
+   "field": "position",
+   "kind": "point",
+   "default": [
+    320,
+    180
+   ]
+  },
+  {
+   "ae": 3,
+   "field": "rx",
+   "kind": "angle",
+   "default": 0
+  },
+  {
+   "ae": 4,
+   "field": "ry",
+   "kind": "angle",
+   "default": 0
+  },
+  {
+   "ae": 5,
+   "field": "rz",
+   "kind": "angle",
+   "default": 0
+  },
+  {
+   "ae": 6,
+   "field": "render",
+   "kind": "enum",
+   "default": 1
+  },
+  {
+   "ae": 8,
+   "field": "lightIntensity",
+   "kind": "number",
+   "default": 100
+  },
+  {
+   "ae": 10,
+   "field": "lightHeight",
+   "kind": "number",
+   "default": 50
+  },
+  {
+   "ae": 11,
+   "field": "lightDir",
+   "kind": "angle",
+   "default": -45
+  },
+  {
+   "ae": 13,
+   "field": "ambient",
+   "kind": "number",
+   "default": 8
+  },
+  {
+   "ae": 14,
+   "field": "diffuse",
+   "kind": "number",
+   "default": 65
+  }
+ ],
+ "status": "unverified",
+ "auto": false,
+ "notes": "Not yet measured against After Effects.  Parameter indices follow the After Effects parameter order as documented by Adobe; `render_refs.py --params` records the real list."
+}
