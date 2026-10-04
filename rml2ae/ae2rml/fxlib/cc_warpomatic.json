@@ -1,0 +1,53 @@
+{
+ "slug": "cc_warpomatic",
+ "aeMatchName": "CC WarpoMatic",
+ "wgsl": "ae_cc_warpomatic.wgsl",
+ "passes": 1,
+ "textures": {
+  "mapTex": "map"
+ },
+ "params": [
+  {
+   "ae": 1,
+   "field": "completion",
+   "kind": "number",
+   "default": 0
+  },
+  {
+   "ae": 4,
+   "field": "driver",
+   "kind": "enum",
+   "default": 1
+  },
+  {
+   "ae": 5,
+   "field": "smoothness",
+   "kind": "number",
+   "default": 0
+  },
+  {
+   "ae": 6,
+   "field": "amount",
+   "kind": "number",
+   "default": 30
+  },
+  {
+   "ae": 7,
+   "field": "direction",
+   "kind": "enum",
+   "default": 1
+  },
+  {
+   "ae": 8,
+   "field": "span",
+   "kind": "number",
+   "default": 20
+  }
+ ],
+ "status": "unverified",
+ "auto": false,
+ "notes": "Not yet measured against After Effects. Layer to Reveal comes from the Rive node's map input (ae2rml binds the referenced layer, PR 7). Parameter indices follow the After Effects parameter order as documented by Adobe; `render_refs.py --params` records the real list.",
+ "textureParams": {
+  "mapTex": 2
+ }
+}

@@ -74,7 +74,7 @@ repeats edge pixels.
 | `ae` | 1-based After Effects parameter index (`property(i)`) |
 | `field` | Name of the field in `Params` |
 | `kind` | `number`, `point`, `color`, `enum`, `bool` or `angle` |
-| `textures` | Extra textures the effect needs, for example `{"origTex": "original", "mapTex": "map"}` |
+| `textures` | Extra textures the effect needs, by role: `original` (this effect's input, e.g. `{"origTex": "original"}`), `layer` (the layer before any of its effects, CC Composite), `map` (a second layer) |
 | `textureParams` | For a `map` texture: the AE position of the layer parameter it comes from, e.g. `{"mapTex": 1}` (ae2rml binds that layer) |
 | `passes` | Number of times the shader runs |
 | `status` | `exact`, `close` or `approx` (below) |
@@ -173,7 +173,7 @@ Everything needed to measure an effect is in the repository:
 
 What is still missing, effect by effect, is in [fxlib-roadmap.md](fxlib-roadmap.md).
 
-37 measured effects: 27 exact, 8 close, 2 approx, plus 129 unverified ones (below the table). "Auto" is whether ae2rml applies the effect without being asked; the two effects
+37 measured effects: 27 exact, 8 close, 2 approx, plus 135 unverified ones (below the table). "Auto" is whether ae2rml applies the effect without being asked; the two effects
 marked `no` are measured to be further from After Effects than leaving the effect out, so they remain a
 `<!-- ae: effect ... -->` comment plus an entry in `effects_todo.json`.
 
@@ -353,6 +353,12 @@ real parameter list, then `render_refs.py <slug>`), add held-out settings, and m
 | Noise HLS Auto | `ADBE Noise HLS Auto` | `noise_hls_auto` | Animation over time not modelled (frame 0's draw); random draw differs |
 | Advanced Lightning | `ADBE Lightning 2` | `advanced_lightning` | One bolt only (no forks / decay / types); random; positions |
 | Brush Strokes | `ADBE Brush Strokes` | `brush_strokes` | Stroke placement is random: differs from AE |
+| CC Composite | `CC Composite` | `cc_composite` | Composite Original menu (41 entries); uses the new texture role "layer" |
+| Paint Bucket | `ADBE Paint Bucket` | `paint_bucket` | Multi-pass flood fill (very winding regions may stay partly unfilled); stroke options; positions |
+| CC Mr. Smoothie | `CC Mr. Smoothie` | `cc_mr_smoothie` | Palette sampling and loop law; Flow Layer not bound |
+| CC WarpoMatic | `CC WarpoMatic` | `cc_warpomatic` | Drivers other than brightness; Reactor layer; positions |
+| CC Glue Gun | `CC Glue Gun` | `cc_glue_gun` | Only the blob at the current Brush Position (no trail: the node has no frame history) |
+| Key Cleaner | `ADBE KeyCleaner` | `key_cleaner` | Match name; edge restore law; Reduce Chatter needs other frames |
 
 Notes:
 
