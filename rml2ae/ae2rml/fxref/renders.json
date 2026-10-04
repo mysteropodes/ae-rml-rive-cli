@@ -1,0 +1,1529 @@
+[
+ {
+  "slug": "none",
+  "mn": "",
+  "k": 0,
+  "vals": {},
+  "held": false,
+  "png": "ae/none_0.png"
+ },
+ {
+  "slug": "fill",
+  "mn": "ADBE Fill",
+  "k": 0,
+  "vals": {
+   "3": [
+    0.2,
+    0.6,
+    1,
+    1
+   ]
+  },
+  "held": false,
+  "png": "ae/fill_0.png"
+ },
+ {
+  "slug": "fill",
+  "mn": "ADBE Fill",
+  "k": 1,
+  "vals": {
+   "3": [
+    1,
+    0.5,
+    0,
+    1
+   ],
+   "7": 0.5
+  },
+  "held": false,
+  "png": "ae/fill_1.png"
+ },
+ {
+  "slug": "fill",
+  "mn": "ADBE Fill",
+  "k": 2,
+  "vals": {
+   "3": [
+    0.9,
+    0.1,
+    0.5,
+    1
+   ],
+   "7": 0.8
+  },
+  "held": true,
+  "png": "ae_holdout/fill_2.png"
+ },
+ {
+  "slug": "tint",
+  "mn": "ADBE Tint",
+  "k": 0,
+  "vals": {
+   "3": 100
+  },
+  "held": false,
+  "png": "ae/tint_0.png"
+ },
+ {
+  "slug": "tint",
+  "mn": "ADBE Tint",
+  "k": 1,
+  "vals": {
+   "1": [
+    0.1,
+    0,
+    0.3,
+    1
+   ],
+   "2": [
+    1,
+    0.9,
+    0.5,
+    1
+   ],
+   "3": 100
+  },
+  "held": false,
+  "png": "ae/tint_1.png"
+ },
+ {
+  "slug": "tint",
+  "mn": "ADBE Tint",
+  "k": 2,
+  "vals": {
+   "1": [
+    0,
+    0.2,
+    0.2,
+    1
+   ],
+   "2": [
+    1,
+    1,
+    0.8,
+    1
+   ],
+   "3": 60
+  },
+  "held": true,
+  "png": "ae_holdout/tint_2.png"
+ },
+ {
+  "slug": "exposure",
+  "mn": "ADBE Exposure2",
+  "k": 0,
+  "vals": {
+   "3": 1
+  },
+  "held": false,
+  "png": "ae/exposure_0.png"
+ },
+ {
+  "slug": "exposure",
+  "mn": "ADBE Exposure2",
+  "k": 1,
+  "vals": {
+   "3": -1,
+   "4": 0.05,
+   "5": 1.5
+  },
+  "held": false,
+  "png": "ae/exposure_1.png"
+ },
+ {
+  "slug": "exposure",
+  "mn": "ADBE Exposure2",
+  "k": 2,
+  "vals": {
+   "3": 0.5,
+   "5": 0.7
+  },
+  "held": true,
+  "png": "ae_holdout/exposure_2.png"
+ },
+ {
+  "slug": "invert",
+  "mn": "ADBE Invert",
+  "k": 0,
+  "vals": {
+   "1": 1
+  },
+  "held": false,
+  "png": "ae/invert_0.png"
+ },
+ {
+  "slug": "invert",
+  "mn": "ADBE Invert",
+  "k": 1,
+  "vals": {
+   "1": 7
+  },
+  "held": false,
+  "png": "ae/invert_1.png"
+ },
+ {
+  "slug": "invert",
+  "mn": "ADBE Invert",
+  "k": 2,
+  "vals": {
+   "1": 2
+  },
+  "held": false,
+  "png": "ae/invert_2.png"
+ },
+ {
+  "slug": "invert",
+  "mn": "ADBE Invert",
+  "k": 3,
+  "vals": {
+   "1": 1,
+   "2": 40
+  },
+  "held": true,
+  "png": "ae_holdout/invert_3.png"
+ },
+ {
+  "slug": "levels",
+  "mn": "ADBE Easy Levels2",
+  "k": 0,
+  "vals": {
+   "3": 0.2,
+   "4": 0.8
+  },
+  "held": false,
+  "png": "ae/levels_0.png"
+ },
+ {
+  "slug": "levels",
+  "mn": "ADBE Easy Levels2",
+  "k": 1,
+  "vals": {
+   "5": 2.0
+  },
+  "held": false,
+  "png": "ae/levels_1.png"
+ },
+ {
+  "slug": "levels",
+  "mn": "ADBE Easy Levels2",
+  "k": 2,
+  "vals": {
+   "6": 0.1,
+   "7": 0.9,
+   "5": 0.6
+  },
+  "held": false,
+  "png": "ae/levels_2.png"
+ },
+ {
+  "slug": "levels",
+  "mn": "ADBE Easy Levels2",
+  "k": 3,
+  "vals": {
+   "3": 0.1,
+   "4": 0.9,
+   "5": 1.4
+  },
+  "held": true,
+  "png": "ae_holdout/levels_3.png"
+ },
+ {
+  "slug": "color_balance_hls",
+  "mn": "ADBE Color Balance (HLS)",
+  "k": 0,
+  "vals": {
+   "1": 90
+  },
+  "held": false,
+  "png": "ae/color_balance_hls_0.png"
+ },
+ {
+  "slug": "color_balance_hls",
+  "mn": "ADBE Color Balance (HLS)",
+  "k": 1,
+  "vals": {
+   "2": 30,
+   "3": -50
+  },
+  "held": false,
+  "png": "ae/color_balance_hls_1.png"
+ },
+ {
+  "slug": "color_balance_hls",
+  "mn": "ADBE Color Balance (HLS)",
+  "k": 2,
+  "vals": {
+   "1": -45,
+   "3": 40
+  },
+  "held": true,
+  "png": "ae_holdout/color_balance_hls_2.png"
+ },
+ {
+  "slug": "hue_saturation",
+  "mn": "ADBE HUE SATURATION",
+  "k": 0,
+  "vals": {
+   "3": 120
+  },
+  "held": false,
+  "png": "ae/hue_saturation_0.png"
+ },
+ {
+  "slug": "hue_saturation",
+  "mn": "ADBE HUE SATURATION",
+  "k": 1,
+  "vals": {
+   "4": -60,
+   "5": 20
+  },
+  "held": false,
+  "png": "ae/hue_saturation_1.png"
+ },
+ {
+  "slug": "hue_saturation",
+  "mn": "ADBE HUE SATURATION",
+  "k": 2,
+  "vals": {
+   "6": 1,
+   "7": 200,
+   "8": 60,
+   "9": 0
+  },
+  "held": false,
+  "png": "ae/hue_saturation_2.png"
+ },
+ {
+  "slug": "hue_saturation",
+  "mn": "ADBE HUE SATURATION",
+  "k": 3,
+  "vals": {
+   "3": -60,
+   "4": 40
+  },
+  "held": true,
+  "png": "ae_holdout/hue_saturation_3.png"
+ },
+ {
+  "slug": "brightness_contrast",
+  "mn": "ADBE Brightness & Contrast 2",
+  "k": 0,
+  "vals": {
+   "1": 40
+  },
+  "held": false,
+  "png": "ae/brightness_contrast_0.png"
+ },
+ {
+  "slug": "brightness_contrast",
+  "mn": "ADBE Brightness & Contrast 2",
+  "k": 1,
+  "vals": {
+   "2": 50
+  },
+  "held": false,
+  "png": "ae/brightness_contrast_1.png"
+ },
+ {
+  "slug": "brightness_contrast",
+  "mn": "ADBE Brightness & Contrast 2",
+  "k": 2,
+  "vals": {
+   "1": -30,
+   "2": -40
+  },
+  "held": false,
+  "png": "ae/brightness_contrast_2.png"
+ },
+ {
+  "slug": "brightness_contrast",
+  "mn": "ADBE Brightness & Contrast 2",
+  "k": 3,
+  "vals": {
+   "1": 20,
+   "2": 30
+  },
+  "held": true,
+  "png": "ae_holdout/brightness_contrast_3.png"
+ },
+ {
+  "slug": "tritone",
+  "mn": "ADBE Tritone",
+  "k": 0,
+  "vals": {},
+  "held": false,
+  "png": "ae/tritone_0.png"
+ },
+ {
+  "slug": "tritone",
+  "mn": "ADBE Tritone",
+  "k": 1,
+  "vals": {
+   "1": [
+    1,
+    0.9,
+    0.7,
+    1
+   ],
+   "2": [
+    0.2,
+    0.5,
+    0.6,
+    1
+   ],
+   "3": [
+    0.05,
+    0,
+    0.1,
+    1
+   ]
+  },
+  "held": false,
+  "png": "ae/tritone_1.png"
+ },
+ {
+  "slug": "tritone",
+  "mn": "ADBE Tritone",
+  "k": 2,
+  "vals": {
+   "4": 30
+  },
+  "held": true,
+  "png": "ae_holdout/tritone_2.png"
+ },
+ {
+  "slug": "shift_channels",
+  "mn": "ADBE Shift Channels",
+  "k": 0,
+  "vals": {
+   "2": 3,
+   "3": 4,
+   "4": 2
+  },
+  "held": false,
+  "png": "ae/shift_channels_0.png"
+ },
+ {
+  "slug": "shift_channels",
+  "mn": "ADBE Shift Channels",
+  "k": 1,
+  "vals": {
+   "1": 5
+  },
+  "held": false,
+  "png": "ae/shift_channels_1.png"
+ },
+ {
+  "slug": "shift_channels",
+  "mn": "ADBE Shift Channels",
+  "k": 2,
+  "vals": {
+   "2": 9,
+   "4": 10
+  },
+  "held": true,
+  "png": "ae_holdout/shift_channels_2.png"
+ },
+ {
+  "slug": "luma_key",
+  "mn": "ADBE Luma Key",
+  "k": 0,
+  "vals": {
+   "1": 2,
+   "2": 100,
+   "3": 20
+  },
+  "held": false,
+  "png": "ae/luma_key_0.png"
+ },
+ {
+  "slug": "luma_key",
+  "mn": "ADBE Luma Key",
+  "k": 1,
+  "vals": {
+   "1": 1,
+   "2": 60,
+   "5": 10
+  },
+  "held": false,
+  "png": "ae/luma_key_1.png"
+ },
+ {
+  "slug": "luma_key",
+  "mn": "ADBE Luma Key",
+  "k": 2,
+  "vals": {
+   "1": 2,
+   "2": 150,
+   "3": 40,
+   "5": 5
+  },
+  "held": true,
+  "png": "ae_holdout/luma_key_2.png"
+ },
+ {
+  "slug": "posterize",
+  "mn": "ADBE Posterize",
+  "k": 0,
+  "vals": {
+   "1": 4
+  },
+  "held": false,
+  "png": "ae/posterize_0.png"
+ },
+ {
+  "slug": "posterize",
+  "mn": "ADBE Posterize",
+  "k": 1,
+  "vals": {
+   "1": 2
+  },
+  "held": false,
+  "png": "ae/posterize_1.png"
+ },
+ {
+  "slug": "posterize",
+  "mn": "ADBE Posterize",
+  "k": 2,
+  "vals": {
+   "1": 6
+  },
+  "held": true,
+  "png": "ae_holdout/posterize_2.png"
+ },
+ {
+  "slug": "black_white",
+  "mn": "ADBE Black&White",
+  "k": 0,
+  "vals": {},
+  "held": false,
+  "png": "ae/black_white_0.png"
+ },
+ {
+  "slug": "black_white",
+  "mn": "ADBE Black&White",
+  "k": 1,
+  "vals": {
+   "1": 100,
+   "5": -50,
+   "7": 1
+  },
+  "held": false,
+  "png": "ae/black_white_1.png"
+ },
+ {
+  "slug": "black_white",
+  "mn": "ADBE Black&White",
+  "k": 2,
+  "vals": {
+   "2": 120,
+   "4": 0
+  },
+  "held": true,
+  "png": "ae_holdout/black_white_2.png"
+ },
+ {
+  "slug": "gaussian_blur",
+  "mn": "ADBE Gaussian Blur 2",
+  "k": 0,
+  "vals": {
+   "1": 10,
+   "3": 0
+  },
+  "held": false,
+  "png": "ae/gaussian_blur_0.png"
+ },
+ {
+  "slug": "gaussian_blur",
+  "mn": "ADBE Gaussian Blur 2",
+  "k": 1,
+  "vals": {
+   "1": 30,
+   "3": 0
+  },
+  "held": false,
+  "png": "ae/gaussian_blur_1.png"
+ },
+ {
+  "slug": "gaussian_blur",
+  "mn": "ADBE Gaussian Blur 2",
+  "k": 2,
+  "vals": {
+   "1": 20,
+   "2": 2,
+   "3": 0
+  },
+  "held": false,
+  "png": "ae/gaussian_blur_2.png"
+ },
+ {
+  "slug": "gaussian_blur",
+  "mn": "ADBE Gaussian Blur 2",
+  "k": 3,
+  "vals": {
+   "1": 20,
+   "3": 1
+  },
+  "held": false,
+  "png": "ae/gaussian_blur_3.png"
+ },
+ {
+  "slug": "gaussian_blur",
+  "mn": "ADBE Gaussian Blur 2",
+  "k": 4,
+  "vals": {
+   "1": 15,
+   "3": 0
+  },
+  "held": true,
+  "png": "ae_holdout/gaussian_blur_4.png"
+ },
+ {
+  "slug": "gaussian_blur_legacy",
+  "mn": "ADBE Gaussian Blur",
+  "k": 0,
+  "vals": {
+   "1": 10
+  },
+  "held": false,
+  "png": "ae/gaussian_blur_legacy_0.png"
+ },
+ {
+  "slug": "gaussian_blur_legacy",
+  "mn": "ADBE Gaussian Blur",
+  "k": 1,
+  "vals": {
+   "1": 25
+  },
+  "held": false,
+  "png": "ae/gaussian_blur_legacy_1.png"
+ },
+ {
+  "slug": "gaussian_blur_legacy",
+  "mn": "ADBE Gaussian Blur",
+  "k": 2,
+  "vals": {
+   "1": 16
+  },
+  "held": true,
+  "png": "ae_holdout/gaussian_blur_legacy_2.png"
+ },
+ {
+  "slug": "fast_blur_legacy",
+  "mn": "ADBE Fast Blur",
+  "k": 0,
+  "vals": {
+   "1": 10,
+   "3": 0
+  },
+  "held": false,
+  "png": "ae/fast_blur_legacy_0.png"
+ },
+ {
+  "slug": "fast_blur_legacy",
+  "mn": "ADBE Fast Blur",
+  "k": 1,
+  "vals": {
+   "1": 25,
+   "3": 0
+  },
+  "held": false,
+  "png": "ae/fast_blur_legacy_1.png"
+ },
+ {
+  "slug": "fast_blur_legacy",
+  "mn": "ADBE Fast Blur",
+  "k": 2,
+  "vals": {
+   "1": 16,
+   "3": 0
+  },
+  "held": true,
+  "png": "ae_holdout/fast_blur_legacy_2.png"
+ },
+ {
+  "slug": "box_blur",
+  "mn": "ADBE Box Blur2",
+  "k": 0,
+  "vals": {
+   "1": 8,
+   "2": 1,
+   "4": 0
+  },
+  "held": false,
+  "png": "ae/box_blur_0.png"
+ },
+ {
+  "slug": "box_blur",
+  "mn": "ADBE Box Blur2",
+  "k": 1,
+  "vals": {
+   "1": 8,
+   "2": 3,
+   "4": 0
+  },
+  "held": false,
+  "png": "ae/box_blur_1.png"
+ },
+ {
+  "slug": "box_blur",
+  "mn": "ADBE Box Blur2",
+  "k": 2,
+  "vals": {
+   "1": 12,
+   "2": 2,
+   "4": 0
+  },
+  "held": true,
+  "png": "ae_holdout/box_blur_2.png"
+ },
+ {
+  "slug": "directional_blur",
+  "mn": "ADBE Motion Blur",
+  "k": 0,
+  "vals": {
+   "1": 0,
+   "2": 20
+  },
+  "held": false,
+  "png": "ae/directional_blur_0.png"
+ },
+ {
+  "slug": "directional_blur",
+  "mn": "ADBE Motion Blur",
+  "k": 1,
+  "vals": {
+   "1": 45,
+   "2": 30
+  },
+  "held": false,
+  "png": "ae/directional_blur_1.png"
+ },
+ {
+  "slug": "directional_blur",
+  "mn": "ADBE Motion Blur",
+  "k": 2,
+  "vals": {
+   "1": 120,
+   "2": 15
+  },
+  "held": true,
+  "png": "ae_holdout/directional_blur_2.png"
+ },
+ {
+  "slug": "cc_radial_fast_blur",
+  "mn": "CC Radial Fast Blur",
+  "k": 0,
+  "vals": {
+   "2": 50
+  },
+  "held": false,
+  "png": "ae/cc_radial_fast_blur_0.png"
+ },
+ {
+  "slug": "cc_radial_fast_blur",
+  "mn": "CC Radial Fast Blur",
+  "k": 1,
+  "vals": {
+   "2": 80,
+   "3": 2
+  },
+  "held": false,
+  "png": "ae/cc_radial_fast_blur_1.png"
+ },
+ {
+  "slug": "cc_radial_fast_blur",
+  "mn": "CC Radial Fast Blur",
+  "k": 2,
+  "vals": {
+   "1": [
+    200,
+    120
+   ],
+   "2": 60,
+   "3": 3
+  },
+  "held": false,
+  "png": "ae/cc_radial_fast_blur_2.png"
+ },
+ {
+  "slug": "cc_radial_fast_blur",
+  "mn": "CC Radial Fast Blur",
+  "k": 3,
+  "vals": {
+   "2": 30,
+   "1": [
+    400,
+    200
+   ]
+  },
+  "held": true,
+  "png": "ae_holdout/cc_radial_fast_blur_3.png"
+ },
+ {
+  "slug": "cc_radial_blur",
+  "mn": "CC Radial Blur",
+  "k": 0,
+  "vals": {
+   "1": 1,
+   "2": 30
+  },
+  "held": false,
+  "png": "ae/cc_radial_blur_0.png"
+ },
+ {
+  "slug": "cc_radial_blur",
+  "mn": "CC Radial Blur",
+  "k": 1,
+  "vals": {
+   "1": 4,
+   "2": 20
+  },
+  "held": false,
+  "png": "ae/cc_radial_blur_1.png"
+ },
+ {
+  "slug": "cc_radial_blur",
+  "mn": "CC Radial Blur",
+  "k": 2,
+  "vals": {
+   "1": 6,
+   "2": 40
+  },
+  "held": false,
+  "png": "ae/cc_radial_blur_2.png"
+ },
+ {
+  "slug": "cc_radial_blur",
+  "mn": "CC Radial Blur",
+  "k": 3,
+  "vals": {
+   "1": 3,
+   "2": 25
+  },
+  "held": true,
+  "png": "ae_holdout/cc_radial_blur_3.png"
+ },
+ {
+  "slug": "simple_choker",
+  "mn": "ADBE Simple Choker",
+  "k": 0,
+  "vals": {
+   "2": 3
+  },
+  "held": false,
+  "png": "ae/simple_choker_0.png"
+ },
+ {
+  "slug": "simple_choker",
+  "mn": "ADBE Simple Choker",
+  "k": 1,
+  "vals": {
+   "2": -4
+  },
+  "held": false,
+  "png": "ae/simple_choker_1.png"
+ },
+ {
+  "slug": "simple_choker",
+  "mn": "ADBE Simple Choker",
+  "k": 2,
+  "vals": {
+   "2": 6
+  },
+  "held": true,
+  "png": "ae_holdout/simple_choker_2.png"
+ },
+ {
+  "slug": "minimax",
+  "mn": "ADBE Minimax",
+  "k": 0,
+  "vals": {
+   "1": 1,
+   "2": 4
+  },
+  "held": false,
+  "png": "ae/minimax_0.png"
+ },
+ {
+  "slug": "minimax",
+  "mn": "ADBE Minimax",
+  "k": 1,
+  "vals": {
+   "1": 2,
+   "2": 4
+  },
+  "held": false,
+  "png": "ae/minimax_1.png"
+ },
+ {
+  "slug": "minimax",
+  "mn": "ADBE Minimax",
+  "k": 2,
+  "vals": {
+   "1": 2,
+   "2": 6,
+   "3": 2
+  },
+  "held": false,
+  "png": "ae/minimax_2.png"
+ },
+ {
+  "slug": "minimax",
+  "mn": "ADBE Minimax",
+  "k": 3,
+  "vals": {
+   "1": 3,
+   "2": 3
+  },
+  "held": true,
+  "png": "ae_holdout/minimax_3.png"
+ },
+ {
+  "slug": "mosaic",
+  "mn": "ADBE Mosaic",
+  "k": 0,
+  "vals": {
+   "1": 20,
+   "2": 10
+  },
+  "held": false,
+  "png": "ae/mosaic_0.png"
+ },
+ {
+  "slug": "mosaic",
+  "mn": "ADBE Mosaic",
+  "k": 1,
+  "vals": {
+   "1": 40,
+   "2": 20,
+   "3": 1
+  },
+  "held": false,
+  "png": "ae/mosaic_1.png"
+ },
+ {
+  "slug": "mosaic",
+  "mn": "ADBE Mosaic",
+  "k": 2,
+  "vals": {
+   "1": 13,
+   "2": 7
+  },
+  "held": true,
+  "png": "ae_holdout/mosaic_2.png"
+ },
+ {
+  "slug": "motion_tile",
+  "mn": "ADBE Tile",
+  "k": 0,
+  "vals": {
+   "2": 50,
+   "3": 50
+  },
+  "held": false,
+  "png": "ae/motion_tile_0.png"
+ },
+ {
+  "slug": "motion_tile",
+  "mn": "ADBE Tile",
+  "k": 1,
+  "vals": {
+   "2": 50,
+   "3": 50,
+   "6": 1
+  },
+  "held": false,
+  "png": "ae/motion_tile_1.png"
+ },
+ {
+  "slug": "motion_tile",
+  "mn": "ADBE Tile",
+  "k": 2,
+  "vals": {
+   "2": 40,
+   "3": 60,
+   "7": 30,
+   "8": 1
+  },
+  "held": false,
+  "png": "ae/motion_tile_2.png"
+ },
+ {
+  "slug": "motion_tile",
+  "mn": "ADBE Tile",
+  "k": 3,
+  "vals": {
+   "1": [
+    200,
+    150
+   ],
+   "2": 60,
+   "3": 60,
+   "6": 1
+  },
+  "held": true,
+  "png": "ae_holdout/motion_tile_3.png"
+ },
+ {
+  "slug": "displacement_map",
+  "mn": "ADBE Displacement Map",
+  "k": 0,
+  "vals": {
+   "3": 20,
+   "5": 20
+  },
+  "held": false,
+  "png": "ae/displacement_map_0.png"
+ },
+ {
+  "slug": "displacement_map",
+  "mn": "ADBE Displacement Map",
+  "k": 1,
+  "vals": {
+   "2": 1,
+   "4": 2,
+   "3": 30,
+   "5": -15
+  },
+  "held": false,
+  "png": "ae/displacement_map_1.png"
+ },
+ {
+  "slug": "displacement_map",
+  "mn": "ADBE Displacement Map",
+  "k": 2,
+  "vals": {
+   "2": 5,
+   "4": 5,
+   "3": 12,
+   "5": 12
+  },
+  "held": true,
+  "png": "ae_holdout/displacement_map_2.png"
+ },
+ {
+  "slug": "turbulent_displace",
+  "mn": "ADBE Turbulent Displace",
+  "k": 0,
+  "vals": {},
+  "held": false,
+  "png": "ae/turbulent_displace_0.png"
+ },
+ {
+  "slug": "turbulent_displace",
+  "mn": "ADBE Turbulent Displace",
+  "k": 1,
+  "vals": {
+   "2": 80,
+   "3": 50
+  },
+  "held": false,
+  "png": "ae/turbulent_displace_1.png"
+ },
+ {
+  "slug": "turbulent_displace",
+  "mn": "ADBE Turbulent Displace",
+  "k": 2,
+  "vals": {
+   "2": 30,
+   "3": 150,
+   "5": 3
+  },
+  "held": true,
+  "png": "ae_holdout/turbulent_displace_2.png"
+ },
+ {
+  "slug": "optics_compensation",
+  "mn": "ADBE Optics Compensation",
+  "k": 0,
+  "vals": {
+   "1": 60
+  },
+  "held": false,
+  "png": "ae/optics_compensation_0.png"
+ },
+ {
+  "slug": "optics_compensation",
+  "mn": "ADBE Optics Compensation",
+  "k": 1,
+  "vals": {
+   "1": 60,
+   "2": 1
+  },
+  "held": false,
+  "png": "ae/optics_compensation_1.png"
+ },
+ {
+  "slug": "optics_compensation",
+  "mn": "ADBE Optics Compensation",
+  "k": 2,
+  "vals": {
+   "1": 90
+  },
+  "held": true,
+  "png": "ae_holdout/optics_compensation_2.png"
+ },
+ {
+  "slug": "corner_pin",
+  "mn": "ADBE Corner Pin",
+  "k": 0,
+  "vals": {
+   "1": [
+    50,
+    30
+   ],
+   "2": [
+    600,
+    0
+   ],
+   "3": [
+    0,
+    360
+   ],
+   "4": [
+    560,
+    330
+   ]
+  },
+  "held": false,
+  "png": "ae/corner_pin_0.png"
+ },
+ {
+  "slug": "corner_pin",
+  "mn": "ADBE Corner Pin",
+  "k": 1,
+  "vals": {
+   "1": [
+    0,
+    40
+   ],
+   "2": [
+    640,
+    0
+   ],
+   "3": [
+    80,
+    360
+   ],
+   "4": [
+    600,
+    300
+   ]
+  },
+  "held": true,
+  "png": "ae_holdout/corner_pin_1.png"
+ },
+ {
+  "slug": "magnify",
+  "mn": "ADBE Magnify",
+  "k": 0,
+  "vals": {
+   "2": [
+    200,
+    150
+   ],
+   "3": 200,
+   "5": 120
+  },
+  "held": false,
+  "png": "ae/magnify_0.png"
+ },
+ {
+  "slug": "magnify",
+  "mn": "ADBE Magnify",
+  "k": 1,
+  "vals": {
+   "1": 2,
+   "2": [
+    400,
+    200
+   ],
+   "3": 300,
+   "5": 80,
+   "6": 10
+  },
+  "held": false,
+  "png": "ae/magnify_1.png"
+ },
+ {
+  "slug": "magnify",
+  "mn": "ADBE Magnify",
+  "k": 2,
+  "vals": {
+   "2": [
+    300,
+    180
+   ],
+   "3": 150,
+   "5": 100
+  },
+  "held": true,
+  "png": "ae_holdout/magnify_2.png"
+ },
+ {
+  "slug": "glow",
+  "mn": "ADBE Glo2",
+  "k": 0,
+  "vals": {
+   "3": 20
+  },
+  "held": false,
+  "png": "ae/glow_0.png"
+ },
+ {
+  "slug": "glow",
+  "mn": "ADBE Glo2",
+  "k": 1,
+  "vals": {
+   "2": 100,
+   "3": 40,
+   "4": 2
+  },
+  "held": false,
+  "png": "ae/glow_1.png"
+ },
+ {
+  "slug": "glow",
+  "mn": "ADBE Glo2",
+  "k": 2,
+  "vals": {
+   "7": 2,
+   "3": 25,
+   "12": [
+    1,
+    0.5,
+    0,
+    1
+   ],
+   "13": [
+    0,
+    0,
+    1,
+    1
+   ]
+  },
+  "held": false,
+  "png": "ae/glow_2.png"
+ },
+ {
+  "slug": "glow",
+  "mn": "ADBE Glo2",
+  "k": 3,
+  "vals": {
+   "2": 60,
+   "3": 15,
+   "4": 1.5
+  },
+  "held": true,
+  "png": "ae_holdout/glow_3.png"
+ },
+ {
+  "slug": "drop_shadow",
+  "mn": "ADBE Drop Shadow",
+  "k": 0,
+  "vals": {
+   "4": 15,
+   "5": 10
+  },
+  "held": false,
+  "png": "ae/drop_shadow_0.png"
+ },
+ {
+  "slug": "drop_shadow",
+  "mn": "ADBE Drop Shadow",
+  "k": 1,
+  "vals": {
+   "1": [
+    0.3,
+    0,
+    0.5,
+    1
+   ],
+   "2": 200,
+   "3": 45,
+   "4": 25,
+   "5": 30
+  },
+  "held": false,
+  "png": "ae/drop_shadow_1.png"
+ },
+ {
+  "slug": "drop_shadow",
+  "mn": "ADBE Drop Shadow",
+  "k": 2,
+  "vals": {
+   "6": 1,
+   "4": 10,
+   "5": 5
+  },
+  "held": false,
+  "png": "ae/drop_shadow_2.png"
+ },
+ {
+  "slug": "drop_shadow",
+  "mn": "ADBE Drop Shadow",
+  "k": 3,
+  "vals": {
+   "3": 200,
+   "4": 12,
+   "5": 20,
+   "2": 180
+  },
+  "held": true,
+  "png": "ae_holdout/drop_shadow_3.png"
+ },
+ {
+  "slug": "emboss",
+  "mn": "ADBE Emboss",
+  "k": 0,
+  "vals": {},
+  "held": false,
+  "png": "ae/emboss_0.png"
+ },
+ {
+  "slug": "emboss",
+  "mn": "ADBE Emboss",
+  "k": 1,
+  "vals": {
+   "1": 120,
+   "2": 3,
+   "3": 200
+  },
+  "held": false,
+  "png": "ae/emboss_1.png"
+ },
+ {
+  "slug": "emboss",
+  "mn": "ADBE Emboss",
+  "k": 2,
+  "vals": {
+   "1": 30,
+   "2": 2,
+   "3": 150,
+   "4": 30
+  },
+  "held": true,
+  "png": "ae_holdout/emboss_2.png"
+ },
+ {
+  "slug": "checkerboard",
+  "mn": "ADBE Checkerboard",
+  "k": 0,
+  "vals": {},
+  "held": false,
+  "png": "ae/checkerboard_0.png"
+ },
+ {
+  "slug": "checkerboard",
+  "mn": "ADBE Checkerboard",
+  "k": 1,
+  "vals": {
+   "2": 2,
+   "4": 30
+  },
+  "held": false,
+  "png": "ae/checkerboard_1.png"
+ },
+ {
+  "slug": "checkerboard",
+  "mn": "ADBE Checkerboard",
+  "k": 2,
+  "vals": {
+   "2": 3,
+   "4": 40,
+   "5": 20,
+   "10": [
+    1,
+    0,
+    0,
+    1
+   ],
+   "11": 50
+  },
+  "held": false,
+  "png": "ae/checkerboard_2.png"
+ },
+ {
+  "slug": "checkerboard",
+  "mn": "ADBE Checkerboard",
+  "k": 3,
+  "vals": {
+   "2": 2,
+   "4": 24,
+   "1": [
+    100,
+    50
+   ]
+  },
+  "held": true,
+  "png": "ae_holdout/checkerboard_3.png"
+ },
+ {
+  "slug": "four_color_gradient",
+  "mn": "ADBE 4ColorGradient",
+  "k": 0,
+  "vals": {},
+  "held": false,
+  "png": "ae/four_color_gradient_0.png"
+ },
+ {
+  "slug": "four_color_gradient",
+  "mn": "ADBE 4ColorGradient",
+  "k": 1,
+  "vals": {
+   "11": 50,
+   "13": 70
+  },
+  "held": false,
+  "png": "ae/four_color_gradient_1.png"
+ },
+ {
+  "slug": "four_color_gradient",
+  "mn": "ADBE 4ColorGradient",
+  "k": 2,
+  "vals": {
+   "2": [
+    100,
+    100
+   ],
+   "4": [
+    540,
+    60
+   ],
+   "11": 200
+  },
+  "held": true,
+  "png": "ae_holdout/four_color_gradient_2.png"
+ },
+ {
+  "slug": "gradient_ramp",
+  "mn": "ADBE Ramp",
+  "k": 0,
+  "vals": {},
+  "held": false,
+  "png": "ae/gradient_ramp_0.png"
+ },
+ {
+  "slug": "gradient_ramp",
+  "mn": "ADBE Ramp",
+  "k": 1,
+  "vals": {
+   "1": [
+    100,
+    100
+   ],
+   "3": [
+    540,
+    260
+   ]
+  },
+  "held": false,
+  "png": "ae/gradient_ramp_1.png"
+ },
+ {
+  "slug": "gradient_ramp",
+  "mn": "ADBE Ramp",
+  "k": 2,
+  "vals": {
+   "5": 2,
+   "1": [
+    320,
+    180
+   ],
+   "3": [
+    320,
+    0
+   ]
+  },
+  "held": false,
+  "png": "ae/gradient_ramp_2.png"
+ },
+ {
+  "slug": "gradient_ramp",
+  "mn": "ADBE Ramp",
+  "k": 3,
+  "vals": {
+   "1": [
+    0,
+    0
+   ],
+   "3": [
+    640,
+    360
+   ],
+   "7": 0.3
+  },
+  "held": true,
+  "png": "ae_holdout/gradient_ramp_3.png"
+ },
+ {
+  "slug": "linear_wipe",
+  "mn": "ADBE Linear Wipe",
+  "k": 0,
+  "vals": {
+   "1": 40
+  },
+  "held": false,
+  "png": "ae/linear_wipe_0.png"
+ },
+ {
+  "slug": "linear_wipe",
+  "mn": "ADBE Linear Wipe",
+  "k": 1,
+  "vals": {
+   "1": 50,
+   "2": 30,
+   "3": 40
+  },
+  "held": false,
+  "png": "ae/linear_wipe_1.png"
+ },
+ {
+  "slug": "linear_wipe",
+  "mn": "ADBE Linear Wipe",
+  "k": 2,
+  "vals": {
+   "1": 60,
+   "2": 200,
+   "3": 20
+  },
+  "held": true,
+  "png": "ae_holdout/linear_wipe_2.png"
+ },
+ {
+  "slug": "cc_scale_wipe",
+  "mn": "CC Scale Wipe",
+  "k": 0,
+  "vals": {
+   "1": 40
+  },
+  "held": false,
+  "png": "ae/cc_scale_wipe_0.png"
+ },
+ {
+  "slug": "cc_scale_wipe",
+  "mn": "CC Scale Wipe",
+  "k": 1,
+  "vals": {
+   "1": -30,
+   "3": 120
+  },
+  "held": false,
+  "png": "ae/cc_scale_wipe_1.png"
+ },
+ {
+  "slug": "cc_scale_wipe",
+  "mn": "CC Scale Wipe",
+  "k": 2,
+  "vals": {
+   "1": 60,
+   "2": [
+    200,
+    200
+   ]
+  },
+  "held": true,
+  "png": "ae_holdout/cc_scale_wipe_2.png"
+ }
+]

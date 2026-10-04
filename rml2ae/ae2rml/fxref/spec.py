@@ -1,0 +1,69 @@
+"""Reference renders of the AE-compatible WGSL effects: effect -> [(settings, held)], settings = {AE param index: value}.
+
+held = 1: a setting kept out of view of whoever implements the effect, used only to verify it afterwards (its render
+lives in ae_holdout/). Add an effect here, then `python render_refs.py <slug>` (After Effects open) renders its
+references from src/src.png, and `python -m rml2ae.ae2rml.fxlib check <slug>` compares the WGSL with them.
+
+    python spec.py        # rewrites renders.json (what fxlib check reads)"""
+import json
+import os
+
+D = os.path.dirname(os.path.abspath(__file__))
+C = lambda r, g, b, a=1: [r, g, b, a]  # noqa: E731
+
+SPEC = {
+    "none": ("", [({}, 0)]),
+    "fill": ("ADBE Fill", [({3: C(0.2, 0.6, 1)}, 0), ({3: C(1, 0.5, 0), 7: 0.5}, 0), ({3: C(0.9, 0.1, 0.5), 7: 0.8}, 1)]),
+    "tint": ("ADBE Tint", [({3: 100}, 0), ({1: C(0.1, 0, 0.3), 2: C(1, 0.9, 0.5), 3: 100}, 0), ({1: C(0, 0.2, 0.2), 2: C(1, 1, 0.8), 3: 60}, 1)]),
+    "exposure": ("ADBE Exposure2", [({3: 1}, 0), ({3: -1, 4: 0.05, 5: 1.5}, 0), ({3: 0.5, 5: 0.7}, 1)]),
+    "invert": ("ADBE Invert", [({1: 1}, 0), ({1: 7}, 0), ({1: 2}, 0), ({1: 1, 2: 40}, 1)]),
+    "levels": ("ADBE Easy Levels2", [({3: 0.2, 4: 0.8}, 0), ({5: 2.0}, 0), ({6: 0.1, 7: 0.9, 5: 0.6}, 0), ({3: 0.1, 4: 0.9, 5: 1.4}, 1)]),
+    "color_balance_hls": ("ADBE Color Balance (HLS)", [({1: 90}, 0), ({2: 30, 3: -50}, 0), ({1: -45, 3: 40}, 1)]),
+    "hue_saturation": ("ADBE HUE SATURATION", [({3: 120}, 0), ({4: -60, 5: 20}, 0), ({6: 1, 7: 200, 8: 60, 9: 0}, 0), ({3: -60, 4: 40}, 1)]),
+    "brightness_contrast": ("ADBE Brightness & Contrast 2", [({1: 40}, 0), ({2: 50}, 0), ({1: -30, 2: -40}, 0), ({1: 20, 2: 30}, 1)]),
+    "tritone": ("ADBE Tritone", [({}, 0), ({1: C(1, 0.9, 0.7), 2: C(0.2, 0.5, 0.6), 3: C(0.05, 0, 0.1)}, 0), ({4: 30}, 1)]),
+    "shift_channels": ("ADBE Shift Channels", [({2: 3, 3: 4, 4: 2}, 0), ({1: 5}, 0), ({2: 9, 4: 10}, 1)]),
+    "luma_key": ("ADBE Luma Key", [({1: 2, 2: 100, 3: 20}, 0), ({1: 1, 2: 60, 5: 10}, 0), ({1: 2, 2: 150, 3: 40, 5: 5}, 1)]),
+    "posterize": ("ADBE Posterize", [({1: 4}, 0), ({1: 2}, 0), ({1: 6}, 1)]),
+    "black_white": ("ADBE Black&White", [({}, 0), ({1: 100, 5: -50, 7: 1}, 0), ({2: 120, 4: 0}, 1)]),
+    "gaussian_blur": ("ADBE Gaussian Blur 2", [({1: 10, 3: 0}, 0), ({1: 30, 3: 0}, 0), ({1: 20, 2: 2, 3: 0}, 0), ({1: 20, 3: 1}, 0), ({1: 15, 3: 0}, 1)]),
+    "gaussian_blur_legacy": ("ADBE Gaussian Blur", [({1: 10}, 0), ({1: 25}, 0), ({1: 16}, 1)]),
+    "fast_blur_legacy": ("ADBE Fast Blur", [({1: 10, 3: 0}, 0), ({1: 25, 3: 0}, 0), ({1: 16, 3: 0}, 1)]),
+    "box_blur": ("ADBE Box Blur2", [({1: 8, 2: 1, 4: 0}, 0), ({1: 8, 2: 3, 4: 0}, 0), ({1: 12, 2: 2, 4: 0}, 1)]),
+    "directional_blur": ("ADBE Motion Blur", [({1: 0, 2: 20}, 0), ({1: 45, 2: 30}, 0), ({1: 120, 2: 15}, 1)]),
+    "cc_radial_fast_blur": ("CC Radial Fast Blur", [({2: 50}, 0), ({2: 80, 3: 2}, 0), ({1: [200, 120], 2: 60, 3: 3}, 0), ({2: 30, 1: [400, 200]}, 1)]),
+    "cc_radial_blur": ("CC Radial Blur", [({1: 1, 2: 30}, 0), ({1: 4, 2: 20}, 0), ({1: 6, 2: 40}, 0), ({1: 3, 2: 25}, 1)]),
+    "simple_choker": ("ADBE Simple Choker", [({2: 3}, 0), ({2: -4}, 0), ({2: 6}, 1)]),
+    "minimax": ("ADBE Minimax", [({1: 1, 2: 4}, 0), ({1: 2, 2: 4}, 0), ({1: 2, 2: 6, 3: 2}, 0), ({1: 3, 2: 3}, 1)]),
+    "mosaic": ("ADBE Mosaic", [({1: 20, 2: 10}, 0), ({1: 40, 2: 20, 3: 1}, 0), ({1: 13, 2: 7}, 1)]),
+    "motion_tile": ("ADBE Tile", [({2: 50, 3: 50}, 0), ({2: 50, 3: 50, 6: 1}, 0), ({2: 40, 3: 60, 7: 30, 8: 1}, 0), ({1: [200, 150], 2: 60, 3: 60, 6: 1}, 1)]),
+    "displacement_map": ("ADBE Displacement Map", [({3: 20, 5: 20}, 0), ({2: 1, 4: 2, 3: 30, 5: -15}, 0), ({2: 5, 4: 5, 3: 12, 5: 12}, 1)]),
+    "turbulent_displace": ("ADBE Turbulent Displace", [({}, 0), ({2: 80, 3: 50}, 0), ({2: 30, 3: 150, 5: 3}, 1)]),
+    "optics_compensation": ("ADBE Optics Compensation", [({1: 60}, 0), ({1: 60, 2: 1}, 0), ({1: 90}, 1)]),
+    "corner_pin": ("ADBE Corner Pin", [({1: [50, 30], 2: [600, 0], 3: [0, 360], 4: [560, 330]}, 0), ({1: [0, 40], 2: [640, 0], 3: [80, 360], 4: [600, 300]}, 1)]),
+    "magnify": ("ADBE Magnify", [({2: [200, 150], 3: 200, 5: 120}, 0), ({1: 2, 2: [400, 200], 3: 300, 5: 80, 6: 10}, 0), ({2: [300, 180], 3: 150, 5: 100}, 1)]),
+    "glow": ("ADBE Glo2", [({3: 20}, 0), ({2: 100, 3: 40, 4: 2}, 0), ({7: 2, 3: 25, 12: C(1, 0.5, 0), 13: C(0, 0, 1)}, 0), ({2: 60, 3: 15, 4: 1.5}, 1)]),
+    "drop_shadow": ("ADBE Drop Shadow", [({4: 15, 5: 10}, 0), ({1: C(0.3, 0, 0.5), 2: 200, 3: 45, 4: 25, 5: 30}, 0), ({6: 1, 4: 10, 5: 5}, 0), ({3: 200, 4: 12, 5: 20, 2: 180}, 1)]),
+    "emboss": ("ADBE Emboss", [({}, 0), ({1: 120, 2: 3, 3: 200}, 0), ({1: 30, 2: 2, 3: 150, 4: 30}, 1)]),
+    "checkerboard": ("ADBE Checkerboard", [({}, 0), ({2: 2, 4: 30}, 0), ({2: 3, 4: 40, 5: 20, 10: C(1, 0, 0), 11: 50}, 0), ({2: 2, 4: 24, 1: [100, 50]}, 1)]),
+    "four_color_gradient": ("ADBE 4ColorGradient", [({}, 0), ({11: 50, 13: 70}, 0), ({2: [100, 100], 4: [540, 60], 11: 200}, 1)]),
+    "gradient_ramp": ("ADBE Ramp", [({}, 0), ({1: [100, 100], 3: [540, 260]}, 0), ({5: 2, 1: [320, 180], 3: [320, 0]}, 0), ({1: [0, 0], 3: [640, 360], 7: 0.3}, 1)]),
+    "linear_wipe": ("ADBE Linear Wipe", [({1: 40}, 0), ({1: 50, 2: 30, 3: 40}, 0), ({1: 60, 2: 200, 3: 20}, 1)]),
+    "cc_scale_wipe": ("CC Scale Wipe", [({1: 40}, 0), ({1: -30, 3: 120}, 0), ({1: 60, 2: [200, 200]}, 1)]),
+}
+NEEDS_MAP = {"displacement_map": {1: 2}}   # param 1 (map layer) = layer index 2 (the map footage)
+
+
+def renders():
+    out = []
+    for slug, (mn, sets) in SPEC.items():
+        for k, (vals, held) in enumerate(sets):
+            out.append(dict(slug=slug, mn=mn, k=k, vals={str(i): v for i, v in vals.items()}, held=bool(held),
+                            png=os.path.join("ae_holdout" if held else "ae", f"{slug}_{k}.png")))     # relative to D
+    return out
+
+
+if __name__ == "__main__":
+    rs = renders()
+    json.dump(rs, open(os.path.join(D, "renders.json"), "w"), indent=1)
+    print(len(rs), "renders,", sum(r["held"] for r in rs), "held out,", len(SPEC), "effects")

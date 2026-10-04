@@ -33,7 +33,8 @@ import tempfile
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 LIB = os.path.join(HERE, "fxlib")
-REF = os.path.expanduser("~/.cache/ae2rml_tests/fxref")
+REF = os.environ.get("AE2RML_FXREF") or os.path.join(HERE, "fxref")      # reference renders + spec (fxref/spec.py)
+CHECK_OUT = os.path.expanduser(os.environ.get("AE2RML_FXCHECK_OUT", "~/.cache/ae2rml/fxcheck"))   # check outputs
 TYPES = {"f32": (1, 4, 4), "i32": (1, 4, 4), "u32": (1, 4, 4), "vec2<f32>": (2, 8, 8), "vec3<f32>": (3, 12, 16),
          "vec4<f32>": (4, 16, 16), "vec2f": (2, 8, 8), "vec3f": (3, 12, 16), "vec4f": (4, 16, 16)}
 
@@ -564,12 +565,12 @@ def check(slug, rive=False, holdout=False, keep=False):
     rows = []
     src = os.path.join(REF, "src", "src_premult.png")
     mp = os.path.join(REF, "src", "map.png")
-    outd = os.path.join(REF, "out", slug)
+    outd = os.path.join(CHECK_OUT, slug)
     os.makedirs(outd, exist_ok=True)
     for r in rs:
         if r["slug"] != slug or (r["held"] and not holdout):
             continue
-        ref = r["png"] if not r["held"] else r["png"].replace("/ae/", "/ae_holdout/")
+        ref = os.path.join(REF, r["png"])                 # ae/<slug>_<k>.png or ae_holdout/<slug>_<k>.png
         name = f"{slug}_{r['k']}"
         o = os.path.join(outd, name + ".png")
         row = {"setting": name, "held": r["held"], "vals": r["vals"]}
