@@ -168,7 +168,11 @@ jobs:
       # comparison as on Linux, on the software Direct3D 12 adapter (WARP): the runner has no GPU
       - name: build.ps1 -GpuOnly (MSVC, wgpu-native)
         run: rml2ae/plugin/build.ps1 -GpuOnly
+      # every fxlib WGSL through Direct3D 12's shader compiler (FXC), as the plugin and wgsl_apply use it on Windows
+      - name: Every fxlib effect compiles and runs on Direct3D 12
+        run: python rml2ae/plugin/tools/oracle_check.py --compile-all
       - name: Plugin GPU module (rs_apply.exe) vs wgsl_apply
+        if: always()
         env:
           RS_WGPU_FALLBACK: "1"
         run: python rml2ae/plugin/tools/oracle_check.py "$env:LOCALAPPDATA\ae-plugin-deps\build-RiveShader-gpu\rs_apply.exe"

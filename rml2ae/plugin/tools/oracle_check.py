@@ -5,8 +5,12 @@ Both run the same WGSL through wgpu with the same parameters; the C++ side is wh
 textures is rendered with each of its settings in fxref/renders.json, and the two 8-bit results are compared.
 
     python rml2ae/plugin/tools/oracle_check.py <path to rs_apply> [slug ...] [--max-diff N]
+    python rml2ae/plugin/tools/oracle_check.py --compile-all
 
 Exit code 1 when a result differs by more than --max-diff levels (default 0) or a render fails.
+--compile-all renders every fxlib effect (multi-pass and map effects included) once with wgsl_apply.py at its
+defaults on a small image: does each WGSL compile and run on this machine's GPU backend (on Windows, Direct3D 12
+with the FXC compiler)?
 """
 import json
 import os
@@ -40,10 +44,31 @@ def read_rgba(path):
         return np.frombuffer(f.read(), dtype=np.uint8).reshape(h, w, 4)
 
 
+def compile_all():
+    tmp = tempfile.mkdtemp(prefix="oracle_")
+    small = os.path.join(tmp, "small.png")
+    Image.open(SRC).resize((160, 90)).save(small)
+    mp = os.path.join(ROOT, "rml2ae", "ae2rml", "fxref", "src", "map.png")
+    slugs = sorted(f[:-5] for f in os.listdir(fxlib.LIB) if f.endswith(".json") and not f.startswith("_"))
+    bad = []
+    for slug in slugs:
+        try:
+            fxlib.run_offline(slug, {}, small, os.path.join(tmp, slug + ".png"), map_png=mp)
+            print(f"ok   {slug}")
+        except Exception as e:
+            msg = " ".join(str(e).split())
+            bad.append(slug)
+            print(f"FAIL {slug}: {msg[-400:]}")
+    print(f"compile-all: {len(slugs)} effect(s), {len(bad)} failing: {' '.join(bad)}")
+    return 1 if bad else 0
+
+
 def main(argv):
     if not argv:
         print(__doc__)
         return 2
+    if argv[0] == "--compile-all":
+        return compile_all()
     rs_apply, rest = argv[0], argv[1:]
     max_diff = 0
     if "--max-diff" in rest:
@@ -67,7 +92,11 @@ def main(argv):
         vals = fxlib.values_for(m, r["vals"], src.size)
         vals["passIndex"] = 0.0
         py_png = os.path.join(tmp, name + ".png")
-        fxlib.run_offline(slug, r["vals"], SRC, py_png)
+        try:
+            fxlib.run_offline(slug, r["vals"], SRC, py_png)
+        except Exception as e:      # the shader does not compile on this platform: rs_apply must say the same
+            py_png = None
+            py_err = str(e).strip().splitlines()[-1] if str(e).strip() else type(e).__name__
         args = [rs_apply, fxlib.wgsl_path(m), src_raw, os.path.join(tmp, name + ".rgba")]
         for k, v in vals.items():
             if k == "size":
@@ -76,6 +105,10 @@ def main(argv):
             args += ["--set", f"{k}=" + ",".join(repr(float(x)) for x in v)]
         p = subprocess.run(args, capture_output=True, text=True)
         checked += 1
+        if py_png is None:
+            bad += 1
+            print(f"FAIL {name}: wgsl_apply: {py_err[:300]} | rs_apply exit {p.returncode}")
+            continue
         if p.returncode != 0:
             bad += 1
             print(f"FAIL {name}: rs_apply exit {p.returncode}: {p.stderr.strip()[:400]}")
