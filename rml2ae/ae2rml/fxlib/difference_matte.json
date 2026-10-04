@@ -1,0 +1,47 @@
+{
+ "slug": "difference_matte",
+ "aeMatchName": "ADBE Difference Matte2",
+ "wgsl": "ae_difference_matte.wgsl",
+ "passes": 1,
+ "textures": {
+  "mapTex": "map"
+ },
+ "params": [
+  {
+   "ae": 1,
+   "field": "view",
+   "kind": "enum",
+   "default": 1
+  },
+  {
+   "ae": 3,
+   "field": "sizes",
+   "kind": "enum",
+   "default": 2
+  },
+  {
+   "ae": 4,
+   "field": "tolerance",
+   "kind": "number",
+   "default": 10
+  },
+  {
+   "ae": 5,
+   "field": "softness",
+   "kind": "number",
+   "default": 0
+  },
+  {
+   "ae": 6,
+   "field": "blur",
+   "kind": "number",
+   "default": 0
+  }
+ ],
+ "status": "unverified",
+ "auto": false,
+ "notes": "Not yet measured against After Effects. The second layer comes from the Rive node's map input (ae2rml binds the referenced layer, PR 7). Parameter indices follow the After Effects parameter order as documented by Adobe; `render_refs.py --params` records the real list.",
+ "textureParams": {
+  "mapTex": 1
+ }
+}

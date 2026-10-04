@@ -173,7 +173,7 @@ Everything needed to measure an effect is in the repository:
 
 What is still missing, effect by effect, is in [fxlib-roadmap.md](fxlib-roadmap.md).
 
-37 measured effects: 27 exact, 8 close, 2 approx, plus 86 unverified ones (below the table). "Auto" is whether ae2rml applies the effect without being asked; the two effects
+37 measured effects: 27 exact, 8 close, 2 approx, plus 94 unverified ones (below the table). "Auto" is whether ae2rml applies the effect without being asked; the two effects
 marked `no` are measured to be further from After Effects than leaving the effect out, so they remain a
 `<!-- ae: effect ... -->` comment plus an entry in `effects_todo.json`.
 
@@ -310,6 +310,14 @@ real parameter list, then `render_refs.py <slug>`), add held-out settings, and m
 | Lens Flare | `ADBE Lens Flare` | `lens_flare` | A stylised flare: AE's elements are not reproduced |
 | CC Grid Wipe | `CC Grid Wipe` | `cc_grid_wipe` | Order of the cells; shapes; Border |
 | CC Block Load | `CC Block Load` | `cc_block_load` | Block levels and fill order; Scanlines |
+| Blend | `ADBE Blend` | `blend` | Color Only / Tint Only laws; Blend With Original direction |
+| Calculations | `ADBE Calculations` | `calculations` | Blending Mode menu order; alpha when not preserving transparency |
+| Compound Arithmetic | `ADBE Compound Arithmetic` | `compound_arithmetic` | Operator menu; Scale overflow ranges |
+| Difference Matte | `ADBE Difference Matte2` | `difference_matte` | Distance measure; Blur Before Difference not modelled |
+| Texturize | `ADBE Texturize` | `texturize` | Relief and lighting law; Texture Contrast scale |
+| Compound Blur | `ADBE Compound Blur` | `compound_blur` | Kernel shape (disc here) and the radius law |
+| CC Image Wipe | `CC Image Wipe` | `cc_image_wipe` | Parameter positions in the Gradient group; Property menu; Blur |
+| 3D Glasses | `ADBE 3D Glasses2` | `three_d_glasses` | 3D View menu order; Balance; the left view is this layer |
 
 Notes:
 

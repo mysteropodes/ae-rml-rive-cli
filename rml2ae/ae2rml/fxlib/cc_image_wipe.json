@@ -1,0 +1,53 @@
+{
+ "slug": "cc_image_wipe",
+ "aeMatchName": "CC Image Wipe",
+ "wgsl": "ae_cc_image_wipe.wgsl",
+ "passes": 1,
+ "textures": {
+  "mapTex": "map"
+ },
+ "params": [
+  {
+   "ae": 1,
+   "field": "completion",
+   "kind": "number",
+   "default": 0
+  },
+  {
+   "ae": 2,
+   "field": "softness",
+   "kind": "number",
+   "default": 0
+  },
+  {
+   "ae": 3,
+   "field": "autoSoft",
+   "kind": "bool",
+   "default": 0
+  },
+  {
+   "ae": 6,
+   "field": "property",
+   "kind": "enum",
+   "default": 1
+  },
+  {
+   "ae": 7,
+   "field": "blur",
+   "kind": "number",
+   "default": 0
+  },
+  {
+   "ae": 8,
+   "field": "inverse",
+   "kind": "bool",
+   "default": 0
+  }
+ ],
+ "status": "unverified",
+ "auto": false,
+ "notes": "Not yet measured against After Effects. The second layer comes from the Rive node's map input (ae2rml binds the referenced layer, PR 7). Parameter indices follow the After Effects parameter order as documented by Adobe; `render_refs.py --params` records the real list.",
+ "textureParams": {
+  "mapTex": 5
+ }
+}

@@ -667,8 +667,10 @@ def pad_problems(slug, pad=40):
             if p["kind"] == "point":
                 v2[p["field"]] = [v1[p["field"]][0] + pad, v1[p["field"]][1] + pad]
         a, b = os.path.join(tmpd, "a.png"), os.path.join(tmpd, "b.png")
-        apply(wgsl_path(m), src, a, values=v1)
-        apply(wgsl_path(m), os.path.join(tmpd, "big.png"), b, values=v2)
+        # a second layer is rendered at the layer's size by the node, whatever the pad: the same map in both renders
+        tex = {n: os.path.join(REF, "src", "map.png") for n, role in m.get("textures", {}).items() if role == "map"}
+        apply(wgsl_path(m), src, a, values=v1, textures=tex)
+        apply(wgsl_path(m), os.path.join(tmpd, "big.png"), b, values=v2, textures=tex)
         x = np.asarray(Image.open(a)).astype(int)
         y = np.asarray(Image.open(b)).astype(int)[pad:pad + h, pad:pad + w]
         d = int(np.abs(x - y).max())
