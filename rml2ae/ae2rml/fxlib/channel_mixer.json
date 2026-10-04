@@ -1,0 +1,90 @@
+{
+ "slug": "channel_mixer",
+ "aeMatchName": "ADBE Channel Mixer",
+ "wgsl": "ae_channel_mixer.wgsl",
+ "passes": 1,
+ "textures": {},
+ "params": [
+  {
+   "ae": 1,
+   "field": "rr",
+   "kind": "number",
+   "default": 100
+  },
+  {
+   "ae": 2,
+   "field": "rg",
+   "kind": "number",
+   "default": 0
+  },
+  {
+   "ae": 3,
+   "field": "rb",
+   "kind": "number",
+   "default": 0
+  },
+  {
+   "ae": 4,
+   "field": "rc",
+   "kind": "number",
+   "default": 0
+  },
+  {
+   "ae": 5,
+   "field": "gr",
+   "kind": "number",
+   "default": 0
+  },
+  {
+   "ae": 6,
+   "field": "gg",
+   "kind": "number",
+   "default": 100
+  },
+  {
+   "ae": 7,
+   "field": "gb",
+   "kind": "number",
+   "default": 0
+  },
+  {
+   "ae": 8,
+   "field": "gc",
+   "kind": "number",
+   "default": 0
+  },
+  {
+   "ae": 9,
+   "field": "br",
+   "kind": "number",
+   "default": 0
+  },
+  {
+   "ae": 10,
+   "field": "bg",
+   "kind": "number",
+   "default": 0
+  },
+  {
+   "ae": 11,
+   "field": "bb",
+   "kind": "number",
+   "default": 100
+  },
+  {
+   "ae": 12,
+   "field": "bc",
+   "kind": "number",
+   "default": 0
+  },
+  {
+   "ae": 13,
+   "field": "mono",
+   "kind": "bool",
+   "default": 0
+  }
+ ],
+ "status": "unverified",
+ "auto": false,
+ "notes": "Not yet measured against After Effects: written from the effect's definition. Status stays 'unverified' and auto false until fxref renders are measured (fxlib check <slug> --rive --holdout). Parameter indices come from the After Effects parameter order as documented by Adobe; `render_refs.py --params` records the real list."
+}

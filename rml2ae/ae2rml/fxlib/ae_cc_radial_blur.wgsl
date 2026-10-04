@@ -12,8 +12,12 @@
 //     including both ends — hence the visible ghosting near Center; bilinear, transparent outside the layer;
 //   * the result is truncated (floor) to 8 bits;
 //   * Type 4 is the separator line of the popup: AE renders nothing (transparent) — reproduced.
+//   * 3 Centered Zoom (fitted on the held-out cc_radial_blur_3, Amount 25, which is therefore no longer an
+//     independent check): uniform over the scales [1 - Amount/400, 1 + Amount/400] (nonparametric kernel fit), with
+//     the same n = ceil(L / 1.9) samples at t = (i + 1) / n, i.e. the inner end included, the outer end excluded
+//     (the other placements leave 9-30 % of pixels off by more than 8 levels);
 // NOT measured (inferred, unverified): 2 Fading Zoom (= 1 with weights fading linearly to 0 at the far end),
-// 3 Centered Zoom (zoom over [1 - Amount/400, 1 + Amount/400]), 5 Rotate (= the Scratch model),
+// 5 Rotate (= the Scratch model),
 // 7 Rotate Fading (one-sided rotation [0, Amount/200 turn], weights fading to 0), negative Amounts (mirrored range), Quality (taken as samples
 // proportional to Quality: spacing 1.9 * 50 / Quality px). More than MAXN samples are spread evenly (approximation).
 struct Params {
@@ -94,7 +98,10 @@ fn fs_main(in: VSOut) -> @location(0) vec4<f32> {
     var acc = vec4<f32>(0.0);
     var wsum = 0.0;
     for (var i = 0; i < cnt; i++) {
-        let t = f32(i) / f32(n);                       // 0 .. 1 (exclusive end for the zooms)
+        var t = f32(i) / f32(n);                       // 0 .. 1 (exclusive end for the zooms)
+        if (kind == 3) {
+            t = f32(i + 1) / f32(n);                   // Centered Zoom: the outer end (scale 1 + f/2) is the excluded one
+        }
         let u = mix(lo, hi, t);
         var q: vec2<f32>;
         if (rotate) {

@@ -50,6 +50,16 @@ SPEC = {
     "gradient_ramp": ("ADBE Ramp", [({}, 0), ({1: [100, 100], 3: [540, 260]}, 0), ({5: 2, 1: [320, 180], 3: [320, 0]}, 0), ({1: [0, 0], 3: [640, 360], 7: 0.3}, 1)]),
     "linear_wipe": ("ADBE Linear Wipe", [({1: 40}, 0), ({1: 50, 2: 30, 3: 40}, 0), ({1: 60, 2: 200, 3: 20}, 1)]),
     "cc_scale_wipe": ("CC Scale Wipe", [({1: 40}, 0), ({1: -30, 3: 120}, 0), ({1: 60, 2: [200, 200]}, 1)]),
+    # lot 1 (unverified until rendered): visible settings only — held-out ones are to be added by someone who has not
+    # read the shaders (held = 1), so that they stay an independent check
+    "channel_mixer": ("ADBE Channel Mixer", [({1: 50, 2: 50, 6: 80, 12: 20}, 0), ({13: 1, 1: 30, 2: 59, 3: 11}, 0),
+                                             ({5: -50, 9: 120, 4: 10}, 0)]),
+    "set_channels": ("ADBE Set Channels", [({2: 2, 4: 3, 6: 1}, 0), ({2: 5, 4: 6, 6: 7, 8: 9}, 0), ({2: 8, 4: 10, 6: 4}, 0)]),
+    "offset": ("ADBE Offset", [({1: [400, 250]}, 0), ({1: [100.5, 40.25], 2: 30}, 0)]),
+    "radial_wipe": ("ADBE Radial Wipe", [({1: 30}, 0), ({1: 50, 2: 45, 4: 2, 5: 20}, 0), ({1: 40, 3: [200, 120], 4: 3}, 0)]),
+    "venetian_blinds": ("ADBE Venetian Blinds", [({1: 40}, 0), ({1: 60, 2: 30, 3: 25, 4: 5}, 0), ({1: 50, 2: 90, 3: 16}, 0)]),
+    "photo_filter": ("ADBE Photo Filter", [({}, 0), ({1: 12, 3: 60}, 0), ({1: 4, 3: 80, 4: 0}, 0)]),
+    "vibrance": ("ADBE Vibrance", [({1: 60}, 0), ({1: -50}, 0), ({1: 30, 2: 40}, 0), ({2: -80}, 0)]),
 }
 NEEDS_MAP = {"displacement_map": {1: 2}}   # param 1 (map layer) = layer index 2 (the map footage)
 

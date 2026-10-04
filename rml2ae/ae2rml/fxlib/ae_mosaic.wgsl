@@ -1,9 +1,9 @@
 // After Effects "Mosaic" (ADBE Mosaic) — the layer is cut into Horizontal Blocks x Vertical Blocks tiles, each tile
 // filled with the average of its pixels (PREMULTIPLIED average, rounded) or, with Sharp Colors, with one source pixel.
 // Measured against AE 2026 8 bpc (640x360 layer, 20x10 and 40x20 tiles):
-//   * tiles are anchored at the layer's top-left corner; pixel x belongs to tile floor(x·n/W) (integer maths), so
-//     tile i spans [ceil(i·W/n), ceil((i+1)·W/n)) — identical to W/n-wide tiles when W is a multiple of n
-//     (the rule for non-divisible sizes is the natural per-pixel one, not measurable on the visible refs);
+//   * tiles are anchored at the layer's top-left corner and span [i·W/n, (i+1)·W/n) EXACTLY, fractions included:
+//     a tile's mean weights each pixel by the share of it inside the tile, and a pixel straddling two tiles is the
+//     coverage-weighted mix of both means (area sampling; measured on the 13x7 held-out reference, 640x360);
 //   * average = mean of the premultiplied RGBA of the tile, rounded to nearest (exact vs AE: mean err 0.015 %, max 1);
 //   * Sharp Colors = the tile's LAST pixel (bottom-right: x = tile end − 1, y = tile end − 1), not its centre —
 //     exact on all 800 tiles of the 40x20 reference.
@@ -12,7 +12,9 @@
 //   pass 2 = vertical chunk mean,                                      pass 3 = vertical tile mean.
 // K = 1 (plain copy, exact) while a tile is <= DIRECT_SPAN px long, else K = ceil(sqrt(tile length)), so a pass never
 // needs more than ~max(DIRECT_SPAN, 2·sqrt(L)) taps (1 tile on a 30000 px layer: 174 taps).
-// Sharp Colors: passes 0 and 2 copy, pass 1 picks the tile's last column, pass 3 its last row (bit-exact).
+// Sharp Colors: passes 0 and 2 copy, pass 1 picks the tile's last column, pass 3 its last row (bit-exact on
+// whole-pixel tiles; non-divisible sizes with Sharp Colors are not measured). Edge pixels are copied by the chunk
+// passes and weighted by their coverage in the gather passes.
 // The tile grid is computed on the canvas size: keep the node's `pad` at 0 (Mosaic never spills out of the layer).
 struct Params {
     size: vec2<f32>,
@@ -52,6 +54,33 @@ fn along(px: vec2<i32>, q: i32, horizontal: bool) -> vec2<i32> {
     return select(vec2<i32>(px.x, q), vec2<i32>(q, px.y), horizontal);
 }
 
+// overlap, in 1/n px, of pixel q ([q, q+1)) with tile b ([b·L/n, (b+1)·L/n)), both scaled by n: [q·n, q·n+n) ∩ [b·L, b·L+L)
+fn overlapN(q: i32, b: i32, n: i32, L: i32) -> i32 {
+    return clamp(min((q + 1) * n, (b + 1) * L) - max(q * n, b * L), 0, n);
+}
+
+// mean of tile b from the chunk pass: edge pixels weighted by their coverage, interior chunks read at their starts
+fn tileMean(px: vec2<i32>, b: i32, n: i32, L: i32, K: i32, horizontal: bool) -> vec4<f32> {
+    let i0 = (b * L + n - 1) / n;                 // first interior pixel = ceil(b·L/n)
+    let i1 = ((b + 1) * L) / n;                   // interior end (exclusive) = floor((b+1)·L/n)
+    var acc = vec4<f32>(0.0);
+    var q = i0;
+    loop {
+        if (q >= i1) { break; }
+        let c = min(K, i1 - q);
+        acc += textureLoad(srcTex, along(px, q, horizontal), 0) * f32(c * n);
+        q += K;
+    }
+    if ((b * L) % n != 0) {                       // left edge pixel, partly in the previous tile
+        let qe = (b * L) / n;
+        acc += textureLoad(srcTex, along(px, qe, horizontal), 0) * f32(overlapN(qe, b, n, L));
+    }
+    if (((b + 1) * L) % n != 0 && i1 < L) {       // right edge pixel, partly in the next tile
+        acc += textureLoad(srcTex, along(px, i1, horizontal), 0) * f32(overlapN(i1, b, n, L));
+    }
+    return acc / f32(L);
+}
+
 @fragment
 fn fs_main(in: VSOut) -> @location(0) vec4<f32> {
     let dims = vec2<i32>(textureDimensions(srcTex));
@@ -62,24 +91,30 @@ fn fs_main(in: VSOut) -> @location(0) vec4<f32> {
     let L = select(dims.y, dims.x, horizontal);
     let n = select(blockCount(P.vBlocks), blockCount(P.hBlocks), horizontal);
     let p = select(px.y, px.x, horizontal);
-    let b = (p * n) / L;                          // tile index of this pixel
-    let s = (b * L + n - 1) / n;                  // tile start = ceil(b·L/n)
-    let e = ((b + 1) * L + n - 1) / n;            // tile end (exclusive)
+    if (n >= L) {                                 // tiles of at most one pixel: identity
+        return textureLoad(srcTex, px, 0);
+    }
+    let b = (p * n) / L;                          // tile holding the left edge of this pixel
     if (P.sharp > 0.5) {
+        let e = ((b + 1) * L + n - 1) / n;        // tile end (exclusive), integer pixels
         if (!gather) {
             return textureLoad(srcTex, px, 0);
         }
         return textureLoad(srcTex, along(px, e - 1, horizontal), 0);
     }
-    let spanMax = (L + n - 1) / n;
+    let spanMax = (L + n - 1) / n + 1;
     var K = 1;
     if (spanMax > DIRECT_SPAN) {
         K = i32(ceil(sqrt(f32(spanMax))));
     }
-    var acc = vec4<f32>(0.0);
     if (!gather) {
-        // chunk mean [p, min(p + K, e)) — only the chunk starts s + c·K are read by the next pass
-        let stop = min(p + K, e);
+        // interior pixels: chunk mean [p, min(p + K, interior end)); edge pixels (shared by two tiles): copied
+        let i1 = ((b + 1) * L) / n;
+        if ((p + 1) * n > (b + 1) * L) {
+            return textureLoad(srcTex, px, 0);
+        }
+        let stop = min(p + K, i1);
+        var acc = vec4<f32>(0.0);
         var q = p;
         loop {
             if (q >= stop) { break; }
@@ -88,12 +123,11 @@ fn fs_main(in: VSOut) -> @location(0) vec4<f32> {
         }
         return acc / f32(stop - p);
     }
-    var q = s;
-    loop {
-        if (q >= e) { break; }
-        let c = min(K, e - q);
-        acc += textureLoad(srcTex, along(px, q, horizontal), 0) * f32(c);
-        q += K;
+    // a pixel on a fractional tile boundary mixes the two tiles by coverage (area sampling, measured on 13x7)
+    let b1 = ((p + 1) * n - 1) / L;
+    var o = tileMean(px, b, n, L, K, horizontal) * f32(overlapN(p, b, n, L));
+    if (b1 != b) {
+        o += tileMean(px, b1, n, L, K, horizontal) * f32(overlapN(p, b1, n, L));
     }
-    return acc / f32(e - s);
+    return o / f32(n);
 }

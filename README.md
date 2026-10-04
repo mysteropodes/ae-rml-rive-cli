@@ -83,7 +83,9 @@ Security). A prebuilt plugin is attached to the GitHub releases.
 ## Checks
 
 GitHub Actions (Linux, no After Effects) runs on every pull request: `python -m rml2ae.tests.sim_incremental`, the
-conversion of `examples/demo.aep` and `rive --verify` on the result, `ruff` (errors only), and
+conversion of `examples/demo.aep` and `rive --verify` on the result, every fxlib effect against its After Effects
+reference renders (`fxlib regress`, wgpu on the CPU, see [docs/fxlib.md](docs/fxlib.md#regression-gate-ci)), `ruff`
+(errors only), and
 `python3 tools/check_private.py`, which fails on local user paths (`/Users/…`, `/Volumes/…`) or e-mail addresses in
 any tracked file — `.aep` files included, since After Effects stores absolute footage paths in them. Run it before
 adding an example.

@@ -113,12 +113,31 @@ repeats edge pixels.
 4. Real projects are used as a final test: an approximate effect that makes a real composition worse than leaving
    the effect out is marked `"auto": false`.
 
+The references live in `rml2ae/ae2rml/fxref/`: `spec.py` lists the settings of each effect (`held = 1` for the
+held-out ones) and writes `renders.json`; `render_refs.py` renders them in After Effects (macOS, After Effects open)
+into `ae/` and `ae_holdout/` from the synthetic source `src/src.png` (640 x 360) and `src/map.png`.
+
 Commands (from the repository root, with the project's Python environment):
 
 ```bash
 python -m rml2ae.ae2rml.fxlib check <slug> [--rive] [--holdout] [--keep]   # references vs offline wgpu (and Rive CLI)
 python -m rml2ae.ae2rml.fxlib luau <slug>[,<slug>...]                      # print the generated Rive node for a stack
+python -m rml2ae.ae2rml.fxlib regress [<slug>...] [--update]               # every reference vs fxref/baseline.json
+python rml2ae/ae2rml/fxref/spec.py && python rml2ae/ae2rml/fxref/render_refs.py <slug>   # new references (macOS + AE)
 ```
+
+### Regression gate (CI)
+
+`fxlib regress` measures every reference of every effect, held-out settings included, with wgpu on the CPU, and
+compares each one with `fxref/baseline.json`. It fails when a setting gets further from After Effects than the
+baseline (mean +0.02 %, pixels over 8 levels +0.05 %, or max +2 levels), when a shader stops compiling, when a
+reference has no baseline yet, or when a manifest names a `Params` field or an After Effects parameter that does not
+exist. The CI runs it on Linux with Mesa's software Vulkan (lavapipe) and `wgpu==0.32.0`, and prints the full table in
+the job summary. After a deliberate change (a better shader, a new effect), run it with `--update` and commit the
+new `baseline.json` with the change; the diff shows what moved.
+
+The baseline is a lavapipe measurement, not the status of the effect: the `status` and `verified` fields of each
+manifest come from the measurements made on macOS and stay the reference for "exact / close / approx".
 
 ### Reference renders (`rml2ae/ae2rml/fxref/`)
 
@@ -150,7 +169,7 @@ Everything needed to measure an effect is in the repository:
 
 ## Effect table
 
-37 effects: 26 exact, 8 close, 3 approx. "Auto" is whether ae2rml applies the effect without being asked; the two effects
+37 measured effects: 27 exact, 8 close, 2 approx, plus 7 unverified ones (below the table). "Auto" is whether ae2rml applies the effect without being asked; the two effects
 marked `no` are measured to be further from After Effects than leaving the effect out, so they remain a
 `<!-- ae: effect ... -->` comment plus an entry in `effects_todo.json`.
 
@@ -159,7 +178,7 @@ marked `no` are measured to be further from After Effects than leaving the effec
 | Black & White | `ADBE Black&White` | `black_white` | 1 | close | yes | Exact without the Tint option; Tint option within +-1 level in clipped shadows/highlights |
 | Box Blur | `ADBE Box Blur2` | `box_blur` | 2 | exact | yes |  |
 | Brightness & Contrast | `ADBE Brightness & Contrast 2` | `brightness_contrast` | 1 | exact | yes |  |
-| CC Radial Blur | `CC Radial Blur` | `cc_radial_blur` | 1 | approx | no | Centered Zoom type was inferred and is wrong (23 % of pixels off by more than 8 levels) |
+| CC Radial Blur | `CC Radial Blur` | `cc_radial_blur` | 1 | approx | no | Straight Zoom, Centered Zoom and Scratch measured (0.1-0.4 % mean); Fading Zoom, Rotate, Rotate Fading inferred |
 | CC Radial Fast Blur | `CC Radial Fast Blur` | `cc_radial_fast_blur` | 64 | close | yes | Within 12 levels |
 | CC Scale Wipe | `CC Scale Wipe` | `cc_scale_wipe` | 1 | exact | yes |  |
 | Checkerboard | `ADBE Checkerboard` | `checkerboard` | 1 | exact | yes |  |
@@ -184,7 +203,7 @@ marked `no` are measured to be further from After Effects than leaving the effec
 | Luma Key | `ADBE Luma Key` | `luma_key` | 4 | close | yes | Max 7 levels on the feathered matte edge |
 | Magnify | `ADBE Magnify` | `magnify` | 1 | close | yes |  |
 | Minimax | `ADBE Minimax` | `minimax` | 4 | exact | yes |  |
-| Mosaic | `ADBE Mosaic` | `mosaic` | 4 | approx | yes | Non-integer tile sizes differ |
+| Mosaic | `ADBE Mosaic` | `mosaic` | 4 | exact | yes | Fractional tiles are area-sampled |
 | Motion Tile | `ADBE Tile` | `motion_tile` | 1 | exact | yes |  |
 | Optics Compensation | `ADBE Optics Compensation` | `optics_compensation` | 1 | close | yes | After Effects softens edges at large FOV; not reproduced |
 | Posterize | `ADBE Posterize` | `posterize` | 1 | exact | yes |  |
@@ -193,14 +212,31 @@ marked `no` are measured to be further from After Effects than leaving the effec
 | Tint | `ADBE Tint` | `tint` | 1 | exact | yes |  |
 | Tritone | `ADBE Tritone` | `tritone` | 1 | exact | yes |  |
 | Turbulent Displace | `ADBE Turbulent Displace` | `turbulent_displace` | 1 | approx | no | After Effects noise is proprietary: same scale and strength, different pattern |
+
+**Unverified effects.** Written from each effect's definition and checked to compile and run, but not yet measured
+against After Effects renders: `"status": "unverified"`, `"auto": false` (ae2rml leaves them out unless asked). Their
+visible settings are in `fxref/spec.py`; render them on a Mac (`render_refs.py --params <slug>` first, to record the
+real parameter list, then `render_refs.py <slug>`), add held-out settings, and measure.
+
+| Effect | Match name | Slug | Open questions to measure |
+|---|---|---|---|
+| Channel Mixer | `ADBE Channel Mixer` | `channel_mixer` | Parameter order; rounding of the constants |
+| Set Channels | `ADBE Set Channels` | `set_channels` | Only the layer itself as source; Luminance weights, HLS of greys |
+| Offset | `ADBE Offset` | `offset` | Sub-pixel filtering of fractional shifts |
+| Radial Wipe | `ADBE Radial Wipe` | `radial_wipe` | Feather law (distance to the edge ray here) |
+| Venetian Blinds | `ADBE Venetian Blinds` | `venetian_blinds` | Stripe origin and direction convention, feather law |
+| Photo Filter | `ADBE Photo Filter` | `photo_filter` | Menu index of Custom; preset colours; luminosity law |
+| Vibrance | `ADBE Vibrance` | `vibrance` | Approximation: Adobe's vibrance law is undocumented |
 Notes:
 
 - **Gaussian Blur (legacy)** and **Fast Blur (legacy)** share the same kernel (confirmed on a third setting).
 - **Motion Tile** is the effect named `ADBE Tile`.
 - **Drop Shadow**, **Glow**, **Linear Wipe** and the multi-pass blurs use several passes; for the stack as a whole
   ae2rml runs every pass in one node.
-- **CC Radial Blur**: types 1, 4 and 6 were measured; the "Centered Zoom" type was inferred without a visible
-  reference and is wrong.
+- **CC Radial Blur**: types 1, 3, 4 and 6 are measured. Centered Zoom (3) was first inferred and wrong; it was refitted
+  on its held-out reference (uniform scales [1 - Amount/400, 1 + Amount/400], inner end sampled, outer end not).
+- **Mosaic**: tiles cut at fractional positions (layer size not a multiple of the block count) are area-sampled: a
+  pixel on a boundary mixes the two tiles by coverage. Found and fixed on the held-out 13 x 7 reference.
 - **Turbulent Displace**: After Effects' noise function is proprietary. Scale, strength and pinning match; the noise
   pattern differs. Measured on real compositions, the missing effect is closer to After Effects than the approximate one.
 
@@ -212,6 +248,8 @@ Notes:
   static or keyed parameters. `fxMix` becomes Effect Opacity (Compositing Options). A group's mix goes on each of its
   effects' Effect Opacity; the blend mode of an adjustment layer is reported (it needs an adjustment layer in After
   Effects).
-- **Adding an effect**: write `ae_<slug>.wgsl`, start a manifest from a similar effect, render After Effects
-  references (include at least one setting you keep to yourself), run `fxlib check <slug> --rive --holdout`, and
-  record `status` and `verified` in the manifest.
+- **Adding an effect**: write `ae_<slug>.wgsl`, start a manifest from a similar effect, add its settings to
+  `fxref/spec.py` (include at least one held-out setting chosen by someone else), render the references with
+  `fxref/render_refs.py`, run `fxlib check <slug> --rive --holdout`, record `status` and `verified` in the manifest,
+  then `fxlib regress <slug> --update`. Until it is measured, a new effect is `"status": "unverified"` with
+  `"auto": false`.

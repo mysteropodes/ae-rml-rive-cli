@@ -100,3 +100,21 @@ jobs:
         run: |
           python -m rml2ae.ae2rml examples/demo.aep out/demo --verify | tee out-verify.txt
           grep -q "rive --verify: ok" out-verify.txt
+
+  fxlib:
+    name: fxlib vs After Effects references
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      # software Vulkan (Mesa lavapipe): wgpu runs the WGSL effects on the CPU, no GPU needed
+      - name: Mesa software Vulkan
+        run: |
+          sudo apt-get update -q
+          sudo apt-get install -y -q --no-install-recommends mesa-vulkan-drivers libvulkan1
+      # wgpu pinned: the baseline (fxref/baseline.json) was recorded with this version on lavapipe
+      - run: pip install -e . "wgpu==0.32.0"
+      - name: Every effect, every reference render (held-out included), vs the recorded baseline
+        run: python -m rml2ae.ae2rml.fxlib regress --summary "$GITHUB_STEP_SUMMARY"

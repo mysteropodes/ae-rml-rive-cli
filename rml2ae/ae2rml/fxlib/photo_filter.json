@@ -1,0 +1,41 @@
+{
+ "slug": "photo_filter",
+ "aeMatchName": "ADBE Photo Filter",
+ "wgsl": "ae_photo_filter.wgsl",
+ "passes": 1,
+ "textures": {},
+ "params": [
+  {
+   "ae": 1,
+   "field": "filterType",
+   "kind": "enum",
+   "default": 1
+  },
+  {
+   "ae": 2,
+   "field": "color",
+   "kind": "color",
+   "default": [
+    0.9254901960784314,
+    0.5411764705882353,
+    0,
+    1
+   ]
+  },
+  {
+   "ae": 3,
+   "field": "density",
+   "kind": "number",
+   "default": 25
+  },
+  {
+   "ae": 4,
+   "field": "preserve",
+   "kind": "bool",
+   "default": 1
+  }
+ ],
+ "status": "unverified",
+ "auto": false,
+ "notes": "Not yet measured against After Effects: written from the effect's definition. Status stays 'unverified' and auto false until fxref renders are measured (fxlib check <slug> --rive --holdout). Parameter indices come from the After Effects parameter order as documented by Adobe; `render_refs.py --params` records the real list."
+}
