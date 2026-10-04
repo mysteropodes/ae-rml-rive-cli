@@ -10,8 +10,8 @@ Round-trip between **Adobe After Effects** and **Rive**, driven from the command
 - **rml2ae** — a Rive CLI project becomes an After Effects project (one comp per artboard, real keys, shape layers,
   text, mattes), rebuilt incrementally; edits made in AE come back with `ae pull`. A file from the **Rive Editor**
   (`.rev`, or a file in your Rive account) goes to After Effects the same way, once the Rive CLI has turned it into a
-  project (`rive create --from-rev`, `rive create --from-remote-file`); `rive push` sends the project back to the Rive
-  Editor and `rive pull` brings the Editor's changes down.
+  project (`rive create --from-rev`, `rive create --from-remote-file`); `rive push` sends the project to the Rive
+  Editor (the file it is bound to in your account), and `rive open <fileId>` opens it there.
 - **Rive Shader** — an After Effects effect plugin that runs a Rive post-process shader (`.wgsl`) as is.
 - **fxlib** — native After Effects effects re-implemented in WGSL and measured against AE renders, so that effects
   survive the trip both ways.
@@ -37,8 +37,8 @@ flowchart LR
   FX -.-> RML
   FX -.-> SH
   SH -.-> COMPS
-  RML <-->|"rive push / rive pull<br/>create --from-remote-file"| EDITOR
-  RML <-->|"--rev / create --from-rev"| REV
+  RML <-->|"rive push / rive create<br/>--from-remote-file"| EDITOR
+  RML <-->|"--rev / rive create<br/>--from-rev"| REV
   RML -->|"rive &lt;project&gt;"| VIEW
   VIEW -->|"review kit"| NOTES
   RML -->|"--publish"| RIV
@@ -72,7 +72,8 @@ rive out/demo                                  # open it in the Rive Viewer
 rive create out/my_scene --from-rev=my_scene.rev
 
 # Rive CLI project <-> Rive Editor (rive login first)
-(cd out/demo && rive push)                     # upload to a Rive file in your account; `rive pull` brings changes back
+rive push out/demo                             # build and push the .rev to the bound Rive file in your account
+rive create out/from_editor --from-remote-file # the other way: a file of your account (edited in the Editor) as a project
 
 # Rive -> After Effects (After Effects open, "Allow Scripts to Write Files" on)
 ae doctor out/demo

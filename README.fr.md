@@ -9,7 +9,8 @@ Aller-retour entre **Adobe After Effects** et **Rive**, en ligne de commande, vi
   forme, textes, mattes), reconstruit de façon incrémentale ; les retouches faites dans AE reviennent par `ae pull`.
   Un fichier du **Rive Editor** (`.rev`) passe dans After Effects de la même façon, une fois transformé en projet par
   le Rive CLI (`rive create <dossier> --from-rev=fichier.rev`, ou `--from-remote-file` pour un fichier de ton compte
-  Rive) ; `rive push` renvoie le projet vers le Rive Editor et `rive pull` rapatrie les changements faits dans l'éditeur.
+  Rive) ; `rive push` envoie le projet vers le Rive Editor (le fichier lié dans ton compte) et `rive open <fileId>`
+  l'y ouvre.
 - **Rive Shader** — un plugin d'effet After Effects qui exécute tel quel un shader post-process Rive (`.wgsl`).
 - **fxlib** — des effets natifs d'After Effects réécrits en WGSL et mesurés contre AE, pour qu'ils passent dans les deux sens.
 - **kit de relecture** — relecture façon Frame.io dans le **Rive Viewer** (`rive <projet>`, le viewer du Rive CLI) :
