@@ -5383,5 +5383,373 @@
   },
   "held": false,
   "png": "ae/camera_lens_blur_2.png"
+ },
+ {
+  "slug": "fractal_noise",
+  "mn": "ADBE Fractal Noise",
+  "k": 0,
+  "vals": {},
+  "held": false,
+  "png": "ae/fractal_noise_0.png"
+ },
+ {
+  "slug": "fractal_noise",
+  "mn": "ADBE Fractal Noise",
+  "k": 1,
+  "vals": {
+   "1": 2,
+   "4": 200,
+   "10": 50
+  },
+  "held": false,
+  "png": "ae/fractal_noise_1.png"
+ },
+ {
+  "slug": "fractal_noise",
+  "mn": "ADBE Fractal Noise",
+  "k": 2,
+  "vals": {
+   "2": 1,
+   "16": 3,
+   "31": 4
+  },
+  "held": false,
+  "png": "ae/fractal_noise_2.png"
+ },
+ {
+  "slug": "fractal_noise",
+  "mn": "ADBE Fractal Noise",
+  "k": 3,
+  "vals": {
+   "1": 3,
+   "24": 90,
+   "31": 5,
+   "30": 60
+  },
+  "held": false,
+  "png": "ae/fractal_noise_3.png"
+ },
+ {
+  "slug": "turbulent_noise",
+  "mn": "ADBE Turbulent Noise",
+  "k": 0,
+  "vals": {},
+  "held": false,
+  "png": "ae/turbulent_noise_0.png"
+ },
+ {
+  "slug": "turbulent_noise",
+  "mn": "ADBE Turbulent Noise",
+  "k": 1,
+  "vals": {
+   "1": 2,
+   "4": 200,
+   "10": 50
+  },
+  "held": false,
+  "png": "ae/turbulent_noise_1.png"
+ },
+ {
+  "slug": "turbulent_noise",
+  "mn": "ADBE Turbulent Noise",
+  "k": 2,
+  "vals": {
+   "2": 1,
+   "16": 3,
+   "31": 4
+  },
+  "held": false,
+  "png": "ae/turbulent_noise_2.png"
+ },
+ {
+  "slug": "turbulent_noise",
+  "mn": "ADBE Turbulent Noise",
+  "k": 3,
+  "vals": {
+   "1": 3,
+   "24": 90,
+   "31": 5,
+   "30": 60
+  },
+  "held": false,
+  "png": "ae/turbulent_noise_3.png"
+ },
+ {
+  "slug": "cell_pattern",
+  "mn": "ADBE Cell Pattern",
+  "k": 0,
+  "vals": {},
+  "held": false,
+  "png": "ae/cell_pattern_0.png"
+ },
+ {
+  "slug": "cell_pattern",
+  "mn": "ADBE Cell Pattern",
+  "k": 1,
+  "vals": {
+   "1": 2,
+   "6": 40
+  },
+  "held": false,
+  "png": "ae/cell_pattern_1.png"
+ },
+ {
+  "slug": "cell_pattern",
+  "mn": "ADBE Cell Pattern",
+  "k": 2,
+  "vals": {
+   "1": 5,
+   "3": 150,
+   "16": 3
+  },
+  "held": false,
+  "png": "ae/cell_pattern_2.png"
+ },
+ {
+  "slug": "cell_pattern",
+  "mn": "ADBE Cell Pattern",
+  "k": 3,
+  "vals": {
+   "1": 12,
+   "6": 80
+  },
+  "held": false,
+  "png": "ae/cell_pattern_3.png"
+ },
+ {
+  "slug": "roughen_edges",
+  "mn": "ADBE Roughen Edges",
+  "k": 0,
+  "vals": {},
+  "held": false,
+  "png": "ae/roughen_edges_0.png"
+ },
+ {
+  "slug": "roughen_edges",
+  "mn": "ADBE Roughen Edges",
+  "k": 1,
+  "vals": {
+   "1": 2,
+   "3": 20,
+   "6": 60
+  },
+  "held": false,
+  "png": "ae/roughen_edges_1.png"
+ },
+ {
+  "slug": "roughen_edges",
+  "mn": "ADBE Roughen Edges",
+  "k": 2,
+  "vals": {
+   "1": 3,
+   "3": 12,
+   "4": 3
+  },
+  "held": false,
+  "png": "ae/roughen_edges_2.png"
+ },
+ {
+  "slug": "fractal",
+  "mn": "ADBE Fractal",
+  "k": 0,
+  "vals": {},
+  "held": false,
+  "png": "ae/fractal_0.png"
+ },
+ {
+  "slug": "fractal",
+  "mn": "ADBE Fractal",
+  "k": 1,
+  "vals": {
+   "4": -0.745,
+   "5": 0.11,
+   "6": 6,
+   "7": 300
+  },
+  "held": false,
+  "png": "ae/fractal_1.png"
+ },
+ {
+  "slug": "fractal",
+  "mn": "ADBE Fractal",
+  "k": 2,
+  "vals": {
+   "1": 3,
+   "4": -0.8,
+   "5": 0.156
+  },
+  "held": false,
+  "png": "ae/fractal_2.png"
+ },
+ {
+  "slug": "cc_plastic",
+  "mn": "CC Plastic",
+  "k": 0,
+  "vals": {
+   "3": 5
+  },
+  "held": false,
+  "png": "ae/cc_plastic_0.png"
+ },
+ {
+  "slug": "cc_plastic",
+  "mn": "CC Plastic",
+  "k": 1,
+  "vals": {
+   "3": 5,
+   "4": 20,
+   "5": 100,
+   "19": 80,
+   "21": 0
+  },
+  "held": false,
+  "png": "ae/cc_plastic_1.png"
+ },
+ {
+  "slug": "cc_blobbylize",
+  "mn": "CC Blobbylize",
+  "k": 0,
+  "vals": {
+   "4": 12
+  },
+  "held": false,
+  "png": "ae/cc_blobbylize_0.png"
+ },
+ {
+  "slug": "cc_blobbylize",
+  "mn": "CC Blobbylize",
+  "k": 1,
+  "vals": {
+   "4": 20,
+   "5": 0.3,
+   "3": 5
+  },
+  "held": false,
+  "png": "ae/cc_blobbylize_1.png"
+ },
+ {
+  "slug": "cc_glass_wipe",
+  "mn": "CC Glass Wipe",
+  "k": 0,
+  "vals": {
+   "1": 40
+  },
+  "held": false,
+  "png": "ae/cc_glass_wipe_0.png"
+ },
+ {
+  "slug": "cc_glass_wipe",
+  "mn": "CC Glass Wipe",
+  "k": 1,
+  "vals": {
+   "1": 70,
+   "4": 30,
+   "5": 40
+  },
+  "held": false,
+  "png": "ae/cc_glass_wipe_1.png"
+ },
+ {
+  "slug": "cc_threads",
+  "mn": "CC Threads",
+  "k": 0,
+  "vals": {},
+  "held": false,
+  "png": "ae/cc_threads_0.png"
+ },
+ {
+  "slug": "cc_threads",
+  "mn": "CC Threads",
+  "k": 1,
+  "vals": {
+   "1": 24,
+   "2": 24,
+   "4": 30,
+   "6": 70,
+   "8": 50
+  },
+  "held": false,
+  "png": "ae/cc_threads_1.png"
+ },
+ {
+  "slug": "cc_threads",
+  "mn": "CC Threads",
+  "k": 2,
+  "vals": {
+   "3": 2,
+   "7": 30
+  },
+  "held": false,
+  "png": "ae/cc_threads_2.png"
+ },
+ {
+  "slug": "advanced_lightning",
+  "mn": "ADBE Lightning 2",
+  "k": 0,
+  "vals": {},
+  "held": false,
+  "png": "ae/advanced_lightning_0.png"
+ },
+ {
+  "slug": "advanced_lightning",
+  "mn": "ADBE Lightning 2",
+  "k": 1,
+  "vals": {
+   "4": 25,
+   "6": 3,
+   "10": 50,
+   "14": 2.5
+  },
+  "held": false,
+  "png": "ae/advanced_lightning_1.png"
+ },
+ {
+  "slug": "brush_strokes",
+  "mn": "ADBE Brush Strokes",
+  "k": 0,
+  "vals": {
+   "2": 6,
+   "3": 20
+  },
+  "held": false,
+  "png": "ae/brush_strokes_0.png"
+ },
+ {
+  "slug": "brush_strokes",
+  "mn": "ADBE Brush Strokes",
+  "k": 1,
+  "vals": {
+   "1": 45,
+   "2": 10,
+   "3": 40,
+   "4": 2,
+   "6": 3
+  },
+  "held": false,
+  "png": "ae/brush_strokes_1.png"
+ },
+ {
+  "slug": "noise_hls_auto",
+  "mn": "ADBE Noise HLS Auto",
+  "k": 0,
+  "vals": {
+   "2": 20,
+   "3": 20,
+   "4": 20
+  },
+  "held": false,
+  "png": "ae/noise_hls_auto_0.png"
+ },
+ {
+  "slug": "noise_hls_auto",
+  "mn": "ADBE Noise HLS Auto",
+  "k": 1,
+  "vals": {
+   "1": 3,
+   "3": 40,
+   "5": 4
+  },
+  "held": false,
+  "png": "ae/noise_hls_auto_1.png"
  }
 ]

@@ -1,0 +1,35 @@
+{
+ "slug": "cc_glass_wipe",
+ "aeMatchName": "CC Glass Wipe",
+ "wgsl": "ae_cc_glass_wipe.wgsl",
+ "passes": 1,
+ "textures": {
+  "mapTex": "map"
+ },
+ "params": [
+  {
+   "ae": 1,
+   "field": "completion",
+   "kind": "number",
+   "default": 0
+  },
+  {
+   "ae": 4,
+   "field": "softness",
+   "kind": "number",
+   "default": 10
+  },
+  {
+   "ae": 5,
+   "field": "amount",
+   "kind": "number",
+   "default": 10
+  }
+ ],
+ "status": "unverified",
+ "auto": false,
+ "notes": "Not yet measured against After Effects. The revealed layer comes from the Rive node's map input (ae2rml binds the referenced layer, PR 7). Parameter indices follow the After Effects parameter order as documented by Adobe; `render_refs.py --params` records the real list.",
+ "textureParams": {
+  "mapTex": 2
+ }
+}

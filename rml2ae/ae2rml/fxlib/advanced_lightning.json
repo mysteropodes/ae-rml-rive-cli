@@ -1,0 +1,94 @@
+{
+ "slug": "advanced_lightning",
+ "aeMatchName": "ADBE Lightning 2",
+ "wgsl": "ae_advanced_lightning.wgsl",
+ "passes": 1,
+ "textures": {},
+ "params": [
+  {
+   "ae": 1,
+   "field": "kind",
+   "kind": "enum",
+   "default": 1
+  },
+  {
+   "ae": 2,
+   "field": "origin",
+   "kind": "point",
+   "default": [
+    100,
+    60
+   ]
+  },
+  {
+   "ae": 3,
+   "field": "toPt",
+   "kind": "point",
+   "default": [
+    540,
+    300
+   ]
+  },
+  {
+   "ae": 4,
+   "field": "conductivity",
+   "kind": "number",
+   "default": 10
+  },
+  {
+   "ae": 6,
+   "field": "coreRadius",
+   "kind": "number",
+   "default": 1.5
+  },
+  {
+   "ae": 7,
+   "field": "coreOpacity",
+   "kind": "number",
+   "default": 75
+  },
+  {
+   "ae": 8,
+   "field": "coreColor",
+   "kind": "color",
+   "default": [
+    1,
+    1,
+    1,
+    1
+   ]
+  },
+  {
+   "ae": 10,
+   "field": "glowRadius",
+   "kind": "number",
+   "default": 30
+  },
+  {
+   "ae": 11,
+   "field": "glowOpacity",
+   "kind": "number",
+   "default": 50
+  },
+  {
+   "ae": 12,
+   "field": "glowColor",
+   "kind": "color",
+   "default": [
+    0.17,
+    0.27,
+    0.8,
+    1
+   ]
+  },
+  {
+   "ae": 14,
+   "field": "turbulence",
+   "kind": "number",
+   "default": 1
+  }
+ ],
+ "status": "unverified",
+ "auto": false,
+ "notes": "Not yet measured against After Effects.  Parameter indices follow the After Effects parameter order as documented by Adobe; `render_refs.py --params` records the real list."
+}
