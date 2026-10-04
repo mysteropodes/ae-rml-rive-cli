@@ -1,0 +1,106 @@
+{
+ "slug": "black_white",
+ "aeMatchName": "ADBE Black&White",
+ "wgsl": "ae_black_white.wgsl",
+ "passes": 1,
+ "textures": {},
+ "params": [
+  {
+   "ae": 1,
+   "field": "reds",
+   "kind": "number",
+   "default": 40
+  },
+  {
+   "ae": 2,
+   "field": "yellows",
+   "kind": "number",
+   "default": 60
+  },
+  {
+   "ae": 3,
+   "field": "greens",
+   "kind": "number",
+   "default": 40
+  },
+  {
+   "ae": 4,
+   "field": "cyans",
+   "kind": "number",
+   "default": 60
+  },
+  {
+   "ae": 5,
+   "field": "blues",
+   "kind": "number",
+   "default": 20
+  },
+  {
+   "ae": 6,
+   "field": "magentas",
+   "kind": "number",
+   "default": 80
+  },
+  {
+   "ae": 7,
+   "field": "tintOn",
+   "kind": "bool",
+   "default": 0
+  },
+  {
+   "ae": 8,
+   "field": "tintColor",
+   "kind": "color",
+   "default": [
+    0.88235294117647,
+    0.82745098039216,
+    0.70196078431373,
+    1
+   ]
+  }
+ ],
+ "notes": "Photoshop B&W mixer, measured on AE 2026 8 bpc, straight 8-bit colour: sort max >= mid >= min; gray = min + (mid - min) * W_secondary/100 + (max - mid) * W_primary/100, primary = weight of the max channel (Reds/Greens/Blues), secondary = weight of the complement of the min channel (min R -> Cyans, min G -> Magentas, min B -> Yellows); clamp 0..255 and round to 8 bits with exact .5 ties DOWN (black_white_1: 114.5 -> 114). Weights in % (-200..300). Without Tint: bit-exact (black_white_0 0 mismatches, incl. semi-transparent pixels). Tint (AE 7 = 1, AE 8 colour): the 8-bit gray is coloured like a W3C/PDF 'Color' blend of the tint colour (SetLum with luma 0.30/0.59/0.11, then ClipColor): exact in the midtones (gray ~35..242: gray + (13, -1, -33) for the default tint), but in the clipped shadows AE keeps the min channel at 1/255 (ClipColor gives 0) and in the clipped highlights it differs by 1 on the min channel -> 12.5k opaque pixels off by 1, a single pixel off by 2. Tested alternatives (Rec.601/709 luma, min target 1/255, pivot shifts, 16-bit) were not exact either. Semi-transparent pixels +-1 (premultiplied offline input).",
+ "measured": {
+  "black_white_0": {
+   "offline": {
+    "mean": 0.0,
+    "pct_px_gt8": 0.0,
+    "max": 0
+   },
+   "rive": {
+    "mean": 0.01,
+    "pct_px_gt8": 0.0,
+    "max": 1
+   }
+  },
+  "black_white_1": {
+   "offline": {
+    "mean": 0.014,
+    "pct_px_gt8": 0.0,
+    "max": 2
+   },
+   "rive": {
+    "mean": 0.027,
+    "pct_px_gt8": 0.0,
+    "max": 2
+   }
+  }
+ },
+ "status": "close",
+ "verified": {
+  "by": "independent check 2026-10-04 (fxlib check --rive --holdout, AE 2026 8 bpc refs)",
+  "settings": {
+   "black_white_2 (held out)": {
+    "offline": {
+     "mean": 0.0,
+     "max": 0
+    },
+    "rive": {
+     "mean": 0.009,
+     "max": 1
+    }
+   }
+  },
+  "note": "held out (no tint) exact; 'close' only for the Tint option (±1 in clipped shadows/highlights)"
+ }
+}

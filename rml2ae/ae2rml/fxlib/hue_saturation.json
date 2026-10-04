@@ -1,0 +1,112 @@
+{
+ "slug": "hue_saturation",
+ "aeMatchName": "ADBE HUE SATURATION",
+ "wgsl": "ae_hue_saturation.wgsl",
+ "passes": 1,
+ "textures": {},
+ "params": [
+  {
+   "ae": 1,
+   "field": "channelControl",
+   "kind": "enum",
+   "default": 1
+  },
+  {
+   "ae": 3,
+   "field": "masterHue",
+   "kind": "angle",
+   "default": 0
+  },
+  {
+   "ae": 4,
+   "field": "masterSat",
+   "kind": "number",
+   "default": 0
+  },
+  {
+   "ae": 5,
+   "field": "masterLight",
+   "kind": "number",
+   "default": 0
+  },
+  {
+   "ae": 6,
+   "field": "colorize",
+   "kind": "bool",
+   "default": 0
+  },
+  {
+   "ae": 7,
+   "field": "colorizeHue",
+   "kind": "angle",
+   "default": 0
+  },
+  {
+   "ae": 8,
+   "field": "colorizeSat",
+   "kind": "number",
+   "default": 25
+  },
+  {
+   "ae": 9,
+   "field": "colorizeLight",
+   "kind": "number",
+   "default": 0
+  }
+ ],
+ "notes": "Master channel, measured on AE 2026 8 bpc, straight 8-bit colour, L = (max + min)/2: Master Hue (degrees) = HLS hue rotation keeping max and min (+120 = (r,g,b) -> (b,r,g), bit-exact). Master Saturation < 0: chroma scaled about L by k = 1 + Sat * 2.55/256 (AE's 8-bit step: -60 -> 103/256 = 0.40234; k = 0.4 is off by 1 on 20 % of the pixels, the LP-feasible range is 0.4022..0.4025). Master Lightness: > 0 blends towards white (c + (1 - c) Lt), < 0 towards black (c (1 + Lt)), Lt = Light/100. Colorize (AE 6 = 1): HLS(Colorize Hue, Colorize Saturation/100, L), bit-exact. One half-up rounding; alpha untouched. Residual: 30 opaque pixels where AE rounds an exact .5 tie of the mid channel down. NOT measured (no visible reference): Master Saturation > 0 (Photoshop formula: inc = Sat*2.55/256, a = inc + S >= 1 ? S : 1 - inc, rgb += (rgb - L)(1/a - 1)), Master Lightness < 0, Colorize Lightness (applied like Master Lightness), hue angles other than multiples of 120 (exact .5 ties may round differently, cf. color_balance_hls). AE 1 Channel Control other than Master and AE 2 Channel Range (per-colour ranges) are not reproduced: only the Master values are used.",
+ "measured": {
+  "hue_saturation_0": {
+   "offline": {
+    "mean": 0.0,
+    "pct_px_gt8": 0.0,
+    "max": 0
+   },
+   "rive": {
+    "mean": 0.007,
+    "pct_px_gt8": 0.0,
+    "max": 1
+   }
+  },
+  "hue_saturation_1": {
+   "offline": {
+    "mean": 0.0,
+    "pct_px_gt8": 0.0,
+    "max": 1
+   },
+   "rive": {
+    "mean": 0.012,
+    "pct_px_gt8": 0.0,
+    "max": 2
+   }
+  },
+  "hue_saturation_2": {
+   "offline": {
+    "mean": 0.0,
+    "pct_px_gt8": 0.0,
+    "max": 0
+   },
+   "rive": {
+    "mean": 0.01,
+    "pct_px_gt8": 0.0,
+    "max": 1
+   }
+  }
+ },
+ "status": "exact",
+ "verified": {
+  "by": "independent check 2026-10-04 (fxlib check --rive --holdout, AE 2026 8 bpc refs)",
+  "settings": {
+   "hue_saturation_3 (held out)": {
+    "offline": {
+     "mean": 0.02,
+     "max": 1
+    },
+    "rive": {
+     "mean": 0.032,
+     "max": 2
+    }
+   }
+  }
+ }
+}

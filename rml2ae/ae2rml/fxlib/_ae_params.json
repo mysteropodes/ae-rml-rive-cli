@@ -1,0 +1,3577 @@
+{
+ "ADBE Fill": {
+  "name": "Remplir",
+  "params": [
+   {
+    "i": 1,
+    "mn": "ADBE Fill-0001",
+    "name": "Remplir le masque",
+    "type": "6422",
+    "default": 0,
+    "min": null,
+    "max": null
+   },
+   {
+    "i": 2,
+    "mn": "ADBE Fill-0007",
+    "name": "Tous les masques",
+    "type": "6417",
+    "default": 0,
+    "min": 0,
+    "max": 1
+   },
+   {
+    "i": 3,
+    "mn": "ADBE Fill-0002",
+    "name": "Couleur",
+    "type": "6418",
+    "default": [
+     1,
+     0,
+     0,
+     1
+    ],
+    "min": -3921568.62745098,
+    "max": 3921568.62745098
+   },
+   {
+    "i": 4,
+    "mn": "ADBE Fill-0006",
+    "name": "Inversion",
+    "type": "6417",
+    "default": 0,
+    "min": 0,
+    "max": 1
+   },
+   {
+    "i": 5,
+    "mn": "ADBE Fill-0003",
+    "name": "Contour progressif horizontal",
+    "type": "6417",
+    "default": 0,
+    "min": 0,
+    "max": 999
+   },
+   {
+    "i": 6,
+    "mn": "ADBE Fill-0004",
+    "name": "Contour progressif vertical",
+    "type": "6417",
+    "default": 0,
+    "min": 0,
+    "max": 999
+   },
+   {
+    "i": 7,
+    "mn": "ADBE Fill-0005",
+    "name": "Opacité ",
+    "type": "6417",
+    "default": 1,
+    "min": 0,
+    "max": 1
+   },
+   {
+    "i": 8,
+    "mn": "ADBE Effect Built In Params",
+    "name": "Options de composition",
+    "type": "undefined",
+    "default": null,
+    "min": null,
+    "max": null
+   }
+  ]
+ },
+ "ADBE Tint": {
+  "name": "Teinte",
+  "params": [
+   {
+    "i": 1,
+    "mn": "ADBE Tint-0001",
+    "name": "Foncée",
+    "type": "6418",
+    "default": [
+     0,
+     0,
+     0,
+     0
+    ],
+    "min": -3921568.62745098,
+    "max": 3921568.62745098
+   },
+   {
+    "i": 2,
+    "mn": "ADBE Tint-0002",
+    "name": "Claire",
+    "type": "6418",
+    "default": [
+     1,
+     1,
+     1,
+     0
+    ],
+    "min": -3921568.62745098,
+    "max": 3921568.62745098
+   },
+   {
+    "i": 3,
+    "mn": "ADBE Tint-0003",
+    "name": "Facteur",
+    "type": "6417",
+    "default": 100,
+    "min": 0,
+    "max": 100
+   },
+   {
+    "i": 4,
+    "mn": "ADBE Tint-0004",
+    "name": "",
+    "type": "6412",
+    "default": null,
+    "min": null,
+    "max": null
+   },
+   {
+    "i": 5,
+    "mn": "ADBE Effect Built In Params",
+    "name": "Options de composition",
+    "type": "undefined",
+    "default": null,
+    "min": null,
+    "max": null
+   }
+  ]
+ },
+ "ADBE Exposure2": {
+  "name": "Exposition",
+  "params": [
+   {
+    "i": 1,
+    "mn": "ADBE Exposure2-0001",
+    "name": "Couches :",
+    "type": "6417",
+    "default": 1,
+    "min": 1,
+    "max": 2
+   },
+   {
+    "i": 2,
+    "mn": "ADBE Exposure2-0002",
+    "name": "Principal",
+    "type": "6412",
+    "default": null,
+    "min": null,
+    "max": null
+   },
+   {
+    "i": 3,
+    "mn": "ADBE Exposure2-0003",
+    "name": "Exposition",
+    "type": "6417",
+    "default": 0,
+    "min": -100,
+    "max": 100
+   },
+   {
+    "i": 4,
+    "mn": "ADBE Exposure2-0004",
+    "name": "Décalage",
+    "type": "6417",
+    "default": 0,
+    "min": -2,
+    "max": 2
+   },
+   {
+    "i": 5,
+    "mn": "ADBE Exposure2-0005",
+    "name": "Correction Gamma",
+    "type": "6417",
+    "default": 1,
+    "min": 0.10000000149012,
+    "max": 10
+   },
+   {
+    "i": 6,
+    "mn": "ADBE Exposure2-0006",
+    "name": "Principal",
+    "type": "6412",
+    "default": null,
+    "min": null,
+    "max": null
+   },
+   {
+    "i": 7,
+    "mn": "ADBE Exposure2-0007",
+    "name": "Rouge",
+    "type": "6412",
+    "default": null,
+    "min": null,
+    "max": null
+   },
+   {
+    "i": 8,
+    "mn": "ADBE Exposure2-0008",
+    "name": "Exposition du rouge",
+    "type": "6417",
+    "default": 0,
+    "min": -100,
+    "max": 100
+   },
+   {
+    "i": 9,
+    "mn": "ADBE Exposure2-0009",
+    "name": "Décalage Rouge",
+    "type": "6417",
+    "default": 0,
+    "min": -2,
+    "max": 2
+   },
+   {
+    "i": 10,
+    "mn": "ADBE Exposure2-0010",
+    "name": "Correction Gamma rouge",
+    "type": "6417",
+    "default": 1,
+    "min": 0.10000000149012,
+    "max": 10
+   },
+   {
+    "i": 11,
+    "mn": "ADBE Exposure2-0011",
+    "name": "Rouge",
+    "type": "6412",
+    "default": null,
+    "min": null,
+    "max": null
+   },
+   {
+    "i": 12,
+    "mn": "ADBE Exposure2-0012",
+    "name": "Vert",
+    "type": "6412",
+    "default": null,
+    "min": null,
+    "max": null
+   },
+   {
+    "i": 13,
+    "mn": "ADBE Exposure2-0013",
+    "name": "Exposition du vert",
+    "type": "6417",
+    "default": 0,
+    "min": -100,
+    "max": 100
+   },
+   {
+    "i": 14,
+    "mn": "ADBE Exposure2-0014",
+    "name": "Décalage Vert",
+    "type": "6417",
+    "default": 0,
+    "min": -2,
+    "max": 2
+   },
+   {
+    "i": 15,
+    "mn": "ADBE Exposure2-0015",
+    "name": "Correction Gamma vert",
+    "type": "6417",
+    "default": 1,
+    "min": 0.10000000149012,
+    "max": 10
+   },
+   {
+    "i": 16,
+    "mn": "ADBE Exposure2-0016",
+    "name": "Vert",
+    "type": "6412",
+    "default": null,
+    "min": null,
+    "max": null
+   },
+   {
+    "i": 17,
+    "mn": "ADBE Exposure2-0017",
+    "name": "Bleu",
+    "type": "6412",
+    "default": null,
+    "min": null,
+    "max": null
+   },
+   {
+    "i": 18,
+    "mn": "ADBE Exposure2-0018",
+    "name": "Exposition du bleu",
+    "type": "6417",
+    "default": 0,
+    "min": -100,
+    "max": 100
+   },
+   {
+    "i": 19,
+    "mn": "ADBE Exposure2-0019",
+    "name": "Décalage Bleu",
+    "type": "6417",
+    "default": 0,
+    "min": -2,
+    "max": 2
+   },
+   {
+    "i": 20,
+    "mn": "ADBE Exposure2-0020",
+    "name": "Correction Gamma bleu",
+    "type": "6417",
+    "default": 1,
+    "min": 0.10000000149012,
+    "max": 10
+   },
+   {
+    "i": 21,
+    "mn": "ADBE Exposure2-0021",
+    "name": "Bleu",
+    "type": "6412",
+    "default": null,
+    "min": null,
+    "max": null
+   },
+   {
+    "i": 22,
+    "mn": "ADBE Exposure2-0022",
+    "name": "Ignorer la conversion de lumière linéaire",
+    "type": "6417",
+    "default": 0,
+    "min": 0,
+    "max": 1
+   },
+   {
+    "i": 23,
+    "mn": "ADBE Effect Built In Params",
+    "name": "Options de composition",
+    "type": "undefined",
+    "default": null,
+    "min": null,
+    "max": null
+   }
+  ]
+ },
+ "ADBE Invert": {
+  "name": "Inverser",
+  "params": [
+   {
+    "i": 1,
+    "mn": "ADBE Invert-0001",
+    "name": "Couches",
+    "type": "6417",
+    "default": 1,
+    "min": 1,
+    "max": 16
+   },
+   {
+    "i": 2,
+    "mn": "ADBE Invert-0002",
+    "name": "Part de l'original",
+    "type": "6417",
+    "default": 0,
+    "min": 0,
+    "max": 100
+   },
+   {
+    "i": 3,
+    "mn": "ADBE Effect Built In Params",
+    "name": "Options de composition",
+    "type": "undefined",
+    "default": null,
+    "min": null,
+    "max": null
+   }
+  ]
+ },
+ "ADBE Easy Levels2": {
+  "name": "Niveaux",
+  "params": [
+   {
+    "i": 1,
+    "mn": "ADBE Easy Levels2-0001",
+    "name": "Couche :",
+    "type": "6417",
+    "default": 1,
+    "min": 1,
+    "max": 5
+   },
+   {
+    "i": 2,
+    "mn": "ADBE Easy Levels2-0002",
+    "name": "Histogramme",
+    "type": "6419",
+    "default": null,
+    "min": null,
+    "max": null
+   },
+   {
+    "i": 3,
+    "mn": "ADBE Easy Levels2-0003",
+    "name": "Noir en entrée",
+    "type": "6417",
+    "default": 0,
+    "min": -10000,
+    "max": 10000
+   },
+   {
+    "i": 4,
+    "mn": "ADBE Easy Levels2-0004",
+    "name": "Blanc en entrée",
+    "type": "6417",
+    "default": 1,
+    "min": -10000,
+    "max": 10000
+   },
+   {
+    "i": 5,
+    "mn": "ADBE Easy Levels2-0005",
+    "name": "Gamma",
+    "type": "6417",
+    "default": 1,
+    "min": 0,
+    "max": 5
+   },
+   {
+    "i": 6,
+    "mn": "ADBE Easy Levels2-0006",
+    "name": "Noir en sortie",
+    "type": "6417",
+    "default": 0,
+    "min": -10000,
+    "max": 10000
+   },
+   {
+    "i": 7,
+    "mn": "ADBE Easy Levels2-0007",
+    "name": "Blanc en sortie",
+    "type": "6417",
+    "default": 1,
+    "min": -10000,
+    "max": 10000
+   },
+   {
+    "i": 8,
+    "mn": "ADBE Easy Levels2-0008",
+    "name": "Ecrêtage noir",
+    "type": "6417",
+    "default": 3,
+    "min": 1,
+    "max": 3
+   },
+   {
+    "i": 9,
+    "mn": "ADBE Easy Levels2-0009",
+    "name": "Ecrêtage blanc",
+    "type": "6417",
+    "default": 3,
+    "min": 1,
+    "max": 3
+   },
+   {
+    "i": 10,
+    "mn": "ADBE Effect Built In Params",
+    "name": "Options de composition",
+    "type": "undefined",
+    "default": null,
+    "min": null,
+    "max": null
+   }
+  ]
+ },
+ "ADBE Color Balance (HLS)": {
+  "name": "Balance des couleurs (TLS)",
+  "params": [
+   {
+    "i": 1,
+    "mn": "ADBE Color Balance (HLS)-0001",
+    "name": "Teinte",
+    "type": "6417",
+    "default": 0,
+    "min": null,
+    "max": null
+   },
+   {
+    "i": 2,
+    "mn": "ADBE Color Balance (HLS)-0002",
+    "name": "Luminosité",
+    "type": "6417",
+    "default": 0,
+    "min": -100,
+    "max": 100
+   },
+   {
+    "i": 3,
+    "mn": "ADBE Color Balance (HLS)-0003",
+    "name": "Saturation",
+    "type": "6417",
+    "default": 0,
+    "min": -100,
+    "max": 100
+   },
+   {
+    "i": 4,
+    "mn": "ADBE Effect Built In Params",
+    "name": "Options de composition",
+    "type": "undefined",
+    "default": null,
+    "min": null,
+    "max": null
+   }
+  ]
+ },
+ "ADBE HUE SATURATION": {
+  "name": "Teinte/Saturation",
+  "params": [
+   {
+    "i": 1,
+    "mn": "ADBE HUE SATURATION-0002",
+    "name": "Couches",
+    "type": "6417",
+    "default": 1,
+    "min": 1,
+    "max": 7
+   },
+   {
+    "i": 2,
+    "mn": "ADBE HUE SATURATION-0003",
+    "name": "Plage de couches",
+    "type": "6419",
+    "default": null,
+    "min": null,
+    "max": null
+   },
+   {
+    "i": 3,
+    "mn": "ADBE HUE SATURATION-0004",
+    "name": "Teinte globale",
+    "type": "6417",
+    "default": 0,
+    "min": null,
+    "max": null
+   },
+   {
+    "i": 4,
+    "mn": "ADBE HUE SATURATION-0005",
+    "name": "Saturation globale",
+    "type": "6417",
+    "default": 0,
+    "min": -100,
+    "max": 100
+   },
+   {
+    "i": 5,
+    "mn": "ADBE HUE SATURATION-0006",
+    "name": "Luminosité globale",
+    "type": "6417",
+    "default": 0,
+    "min": -100,
+    "max": 100
+   },
+   {
+    "i": 6,
+    "mn": "ADBE HUE SATURATION-0007",
+    "name": "Redéfinir",
+    "type": "6417",
+    "default": 0,
+    "min": 0,
+    "max": 1
+   },
+   {
+    "i": 7,
+    "mn": "ADBE HUE SATURATION-0008",
+    "name": "Redéfinir la teinte",
+    "type": "6417",
+    "default": 0,
+    "min": null,
+    "max": null
+   },
+   {
+    "i": 8,
+    "mn": "ADBE HUE SATURATION-0009",
+    "name": "Redéfinir la saturation",
+    "type": "6417",
+    "default": 25,
+    "min": 0,
+    "max": 100
+   },
+   {
+    "i": 9,
+    "mn": "ADBE HUE SATURATION-0010",
+    "name": "Redéfinir la luminosité",
+    "type": "6417",
+    "default": 0,
+    "min": -100,
+    "max": 100
+   },
+   {
+    "i": 10,
+    "mn": "ADBE Effect Built In Params",
+    "name": "Options de composition",
+    "type": "undefined",
+    "default": null,
+    "min": null,
+    "max": null
+   }
+  ]
+ },
+ "ADBE Brightness & Contrast 2": {
+  "name": "Luminosité et contraste",
+  "params": [
+   {
+    "i": 1,
+    "mn": "ADBE Brightness & Contrast 2-0001",
+    "name": "Luminosité",
+    "type": "6417",
+    "default": 0,
+    "min": -150,
+    "max": 150
+   },
+   {
+    "i": 2,
+    "mn": "ADBE Brightness & Contrast 2-0002",
+    "name": "Contraste",
+    "type": "6417",
+    "default": 0,
+    "min": -100,
+    "max": 100
+   },
+   {
+    "i": 3,
+    "mn": "ADBE Brightness & Contrast 2-0003",
+    "name": "Utiliser les fichiers existants (prise en charge HDR)",
+    "type": "6417",
+    "default": 0,
+    "min": 0,
+    "max": 1
+   },
+   {
+    "i": 4,
+    "mn": "ADBE Effect Built In Params",
+    "name": "Options de composition",
+    "type": "undefined",
+    "default": null,
+    "min": null,
+    "max": null
+   }
+  ]
+ },
+ "ADBE Tritone": {
+  "name": "Trichrome",
+  "params": [
+   {
+    "i": 1,
+    "mn": "ADBE Tritone-0001",
+    "name": "Tons clairs",
+    "type": "6418",
+    "default": [
+     1,
+     1,
+     1,
+     0
+    ],
+    "min": -3921568.62745098,
+    "max": 3921568.62745098
+   },
+   {
+    "i": 2,
+    "mn": "ADBE Tritone-0002",
+    "name": "Tons moyens",
+    "type": "6418",
+    "default": [
+     0.49803921568627,
+     0.3921568627451,
+     0.27450980392157,
+     0
+    ],
+    "min": -3921568.62745098,
+    "max": 3921568.62745098
+   },
+   {
+    "i": 3,
+    "mn": "ADBE Tritone-0003",
+    "name": "Tons foncés",
+    "type": "6418",
+    "default": [
+     0,
+     0,
+     0,
+     0
+    ],
+    "min": -3921568.62745098,
+    "max": 3921568.62745098
+   },
+   {
+    "i": 4,
+    "mn": "ADBE Tritone-0004",
+    "name": "Part de l'original",
+    "type": "6417",
+    "default": 0,
+    "min": 0,
+    "max": 100
+   },
+   {
+    "i": 5,
+    "mn": "ADBE Effect Built In Params",
+    "name": "Options de composition",
+    "type": "undefined",
+    "default": null,
+    "min": null,
+    "max": null
+   }
+  ]
+ },
+ "ADBE Shift Channels": {
+  "name": "Décalage des couches",
+  "params": [
+   {
+    "i": 1,
+    "mn": "ADBE Shift Channels-0001",
+    "name": "Alpha =",
+    "type": "6417",
+    "default": 1,
+    "min": 1,
+    "max": 10
+   },
+   {
+    "i": 2,
+    "mn": "ADBE Shift Channels-0002",
+    "name": "Rouge =",
+    "type": "6417",
+    "default": 2,
+    "min": 1,
+    "max": 10
+   },
+   {
+    "i": 3,
+    "mn": "ADBE Shift Channels-0003",
+    "name": "Vert =",
+    "type": "6417",
+    "default": 3,
+    "min": 1,
+    "max": 10
+   },
+   {
+    "i": 4,
+    "mn": "ADBE Shift Channels-0004",
+    "name": "Bleu =",
+    "type": "6417",
+    "default": 4,
+    "min": 1,
+    "max": 10
+   },
+   {
+    "i": 5,
+    "mn": "ADBE Effect Built In Params",
+    "name": "Options de composition",
+    "type": "undefined",
+    "default": null,
+    "min": null,
+    "max": null
+   }
+  ]
+ },
+ "ADBE Luma Key": {
+  "name": "Incrustation Luminance",
+  "params": [
+   {
+    "i": 1,
+    "mn": "ADBE Luma Key-0001",
+    "name": "Masquer",
+    "type": "6417",
+    "default": 2,
+    "min": 1,
+    "max": 4
+   },
+   {
+    "i": 2,
+    "mn": "ADBE Luma Key-0002",
+    "name": "Seuil",
+    "type": "6417",
+    "default": 0,
+    "min": 0,
+    "max": 255
+   },
+   {
+    "i": 3,
+    "mn": "ADBE Luma Key-0003",
+    "name": "Tolérance",
+    "type": "6417",
+    "default": 0,
+    "min": 0,
+    "max": 255
+   },
+   {
+    "i": 4,
+    "mn": "ADBE Luma Key-0004",
+    "name": "Contour",
+    "type": "6417",
+    "default": 0,
+    "min": -5,
+    "max": 5
+   },
+   {
+    "i": 5,
+    "mn": "ADBE Luma Key-0005",
+    "name": "Lissage",
+    "type": "6417",
+    "default": 0,
+    "min": 0,
+    "max": 100
+   },
+   {
+    "i": 6,
+    "mn": "ADBE Effect Built In Params",
+    "name": "Options de composition",
+    "type": "undefined",
+    "default": null,
+    "min": null,
+    "max": null
+   }
+  ]
+ },
+ "CC Composite": {
+  "name": "CC Composite (obsolete)",
+  "params": [
+   {
+    "i": 1,
+    "mn": "CC Composite-0001",
+    "name": "Opacity",
+    "type": "6417",
+    "default": 100,
+    "min": 0,
+    "max": 100
+   },
+   {
+    "i": 2,
+    "mn": "CC Composite-0002",
+    "name": "Composite Original",
+    "type": "6417",
+    "default": 3,
+    "min": 1,
+    "max": 41
+   },
+   {
+    "i": 3,
+    "mn": "CC Composite-0003",
+    "name": "RGB Only",
+    "type": "6417",
+    "default": 1,
+    "min": 0,
+    "max": 1
+   },
+   {
+    "i": 4,
+    "mn": "ADBE Effect Built In Params",
+    "name": "Options de composition",
+    "type": "undefined",
+    "default": null,
+    "min": null,
+    "max": null
+   }
+  ]
+ },
+ "ADBE Set Channels": {
+  "name": "Correspondance des couches",
+  "params": [
+   {
+    "i": 1,
+    "mn": "ADBE Set Channels-0001",
+    "name": "Calque source 1",
+    "type": "6421",
+    "default": 0,
+    "min": null,
+    "max": null
+   },
+   {
+    "i": 2,
+    "mn": "ADBE Set Channels-0002",
+    "name": "Rouge = (dans source 1)",
+    "type": "6417",
+    "default": 1,
+    "min": 1,
+    "max": 10
+   },
+   {
+    "i": 3,
+    "mn": "ADBE Set Channels-0003",
+    "name": "Calque source 2",
+    "type": "6421",
+    "default": 0,
+    "min": null,
+    "max": null
+   },
+   {
+    "i": 4,
+    "mn": "ADBE Set Channels-0004",
+    "name": "Vert = (dans source 2)",
+    "type": "6417",
+    "default": 2,
+    "min": 1,
+    "max": 10
+   },
+   {
+    "i": 5,
+    "mn": "ADBE Set Channels-0005",
+    "name": "Calque source 3",
+    "type": "6421",
+    "default": 0,
+    "min": null,
+    "max": null
+   },
+   {
+    "i": 6,
+    "mn": "ADBE Set Channels-0006",
+    "name": "Bleu = (dans source 3)",
+    "type": "6417",
+    "default": 3,
+    "min": 1,
+    "max": 10
+   },
+   {
+    "i": 7,
+    "mn": "ADBE Set Channels-0007",
+    "name": "Calque source 4",
+    "type": "6421",
+    "default": 0,
+    "min": null,
+    "max": null
+   },
+   {
+    "i": 8,
+    "mn": "ADBE Set Channels-0008",
+    "name": "Alpha = (dans source 4)",
+    "type": "6417",
+    "default": 4,
+    "min": 1,
+    "max": 10
+   },
+   {
+    "i": 9,
+    "mn": "ADBE Set Channels-0009",
+    "name": "Si tailles différentes",
+    "type": "6417",
+    "default": 1,
+    "min": 0,
+    "max": 1
+   },
+   {
+    "i": 10,
+    "mn": "ADBE Effect Built In Params",
+    "name": "Options de composition",
+    "type": "undefined",
+    "default": null,
+    "min": null,
+    "max": null
+   }
+  ]
+ },
+ "ADBE Gaussian Blur 2": {
+  "name": "Flou gaussien",
+  "params": [
+   {
+    "i": 1,
+    "mn": "ADBE Gaussian Blur 2-0001",
+    "name": "Flou",
+    "type": "6417",
+    "default": 25,
+    "min": 0,
+    "max": 30000
+   },
+   {
+    "i": 2,
+    "mn": "ADBE Gaussian Blur 2-0002",
+    "name": "Dimensions de flou",
+    "type": "6417",
+    "default": 1,
+    "min": 1,
+    "max": 3
+   },
+   {
+    "i": 3,
+    "mn": "ADBE Gaussian Blur 2-0003",
+    "name": "Recopier les pixels du contour",
+    "type": "6417",
+    "default": 1,
+    "min": 0,
+    "max": 1
+   },
+   {
+    "i": 4,
+    "mn": "ADBE Effect Built In Params",
+    "name": "Options de composition",
+    "type": "undefined",
+    "default": null,
+    "min": null,
+    "max": null
+   }
+  ]
+ },
+ "ADBE Gaussian Blur": {
+  "name": "Flou gaussien (hérité)",
+  "params": [
+   {
+    "i": 1,
+    "mn": "ADBE Gaussian Blur-0001",
+    "name": "Intensité",
+    "type": "6417",
+    "default": 0,
+    "min": 0,
+    "max": 30000
+   },
+   {
+    "i": 2,
+    "mn": "ADBE Gaussian Blur-0002",
+    "name": "Dimensions de flou",
+    "type": "6417",
+    "default": 1,
+    "min": 1,
+    "max": 3
+   },
+   {
+    "i": 3,
+    "mn": "ADBE Effect Built In Params",
+    "name": "Options de composition",
+    "type": "undefined",
+    "default": null,
+    "min": null,
+    "max": null
+   }
+  ]
+ },
+ "ADBE Fast Blur": {
+  "name": "Flou accéléré (hérité)",
+  "params": [
+   {
+    "i": 1,
+    "mn": "ADBE Fast Blur-0001",
+    "name": "Intensité",
+    "type": "6417",
+    "default": 0,
+    "min": 0,
+    "max": 30000
+   },
+   {
+    "i": 2,
+    "mn": "ADBE Fast Blur-0002",
+    "name": "Dimensions de flou",
+    "type": "6417",
+    "default": 1,
+    "min": 1,
+    "max": 3
+   },
+   {
+    "i": 3,
+    "mn": "ADBE Fast Blur-0003",
+    "name": "Recopier les pixels du contour",
+    "type": "6417",
+    "default": 1,
+    "min": 0,
+    "max": 1
+   },
+   {
+    "i": 4,
+    "mn": "ADBE Effect Built In Params",
+    "name": "Options de composition",
+    "type": "undefined",
+    "default": null,
+    "min": null,
+    "max": null
+   }
+  ]
+ },
+ "ADBE Box Blur2": {
+  "name": "Flou encadré accéléré",
+  "params": [
+   {
+    "i": 1,
+    "mn": "ADBE Box Blur2-0001",
+    "name": "Rayon de flou",
+    "type": "6417",
+    "default": 0,
+    "min": 0,
+    "max": 30000
+   },
+   {
+    "i": 2,
+    "mn": "ADBE Box Blur2-0002",
+    "name": "Itérations",
+    "type": "6417",
+    "default": 3,
+    "min": 1,
+    "max": 50
+   },
+   {
+    "i": 3,
+    "mn": "ADBE Box Blur2-0003",
+    "name": "Dimensions de flou",
+    "type": "6417",
+    "default": 1,
+    "min": 1,
+    "max": 3
+   },
+   {
+    "i": 4,
+    "mn": "ADBE Box Blur2-0004",
+    "name": "Recopier les pixels du contour",
+    "type": "6417",
+    "default": 1,
+    "min": 0,
+    "max": 1
+   },
+   {
+    "i": 5,
+    "mn": "ADBE Effect Built In Params",
+    "name": "Options de composition",
+    "type": "undefined",
+    "default": null,
+    "min": null,
+    "max": null
+   }
+  ]
+ },
+ "ADBE Motion Blur": {
+  "name": "Flou directionnel",
+  "params": [
+   {
+    "i": 1,
+    "mn": "ADBE Motion Blur-0001",
+    "name": "Angle",
+    "type": "6417",
+    "default": 90,
+    "min": null,
+    "max": null
+   },
+   {
+    "i": 2,
+    "mn": "ADBE Motion Blur-0002",
+    "name": "Distance",
+    "type": "6417",
+    "default": 10,
+    "min": 0,
+    "max": 1000
+   },
+   {
+    "i": 3,
+    "mn": "ADBE Effect Built In Params",
+    "name": "Options de composition",
+    "type": "undefined",
+    "default": null,
+    "min": null,
+    "max": null
+   }
+  ]
+ },
+ "CC Radial Fast Blur": {
+  "name": "CC Radial Fast Blur",
+  "params": [
+   {
+    "i": 1,
+    "mn": "CC Radial Fast Blur-0001",
+    "name": "Center",
+    "type": "6415",
+    "default": [
+     320,
+     180
+    ],
+    "min": null,
+    "max": null
+   },
+   {
+    "i": 2,
+    "mn": "CC Radial Fast Blur-0002",
+    "name": "Amount",
+    "type": "6417",
+    "default": 50,
+    "min": 0,
+    "max": 100
+   },
+   {
+    "i": 3,
+    "mn": "CC Radial Fast Blur-0003",
+    "name": "Zoom",
+    "type": "6417",
+    "default": 1,
+    "min": 1,
+    "max": 3
+   },
+   {
+    "i": 4,
+    "mn": "ADBE Effect Built In Params",
+    "name": "Options de composition",
+    "type": "undefined",
+    "default": null,
+    "min": null,
+    "max": null
+   }
+  ]
+ },
+ "CC Radial Blur": {
+  "name": "CC Radial Blur",
+  "params": [
+   {
+    "i": 1,
+    "mn": "CC Radial Blur-0001",
+    "name": "Type",
+    "type": "6417",
+    "default": 6,
+    "min": 1,
+    "max": 7
+   },
+   {
+    "i": 2,
+    "mn": "CC Radial Blur-0002",
+    "name": "Amount",
+    "type": "6417",
+    "default": 0,
+    "min": -250,
+    "max": 250
+   },
+   {
+    "i": 3,
+    "mn": "CC Radial Blur-0003",
+    "name": "Quality",
+    "type": "6417",
+    "default": 50,
+    "min": 10,
+    "max": 100
+   },
+   {
+    "i": 4,
+    "mn": "CC Radial Blur-0004",
+    "name": "Center",
+    "type": "6415",
+    "default": [
+     320,
+     180
+    ],
+    "min": null,
+    "max": null
+   },
+   {
+    "i": 5,
+    "mn": "ADBE Effect Built In Params",
+    "name": "Options de composition",
+    "type": "undefined",
+    "default": null,
+    "min": null,
+    "max": null
+   }
+  ]
+ },
+ "ADBE Simple Choker": {
+  "name": "Dilaté-érodé simple",
+  "params": [
+   {
+    "i": 1,
+    "mn": "ADBE Simple Choker-0001",
+    "name": "Afficher",
+    "type": "6417",
+    "default": 1,
+    "min": 1,
+    "max": 2
+   },
+   {
+    "i": 2,
+    "mn": "ADBE Simple Choker-0002",
+    "name": "Dilaté-érodé",
+    "type": "6417",
+    "default": 0,
+    "min": -100,
+    "max": 100
+   },
+   {
+    "i": 3,
+    "mn": "ADBE Effect Built In Params",
+    "name": "Options de composition",
+    "type": "undefined",
+    "default": null,
+    "min": null,
+    "max": null
+   }
+  ]
+ },
+ "ADBE Minimax": {
+  "name": "Minimax",
+  "params": [
+   {
+    "i": 1,
+    "mn": "ADBE Minimax-0001",
+    "name": "Opération",
+    "type": "6417",
+    "default": 2,
+    "min": 1,
+    "max": 4
+   },
+   {
+    "i": 2,
+    "mn": "ADBE Minimax-0002",
+    "name": "Rayon",
+    "type": "6417",
+    "default": 0,
+    "min": 0,
+    "max": 32000
+   },
+   {
+    "i": 3,
+    "mn": "ADBE Minimax-0003",
+    "name": "Couches",
+    "type": "6417",
+    "default": 1,
+    "min": 1,
+    "max": 6
+   },
+   {
+    "i": 4,
+    "mn": "ADBE Minimax-0004",
+    "name": "Sens",
+    "type": "6417",
+    "default": 1,
+    "min": 1,
+    "max": 3
+   },
+   {
+    "i": 5,
+    "mn": "ADBE Minimax-0005",
+    "name": "Ne pas réduire les contours",
+    "type": "6417",
+    "default": 0,
+    "min": 0,
+    "max": 1
+   },
+   {
+    "i": 6,
+    "mn": "ADBE Effect Built In Params",
+    "name": "Options de composition",
+    "type": "undefined",
+    "default": null,
+    "min": null,
+    "max": null
+   }
+  ]
+ },
+ "ADBE Mosaic": {
+  "name": "Mosaïque",
+  "params": [
+   {
+    "i": 1,
+    "mn": "ADBE Mosaic-0001",
+    "name": "Carreaux horizontaux",
+    "type": "6417",
+    "default": 10,
+    "min": 1,
+    "max": 4000
+   },
+   {
+    "i": 2,
+    "mn": "ADBE Mosaic-0002",
+    "name": "Carreaux verticaux",
+    "type": "6417",
+    "default": 10,
+    "min": 1,
+    "max": 4000
+   },
+   {
+    "i": 3,
+    "mn": "ADBE Mosaic-0003",
+    "name": "Couleur centrale",
+    "type": "6417",
+    "default": 0,
+    "min": 0,
+    "max": 1
+   },
+   {
+    "i": 4,
+    "mn": "ADBE Effect Built In Params",
+    "name": "Options de composition",
+    "type": "undefined",
+    "default": null,
+    "min": null,
+    "max": null
+   }
+  ]
+ },
+ "ADBE Tile": {
+  "name": "Juxtaposition directionnelle",
+  "params": [
+   {
+    "i": 1,
+    "mn": "ADBE Tile-0001",
+    "name": "Juxtaposition centrale",
+    "type": "6415",
+    "default": [
+     320,
+     180
+    ],
+    "min": null,
+    "max": null
+   },
+   {
+    "i": 2,
+    "mn": "ADBE Tile-0002",
+    "name": "Juxtaposition en largeur",
+    "type": "6417",
+    "default": 100,
+    "min": 0,
+    "max": 100
+   },
+   {
+    "i": 3,
+    "mn": "ADBE Tile-0003",
+    "name": "Juxtaposition en hauteur",
+    "type": "6417",
+    "default": 100,
+    "min": 0,
+    "max": 100
+   },
+   {
+    "i": 4,
+    "mn": "ADBE Tile-0004",
+    "name": "Largeur en sortie",
+    "type": "6417",
+    "default": 100,
+    "min": 0,
+    "max": 30000
+   },
+   {
+    "i": 5,
+    "mn": "ADBE Tile-0005",
+    "name": "Hauteur en sortie",
+    "type": "6417",
+    "default": 100,
+    "min": 0,
+    "max": 30000
+   },
+   {
+    "i": 6,
+    "mn": "ADBE Tile-0006",
+    "name": "Contours du miroir",
+    "type": "6417",
+    "default": 0,
+    "min": 0,
+    "max": 1
+   },
+   {
+    "i": 7,
+    "mn": "ADBE Tile-0007",
+    "name": "Phase",
+    "type": "6417",
+    "default": 0,
+    "min": null,
+    "max": null
+   },
+   {
+    "i": 8,
+    "mn": "ADBE Tile-0008",
+    "name": "Changement de phase horizontale",
+    "type": "6417",
+    "default": 0,
+    "min": 0,
+    "max": 1
+   },
+   {
+    "i": 9,
+    "mn": "ADBE Effect Built In Params",
+    "name": "Options de composition",
+    "type": "undefined",
+    "default": null,
+    "min": null,
+    "max": null
+   }
+  ]
+ },
+ "ADBE Displacement Map": {
+  "name": "Dispersion",
+  "params": [
+   {
+    "i": 1,
+    "mn": "ADBE Displacement Map-0001",
+    "name": "Calque de référence",
+    "type": "6421",
+    "default": 1,
+    "min": null,
+    "max": null
+   },
+   {
+    "i": 2,
+    "mn": "ADBE Displacement Map-0002",
+    "name": "Couche horizontale",
+    "type": "6417",
+    "default": 1,
+    "min": 1,
+    "max": 11
+   },
+   {
+    "i": 3,
+    "mn": "ADBE Displacement Map-0003",
+    "name": "Horizontale maxi",
+    "type": "6417",
+    "default": 5,
+    "min": -32000,
+    "max": 32000
+   },
+   {
+    "i": 4,
+    "mn": "ADBE Displacement Map-0004",
+    "name": "Couche verticale",
+    "type": "6417",
+    "default": 2,
+    "min": 1,
+    "max": 11
+   },
+   {
+    "i": 5,
+    "mn": "ADBE Displacement Map-0005",
+    "name": "Verticale maxi",
+    "type": "6417",
+    "default": 5,
+    "min": -32000,
+    "max": 32000
+   },
+   {
+    "i": 6,
+    "mn": "ADBE Displacement Map-0006",
+    "name": "Disposition",
+    "type": "6417",
+    "default": 1,
+    "min": 1,
+    "max": 3
+   },
+   {
+    "i": 7,
+    "mn": "ADBE Displacement Map-0007",
+    "name": "Pixels du contour",
+    "type": "6417",
+    "default": 0,
+    "min": 0,
+    "max": 1
+   },
+   {
+    "i": 8,
+    "mn": "ADBE Displacement Map-0008",
+    "name": "Développer sortie",
+    "type": "6417",
+    "default": 1,
+    "min": 0,
+    "max": 1
+   },
+   {
+    "i": 9,
+    "mn": "ADBE Effect Built In Params",
+    "name": "Options de composition",
+    "type": "undefined",
+    "default": null,
+    "min": null,
+    "max": null
+   }
+  ]
+ },
+ "ADBE Turbulent Displace": {
+  "name": "Turbulences",
+  "params": [
+   {
+    "i": 1,
+    "mn": "ADBE Turbulent Displace-0001",
+    "name": "Balayage",
+    "type": "6417",
+    "default": 1,
+    "min": 1,
+    "max": 11
+   },
+   {
+    "i": 2,
+    "mn": "ADBE Turbulent Displace-0002",
+    "name": "Quantité",
+    "type": "6417",
+    "default": 50,
+    "min": -10000,
+    "max": 10000
+   },
+   {
+    "i": 3,
+    "mn": "ADBE Turbulent Displace-0003",
+    "name": "Taille",
+    "type": "6417",
+    "default": 100,
+    "min": 2,
+    "max": 1000
+   },
+   {
+    "i": 4,
+    "mn": "ADBE Turbulent Displace-0004",
+    "name": "Décalage (turbulence)",
+    "type": "6415",
+    "default": [
+     320,
+     180
+    ],
+    "min": null,
+    "max": null
+   },
+   {
+    "i": 5,
+    "mn": "ADBE Turbulent Displace-0005",
+    "name": "Complexité",
+    "type": "6417",
+    "default": 1,
+    "min": 1,
+    "max": 10
+   },
+   {
+    "i": 6,
+    "mn": "ADBE Turbulent Displace-0006",
+    "name": "Evolution",
+    "type": "6417",
+    "default": 0,
+    "min": null,
+    "max": null
+   },
+   {
+    "i": 7,
+    "mn": "ADBE Turbulent Displace-0007",
+    "name": "Options d'évolution",
+    "type": "6412",
+    "default": null,
+    "min": null,
+    "max": null
+   },
+   {
+    "i": 8,
+    "mn": "ADBE Turbulent Displace-0008",
+    "name": "Evolution du cycle",
+    "type": "6417",
+    "default": 0,
+    "min": 0,
+    "max": 1
+   },
+   {
+    "i": 9,
+    "mn": "ADBE Turbulent Displace-0009",
+    "name": "Cycle (nbre révolutions)",
+    "type": "6417",
+    "default": 1,
+    "min": 1,
+    "max": 88
+   },
+   {
+    "i": 10,
+    "mn": "ADBE Turbulent Displace-0010",
+    "name": "Générateur aléatoire",
+    "type": "6417",
+    "default": 0,
+    "min": 0,
+    "max": 100000
+   },
+   {
+    "i": 11,
+    "mn": "ADBE Turbulent Displace-0011",
+    "name": "Générateur aléatoire",
+    "type": "6412",
+    "default": null,
+    "min": null,
+    "max": null
+   },
+   {
+    "i": 12,
+    "mn": "ADBE Turbulent Displace-0012",
+    "name": "Stabilisation contours",
+    "type": "6417",
+    "default": 3,
+    "min": 1,
+    "max": 17
+   },
+   {
+    "i": 13,
+    "mn": "ADBE Turbulent Displace-0013",
+    "name": "Redimensionner le calque",
+    "type": "6417",
+    "default": 0,
+    "min": 0,
+    "max": 1
+   },
+   {
+    "i": 14,
+    "mn": "ADBE Turbulent Displace-0014",
+    "name": "Lissage pour qualité optimale",
+    "type": "6417",
+    "default": 1,
+    "min": 1,
+    "max": 2
+   },
+   {
+    "i": 15,
+    "mn": "ADBE Effect Built In Params",
+    "name": "Options de composition",
+    "type": "undefined",
+    "default": null,
+    "min": null,
+    "max": null
+   }
+  ]
+ },
+ "ADBE Optics Compensation": {
+  "name": "Compensation optique",
+  "params": [
+   {
+    "i": 1,
+    "mn": "ADBE Optics Compensation-0001",
+    "name": "Angle d'ouverture (FOV)",
+    "type": "6417",
+    "default": 0,
+    "min": 0,
+    "max": 179.999984741211
+   },
+   {
+    "i": 2,
+    "mn": "ADBE Optics Compensation-0002",
+    "name": "Inverser la déformation de la lentille",
+    "type": "6417",
+    "default": 0,
+    "min": 0,
+    "max": 1
+   },
+   {
+    "i": 3,
+    "mn": "ADBE Optics Compensation-0003",
+    "name": "Orient. auto angle ouverture",
+    "type": "6417",
+    "default": 1,
+    "min": 1,
+    "max": 3
+   },
+   {
+    "i": 4,
+    "mn": "ADBE Optics Compensation-0004",
+    "name": "Centre",
+    "type": "6415",
+    "default": [
+     320,
+     180
+    ],
+    "min": null,
+    "max": null
+   },
+   {
+    "i": 5,
+    "mn": "ADBE Optics Compensation-0005",
+    "name": "Pixels optimaux (annule l'inverse)",
+    "type": "6417",
+    "default": 0,
+    "min": 0,
+    "max": 1
+   },
+   {
+    "i": 6,
+    "mn": "ADBE Optics Compensation-0006",
+    "name": "Redimensionner",
+    "type": "6417",
+    "default": 1,
+    "min": 1,
+    "max": 4
+   },
+   {
+    "i": 7,
+    "mn": "ADBE Effect Built In Params",
+    "name": "Options de composition",
+    "type": "undefined",
+    "default": null,
+    "min": null,
+    "max": null
+   }
+  ]
+ },
+ "ADBE Corner Pin": {
+  "name": "Quatre coins",
+  "params": [
+   {
+    "i": 1,
+    "mn": "ADBE Corner Pin-0001",
+    "name": "Supérieur gauche",
+    "type": "6415",
+    "default": [
+     0,
+     0
+    ],
+    "min": null,
+    "max": null
+   },
+   {
+    "i": 2,
+    "mn": "ADBE Corner Pin-0002",
+    "name": "Supérieur droit",
+    "type": "6415",
+    "default": [
+     640,
+     0
+    ],
+    "min": null,
+    "max": null
+   },
+   {
+    "i": 3,
+    "mn": "ADBE Corner Pin-0003",
+    "name": "Inférieur gauche",
+    "type": "6415",
+    "default": [
+     0,
+     360
+    ],
+    "min": null,
+    "max": null
+   },
+   {
+    "i": 4,
+    "mn": "ADBE Corner Pin-0004",
+    "name": "Inférieur droit",
+    "type": "6415",
+    "default": [
+     640,
+     360
+    ],
+    "min": null,
+    "max": null
+   },
+   {
+    "i": 5,
+    "mn": "ADBE Effect Built In Params",
+    "name": "Options de composition",
+    "type": "undefined",
+    "default": null,
+    "min": null,
+    "max": null
+   }
+  ]
+ },
+ "ADBE Magnify": {
+  "name": "Loupe",
+  "params": [
+   {
+    "i": 1,
+    "mn": "ADBE Magnify-0010",
+    "name": "Forme",
+    "type": "6417",
+    "default": 1,
+    "min": 1,
+    "max": 2
+   },
+   {
+    "i": 2,
+    "mn": "ADBE Magnify-0001",
+    "name": "Centre",
+    "type": "6415",
+    "default": [
+     320,
+     180
+    ],
+    "min": null,
+    "max": null
+   },
+   {
+    "i": 3,
+    "mn": "ADBE Magnify-0003",
+    "name": "Zoom",
+    "type": "6417",
+    "default": 150,
+    "min": 100,
+    "max": 20000
+   },
+   {
+    "i": 4,
+    "mn": "ADBE Magnify-0011",
+    "name": "Interdépendance",
+    "type": "6417",
+    "default": 1,
+    "min": 1,
+    "max": 3
+   },
+   {
+    "i": 5,
+    "mn": "ADBE Magnify-0002",
+    "name": "Taille",
+    "type": "6417",
+    "default": 100,
+    "min": 1,
+    "max": 4000
+   },
+   {
+    "i": 6,
+    "mn": "ADBE Magnify-0004",
+    "name": "Contour progressif",
+    "type": "6417",
+    "default": 0,
+    "min": 0,
+    "max": 1000
+   },
+   {
+    "i": 7,
+    "mn": "ADBE Magnify-0005",
+    "name": "Opacité",
+    "type": "6417",
+    "default": 100,
+    "min": 0,
+    "max": 100
+   },
+   {
+    "i": 8,
+    "mn": "ADBE Magnify-0008",
+    "name": "Echelle",
+    "type": "6417",
+    "default": 1,
+    "min": 1,
+    "max": 3
+   },
+   {
+    "i": 9,
+    "mn": "ADBE Magnify-0012",
+    "name": "Mode de transfert",
+    "type": "6417",
+    "default": 2,
+    "min": 1,
+    "max": 22
+   },
+   {
+    "i": 10,
+    "mn": "ADBE Magnify-0009",
+    "name": "Redimensionner le calque",
+    "type": "6417",
+    "default": 0,
+    "min": 0,
+    "max": 1
+   },
+   {
+    "i": 11,
+    "mn": "ADBE Effect Built In Params",
+    "name": "Options de composition",
+    "type": "undefined",
+    "default": null,
+    "min": null,
+    "max": null
+   }
+  ]
+ },
+ "ADBE Glo2": {
+  "name": "Lueur diffuse",
+  "params": [
+   {
+    "i": 1,
+    "mn": "ADBE Glo2-0001",
+    "name": "Couches",
+    "type": "6417",
+    "default": 2,
+    "min": 1,
+    "max": 2
+   },
+   {
+    "i": 2,
+    "mn": "ADBE Glo2-0002",
+    "name": "Seuil",
+    "type": "6417",
+    "default": 153,
+    "min": 0,
+    "max": 255
+   },
+   {
+    "i": 3,
+    "mn": "ADBE Glo2-0003",
+    "name": "Rayon",
+    "type": "6417",
+    "default": 10,
+    "min": 0,
+    "max": 1000
+   },
+   {
+    "i": 4,
+    "mn": "ADBE Glo2-0004",
+    "name": "Intensité",
+    "type": "6417",
+    "default": 1,
+    "min": 0,
+    "max": 255
+   },
+   {
+    "i": 5,
+    "mn": "ADBE Glo2-0005",
+    "name": "Composite original",
+    "type": "6417",
+    "default": 2,
+    "min": 1,
+    "max": 3
+   },
+   {
+    "i": 6,
+    "mn": "ADBE Glo2-0006",
+    "name": "Mode de fusion",
+    "type": "6417",
+    "default": 3,
+    "min": 1,
+    "max": 25
+   },
+   {
+    "i": 7,
+    "mn": "ADBE Glo2-0007",
+    "name": "Couleurs",
+    "type": "6417",
+    "default": 1,
+    "min": 1,
+    "max": 3
+   },
+   {
+    "i": 8,
+    "mn": "ADBE Glo2-0008",
+    "name": "Cycle des couleurs",
+    "type": "6417",
+    "default": 3,
+    "min": 1,
+    "max": 4
+   },
+   {
+    "i": 9,
+    "mn": "ADBE Glo2-0009",
+    "name": "Nombre de cycles",
+    "type": "6417",
+    "default": 1,
+    "min": 1,
+    "max": 127
+   },
+   {
+    "i": 10,
+    "mn": "ADBE Glo2-0010",
+    "name": "Phase",
+    "type": "6417",
+    "default": 0,
+    "min": null,
+    "max": null
+   },
+   {
+    "i": 11,
+    "mn": "ADBE Glo2-0011",
+    "name": "Milieu A-B",
+    "type": "6417",
+    "default": 0.5,
+    "min": 0.00999450683594,
+    "max": 0.99000549316406
+   },
+   {
+    "i": 12,
+    "mn": "ADBE Glo2-0012",
+    "name": "Couleur A",
+    "type": "6418",
+    "default": [
+     1,
+     1,
+     1,
+     1
+    ],
+    "min": -3921568.62745098,
+    "max": 3921568.62745098
+   },
+   {
+    "i": 13,
+    "mn": "ADBE Glo2-0013",
+    "name": "Couleur B",
+    "type": "6418",
+    "default": [
+     0,
+     0,
+     0,
+     1
+    ],
+    "min": -3921568.62745098,
+    "max": 3921568.62745098
+   },
+   {
+    "i": 14,
+    "mn": "ADBE Glo2-0014",
+    "name": "Dimensions",
+    "type": "6417",
+    "default": 1,
+    "min": 1,
+    "max": 3
+   },
+   {
+    "i": 15,
+    "mn": "ADBE Effect Built In Params",
+    "name": "Options de composition",
+    "type": "undefined",
+    "default": null,
+    "min": null,
+    "max": null
+   }
+  ]
+ },
+ "ADBE Drop Shadow": {
+  "name": "Ombre portée",
+  "params": [
+   {
+    "i": 1,
+    "mn": "ADBE Drop Shadow-0001",
+    "name": "Couleur",
+    "type": "6418",
+    "default": [
+     0,
+     0,
+     0,
+     1
+    ],
+    "min": -3921568.62745098,
+    "max": 3921568.62745098
+   },
+   {
+    "i": 2,
+    "mn": "ADBE Drop Shadow-0002",
+    "name": "Opacité",
+    "type": "6417",
+    "default": 127.5,
+    "min": 0,
+    "max": 255
+   },
+   {
+    "i": 3,
+    "mn": "ADBE Drop Shadow-0003",
+    "name": "Direction",
+    "type": "6417",
+    "default": 135,
+    "min": null,
+    "max": null
+   },
+   {
+    "i": 4,
+    "mn": "ADBE Drop Shadow-0004",
+    "name": "Distance",
+    "type": "6417",
+    "default": 5,
+    "min": 0,
+    "max": 4000
+   },
+   {
+    "i": 5,
+    "mn": "ADBE Drop Shadow-0005",
+    "name": "Lissage",
+    "type": "6417",
+    "default": 0,
+    "min": 0,
+    "max": 30000
+   },
+   {
+    "i": 6,
+    "mn": "ADBE Drop Shadow-0006",
+    "name": "Ombre seulement",
+    "type": "6417",
+    "default": 0,
+    "min": 0,
+    "max": 1
+   },
+   {
+    "i": 7,
+    "mn": "ADBE Effect Built In Params",
+    "name": "Options de composition",
+    "type": "undefined",
+    "default": null,
+    "min": null,
+    "max": null
+   }
+  ]
+ },
+ "ADBE Emboss": {
+  "name": "Estampage",
+  "params": [
+   {
+    "i": 1,
+    "mn": "ADBE Emboss-0001",
+    "name": "Angle",
+    "type": "6417",
+    "default": 45,
+    "min": null,
+    "max": null
+   },
+   {
+    "i": 2,
+    "mn": "ADBE Emboss-0002",
+    "name": "Hauteur",
+    "type": "6417",
+    "default": 1,
+    "min": 0,
+    "max": 1000
+   },
+   {
+    "i": 3,
+    "mn": "ADBE Emboss-0003",
+    "name": "Contraste",
+    "type": "6417",
+    "default": 100,
+    "min": 0,
+    "max": 32767
+   },
+   {
+    "i": 4,
+    "mn": "ADBE Emboss-0004",
+    "name": "Part de l'original",
+    "type": "6417",
+    "default": 0,
+    "min": 0,
+    "max": 100
+   },
+   {
+    "i": 5,
+    "mn": "ADBE Effect Built In Params",
+    "name": "Options de composition",
+    "type": "undefined",
+    "default": null,
+    "min": null,
+    "max": null
+   }
+  ]
+ },
+ "ADBE Checkerboard": {
+  "name": "Damier",
+  "params": [
+   {
+    "i": 1,
+    "mn": "ADBE Checkerboard-0001",
+    "name": "Ancrage",
+    "type": "6415",
+    "default": [
+     320,
+     180
+    ],
+    "min": null,
+    "max": null
+   },
+   {
+    "i": 2,
+    "mn": "ADBE Checkerboard-0002",
+    "name": "Taille des cases",
+    "type": "6417",
+    "default": 2,
+    "min": 1,
+    "max": 3
+   },
+   {
+    "i": 3,
+    "mn": "ADBE Checkerboard-0003",
+    "name": "Coin",
+    "type": "6415",
+    "default": [
+     371.2,
+     208.8
+    ],
+    "min": null,
+    "max": null
+   },
+   {
+    "i": 4,
+    "mn": "ADBE Checkerboard-0004",
+    "name": "Largeur",
+    "type": "6417",
+    "default": 16,
+    "min": 1,
+    "max": 4000
+   },
+   {
+    "i": 5,
+    "mn": "ADBE Checkerboard-0005",
+    "name": "Hauteur",
+    "type": "6417",
+    "default": 8,
+    "min": 1,
+    "max": 4000
+   },
+   {
+    "i": 6,
+    "mn": "ADBE Checkerboard-0006",
+    "name": "Contour progressif",
+    "type": "6412",
+    "default": null,
+    "min": null,
+    "max": null
+   },
+   {
+    "i": 7,
+    "mn": "ADBE Checkerboard-0007",
+    "name": "Largeur",
+    "type": "6417",
+    "default": 0,
+    "min": 0,
+    "max": 400
+   },
+   {
+    "i": 8,
+    "mn": "ADBE Checkerboard-0008",
+    "name": "Hauteur",
+    "type": "6417",
+    "default": 0,
+    "min": 0,
+    "max": 400
+   },
+   {
+    "i": 9,
+    "mn": "ADBE Checkerboard-0009",
+    "name": "Hauteur",
+    "type": "6412",
+    "default": null,
+    "min": null,
+    "max": null
+   },
+   {
+    "i": 10,
+    "mn": "ADBE Checkerboard-0010",
+    "name": "Couleur",
+    "type": "6418",
+    "default": [
+     1,
+     1,
+     1,
+     1
+    ],
+    "min": -3921568.62745098,
+    "max": 3921568.62745098
+   },
+   {
+    "i": 11,
+    "mn": "ADBE Checkerboard-0011",
+    "name": "Opacité",
+    "type": "6417",
+    "default": 100,
+    "min": 0,
+    "max": 100
+   },
+   {
+    "i": 12,
+    "mn": "ADBE Checkerboard-0012",
+    "name": "Mode de transfert",
+    "type": "6417",
+    "default": 1,
+    "min": 1,
+    "max": 23
+   },
+   {
+    "i": 13,
+    "mn": "ADBE Effect Built In Params",
+    "name": "Options de composition",
+    "type": "undefined",
+    "default": null,
+    "min": null,
+    "max": null
+   }
+  ]
+ },
+ "ADBE 4ColorGradient": {
+  "name": "Dégradé 4 couleurs",
+  "params": [
+   {
+    "i": 1,
+    "mn": "ADBE 4ColorGradient-0011",
+    "name": "Positions et Couleurs",
+    "type": "6412",
+    "default": null,
+    "min": null,
+    "max": null
+   },
+   {
+    "i": 2,
+    "mn": "ADBE 4ColorGradient-0001",
+    "name": "Point 1",
+    "type": "6415",
+    "default": [
+     64,
+     36
+    ],
+    "min": null,
+    "max": null
+   },
+   {
+    "i": 3,
+    "mn": "ADBE 4ColorGradient-0002",
+    "name": "Couleur 1",
+    "type": "6418",
+    "default": [
+     1,
+     1,
+     0,
+     1
+    ],
+    "min": -3921568.62745098,
+    "max": 3921568.62745098
+   },
+   {
+    "i": 4,
+    "mn": "ADBE 4ColorGradient-0003",
+    "name": "Point 2",
+    "type": "6415",
+    "default": [
+     576,
+     36
+    ],
+    "min": null,
+    "max": null
+   },
+   {
+    "i": 5,
+    "mn": "ADBE 4ColorGradient-0004",
+    "name": "Couleur 2",
+    "type": "6418",
+    "default": [
+     0,
+     1,
+     0,
+     1
+    ],
+    "min": -3921568.62745098,
+    "max": 3921568.62745098
+   },
+   {
+    "i": 6,
+    "mn": "ADBE 4ColorGradient-0005",
+    "name": "Point 3",
+    "type": "6415",
+    "default": [
+     64,
+     324
+    ],
+    "min": null,
+    "max": null
+   },
+   {
+    "i": 7,
+    "mn": "ADBE 4ColorGradient-0006",
+    "name": "Couleur 3",
+    "type": "6418",
+    "default": [
+     1,
+     0,
+     1,
+     1
+    ],
+    "min": -3921568.62745098,
+    "max": 3921568.62745098
+   },
+   {
+    "i": 8,
+    "mn": "ADBE 4ColorGradient-0007",
+    "name": "Point 4",
+    "type": "6415",
+    "default": [
+     576,
+     324
+    ],
+    "min": null,
+    "max": null
+   },
+   {
+    "i": 9,
+    "mn": "ADBE 4ColorGradient-0008",
+    "name": "Couleur 4",
+    "type": "6418",
+    "default": [
+     0,
+     0,
+     1,
+     1
+    ],
+    "min": -3921568.62745098,
+    "max": 3921568.62745098
+   },
+   {
+    "i": 10,
+    "mn": "ADBE 4ColorGradient-0012",
+    "name": "Couleur 4",
+    "type": "6412",
+    "default": null,
+    "min": null,
+    "max": null
+   },
+   {
+    "i": 11,
+    "mn": "ADBE 4ColorGradient-0009",
+    "name": "Fondu",
+    "type": "6417",
+    "default": 100,
+    "min": 5,
+    "max": 10000
+   },
+   {
+    "i": 12,
+    "mn": "ADBE 4ColorGradient-0010",
+    "name": "Bougé",
+    "type": "6417",
+    "default": 0,
+    "min": 0,
+    "max": 500
+   },
+   {
+    "i": 13,
+    "mn": "ADBE 4ColorGradient-0013",
+    "name": "Opacité",
+    "type": "6417",
+    "default": 100,
+    "min": 0,
+    "max": 100
+   },
+   {
+    "i": 14,
+    "mn": "ADBE 4ColorGradient-0014",
+    "name": "Mode de transfert",
+    "type": "6417",
+    "default": 1,
+    "min": 1,
+    "max": 22
+   },
+   {
+    "i": 15,
+    "mn": "ADBE Effect Built In Params",
+    "name": "Options de composition",
+    "type": "undefined",
+    "default": null,
+    "min": null,
+    "max": null
+   }
+  ]
+ },
+ "ADBE Ramp": {
+  "name": "Gamme des dégradés",
+  "params": [
+   {
+    "i": 1,
+    "mn": "ADBE Ramp-0001",
+    "name": "Point de départ",
+    "type": "6415",
+    "default": [
+     320,
+     0
+    ],
+    "min": null,
+    "max": null
+   },
+   {
+    "i": 2,
+    "mn": "ADBE Ramp-0002",
+    "name": "Couleur de départ",
+    "type": "6418",
+    "default": [
+     0,
+     0,
+     0,
+     1
+    ],
+    "min": -3921568.62745098,
+    "max": 3921568.62745098
+   },
+   {
+    "i": 3,
+    "mn": "ADBE Ramp-0003",
+    "name": "Point d'arrivée",
+    "type": "6415",
+    "default": [
+     320,
+     360
+    ],
+    "min": null,
+    "max": null
+   },
+   {
+    "i": 4,
+    "mn": "ADBE Ramp-0004",
+    "name": "Couleur d'arrivée",
+    "type": "6418",
+    "default": [
+     1,
+     1,
+     1,
+     1
+    ],
+    "min": -3921568.62745098,
+    "max": 3921568.62745098
+   },
+   {
+    "i": 5,
+    "mn": "ADBE Ramp-0005",
+    "name": "Type",
+    "type": "6417",
+    "default": 1,
+    "min": 1,
+    "max": 2
+   },
+   {
+    "i": 6,
+    "mn": "ADBE Ramp-0006",
+    "name": "Dispersion",
+    "type": "6417",
+    "default": 0,
+    "min": 0,
+    "max": 512
+   },
+   {
+    "i": 7,
+    "mn": "ADBE Ramp-0007",
+    "name": "Part de l'original",
+    "type": "6417",
+    "default": 0,
+    "min": 0,
+    "max": 1
+   },
+   {
+    "i": 8,
+    "mn": "ADBE Ramp-0008",
+    "name": "",
+    "type": "6412",
+    "default": null,
+    "min": null,
+    "max": null
+   },
+   {
+    "i": 9,
+    "mn": "ADBE Effect Built In Params",
+    "name": "Options de composition",
+    "type": "undefined",
+    "default": null,
+    "min": null,
+    "max": null
+   }
+  ]
+ },
+ "ADBE Linear Wipe": {
+  "name": "Volet linéaire",
+  "params": [
+   {
+    "i": 1,
+    "mn": "ADBE Linear Wipe-0001",
+    "name": "Pourcentage",
+    "type": "6417",
+    "default": 0,
+    "min": 0,
+    "max": 100
+   },
+   {
+    "i": 2,
+    "mn": "ADBE Linear Wipe-0002",
+    "name": "Angle",
+    "type": "6417",
+    "default": 90,
+    "min": null,
+    "max": null
+   },
+   {
+    "i": 3,
+    "mn": "ADBE Linear Wipe-0003",
+    "name": "Contour progressif",
+    "type": "6417",
+    "default": 0,
+    "min": 0,
+    "max": 32000
+   },
+   {
+    "i": 4,
+    "mn": "ADBE Effect Built In Params",
+    "name": "Options de composition",
+    "type": "undefined",
+    "default": null,
+    "min": null,
+    "max": null
+   }
+  ]
+ },
+ "CC Scale Wipe": {
+  "name": "CC Scale Wipe",
+  "params": [
+   {
+    "i": 1,
+    "mn": "CC Scale Wipe-0001",
+    "name": "Stretch",
+    "type": "6417",
+    "default": 0,
+    "min": -100,
+    "max": 100
+   },
+   {
+    "i": 2,
+    "mn": "CC Scale Wipe-0002",
+    "name": "Center",
+    "type": "6415",
+    "default": [
+     320,
+     180
+    ],
+    "min": null,
+    "max": null
+   },
+   {
+    "i": 3,
+    "mn": "CC Scale Wipe-0003",
+    "name": "Direction",
+    "type": "6417",
+    "default": 50,
+    "min": null,
+    "max": null
+   },
+   {
+    "i": 4,
+    "mn": "ADBE Effect Built In Params",
+    "name": "Options de composition",
+    "type": "undefined",
+    "default": null,
+    "min": null,
+    "max": null
+   }
+  ]
+ },
+ "ADBE Roughen Edges": {
+  "name": "Contours bruts",
+  "params": [
+   {
+    "i": 1,
+    "mn": "ADBE Roughen Edges-0001",
+    "name": "Type de contour",
+    "type": "6417",
+    "default": 1,
+    "min": 1,
+    "max": 8
+   },
+   {
+    "i": 2,
+    "mn": "ADBE Roughen Edges-0010",
+    "name": "Couleur du contour",
+    "type": "6418",
+    "default": [
+     0.6,
+     0.2,
+     0,
+     1
+    ],
+    "min": -3921568.62745098,
+    "max": 3921568.62745098
+   },
+   {
+    "i": 3,
+    "mn": "ADBE Roughen Edges-0002",
+    "name": "Bordure",
+    "type": "6417",
+    "default": 8,
+    "min": 0,
+    "max": 500
+   },
+   {
+    "i": 4,
+    "mn": "ADBE Roughen Edges-0003",
+    "name": "Netteté du contour",
+    "type": "6417",
+    "default": 1,
+    "min": 0,
+    "max": 10
+   },
+   {
+    "i": 5,
+    "mn": "ADBE Roughen Edges-0004",
+    "name": "Influence fractale",
+    "type": "6417",
+    "default": 1,
+    "min": 0,
+    "max": 1
+   },
+   {
+    "i": 6,
+    "mn": "ADBE Roughen Edges-0005",
+    "name": "Echelle",
+    "type": "6417",
+    "default": 100,
+    "min": 10,
+    "max": 1000
+   },
+   {
+    "i": 7,
+    "mn": "ADBE Roughen Edges-0006",
+    "name": "Augmenter largeur ou hauteur",
+    "type": "6417",
+    "default": 0,
+    "min": -100,
+    "max": 100
+   },
+   {
+    "i": 8,
+    "mn": "ADBE Roughen Edges-0007",
+    "name": "Décalage (Turbulence)",
+    "type": "6415",
+    "default": [
+     0,
+     0
+    ],
+    "min": null,
+    "max": null
+   },
+   {
+    "i": 9,
+    "mn": "ADBE Roughen Edges-0008",
+    "name": "Complexité",
+    "type": "6417",
+    "default": 2,
+    "min": 1,
+    "max": 10
+   },
+   {
+    "i": 10,
+    "mn": "ADBE Roughen Edges-0009",
+    "name": "Evolution",
+    "type": "6417",
+    "default": 0,
+    "min": null,
+    "max": null
+   },
+   {
+    "i": 11,
+    "mn": "ADBE Roughen Edges-0011",
+    "name": "Options d'évolution",
+    "type": "6412",
+    "default": null,
+    "min": null,
+    "max": null
+   },
+   {
+    "i": 12,
+    "mn": "ADBE Roughen Edges-0012",
+    "name": "Evolution du cycle",
+    "type": "6417",
+    "default": 0,
+    "min": 0,
+    "max": 1
+   },
+   {
+    "i": 13,
+    "mn": "ADBE Roughen Edges-0013",
+    "name": "Cycle (en révolutions)",
+    "type": "6417",
+    "default": 1,
+    "min": 1,
+    "max": 88
+   },
+   {
+    "i": 14,
+    "mn": "ADBE Roughen Edges-0014",
+    "name": "Générateur aléatoire",
+    "type": "6417",
+    "default": 0,
+    "min": 0,
+    "max": 100000
+   },
+   {
+    "i": 15,
+    "mn": "ADBE Roughen Edges-0015",
+    "name": "Générateur aléatoire",
+    "type": "6412",
+    "default": null,
+    "min": null,
+    "max": null
+   },
+   {
+    "i": 16,
+    "mn": "ADBE Effect Built In Params",
+    "name": "Options de composition",
+    "type": "undefined",
+    "default": null,
+    "min": null,
+    "max": null
+   }
+  ]
+ },
+ "ADBE Fractal Noise": {
+  "name": "Bruit fractal",
+  "params": [
+   {
+    "i": 1,
+    "mn": "ADBE Fractal Noise-0001",
+    "name": "Type fractal",
+    "type": "6417",
+    "default": 1,
+    "min": 1,
+    "max": 20
+   },
+   {
+    "i": 2,
+    "mn": "ADBE Fractal Noise-0002",
+    "name": "Type de bruit",
+    "type": "6417",
+    "default": 3,
+    "min": 1,
+    "max": 4
+   },
+   {
+    "i": 3,
+    "mn": "ADBE Fractal Noise-0003",
+    "name": "Inversion",
+    "type": "6417",
+    "default": 0,
+    "min": 0,
+    "max": 1
+   },
+   {
+    "i": 4,
+    "mn": "ADBE Fractal Noise-0004",
+    "name": "Contraste",
+    "type": "6417",
+    "default": 100,
+    "min": 0,
+    "max": 10000
+   },
+   {
+    "i": 5,
+    "mn": "ADBE Fractal Noise-0005",
+    "name": "Luminosité",
+    "type": "6417",
+    "default": 0,
+    "min": -10000,
+    "max": 10000
+   },
+   {
+    "i": 6,
+    "mn": "ADBE Fractal Noise-0006",
+    "name": "Débordement",
+    "type": "6417",
+    "default": 4,
+    "min": 1,
+    "max": 4
+   },
+   {
+    "i": 7,
+    "mn": "ADBE Fractal Noise-0007",
+    "name": "Transformation",
+    "type": "6412",
+    "default": null,
+    "min": null,
+    "max": null
+   },
+   {
+    "i": 8,
+    "mn": "ADBE Fractal Noise-0008",
+    "name": "Rotation",
+    "type": "6417",
+    "default": 0,
+    "min": null,
+    "max": null
+   },
+   {
+    "i": 9,
+    "mn": "ADBE Fractal Noise-0009",
+    "name": "Echelle uniforme",
+    "type": "6417",
+    "default": 1,
+    "min": 0,
+    "max": 1
+   },
+   {
+    "i": 10,
+    "mn": "ADBE Fractal Noise-0010",
+    "name": "Echelle",
+    "type": "6417",
+    "default": 100,
+    "min": 1,
+    "max": 10000
+   },
+   {
+    "i": 11,
+    "mn": "ADBE Fractal Noise-0011",
+    "name": "Largeur d'échelle",
+    "type": "6417",
+    "default": 100,
+    "min": 1,
+    "max": 10000
+   },
+   {
+    "i": 12,
+    "mn": "ADBE Fractal Noise-0012",
+    "name": "Hauteur d'échelle",
+    "type": "6417",
+    "default": 100,
+    "min": 1,
+    "max": 10000
+   },
+   {
+    "i": 13,
+    "mn": "ADBE Fractal Noise-0013",
+    "name": "Décalage de turbulence",
+    "type": "6415",
+    "default": [
+     320,
+     180
+    ],
+    "min": null,
+    "max": null
+   },
+   {
+    "i": 14,
+    "mn": "ADBE Fractal Noise-0031",
+    "name": "Décalage de la perspective",
+    "type": "6417",
+    "default": 0,
+    "min": 0,
+    "max": 1
+   },
+   {
+    "i": 15,
+    "mn": "ADBE Fractal Noise-0014",
+    "name": "",
+    "type": "6412",
+    "default": null,
+    "min": null,
+    "max": null
+   },
+   {
+    "i": 16,
+    "mn": "ADBE Fractal Noise-0015",
+    "name": "Complexité",
+    "type": "6417",
+    "default": 6,
+    "min": 1,
+    "max": 20
+   },
+   {
+    "i": 17,
+    "mn": "ADBE Fractal Noise-0016",
+    "name": "Sous-attributs",
+    "type": "6412",
+    "default": null,
+    "min": null,
+    "max": null
+   },
+   {
+    "i": 18,
+    "mn": "ADBE Fractal Noise-0017",
+    "name": "Sous-influence (%)",
+    "type": "6417",
+    "default": 70,
+    "min": 1.525878906e-05,
+    "max": 10000
+   },
+   {
+    "i": 19,
+    "mn": "ADBE Fractal Noise-0018",
+    "name": "Sous-échelle",
+    "type": "6417",
+    "default": 56,
+    "min": 10,
+    "max": 10000
+   },
+   {
+    "i": 20,
+    "mn": "ADBE Fractal Noise-0019",
+    "name": "Sous-rotation",
+    "type": "6417",
+    "default": 0,
+    "min": null,
+    "max": null
+   },
+   {
+    "i": 21,
+    "mn": "ADBE Fractal Noise-0020",
+    "name": "Sous-décalage",
+    "type": "6415",
+    "default": [
+     0,
+     0
+    ],
+    "min": null,
+    "max": null
+   },
+   {
+    "i": 22,
+    "mn": "ADBE Fractal Noise-0021",
+    "name": "Sous-échelle centre",
+    "type": "6417",
+    "default": 0,
+    "min": 0,
+    "max": 1
+   },
+   {
+    "i": 23,
+    "mn": "ADBE Fractal Noise-0022",
+    "name": "",
+    "type": "6412",
+    "default": null,
+    "min": null,
+    "max": null
+   },
+   {
+    "i": 24,
+    "mn": "ADBE Fractal Noise-0023",
+    "name": "Evolution",
+    "type": "6417",
+    "default": 0,
+    "min": null,
+    "max": null
+   },
+   {
+    "i": 25,
+    "mn": "ADBE Fractal Noise-0024",
+    "name": "Options d'évolution",
+    "type": "6412",
+    "default": null,
+    "min": null,
+    "max": null
+   },
+   {
+    "i": 26,
+    "mn": "ADBE Fractal Noise-0025",
+    "name": "Evolution du cycle",
+    "type": "6417",
+    "default": 0,
+    "min": 0,
+    "max": 1
+   },
+   {
+    "i": 27,
+    "mn": "ADBE Fractal Noise-0026",
+    "name": "Cycle (en révolutions)",
+    "type": "6417",
+    "default": 1,
+    "min": 1,
+    "max": 88
+   },
+   {
+    "i": 28,
+    "mn": "ADBE Fractal Noise-0027",
+    "name": "Générateur aléatoire",
+    "type": "6417",
+    "default": 0,
+    "min": 0,
+    "max": 100000
+   },
+   {
+    "i": 29,
+    "mn": "ADBE Fractal Noise-0028",
+    "name": "Générateur aléatoire",
+    "type": "6412",
+    "default": null,
+    "min": null,
+    "max": null
+   },
+   {
+    "i": 30,
+    "mn": "ADBE Fractal Noise-0029",
+    "name": "Opacité",
+    "type": "6417",
+    "default": 100,
+    "min": 0,
+    "max": 100
+   },
+   {
+    "i": 31,
+    "mn": "ADBE Fractal Noise-0030",
+    "name": "Mode de transfert",
+    "type": "6417",
+    "default": 2,
+    "min": 1,
+    "max": 21
+   },
+   {
+    "i": 32,
+    "mn": "ADBE Effect Built In Params",
+    "name": "Options de composition",
+    "type": "undefined",
+    "default": null,
+    "min": null,
+    "max": null
+   }
+  ]
+ },
+ "APC Colorama": {
+  "name": "Colorama",
+  "params": [
+   {
+    "i": 1,
+    "mn": "APC Colorama-0003",
+    "name": "Phase d'entrée",
+    "type": "6412",
+    "default": null,
+    "min": null,
+    "max": null
+   },
+   {
+    "i": 2,
+    "mn": "APC Colorama-0002",
+    "name": "Phase à partir de",
+    "type": "6417",
+    "default": 1,
+    "min": 1,
+    "max": 10
+   },
+   {
+    "i": 3,
+    "mn": "APC Colorama-0004",
+    "name": "Ajouter phase",
+    "type": "6421",
+    "default": 0,
+    "min": null,
+    "max": null
+   },
+   {
+    "i": 4,
+    "mn": "APC Colorama-0006",
+    "name": "Ajouter phase à partir de",
+    "type": "6417",
+    "default": 1,
+    "min": 1,
+    "max": 10
+   },
+   {
+    "i": 5,
+    "mn": "APC Colorama-0040",
+    "name": "Ajouter mode",
+    "type": "6417",
+    "default": 1,
+    "min": 1,
+    "max": 4
+   },
+   {
+    "i": 6,
+    "mn": "APC Colorama-0008",
+    "name": "Changement de phase",
+    "type": "6417",
+    "default": 0,
+    "min": null,
+    "max": null
+   },
+   {
+    "i": 7,
+    "mn": "APC Colorama-0015",
+    "name": "",
+    "type": "6412",
+    "default": null,
+    "min": null,
+    "max": null
+   },
+   {
+    "i": 8,
+    "mn": "APC Colorama-0017",
+    "name": "Cycle de sortie",
+    "type": "6412",
+    "default": null,
+    "min": null,
+    "max": null
+   },
+   {
+    "i": 9,
+    "mn": "APC Colorama-0010",
+    "name": "Utiliser palette préconfig.",
+    "type": "6417",
+    "default": 1,
+    "min": 1,
+    "max": 35
+   },
+   {
+    "i": 10,
+    "mn": "APC Colorama-0012",
+    "name": "Cycle de sortie",
+    "type": "6419",
+    "default": null,
+    "min": null,
+    "max": null
+   },
+   {
+    "i": 11,
+    "mn": "APC Colorama-0038",
+    "name": "Répétitions du cycle",
+    "type": "6417",
+    "default": 1,
+    "min": 0,
+    "max": 64
+   },
+   {
+    "i": 12,
+    "mn": "APC Colorama-0014",
+    "name": "Interpolation de palette",
+    "type": "6417",
+    "default": 1,
+    "min": 0,
+    "max": 1
+   },
+   {
+    "i": 13,
+    "mn": "APC Colorama-0027",
+    "name": "",
+    "type": "6412",
+    "default": null,
+    "min": null,
+    "max": null
+   },
+   {
+    "i": 14,
+    "mn": "APC Colorama-0029",
+    "name": "Modifier",
+    "type": "6412",
+    "default": null,
+    "min": null,
+    "max": null
+   },
+   {
+    "i": 15,
+    "mn": "APC Colorama-0016",
+    "name": "Modifier",
+    "type": "6417",
+    "default": 1,
+    "min": 1,
+    "max": 14
+   },
+   {
+    "i": 16,
+    "mn": "APC Colorama-0018",
+    "name": "Modifier alpha",
+    "type": "6417",
+    "default": 1,
+    "min": 0,
+    "max": 1
+   },
+   {
+    "i": 17,
+    "mn": "APC Colorama-0034",
+    "name": "Changer les pixels vides",
+    "type": "6417",
+    "default": 0,
+    "min": 0,
+    "max": 1
+   },
+   {
+    "i": 18,
+    "mn": "APC Colorama-0037",
+    "name": "",
+    "type": "6412",
+    "default": null,
+    "min": null,
+    "max": null
+   },
+   {
+    "i": 19,
+    "mn": "APC Colorama-0039",
+    "name": "Sélection de pixel",
+    "type": "6412",
+    "default": null,
+    "min": null,
+    "max": null
+   },
+   {
+    "i": 20,
+    "mn": "APC Colorama-0020",
+    "name": "Correspondance couleur",
+    "type": "6418",
+    "default": [
+     1,
+     0,
+     0,
+     1
+    ],
+    "min": -3921568.62745098,
+    "max": 3921568.62745098
+   },
+   {
+    "i": 21,
+    "mn": "APC Colorama-0022",
+    "name": "Tolérance",
+    "type": "6417",
+    "default": 0.5,
+    "min": 0,
+    "max": 1
+   },
+   {
+    "i": 22,
+    "mn": "APC Colorama-0024",
+    "name": "Lissage",
+    "type": "6417",
+    "default": 0,
+    "min": 0,
+    "max": 1
+   },
+   {
+    "i": 23,
+    "mn": "APC Colorama-0026",
+    "name": "Mode de correspondance",
+    "type": "6417",
+    "default": 1,
+    "min": 1,
+    "max": 4
+   },
+   {
+    "i": 24,
+    "mn": "APC Colorama-0049",
+    "name": "",
+    "type": "6412",
+    "default": null,
+    "min": null,
+    "max": null
+   },
+   {
+    "i": 25,
+    "mn": "APC Colorama-0051",
+    "name": "Masquage",
+    "type": "6412",
+    "default": null,
+    "min": null,
+    "max": null
+   },
+   {
+    "i": 26,
+    "mn": "APC Colorama-0028",
+    "name": "Calque de masque",
+    "type": "6421",
+    "default": 0,
+    "min": null,
+    "max": null
+   },
+   {
+    "i": 27,
+    "mn": "APC Colorama-0030",
+    "name": "Mode masque",
+    "type": "6417",
+    "default": 1,
+    "min": 1,
+    "max": 5
+   },
+   {
+    "i": 28,
+    "mn": "APC Colorama-0057",
+    "name": "",
+    "type": "6412",
+    "default": null,
+    "min": null,
+    "max": null
+   },
+   {
+    "i": 29,
+    "mn": "APC Colorama-0032",
+    "name": "Composite sur calque",
+    "type": "6417",
+    "default": 1,
+    "min": 0,
+    "max": 1
+   },
+   {
+    "i": 30,
+    "mn": "APC Colorama-0036",
+    "name": "Part de l'original",
+    "type": "6417",
+    "default": 0,
+    "min": 0,
+    "max": 100
+   },
+   {
+    "i": 31,
+    "mn": "ADBE Effect Built In Params",
+    "name": "Options de composition",
+    "type": "undefined",
+    "default": null,
+    "min": null,
+    "max": null
+   }
+  ]
+ },
+ "ADBE Posterize": {
+  "name": "Postérisation",
+  "params": [
+   {
+    "i": 1,
+    "mn": "ADBE Posterize-0001",
+    "name": "Niveau",
+    "type": "6417",
+    "default": 7,
+    "min": 2,
+    "max": 255
+   },
+   {
+    "i": 2,
+    "mn": "ADBE Effect Built In Params",
+    "name": "Options de composition",
+    "type": "undefined",
+    "default": null,
+    "min": null,
+    "max": null
+   }
+  ]
+ },
+ "ADBE Black&White": {
+  "name": "Noir et blanc",
+  "params": [
+   {
+    "i": 1,
+    "mn": "ADBE Black&White-0001",
+    "name": "Rouges",
+    "type": "6417",
+    "default": 40,
+    "min": -200,
+    "max": 300
+   },
+   {
+    "i": 2,
+    "mn": "ADBE Black&White-0002",
+    "name": "Jaunes",
+    "type": "6417",
+    "default": 60,
+    "min": -200,
+    "max": 300
+   },
+   {
+    "i": 3,
+    "mn": "ADBE Black&White-0003",
+    "name": "Verts",
+    "type": "6417",
+    "default": 40,
+    "min": -200,
+    "max": 300
+   },
+   {
+    "i": 4,
+    "mn": "ADBE Black&White-0004",
+    "name": "Cyans",
+    "type": "6417",
+    "default": 60,
+    "min": -200,
+    "max": 300
+   },
+   {
+    "i": 5,
+    "mn": "ADBE Black&White-0005",
+    "name": "Bleus",
+    "type": "6417",
+    "default": 20,
+    "min": -200,
+    "max": 300
+   },
+   {
+    "i": 6,
+    "mn": "ADBE Black&White-0006",
+    "name": "Magentas",
+    "type": "6417",
+    "default": 80,
+    "min": -200,
+    "max": 300
+   },
+   {
+    "i": 7,
+    "mn": "ADBE Black&White-0007",
+    "name": "Teinte :",
+    "type": "6417",
+    "default": 0,
+    "min": 0,
+    "max": 1
+   },
+   {
+    "i": 8,
+    "mn": "ADBE Black&White-0008",
+    "name": "Couleur de teinte",
+    "type": "6418",
+    "default": [
+     0.88235294117647,
+     0.82745098039216,
+     0.70196078431373,
+     1
+    ],
+    "min": -3921568.62745098,
+    "max": 3921568.62745098
+   },
+   {
+    "i": 9,
+    "mn": "ADBE Effect Built In Params",
+    "name": "Options de composition",
+    "type": "undefined",
+    "default": null,
+    "min": null,
+    "max": null
+   }
+  ]
+ }
+}

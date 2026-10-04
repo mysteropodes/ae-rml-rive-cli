@@ -1,0 +1,155 @@
+{
+ "slug": "motion_tile",
+ "aeMatchName": "ADBE Tile",
+ "wgsl": "ae_motion_tile.wgsl",
+ "passes": 1,
+ "textures": {},
+ "params": [
+  {
+   "ae": 1,
+   "field": "center",
+   "kind": "point",
+   "default": [
+    320,
+    180
+   ]
+  },
+  {
+   "ae": 2,
+   "field": "tileW",
+   "kind": "number",
+   "default": 100
+  },
+  {
+   "ae": 3,
+   "field": "tileH",
+   "kind": "number",
+   "default": 100
+  },
+  {
+   "ae": 4,
+   "field": "outW",
+   "kind": "number",
+   "default": 100
+  },
+  {
+   "ae": 5,
+   "field": "outH",
+   "kind": "number",
+   "default": 100
+  },
+  {
+   "ae": 6,
+   "field": "mirror",
+   "kind": "bool",
+   "default": 0
+  },
+  {
+   "ae": 7,
+   "field": "phase",
+   "kind": "angle",
+   "default": 0
+  },
+  {
+   "ae": 8,
+   "field": "hShift",
+   "kind": "bool",
+   "default": 0
+  }
+ ],
+ "notes": "Measured algorithm (pixel-exact vs AE): the tile image is built by exact area averaging (box of 100/tile% layer px per tile px, grid anchored at the tile corner = Tile Center - tile/2); tiles landing on fractional positions (Phase shifts) are placed with bilinear interpolation of that tile image; 8 bpc rounds x.5 up (shader adds +0.02/255). Horizontal Phase Shift: odd rows (row 0 holds Tile Center) move right by Phase/360 * tile width. Not measured / assumptions: vertical Phase (Horizontal Phase Shift off) mirrors the horizontal case (odd columns move down by Phase/360 * tile height); Mirror + Phase mirrors by the shifted tile index; Output Width/Height < 100 % crop symmetrically around the layer centre, > 100 % (layer expansion) is not reproduced because the shader assumes canvas = layer (the generated node's `pad` grows the canvas but Params carries no layer size, so pad must stay 0); non-integer tile sizes (e.g. 33 % of 640) use a continuous global tile-pixel grid, AE may round the tile size; tiles under ~6.7 % of the layer (footprint > 16 px) use an approximate box (8 evenly spaced bilinear taps per axis). AE 9 (Compositing Options, built-in effect opacity/masks) not reproduced.",
+ "measured": {
+  "motion_tile_0": {
+   "offline": {
+    "mean": 0.0,
+    "pct_px_gt8": 0.0,
+    "max": 0
+   },
+   "rive": {
+    "mean": 0.007,
+    "pct_px_gt8": 0.0,
+    "max": 1
+   }
+  },
+  "motion_tile_1": {
+   "offline": {
+    "mean": 0.0,
+    "pct_px_gt8": 0.0,
+    "max": 0
+   },
+   "rive": {
+    "mean": 0.007,
+    "pct_px_gt8": 0.0,
+    "max": 1
+   }
+  },
+  "motion_tile_2": {
+   "offline": {
+    "mean": 0.004,
+    "pct_px_gt8": 0.0,
+    "max": 1
+   },
+   "rive": {
+    "mean": 0.012,
+    "pct_px_gt8": 0.0,
+    "max": 2
+   }
+  }
+ },
+ "status": "exact",
+ "verified": {
+  "by": "independent check 2026-10-04 (fxlib check --rive --holdout, AE 2026 8 bpc refs)",
+  "settings": {
+   "motion_tile_0": {
+    "offline": {
+     "mean": 0.0,
+     "pct_px_gt8": 0.0,
+     "max": 0
+    },
+    "rive": {
+     "mean": 0.007,
+     "pct_px_gt8": 0.0,
+     "max": 1
+    }
+   },
+   "motion_tile_1": {
+    "offline": {
+     "mean": 0.0,
+     "pct_px_gt8": 0.0,
+     "max": 0
+    },
+    "rive": {
+     "mean": 0.007,
+     "pct_px_gt8": 0.0,
+     "max": 1
+    }
+   },
+   "motion_tile_2": {
+    "offline": {
+     "mean": 0.004,
+     "pct_px_gt8": 0.0,
+     "max": 1
+    },
+    "rive": {
+     "mean": 0.012,
+     "pct_px_gt8": 0.0,
+     "max": 2
+    }
+   },
+   "motion_tile_3 (held out)": {
+    "offline": {
+     "mean": 0.002,
+     "pct_px_gt8": 0.0,
+     "max": 1
+    },
+    "rive": {
+     "mean": 0.009,
+     "pct_px_gt8": 0.0,
+     "max": 2
+    }
+   }
+  },
+  "worst_mean_pct": 0.012,
+  "worst_pct_px_gt8": 0.0
+ }
+}

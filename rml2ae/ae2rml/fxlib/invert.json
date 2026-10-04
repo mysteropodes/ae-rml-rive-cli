@@ -1,0 +1,121 @@
+{
+ "slug": "invert",
+ "aeMatchName": "ADBE Invert",
+ "wgsl": "ae_invert.wgsl",
+ "passes": 1,
+ "textures": {},
+ "params": [
+  {
+   "ae": 1,
+   "field": "channel",
+   "kind": "enum",
+   "default": 1
+  },
+  {
+   "ae": 2,
+   "field": "blend",
+   "kind": "number",
+   "default": 0
+  }
+ ],
+ "notes": "AE 1 Channel popup indices (max 16, separators counted): 1 RGB, 2 Red, 3 Green, 4 Blue, 5 separator, 6 HLS, 7 Hue, 8 Lightness, 9 Saturation, 10 separator, 11 YIQ, 12 Luminance, 13 In Phase Chrominance, 14 Quadrature Chrominance, 15 separator, 16 Alpha (separators = pass-through). Algorithm on the STRAIGHT 8-bit colour, output premultiplied by the (possibly inverted) alpha. Bit-exact vs AE (offline, every pixel): RGB and Red (c' = 255 - c), Hue. Measured: AE's Hue invert is a MIRROR of the hue, H' = 0.5 - H (mod 1, standard HLS hue 0 = red) with L and S kept (= min/max of RGB kept): (255,3,0) -> (0,255,252); a 180 deg rotation (H + 0.5) is wrong on 70 % of the pixels. Not covered by visible refs (natural extensions, unverified): HLS = H' = 0.5 - H, L' = 1 - L, S' = 1 - S; Lightness = L' = 1 - L; Saturation = S' = 1 - S (the hue of a grey pixel is taken as 0 = red, AE's convention for greys is unknown and may differ, e.g. 90 deg if AE's hue axis is offset as the mirror suggests); YIQ family with NTSC coefficients (Y .299 .587 .114, I .596 -.274 -.322, Q .211 -.523 .312), Y' = 1 - Y, I' = -I, Q' = -Q, result clamped (YIQ = all three = exactly the RGB invert; AE may quantize Y/I/Q to 8 bits, <= ~1-2 LSB); Alpha = A' = 255 - A with the straight colour kept (fully transparent pixels -> opaque black). AE 2 Blend With Original = straight mix(inverted, original, Blend/100) rounded to 8 bits, then premultiplied (no visible ref; <= 1 LSB if AE rounds differently). Not reproduced: AE 3 Compositing Options (effect opacity / effect masks, common to all effects, not a shader parameter). Rive residual (max 1/255 on ~4-6 % of the opaque pixels, unbiased) is the Rive canvas/composite +-1 noise already seen on tint, not the shader (offline is bit-exact).",
+ "measured": {
+  "invert_0 (RGB)": {
+   "offline": {
+    "mean": 0.0,
+    "pct_px_gt8": 0.0,
+    "max": 0
+   },
+   "rive": {
+    "mean": 0.008,
+    "pct_px_gt8": 0.0,
+    "max": 1
+   }
+  },
+  "invert_1 (Hue, popup 7)": {
+   "offline": {
+    "mean": 0.0,
+    "pct_px_gt8": 0.0,
+    "max": 0
+   },
+   "rive": {
+    "mean": 0.007,
+    "pct_px_gt8": 0.0,
+    "max": 1
+   }
+  },
+  "invert_2 (Red)": {
+   "offline": {
+    "mean": 0.0,
+    "pct_px_gt8": 0.0,
+    "max": 0
+   },
+   "rive": {
+    "mean": 0.007,
+    "pct_px_gt8": 0.0,
+    "max": 1
+   }
+  },
+  "bit_exact_px_offline": {
+   "invert_0": 1.0,
+   "invert_1": 1.0,
+   "invert_2": 1.0
+  }
+ },
+ "status": "exact",
+ "verified": {
+  "by": "independent check 2026-10-04 (fxlib check --rive --holdout, AE 2026 8 bpc refs)",
+  "settings": {
+   "invert_0": {
+    "offline": {
+     "mean": 0.0,
+     "pct_px_gt8": 0.0,
+     "max": 0
+    },
+    "rive": {
+     "mean": 0.008,
+     "pct_px_gt8": 0.0,
+     "max": 1
+    }
+   },
+   "invert_1": {
+    "offline": {
+     "mean": 0.0,
+     "pct_px_gt8": 0.0,
+     "max": 0
+    },
+    "rive": {
+     "mean": 0.007,
+     "pct_px_gt8": 0.0,
+     "max": 1
+    }
+   },
+   "invert_2": {
+    "offline": {
+     "mean": 0.0,
+     "pct_px_gt8": 0.0,
+     "max": 0
+    },
+    "rive": {
+     "mean": 0.007,
+     "pct_px_gt8": 0.0,
+     "max": 1
+    }
+   },
+   "invert_3 (held out)": {
+    "offline": {
+     "mean": 0.0,
+     "pct_px_gt8": 0.0,
+     "max": 0
+    },
+    "rive": {
+     "mean": 0.011,
+     "pct_px_gt8": 0.0,
+     "max": 1
+    }
+   }
+  },
+  "worst_mean_pct": 0.011,
+  "worst_pct_px_gt8": 0.0
+ }
+}

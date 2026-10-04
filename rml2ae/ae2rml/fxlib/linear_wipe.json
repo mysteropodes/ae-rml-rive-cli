@@ -1,0 +1,73 @@
+{
+ "slug": "linear_wipe",
+ "aeMatchName": "ADBE Linear Wipe",
+ "wgsl": "ae_linear_wipe.wgsl",
+ "passes": 3,
+ "textures": {
+  "origTex": "original"
+ },
+ "params": [
+  {
+   "ae": 1,
+   "field": "completion",
+   "kind": "number",
+   "default": 0
+  },
+  {
+   "ae": 2,
+   "field": "angle",
+   "kind": "angle",
+   "default": 90
+  },
+  {
+   "ae": 3,
+   "field": "feather",
+   "kind": "number",
+   "default": 0
+  }
+ ],
+ "notes": "Measured on AE 2026 8 bpc. Direction d = (sin A, -cos A) (Angle 90 wipes from the left), t = d.p with p in layer px and pixel i covering [i, i+1]; edge e = tmin + Completion/100 * (tmax - tmin), tmin/tmax = t of the layer corners (40 % at 90 deg on 640 px: x < 256 wiped, bit-exact); pixels with t < e are wiped. The hard edge is anti-aliased by exact pixel-area coverage, then Feather = AE's Fast Blur of that matte: per axis three iterated fractional boxes of radius 0.369 x Feather (the Fast Blur (Legacy) law; free fit 14.8 at Feather 40, a Gaussian fits clearly worse); the matte is unbounded (not cropped to the layer). Output alpha = round(alpha8 * matte) (rounding measured: flooring is 1 low on 28k px), straight colour kept, premultiplied (c8 * a + 127) div 255. Not covered by a visible ref: whether AE extends the travel range by the feather (here it does NOT: at 0 % / 100 % half of the feather ramp stays at the far corner; both refs are at 0 feather or 50 %, where it cancels), and AA of fractional hard edges. The matte depends only on z = t(centre) - e: pass 0 tabulates the horizontal blur h(z), pass 1 the vertical blur g(z) of h (16384 entries over the ramp, 16-bit packed in the first texels of the canvas), pass 2 looks g up per pixel and composites with origTex (checked against a numpy model at 0/-45/135/200/270 deg: max 1-2/255 = supersampling of the model). Kernels wider than 255 taps are sampled every ceil(taps/255) px (Feather > ~225, approximation). tmin/tmax are taken from the canvas size (= the layer when fxPad = 0; with fxPad > 0 the travel range grows by the pad: harness limitation, the shader does not know the layer rect). AE 4 Compositing Options not reproduced. Rive residuals (max 1-2/255, mean <= 0.008 %) are the Rive canvas/composite +-1 noise already documented on tint/invert, not the shader.",
+ "measured": {
+  "linear_wipe_0 (40 %)": {
+   "offline": {
+    "mean": 0.0,
+    "pct_px_gt8": 0.0,
+    "max": 0
+   },
+   "rive": {
+    "mean": 0.005,
+    "pct_px_gt8": 0.0,
+    "max": 1
+   }
+  },
+  "linear_wipe_1 (50 %, 30 deg, Feather 40)": {
+   "offline": {
+    "mean": 0.002,
+    "pct_px_gt8": 0.0,
+    "max": 1
+   },
+   "rive": {
+    "mean": 0.005,
+    "pct_px_gt8": 0.0,
+    "max": 2
+   }
+  }
+ },
+ "status": "exact",
+ "verified": {
+  "by": "independent check 2026-10-04 (fxlib check --rive --holdout, AE 2026 8 bpc refs)",
+  "settings": {
+   "linear_wipe_2 (held out)": {
+    "offline": {
+     "mean": 0.002,
+     "max": 1
+    },
+    "rive": {
+     "mean": 0.004,
+     "max": 2
+    }
+   }
+  },
+  "note": "held out 60 %, 200°, feather 20: exact — the feather does not extend the travel range (the open question of the author)"
+ }
+}

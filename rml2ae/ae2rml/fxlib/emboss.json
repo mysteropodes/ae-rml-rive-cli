@@ -1,0 +1,116 @@
+{
+ "slug": "emboss",
+ "aeMatchName": "ADBE Emboss",
+ "wgsl": "ae_emboss.wgsl",
+ "passes": 1,
+ "textures": {},
+ "params": [
+  {
+   "ae": 1,
+   "field": "direction",
+   "kind": "angle",
+   "default": 45
+  },
+  {
+   "ae": 2,
+   "field": "relief",
+   "kind": "number",
+   "default": 1
+  },
+  {
+   "ae": 3,
+   "field": "contrast",
+   "kind": "number",
+   "default": 100
+  },
+  {
+   "ae": 4,
+   "field": "blend",
+   "kind": "number",
+   "default": 0
+  }
+ ],
+ "notes": "Algorithm measured (kernel least-squares fit on the AE refs, then a bit-exact numpy emulation): per RGB channel on the premultiplied colour, out = clamp(128 + Contrast/100 * (S(p+v) - S(p-v)), 0, 255) * alpha/255, alpha unchanged; v = Relief * (sin Direction, -cos Direction) px (0 deg = up, clockwise); S = AE 8 bpc bilinear sample (weights rounded to 1/256, integer sum, rounded half up to 8 bits), transparent outside the layer (no edge repeat). Colours are NOT desaturated (AE's Emboss works per channel). Blend With Original = linear mix with the untouched premultiplied layer (not covered by the visible refs). Not reproduced: Compositing Options (AE 5: effect opacity / effect masks); the rounding of Contrast/100 * D when it is fractional (e.g. Contrast 150) is unknown, the shader leaves it to the 8-bit output (<= 1 LSB); in 16/32 bpc AE projects the samples are not quantized to 8 bits (<= 1 LSB of D times Contrast/100). Remaining offline mismatches are 1 LSB of D on ~0.1 % of the pixels (AE fixed-point details). Rive's canvas render of the source differs from the PNG by 1 LSB on ~1 % of the pixels on some runs (run-to-run), which moves D by 1.",
+ "measured": {
+  "emboss_0 (defaults: 45 deg, relief 1, contrast 100)": {
+   "offline": {
+    "mean": 0.0,
+    "pct_px_gt8": 0.0,
+    "max": 1
+   },
+   "rive": {
+    "mean": 0.0,
+    "pct_px_gt8": 0.0,
+    "max": 1,
+    "worst_run": {
+     "mean": 0.007,
+     "max": 2
+    }
+   }
+  },
+  "emboss_1 (120 deg, relief 3, contrast 200)": {
+   "offline": {
+    "mean": 0.001,
+    "pct_px_gt8": 0.0,
+    "max": 4
+   },
+   "rive": {
+    "mean": 0.001,
+    "pct_px_gt8": 0.0,
+    "max": 4,
+    "worst_run": {
+     "mean": 0.009,
+     "max": 4
+    }
+   }
+  },
+  "bit_exact_px_offline": {
+   "emboss_0": 0.999,
+   "emboss_1": 0.9987
+  }
+ },
+ "status": "exact",
+ "verified": {
+  "by": "independent check 2026-10-04 (fxlib check --rive --holdout, AE 2026 8 bpc refs)",
+  "settings": {
+   "emboss_0": {
+    "offline": {
+     "mean": 0.0,
+     "pct_px_gt8": 0.0,
+     "max": 1
+    },
+    "rive": {
+     "mean": 0.007,
+     "pct_px_gt8": 0.0,
+     "max": 2
+    }
+   },
+   "emboss_1": {
+    "offline": {
+     "mean": 0.001,
+     "pct_px_gt8": 0.0,
+     "max": 4
+    },
+    "rive": {
+     "mean": 0.009,
+     "pct_px_gt8": 0.0,
+     "max": 4
+    }
+   },
+   "emboss_2 (held out)": {
+    "offline": {
+     "mean": 0.138,
+     "pct_px_gt8": 0.0,
+     "max": 3
+    },
+    "rive": {
+     "mean": 0.183,
+     "pct_px_gt8": 0.0,
+     "max": 3
+    }
+   }
+  },
+  "worst_mean_pct": 0.183,
+  "worst_pct_px_gt8": 0.0
+ }
+}

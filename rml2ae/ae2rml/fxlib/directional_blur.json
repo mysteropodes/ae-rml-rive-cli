@@ -1,0 +1,67 @@
+{
+ "slug": "directional_blur",
+ "aeMatchName": "ADBE Motion Blur",
+ "wgsl": "ae_directional_blur.wgsl",
+ "passes": 1,
+ "textures": {},
+ "params": [
+  {
+   "ae": 1,
+   "field": "direction",
+   "kind": "angle",
+   "default": 90
+  },
+  {
+   "ae": 2,
+   "field": "blurLength",
+   "kind": "number",
+   "default": 10
+  }
+ ],
+ "notes": "",
+ "measured": {},
+ "status": "exact",
+ "verified": {
+  "by": "independent check 2026-10-04 (fxlib check --rive --holdout, AE 2026 8 bpc refs)",
+  "settings": {
+   "directional_blur_0": {
+    "offline": {
+     "mean": 0.01,
+     "pct_px_gt8": 0.0,
+     "max": 1
+    },
+    "rive": {
+     "mean": 0.021,
+     "pct_px_gt8": 0.0,
+     "max": 2
+    }
+   },
+   "directional_blur_1": {
+    "offline": {
+     "mean": 0.016,
+     "pct_px_gt8": 0.0,
+     "max": 1
+    },
+    "rive": {
+     "mean": 0.03,
+     "pct_px_gt8": 0.0,
+     "max": 2
+    }
+   },
+   "directional_blur_2 (held out)": {
+    "offline": {
+     "mean": 0.061,
+     "pct_px_gt8": 0.025,
+     "max": 21
+    },
+    "rive": {
+     "mean": 0.084,
+     "pct_px_gt8": 0.027,
+     "max": 21
+    }
+   }
+  },
+  "worst_mean_pct": 0.084,
+  "worst_pct_px_gt8": 0.027
+ }
+}

@@ -1,0 +1,94 @@
+{
+ "slug": "corner_pin",
+ "aeMatchName": "ADBE Corner Pin",
+ "wgsl": "ae_corner_pin.wgsl",
+ "passes": 1,
+ "textures": {},
+ "params": [
+  {
+   "ae": 1,
+   "field": "ul",
+   "kind": "point",
+   "default": [
+    0,
+    0
+   ]
+  },
+  {
+   "ae": 2,
+   "field": "ur",
+   "kind": "point",
+   "default": [
+    640,
+    0
+   ]
+  },
+  {
+   "ae": 3,
+   "field": "ll",
+   "kind": "point",
+   "default": [
+    0,
+    360
+   ]
+  },
+  {
+   "ae": 4,
+   "field": "lr",
+   "kind": "point",
+   "default": [
+    640,
+    360
+   ]
+  }
+ ],
+ "notes": "Measured algorithm (pixel-exact vs AE 2026, 8 bpc): projective (perspective) homography taking the layer rectangle (0,0)-(W,H) onto the quad UL/UR/LR/LL, with pixel centres at INTEGER coordinates in both spaces (output pixel i has coordinate i, not i+0.5; the bilinear fit with .5 centres was off by ~0.15 px). Each output pixel is mapped back through the inverse homography and the layer is AREA-SAMPLED with an axis-aligned box centred on the mapped point whose size is the bounding box of the output pixel's footprint in the layer (width = |dsx/dx| + |dsx/dy|, height = |dsy/dx| + |dsy/dy|, analytic Jacobian of the inverse map), exact pixel coverage, transparent outside the layer: edge ramps measured 1.35 px wide on the slanted left edge and 1.15 px on top/bottom, exactly the L1 footprint (a hypot footprint or plain bilinear/bicubic are clearly worse: bilinear 0.13 mean / 2 % > 8). Plain round-to-nearest 8-bit output (a round-half-up bias measured worse). Default points (layer corners) = identity, bit-exact. Assumptions / not measured: magnification (footprint < 1 px) keeps a 1 px box (= bilinear) — the visible ref only has footprints 1.14..1.35; quads that are concave or self-intersecting (bow-tie) put the projective horizon inside the layer: points whose forward denominator is <= 0 are left transparent (AE's rendering of such quads unknown); boxes wider than 24 layer px per axis (quad < ~1/24 of the layer) use 12 evenly spaced bilinear taps per axis (approximate box, max 7 levels off vs the exact box); boxes up to 8x8 texels read texels with exact float weights, larger ones (<= 24 px) use the GPU bilinear filter to merge texel pairs (<= 144 taps). In AE the pinned layer can spill outside the layer bounds; here the output is clipped to the canvas (= layer) because the shader maps the whole canvas: the generated node's `pad` must stay 0 (with pad > 0 the points are offset by pad but the layer rectangle is taken as the padded canvas — fxlib passes no layer size/pad to Params). Not reproduced: AE 5 Compositing Options (effect opacity / effect masks).",
+ "measured": {
+  "corner_pin_0": {
+   "offline": {
+    "mean": 0.0,
+    "pct_px_gt8": 0.0,
+    "max": 1
+   },
+   "rive": {
+    "mean": 0.006,
+    "pct_px_gt8": 0.0,
+    "max": 2
+   }
+  },
+  "offline_mean_unrounded": 0.0005,
+  "rive_vs_offline_extra": "magnified (corners outside the layer), tiny 30x16 quad (24 px boxes), strong perspective: Rive vs offline mean <= 0.01, max 1; shader vs numpy exact-box model on identity / magnify / shrink / perspective / affine / mirrored quads: mean <= 0.0002, max 1"
+ },
+ "status": "exact",
+ "verified": {
+  "by": "independent check 2026-10-04 (fxlib check --rive --holdout, AE 2026 8 bpc refs)",
+  "settings": {
+   "corner_pin_0": {
+    "offline": {
+     "mean": 0.0,
+     "pct_px_gt8": 0.0,
+     "max": 1
+    },
+    "rive": {
+     "mean": 0.006,
+     "pct_px_gt8": 0.0,
+     "max": 2
+    }
+   },
+   "corner_pin_1 (held out)": {
+    "offline": {
+     "mean": 0.012,
+     "pct_px_gt8": 0.112,
+     "max": 23
+    },
+    "rive": {
+     "mean": 0.019,
+     "pct_px_gt8": 0.09,
+     "max": 20
+    }
+   }
+  },
+  "worst_mean_pct": 0.019,
+  "worst_pct_px_gt8": 0.112
+ }
+}

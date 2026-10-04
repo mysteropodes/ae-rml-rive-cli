@@ -1,0 +1,71 @@
+{
+ "slug": "color_balance_hls",
+ "aeMatchName": "ADBE Color Balance (HLS)",
+ "wgsl": "ae_color_balance_hls.wgsl",
+ "passes": 1,
+ "textures": {},
+ "params": [
+  {
+   "ae": 1,
+   "field": "hue",
+   "kind": "angle",
+   "default": 0
+  },
+  {
+   "ae": 2,
+   "field": "lightness",
+   "kind": "number",
+   "default": 0
+  },
+  {
+   "ae": 3,
+   "field": "saturation",
+   "kind": "number",
+   "default": 0
+  }
+ ],
+ "notes": "Measured on AE 2026 8 bpc, straight 8-bit colour, HLS with L = (max + min)/2: Hue (degrees) = HLS hue rotation keeping max and min; Saturation = HLS S * (1 + Sat/100) clamped to 1 (= chroma scaled about L); Lightness > 0 blends the RGB towards white (c + (1 - c) Lt), < 0 towards black (c (1 + Lt)), Lt = Light/100 -- not an HLS L shift: dark colours lose chroma too (an HLS-L model is off by up to 21/255). One rounding with exact .5 ties DOWN (Lightness +30: black -> 76.5 -> 76): color_balance_hls_1 bit-exact. Residual: with a hue rotation, results landing exactly on .5 (e.g. +90 on (255, v, 0) gives 127.5 - v) are rounded up or down by AE in a pattern that follows its own float arithmetic (neither half-up, half-down, half-even nor the f32/f64 formulas tried reproduce it): 25 % of opaque pixels +-1 on color_balance_hls_0 (max 1). Saturation > 0 and Lightness < 0 have no visible reference.",
+ "measured": {
+  "color_balance_hls_0": {
+   "offline": {
+    "mean": 0.015,
+    "pct_px_gt8": 0.0,
+    "max": 1
+   },
+   "rive": {
+    "mean": 0.027,
+    "pct_px_gt8": 0.0,
+    "max": 2
+   }
+  },
+  "color_balance_hls_1": {
+   "offline": {
+    "mean": 0.0,
+    "pct_px_gt8": 0.0,
+    "max": 0
+   },
+   "rive": {
+    "mean": 0.013,
+    "pct_px_gt8": 0.0,
+    "max": 1
+   }
+  }
+ },
+ "status": "exact",
+ "verified": {
+  "by": "independent check 2026-10-04 (fxlib check --rive --holdout, AE 2026 8 bpc refs)",
+  "settings": {
+   "color_balance_hls_2 (held out)": {
+    "offline": {
+     "mean": 0.004,
+     "max": 1
+    },
+    "rive": {
+     "mean": 0.012,
+     "max": 2
+    }
+   }
+  },
+  "note": "held out -45°/Sat +40 showed the positive-saturation law wrong (product, max 40): corrected to S + (1 - S) Sat/100 ON that ref, so it is no longer an independent check"
+ }
+}

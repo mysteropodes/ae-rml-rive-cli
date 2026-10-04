@@ -1,0 +1,157 @@
+{
+ "slug": "glow",
+ "aeMatchName": "ADBE Glo2",
+ "wgsl": "ae_glow.wgsl",
+ "passes": 2,
+ "textures": {
+  "origTex": "original"
+ },
+ "params": [
+  {
+   "ae": 1,
+   "field": "basedOn",
+   "kind": "enum",
+   "default": 2
+  },
+  {
+   "ae": 2,
+   "field": "threshold",
+   "kind": "number",
+   "default": 153
+  },
+  {
+   "ae": 3,
+   "field": "radius",
+   "kind": "number",
+   "default": 10
+  },
+  {
+   "ae": 4,
+   "field": "intensity",
+   "kind": "number",
+   "default": 1
+  },
+  {
+   "ae": 5,
+   "field": "composite",
+   "kind": "enum",
+   "default": 2
+  },
+  {
+   "ae": 6,
+   "field": "operation",
+   "kind": "enum",
+   "default": 3
+  },
+  {
+   "ae": 7,
+   "field": "colors",
+   "kind": "enum",
+   "default": 1
+  },
+  {
+   "ae": 8,
+   "field": "looping",
+   "kind": "enum",
+   "default": 3
+  },
+  {
+   "ae": 9,
+   "field": "cycles",
+   "kind": "number",
+   "default": 1
+  },
+  {
+   "ae": 10,
+   "field": "phase",
+   "kind": "angle",
+   "default": 0
+  },
+  {
+   "ae": 11,
+   "field": "midpoint",
+   "kind": "number",
+   "default": 0.5
+  },
+  {
+   "ae": 12,
+   "field": "colorA",
+   "kind": "color",
+   "default": [
+    1,
+    1,
+    1,
+    1
+   ]
+  },
+  {
+   "ae": 13,
+   "field": "colorB",
+   "kind": "color",
+   "default": [
+    0,
+    0,
+    0,
+    1
+   ]
+  },
+  {
+   "ae": 14,
+   "field": "dims",
+   "kind": "enum",
+   "default": 1
+  }
+ ],
+ "notes": "Measured on AE 2026 8 bpc (3 visible settings: Radius 20; Threshold 100 / Radius 40 / Intensity 2; A & B Colors orange/blue Radius 25; all Composite Original Behind + Glow Operation Add, Dimensions H&V). Threshold = SOFT linear ramp t(x) = clamp((x - Threshold)/30.6 + 0.5, 0, 1) on 0..255 values (free-form transfer fits: ramp 137..168 at 153, 85..116 at 100; width constant ~30-33 levels, not proportional to the threshold). Original Colors: each STRAIGHT channel thresholded on its own then premultiplied (s_c = t(c)*alpha); glow alpha = blurred layer alpha (unthresholded: opaque black areas glow in alpha only). A & B Colors: a single glow value from the Rec.601 luminance of the PREMULTIPLIED colour (Rec.709 / mean / straight luminance fit clearly worse: the half-transparent cyan circle does not glow), glow = colour(v)*v with alpha v; Triangle A>B>A (1 cycle, phase 0, midpoint 0.5) measured as colour = mix(B, A, 1 - |2v - 1|) (B where the glow is faint and where it saturates, A at v = 0.5). Blur = separable Gaussian sigma = 0.404*Radius truncated at |x| <= ceil(Radius) - 1 (free-kernel fits: AE uses integer weights /256 of that Gaussian; alpha profiles within 1-2 levels), transparent plane. Intensity multiplies the blurred colour glow AFTER the blur and the result is limited by the glow alpha: glow = (min(I*blur(s_c), blur(alpha)), blur(alpha)) (at the layer edge an Intensity-2 glow saturates to the alpha; deep inside it doubles - both measured). Composite (exact, including half-transparent pixels): L = original + glow (premultiplied add = AE's separable blend rule with unclipped Add, alpha = union), result = L over the original (so a half-transparent original counts twice: alpha = 1 - (1-ao)^2 (1-ag)), colour clipped to alpha. Residuals: Intensity 2 / Radius 40 leaves up to 11 levels (mean 0.12 %) in a few interior spots (the dark hole inside the white ring gets ~5-7 levels more glow in AE, slightly bluish; no global bias, kernel and ramp re-fits do not remove it: an AE mechanism not identified). NOT covered by the refs (implemented as best guesses): Glow Based On Alpha Channel (source = premultiplied colour * t(alpha)); Arbitrary Map (falls back to A & B colours); Color Looping 1/2/4, Color Loops, Color Phase, A & B Midpoint (phase = cycles of v + phase/360, midpoint = gamma on the A weight); Intensity with A & B Colors (v' = min(I*v, 1)); Composite Original On Top (original over L) and None (glow alone); Glow Operation None (= original), other operations via the _ae_fx_mix.wgsl W3C formulas through AE's separable blend rule, assumed menu order 1 None, 2 Normal, 3 Add, 4 Multiply, 5 Screen, 6 Overlay, 7 Soft Light, 8 Hard Light, 9 Linear Light, 10 Vivid Light, 11 Pin Light, 12 Color Dodge, 13 Classic Color Dodge, 14 Linear Dodge, 15 Color Burn, 16 Classic Color Burn, 17 Linear Burn, 18 Darken, 19 Lighten, 20 Difference, 21 Classic Difference, 22 Exclusion, 23 Hue, 24 Saturation, 25 Color (verify against AE's menu); Glow Dimensions Horizontal / Vertical (one-axis blur). 2 passes: pass 0 horizontal blur of the sources (RGBA8, 8-bit intermediate: <= ~1 level, x Intensity), A & B value as 16 bits in R,G; pass 1 vertical blur + intensity + colours + composite with origTex. Above 513 taps per axis (Radius > ~257) taps are strided (approximation). The glow spills outside the content: give the node fxPad >= Radius if the content touches the layer edge (AE's behaviour at the layer edge unmeasured). Not reproduced: Compositing Options (AE 15).",
+ "measured": {
+  "glow_0 (Radius 20)": {
+   "offline": {
+    "mean": 0.046,
+    "pct_px_gt8": 0.0,
+    "max": 4
+   },
+   "rive": {
+    "mean": 0.058,
+    "pct_px_gt8": 0.0,
+    "max": 4
+   }
+  },
+  "glow_1 (Threshold 100, Radius 40, Intensity 2)": {
+   "offline": {
+    "mean": 0.119,
+    "pct_px_gt8": 0.059,
+    "max": 11
+   },
+   "rive": {
+    "mean": 0.15,
+    "pct_px_gt8": 0.059,
+    "max": 11
+   }
+  },
+  "glow_2 (A & B Colors orange/blue, Radius 25)": {
+   "offline": {
+    "mean": 0.055,
+    "pct_px_gt8": 0.0,
+    "max": 8
+   },
+   "rive": {
+    "mean": 0.073,
+    "pct_px_gt8": 0.0,
+    "max": 8
+   }
+  }
+ },
+ "status": "close",
+ "verified": {
+  "by": "independent check 2026-10-04 (fxlib check --holdout, offline wgpu vs AE 2026 8 bpc refs)",
+  "settings": {
+   "glow_3 (held out)": {
+    "offline": {
+     "mean": 0.057,
+     "max": 7
+    }
+   }
+  },
+  "note": "same residual family as glow_1 (a few interior spots, 5-11 levels)"
+ }
+}

@@ -1,0 +1,70 @@
+{
+ "slug": "cc_scale_wipe",
+ "aeMatchName": "CC Scale Wipe",
+ "wgsl": "ae_cc_scale_wipe.wgsl",
+ "passes": 1,
+ "textures": {},
+ "params": [
+  {
+   "ae": 1,
+   "field": "stretch",
+   "kind": "number",
+   "default": 0
+  },
+  {
+   "ae": 2,
+   "field": "center",
+   "kind": "point",
+   "default": [
+    320,
+    180
+   ]
+  },
+  {
+   "ae": 3,
+   "field": "direction",
+   "kind": "angle",
+   "default": 50
+  }
+ ],
+ "notes": "Measured pixel-exact (max 1 level) on AE 2026 8 bpc (Stretch 40 / Direction 50, Stretch -30 / Direction 120, Center default): smear direction d = (sin th, -cos th) (Direction th clockwise from up), reversed for negative Stretch; the half-plane behind the line through Center perpendicular to d is untouched; at distance u > 0 past that line a pixel reads the source at distance g(u) = u / (1 + u*|Stretch|/R) along d (same perpendicular offset), R = half the layer DIAGONAL sqrt(w^2+h^2)/2 (the fitted saturation length L*|Stretch| = 367.155 for both settings; half diagonal of 640x360 = 367.151). Center is a pixel centre (AE point (x,y) = pixel-corner coordinates (x+0.5, y+0.5)): the -30/120 setting needs exactly that half-pixel shift (0.68 px along d), the 40/50 setting is insensitive. Source read with bilinear interpolation of the premultiplied pixels, transparent outside the layer. Stretch 0 = identity. The half-diagonal law is fitted on one layer size (640x360): it could instead be another size-derived length that coincides here (e.g. not checked on non-16:9 layers). R is computed from the canvas size, so the node's fxPad must stay 0 (a pad would change R; the effect never draws outside the layer). Held-out setting (Stretch 60, Center 200,200) not inspected. Not reproduced: Compositing Options (AE 4).",
+ "measured": {
+  "cc_scale_wipe_0 (Stretch 40, Direction 50)": {
+   "offline": {
+    "mean": 0.0,
+    "pct_px_gt8": 0.0,
+    "max": 1
+   },
+   "rive": {
+    "mean": 0.008,
+    "pct_px_gt8": 0.0,
+    "max": 2
+   }
+  },
+  "cc_scale_wipe_1 (Stretch -30, Direction 120)": {
+   "offline": {
+    "mean": 0.0,
+    "pct_px_gt8": 0.0,
+    "max": 1
+   },
+   "rive": {
+    "mean": 0.009,
+    "pct_px_gt8": 0.0,
+    "max": 2
+   }
+  }
+ },
+ "status": "exact",
+ "verified": {
+  "by": "independent check 2026-10-04 (fxlib check --holdout, offline wgpu vs AE 2026 8 bpc refs)",
+  "settings": {
+   "cc_scale_wipe_2 (held out)": {
+    "offline": {
+     "mean": 0.0,
+     "max": 1
+    }
+   }
+  },
+  "note": "R now = half the layer diagonal from P.layerRect (fxPad-safe); the half-diagonal law holds with a moved centre"
+ }
+}

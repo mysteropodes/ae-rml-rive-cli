@@ -1,0 +1,133 @@
+{
+ "slug": "displacement_map",
+ "aeMatchName": "ADBE Displacement Map",
+ "wgsl": "ae_displacement_map.wgsl",
+ "passes": 1,
+ "textures": {
+  "mapTex": "map"
+ },
+ "textureParams": {
+  "mapTex": 1
+ },
+ "params": [
+  {
+   "ae": 2,
+   "field": "hChan",
+   "kind": "enum",
+   "default": 1
+  },
+  {
+   "ae": 3,
+   "field": "hMax",
+   "kind": "number",
+   "default": 5
+  },
+  {
+   "ae": 4,
+   "field": "vChan",
+   "kind": "enum",
+   "default": 2
+  },
+  {
+   "ae": 5,
+   "field": "vMax",
+   "kind": "number",
+   "default": 5
+  },
+  {
+   "ae": 6,
+   "field": "behavior",
+   "kind": "enum",
+   "default": 1
+  },
+  {
+   "ae": 7,
+   "field": "wrap",
+   "kind": "bool",
+   "default": 0
+  },
+  {
+   "ae": 8,
+   "field": "expand",
+   "kind": "bool",
+   "default": 1
+  }
+ ],
+ "notes": "AE 1 Displacement Map Layer is the layer reference -> textures.mapTex (role 'map'; textureParams maps it back to AE param 1). Measured model (exact): out(x,y) = bilinear(premultiplied layer, x + dx, y + dy), transparent outside the layer, dx = MaxH*(V-128)/128, dy = MaxV*(V'-128)/128, V = 8-bit value of the chosen map channel at the same pixel (not (V-127.5)/127.5, not 2*(v-0.5)). Popup order 1 Red 2 Green 3 Blue 4 Alpha 5 Luminance 6 Hue 7 Lightness 8 Saturation 9 Full 10 Half 11 Off. Luminance = round(0.299R+0.587G+0.114B) on the straight colour (measured on AE Shift Channels' Luminance, 99.99 % exact; not measured on this effect). NOT measured: Hue/Lightness/Saturation (HLS of the straight map colour), Full/Half/Off taken as constant channel values 255/128/0 (Half = no displacement, Off = -Max, like Shift Channels' constants; if AE's Off actually means 'no displacement', change case 11 to return 128), Wrap Pixels Around (implemented as a modulo wrap of the bilinear taps), Displacement Map Behavior for a map of a different size (Center = centred, no displacement outside the map; Stretch = nearest-scaled map; Tile = modulo) — in the generated Rive node the map artboard is rendered into a layer-sized canvas so textureDimensions(mapTex) == size and the 3 modes coincide. Expand Output (AE 8) only grows the AE layer bounds; with a layer-sized canvas it has no visible effect and with pad > 0 the shader cannot tell the layer rect from the pad (Wrap then wraps around the padded canvas). Map layer effects/masks/transforms: the shader uses whatever the map artboard renders.",
+ "measured": {
+  "displacement_map_0": {
+   "offline": {
+    "mean": 0.001,
+    "pct_px_gt8": 0.0,
+    "max": 1
+   },
+   "rive": {
+    "mean": 0.008,
+    "pct_px_gt8": 0.0,
+    "max": 2
+   }
+  },
+  "displacement_map_1": {
+   "offline": {
+    "mean": 0.001,
+    "pct_px_gt8": 0.0,
+    "max": 1
+   },
+   "rive": {
+    "mean": 0.008,
+    "pct_px_gt8": 0.0,
+    "max": 2
+   }
+  },
+  "rive_run_to_run": "Rive screenshots vary between runs by +-1 on ~4 % of pixels (0.001 or 0.008 mean)",
+  "luminance_5_5_12_12_rive_vs_offline": {
+   "mean": 0.012,
+   "pct_px_gt8": 0.089,
+   "max": 35
+  }
+ },
+ "status": "close",
+ "verified": {
+  "by": "independent check 2026-10-04 (fxlib check --rive --holdout, AE 2026 8 bpc refs)",
+  "settings": {
+   "displacement_map_0": {
+    "offline": {
+     "mean": 0.001,
+     "pct_px_gt8": 0.0,
+     "max": 1
+    },
+    "rive": {
+     "mean": 0.008,
+     "pct_px_gt8": 0.0,
+     "max": 2
+    }
+   },
+   "displacement_map_1": {
+    "offline": {
+     "mean": 0.001,
+     "pct_px_gt8": 0.0,
+     "max": 1
+    },
+    "rive": {
+     "mean": 0.008,
+     "pct_px_gt8": 0.0,
+     "max": 2
+    }
+   },
+   "displacement_map_2 (held out)": {
+    "offline": {
+     "mean": 0.064,
+     "pct_px_gt8": 1.253,
+     "max": 48
+    },
+    "rive": {
+     "mean": 0.08,
+     "pct_px_gt8": 1.251,
+     "max": 48
+    }
+   }
+  },
+  "worst_mean_pct": 0.08,
+  "worst_pct_px_gt8": 1.253
+ }
+}

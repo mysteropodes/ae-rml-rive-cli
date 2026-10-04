@@ -1,0 +1,66 @@
+{
+ "slug": "gaussian_blur_legacy",
+ "aeMatchName": "ADBE Gaussian Blur",
+ "wgsl": "ae_gaussian_blur_legacy.wgsl",
+ "passes": 2,
+ "textures": {},
+ "params": [
+  {
+   "ae": 1,
+   "field": "blurriness",
+   "kind": "number",
+   "default": 0
+  },
+  {
+   "ae": 2,
+   "field": "dims",
+   "kind": "enum",
+   "default": 1
+  }
+ ],
+ "notes": "Measured on AE 2026 8 bpc: 'Gaussian Blur (Legacy)' (ADBE Gaussian Blur) is NOT a Gaussian: its renders at Blurriness 10 and 25 are pixel-identical (0 difference over the whole frame) to Fast Blur (Legacy) (ADBE Fast Blur) with Repeat Edge Pixels OFF, and an independent fit confirms it (edge step-response kurtosis 2.60 = three boxes; best 3-box radius rho = 0.370 * Blurriness at both settings, vs 0.369 for fast_blur_legacy). Model: per axis, THREE iterated box blurs of the PREMULTIPLIED colour, each of fractional radius rho = 0.369 * Blurriness (weight 1 on |x| <= floor(rho), frac(rho) at floor(rho)+1), horizontal then vertical, on an unbounded transparent plane (no Repeat Edge Pixels option in this effect). The shader is ae_fast_blur_legacy.wgsl with repeatEdge forced off (exact b*b*b composite kernel per axis, one RGBA8 rounding per axis instead of AE's per-box rounding: <= 2 LSB). Large blurs: direct taps up to Blurriness ~130, exact bilinear pairs up to ~265, then a strided coarse kernel (approximation). Blur Dimensions 2/3 (Horizontal/Vertical only) are not covered by the refs (inherited from fast_blur_legacy, checked there against the numpy model). AE grows the layer by the blur: give the node a pad >= 3*(floor(0.369*Blurriness)+1) px when the content reaches the layer edge. Not reproduced: Compositing Options (AE 3).",
+ "measured": {
+  "gaussian_blur_legacy_0 (Blurriness 10)": {
+   "offline": {
+    "mean": 0.018,
+    "pct_px_gt8": 0.0,
+    "max": 2
+   },
+   "rive": {
+    "mean": 0.03,
+    "pct_px_gt8": 0.0,
+    "max": 3
+   }
+  },
+  "gaussian_blur_legacy_1 (Blurriness 25)": {
+   "offline": {
+    "mean": 0.027,
+    "pct_px_gt8": 0.0,
+    "max": 2
+   },
+   "rive": {
+    "mean": 0.044,
+    "pct_px_gt8": 0.0,
+    "max": 3
+   }
+  },
+  "ae_ref_vs_fast_blur_legacy_ae_ref (Blurriness 10 and 25)": {
+   "mean": 0.0,
+   "pct_px_gt8": 0.0,
+   "max": 0
+  }
+ },
+ "status": "exact",
+ "verified": {
+  "by": "independent check 2026-10-04 (fxlib check --holdout, offline wgpu vs AE 2026 8 bpc refs)",
+  "settings": {
+   "gaussian_blur_legacy_2 (held out)": {
+    "offline": {
+     "mean": 0.022,
+     "max": 2
+    }
+   }
+  },
+  "note": "same kernel as Fast Blur (legacy), confirmed on a third blurriness"
+ }
+}

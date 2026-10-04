@@ -1,0 +1,109 @@
+{
+ "slug": "tint",
+ "aeMatchName": "ADBE Tint",
+ "wgsl": "ae_tint.wgsl",
+ "passes": 1,
+ "textures": {},
+ "params": [
+  {
+   "ae": 1,
+   "field": "mapBlack",
+   "kind": "color",
+   "default": [
+    0,
+    0,
+    0,
+    1
+   ]
+  },
+  {
+   "ae": 2,
+   "field": "mapWhite",
+   "kind": "color",
+   "default": [
+    1,
+    1,
+    1,
+    1
+   ]
+  },
+  {
+   "ae": 3,
+   "field": "amount",
+   "kind": "number",
+   "default": 100
+  }
+ ],
+ "notes": "Bit-exact algorithm (straight 8-bit, as AE): L8 = round(255*(0.299 R + 0.587 G + 0.114 B)) (Rec.601, rounded to 8 bits BEFORE the ramp); colours quantised round-half-up; tinted = round(black + (white - black) * L8/255); out = round(lerp(orig, tinted, Amount/100)); alpha untouched, then premultiplied. Only residual offline: 1 pixel at an exact luma tie (188,14,255 -> AE 93, float noise). Amount < 100 has no visible ref: the lerp/rounding order is the natural one (<= 1/255 if AE rounds differently). AE 4 'Swap Colors' is a button (no value, no image effect) and AE 5 'Compositing Options' (effect opacity / masks, common to all effects) are not parameters of the shader. Colour alpha is ignored (AE colours have none). Rive residuals are not from the shader: fxlib.argb_hex uses Python round() (half-to-even) so 0.3*255 = 76.5 -> 76 instead of AE's 77 (blue channel -1 on tint_1), and the Rive composite adds a +-1 dither-like noise on ~2-3 % of pixels (reproduced with a constant-colour shader; it toggles with unrelated inputs).",
+ "measured": {
+  "tint_0": {
+   "offline": {
+    "mean": 0.0,
+    "pct_px_gt8": 0.0,
+    "max": 1
+   },
+   "rive": {
+    "mean": 0.01,
+    "pct_px_gt8": 0.0,
+    "max": 1
+   }
+  },
+  "tint_1": {
+   "offline": {
+    "mean": 0.0,
+    "pct_px_gt8": 0.0,
+    "max": 1
+   },
+   "rive": {
+    "mean": 0.05,
+    "pct_px_gt8": 0.0,
+    "max": 2
+   }
+  },
+  "offline_px_off": "1 pixel per setting (exact luma tie), off by 1/255"
+ },
+ "status": "exact",
+ "verified": {
+  "by": "independent check 2026-10-04 (fxlib check --rive --holdout, AE 2026 8 bpc refs)",
+  "settings": {
+   "tint_0": {
+    "offline": {
+     "mean": 0.0,
+     "pct_px_gt8": 0.0,
+     "max": 1
+    },
+    "rive": {
+     "mean": 0.01,
+     "pct_px_gt8": 0.0,
+     "max": 1
+    }
+   },
+   "tint_1": {
+    "offline": {
+     "mean": 0.0,
+     "pct_px_gt8": 0.0,
+     "max": 1
+    },
+    "rive": {
+     "mean": 0.05,
+     "pct_px_gt8": 0.0,
+     "max": 2
+    }
+   },
+   "tint_2 (held out)": {
+    "offline": {
+     "mean": 0.002,
+     "pct_px_gt8": 0.0,
+     "max": 1
+    },
+    "rive": {
+     "mean": 0.013,
+     "pct_px_gt8": 0.0,
+     "max": 1
+    }
+   }
+  },
+  "worst_mean_pct": 0.05,
+  "worst_pct_px_gt8": 0.0
+ }
+}

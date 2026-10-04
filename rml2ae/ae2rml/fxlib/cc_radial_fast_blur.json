@@ -1,0 +1,85 @@
+{
+ "slug": "cc_radial_fast_blur",
+ "aeMatchName": "CC Radial Fast Blur",
+ "wgsl": "ae_cc_radial_fast_blur.wgsl",
+ "passes": 64,
+ "textures": {
+  "origTex": "original"
+ },
+ "params": [
+  {
+   "ae": 1,
+   "field": "center",
+   "kind": "point",
+   "default": [
+    320,
+    180
+   ]
+  },
+  {
+   "ae": 2,
+   "field": "amount",
+   "kind": "number",
+   "default": 50
+  },
+  {
+   "ae": 3,
+   "field": "zoom",
+   "kind": "enum",
+   "default": 1
+  }
+ ],
+ "notes": "Zoom popup (plug-in resources): 1 Standard, 2 Brightest, 3 Darkest. Measured model: a recursive (IIR) filter run outward from Center over square (Chebyshev) rings — the decay per pixel along 45 deg rays is 1/sqrt(2) of the axis rate, the giveaway. Pixel p at m = max(|dx|,|dy|) reads q = p - d/m in the already filtered output (the minor coordinate linearly interpolated between the two pixels of that column/row; this repeated interpolation softens the streaks sideways and matters: a straight ray sum is 2-3x worse). Standard: out = (1-w) src + w out(q); Brightest/Darkest: the same mix kept only where its R+G+B is larger/smaller than the source pixel's (per pixel, not per channel). Ring m < 1 = the layer. w(m) = W - 1.43/m^1.19 (>= 0), W = exp(-0.1003*(-ln(Amount/100))^0.976) (Amount 50 -> 0.9323, 60 -> 0.9493, 80 -> 0.9771, fitted per reference; c and the exponent were consistent across the three). Output truncated (floor) to 8 bits; intermediates are float in AE. GPU form: 64 passes; pass i finalises rings [iK, (i+1)K), K = ceil((max ring+1)/64); each pixel re-runs the recursion over its dependency cone (<= 28 levels) from rings final in the previous pass, which reproduces the numpy ring-scan reference within 1 level. Intermediates are RGBA8 storing floor(); reads add half a level. Layers needing K > 16 (max ring > ~1024 px, e.g. 2048+ px wide with a centred Center) fall back to a single-pass ray march without the sideways interpolation (numpy estimate on the refs: Standard 0.17 % mean / 1.1 % px > 8). Residuals: Brightest/Darkest decision flips on near-ties (max ~90 on ~0.2 % px); Darkest worst near Center. Only these 3 Amounts were measured: the Amount -> W law outside 50..80 is extrapolated. Cost: up to ~ (1.5K)^2/2 texel loads per pixel once, plus 64 full-screen copy passes.",
+ "measured": {
+  "cc_radial_fast_blur_0": {
+   "offline": {
+    "mean": 0.073,
+    "pct_px_gt8": 0.001,
+    "max": 23
+   },
+   "rive": {
+    "mean": 0.1,
+    "pct_px_gt8": 0.002,
+    "max": 23
+   }
+  },
+  "cc_radial_fast_blur_1": {
+   "offline": {
+    "mean": 0.116,
+    "pct_px_gt8": 0.212,
+    "max": 88
+   },
+   "rive": {
+    "mean": 0.143,
+    "pct_px_gt8": 0.214,
+    "max": 88
+   }
+  },
+  "cc_radial_fast_blur_2": {
+   "offline": {
+    "mean": 0.031,
+    "pct_px_gt8": 0.232,
+    "max": 92
+   },
+   "rive": {
+    "mean": 0.048,
+    "pct_px_gt8": 0.233,
+    "max": 92
+   }
+  }
+ },
+ "status": "close",
+ "verified": {
+  "by": "independent check 2026-10-04 (fxlib check --holdout, offline wgpu vs AE 2026 8 bpc refs)",
+  "settings": {
+   "cc_radial_fast_blur_3 (held out)": {
+    "offline": {
+     "mean": 0.06,
+     "pct_px_gt8": 0.021,
+     "max": 12
+    }
+   }
+  },
+  "note": "Amount 30 with a moved centre: holds"
+ }
+}

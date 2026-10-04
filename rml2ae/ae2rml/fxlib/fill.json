@@ -1,0 +1,71 @@
+{
+ "slug": "fill",
+ "aeMatchName": "ADBE Fill",
+ "wgsl": "ae_fill.wgsl",
+ "passes": 1,
+ "textures": {},
+ "params": [
+  {
+   "ae": 3,
+   "field": "color",
+   "kind": "color",
+   "default": [
+    1,
+    0,
+    0,
+    1
+   ]
+  },
+  {
+   "ae": 7,
+   "field": "opacity",
+   "kind": "number",
+   "default": 1
+  }
+ ],
+ "notes": "masks options (1, 2, 4, 5, 6) not reproduced",
+ "status": "exact",
+ "verified": {
+  "by": "independent check 2026-10-04 (fxlib check --rive --holdout, AE 2026 8 bpc refs)",
+  "settings": {
+   "fill_0": {
+    "offline": {
+     "mean": 0.0,
+     "pct_px_gt8": 0.0,
+     "max": 0
+    },
+    "rive": {
+     "mean": 0.006,
+     "pct_px_gt8": 0.0,
+     "max": 1
+    }
+   },
+   "fill_1": {
+    "offline": {
+     "mean": 0.0,
+     "pct_px_gt8": 0.0,
+     "max": 0
+    },
+    "rive": {
+     "mean": 0.0,
+     "pct_px_gt8": 0.0,
+     "max": 0
+    }
+   },
+   "fill_2 (held out)": {
+    "offline": {
+     "mean": 0.06,
+     "pct_px_gt8": 0.0,
+     "max": 1
+    },
+    "rive": {
+     "mean": 0.008,
+     "pct_px_gt8": 0.0,
+     "max": 1
+    }
+   }
+  },
+  "worst_mean_pct": 0.06,
+  "worst_pct_px_gt8": 0.0
+ }
+}

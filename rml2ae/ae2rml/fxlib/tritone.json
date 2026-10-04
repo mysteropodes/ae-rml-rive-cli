@@ -1,0 +1,91 @@
+{
+ "slug": "tritone",
+ "aeMatchName": "ADBE Tritone",
+ "wgsl": "ae_tritone.wgsl",
+ "passes": 1,
+ "textures": {},
+ "params": [
+  {
+   "ae": 1,
+   "field": "highlights",
+   "kind": "color",
+   "default": [
+    1,
+    1,
+    1,
+    1
+   ]
+  },
+  {
+   "ae": 2,
+   "field": "midtones",
+   "kind": "color",
+   "default": [
+    0.49803921568627,
+    0.3921568627451,
+    0.27450980392157,
+    1
+   ]
+  },
+  {
+   "ae": 3,
+   "field": "shadows",
+   "kind": "color",
+   "default": [
+    0,
+    0,
+    0,
+    1
+   ]
+  },
+  {
+   "ae": 4,
+   "field": "blend",
+   "kind": "number",
+   "default": 0
+  }
+ ],
+ "notes": "Algorithm measured on AE 2026 8 bpc, straight 8-bit colour: L = 0.299 R + 0.587 G + 0.114 B in float (NOT rounded to 8 bits, unlike Tint); the three colours are used as floats (quantising them to 8 bits first breaks tritone_1 on 53 % of the pixels); out = L < 0.5 ? mix(Shadows, Midtones, 2L) : mix(Midtones, Highlights, 2L - 1); one half-up rounding at the end; alpha untouched. Double precision gives 0 mismatches on the opaque pixels; f32 leaves 1-2 exact-tie pixels (+-1). Units: colours straight 0..1 (alpha ignored, AE stores alpha 0 in the defaults), Blend With Original 0..100 % (lerp tritone -> original; no visible reference). Residuals: semi-transparent pixels (alpha 128) are +-1 because the offline input is premultiplied (straight 200 at alpha 128 comes back as 199); Rive: colours pass through fxlib.argb_hex (8-bit, Python half-to-even: 0.7 -> 178 instead of AE's float 178.5), hence tritone_1 rive mean 0.055 / max 2, plus the usual +-1 Rive composite noise.",
+ "measured": {
+  "tritone_0": {
+   "offline": {
+    "mean": 0.002,
+    "pct_px_gt8": 0.0,
+    "max": 1
+   },
+   "rive": {
+    "mean": 0.011,
+    "pct_px_gt8": 0.0,
+    "max": 1
+   }
+  },
+  "tritone_1": {
+   "offline": {
+    "mean": 0.005,
+    "pct_px_gt8": 0.0,
+    "max": 1
+   },
+   "rive": {
+    "mean": 0.055,
+    "pct_px_gt8": 0.0,
+    "max": 2
+   }
+  }
+ },
+ "status": "exact",
+ "verified": {
+  "by": "independent check 2026-10-04 (fxlib check --rive --holdout, AE 2026 8 bpc refs)",
+  "settings": {
+   "tritone_2 (held out)": {
+    "offline": {
+     "mean": 0.002,
+     "max": 1
+    },
+    "rive": {
+     "mean": 0.012,
+     "max": 1
+    }
+   }
+  }
+ }
+}

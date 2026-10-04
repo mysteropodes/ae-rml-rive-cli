@@ -1,0 +1,89 @@
+{
+ "slug": "optics_compensation",
+ "aeMatchName": "ADBE Optics Compensation",
+ "wgsl": "ae_optics_compensation.wgsl",
+ "passes": 1,
+ "textures": {},
+ "params": [
+  {
+   "ae": 1,
+   "field": "fov",
+   "kind": "number",
+   "default": 0
+  },
+  {
+   "ae": 2,
+   "field": "reverse",
+   "kind": "bool",
+   "default": 0
+  },
+  {
+   "ae": 3,
+   "field": "orientation",
+   "kind": "enum",
+   "default": 1
+  },
+  {
+   "ae": 4,
+   "field": "center",
+   "kind": "point",
+   "default": [
+    320,
+    180
+   ]
+  },
+  {
+   "ae": 5,
+   "field": "optimal",
+   "kind": "bool",
+   "default": 0
+  },
+  {
+   "ae": 6,
+   "field": "resize",
+   "kind": "enum",
+   "default": 1
+  }
+ ],
+ "notes": "Measured model: F = L / tan(FOV/2), L = half layer width (FOV Orientation 1; 2 Vertical = half height and 3 Diagonal = half diagonal are inferred, not measured). Output pixel centre at radius r from Center samples the layer at s = r / sqrt(1 - (r/F)^2) (normal; r >= F transparent) or s = r / sqrt(1 + (r/F)^2) (Reverse Lens Distortion, exact inverse), bilinear on premultiplied pixels with centres at +0.5, transparent outside the layer. F was confirmed by a radial ray fit (554.15 vs 554.26 predicted) and a full-image scan. Reverse: exact (max 1). Normal: exact wherever the map minifies by less than ~1.2x; at the content edges far from Center (radial minification ~1.5x) AE filters differently (its edge ramps are ~1.4 source px wide, like an area filter, but area/box, mip and supersampled filters were all worse overall), giving up to 44 levels on 0.2 % of the pixels. Not reproduced: AE 5 Optimal Pixels, AE 6 Resize Layer (popup Off|Max 2X|Max 4X|Unlimited; the canvas is the layer). Reference length uses the canvas size: keep fxPad = 0.",
+ "measured": {
+  "optics_compensation_0": {
+   "offline": {
+    "mean": 0.015,
+    "pct_px_gt8": 0.195,
+    "max": 44
+   },
+   "rive": {
+    "mean": 0.02,
+    "pct_px_gt8": 0.17,
+    "max": 44
+   }
+  },
+  "optics_compensation_1": {
+   "offline": {
+    "mean": 0.005,
+    "pct_px_gt8": 0.0,
+    "max": 1
+   },
+   "rive": {
+    "mean": 0.015,
+    "pct_px_gt8": 0.0,
+    "max": 2
+   }
+  }
+ },
+ "status": "close",
+ "verified": {
+  "by": "independent check 2026-10-04 (fxlib check --holdout, offline wgpu vs AE 2026 8 bpc refs)",
+  "settings": {
+   "optics_compensation_2 (held out)": {
+    "offline": {
+     "mean": 0.07,
+     "pct_px_gt8": 0.872,
+     "max": 95
+    }
+   }
+  },
+  "note": "FOV 90: AE's edge softening (not reproduced) grows with the FOV — 0.9 % of pixels > 8 levels"
+ }
+}

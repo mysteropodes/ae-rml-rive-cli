@@ -1,0 +1,127 @@
+{
+ "slug": "turbulent_displace",
+ "aeMatchName": "ADBE Turbulent Displace",
+ "wgsl": "ae_turbulent_displace.wgsl",
+ "passes": 1,
+ "textures": {},
+ "params": [
+  {
+   "ae": 1,
+   "field": "displacement",
+   "kind": "enum",
+   "default": 1
+  },
+  {
+   "ae": 2,
+   "field": "amount",
+   "kind": "number",
+   "default": 50
+  },
+  {
+   "ae": 3,
+   "field": "noiseSize",
+   "kind": "number",
+   "default": 100
+  },
+  {
+   "ae": 4,
+   "field": "offset",
+   "kind": "point",
+   "default": [
+    320,
+    180
+   ]
+  },
+  {
+   "ae": 5,
+   "field": "complexity",
+   "kind": "number",
+   "default": 1
+  },
+  {
+   "ae": 6,
+   "field": "evolution",
+   "kind": "angle",
+   "default": 0
+  },
+  {
+   "ae": 8,
+   "field": "cycleEvolution",
+   "kind": "bool",
+   "default": 0
+  },
+  {
+   "ae": 9,
+   "field": "cycleRevolutions",
+   "kind": "number",
+   "default": 1
+  },
+  {
+   "ae": 10,
+   "field": "randomSeed",
+   "kind": "number",
+   "default": 0
+  },
+  {
+   "ae": 12,
+   "field": "pinning",
+   "kind": "enum",
+   "default": 3
+  },
+  {
+   "ae": 13,
+   "field": "resizeLayer",
+   "kind": "bool",
+   "default": 0
+  },
+  {
+   "ae": 14,
+   "field": "antialiasing",
+   "kind": "enum",
+   "default": 1
+  }
+ ],
+ "notes": "NOT pixel-matching: AE's fractal-noise generator (lattice hash, interpolation) is proprietary; this shader is a statistically matched stand-in (cubic B-spline value noise, lattice 1.12 Size, AE fractal defaults for Complexity octaves), so the warp has AE's scale, strength, edge pinning and parameter behaviour but a different pattern — expect large per-pixel errors (13 % mean on the refs) while the look (wave size and amplitude of the displaced edges) is comparable. Model (from the earlier fit recorded in the shader header): D(p) = Amount/100 * Size * N((p - Offset)/Size); Pin All fades the component perpendicular to each layer edge with smoothstep over 0.84 Size. Popups from the plug-in strings: Displacement 1 Turbulent, 2 Bulge, 3 Twist, 4 (-, 5/6/7 Smoother versions, 8 (-, 9 Vertical, 10 Horizontal, 11 Cross; Pinning 1 None, 2 (-, 3 All, 4 Horizontal, 5 Vertical, 6 Left, 7 Right, 8 Top, 9 Bottom, 10 (-, 11..17 Locked versions (this pass fixed a Right/Top swap in the shader); Antialiasing 1 Low, 2 High. Unverified: Bulge/Twist/Smoother modes, Pin Horizontal = top+bottom edges, Evolution/Cycle/Random Seed behaviour (only the statistics are meaningful), separators 4/8 (rendered as Turbulent), Resize Layer.",
+ "measured": {
+  "turbulent_displace_0": {
+   "offline": {
+    "mean": 13.48,
+    "pct_px_gt8": 57.055,
+    "max": 255
+   },
+   "rive": {
+    "mean": 14.961,
+    "pct_px_gt8": 56.844,
+    "max": 255
+   }
+  },
+  "turbulent_displace_1": {
+   "offline": {
+    "mean": 12.877,
+    "pct_px_gt8": 59.736,
+    "max": 255
+   },
+   "rive": {
+    "mean": 14.59,
+    "pct_px_gt8": 59.421,
+    "max": 255
+   }
+  }
+ },
+ "status": "approx",
+ "verified": {
+  "by": "independent check 2026-10-04 (fxlib check --holdout, offline wgpu vs AE 2026 8 bpc refs)",
+  "settings": {
+   "turbulent_displace_2 (held out)": {
+    "offline": {
+     "mean": 10.24,
+     "pct_px_gt8": 49.3,
+     "max": 255
+    }
+   }
+  },
+  "note": "AE's noise is proprietary: same wave size / strength / pinning, different pattern"
+ },
+ "auto": false,
+ "auto_note": "not applied by ae2rml (04/10): its stand-in noise is a different pattern — Shape_01 went 0.05 % -> 0.8 % from AE with it, the layer undisplaced is closer"
+}

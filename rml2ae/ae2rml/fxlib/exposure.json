@@ -1,0 +1,164 @@
+{
+ "slug": "exposure",
+ "aeMatchName": "ADBE Exposure2",
+ "wgsl": "ae_exposure.wgsl",
+ "passes": 1,
+ "textures": {},
+ "params": [
+  {
+   "ae": 1,
+   "field": "channels",
+   "kind": "enum",
+   "default": 1
+  },
+  {
+   "ae": 3,
+   "field": "exposure",
+   "kind": "number",
+   "default": 0
+  },
+  {
+   "ae": 4,
+   "field": "offset",
+   "kind": "number",
+   "default": 0
+  },
+  {
+   "ae": 5,
+   "field": "gammaCorr",
+   "kind": "number",
+   "default": 1
+  },
+  {
+   "ae": 8,
+   "field": "redExposure",
+   "kind": "number",
+   "default": 0
+  },
+  {
+   "ae": 9,
+   "field": "redOffset",
+   "kind": "number",
+   "default": 0
+  },
+  {
+   "ae": 10,
+   "field": "redGamma",
+   "kind": "number",
+   "default": 1
+  },
+  {
+   "ae": 13,
+   "field": "greenExposure",
+   "kind": "number",
+   "default": 0
+  },
+  {
+   "ae": 14,
+   "field": "greenOffset",
+   "kind": "number",
+   "default": 0
+  },
+  {
+   "ae": 15,
+   "field": "greenGamma",
+   "kind": "number",
+   "default": 1
+  },
+  {
+   "ae": 18,
+   "field": "blueExposure",
+   "kind": "number",
+   "default": 0
+  },
+  {
+   "ae": 19,
+   "field": "blueOffset",
+   "kind": "number",
+   "default": 0
+  },
+  {
+   "ae": 20,
+   "field": "blueGamma",
+   "kind": "number",
+   "default": 1
+  },
+  {
+   "ae": 22,
+   "field": "bypassLinear",
+   "kind": "bool",
+   "default": 0
+  }
+ ],
+ "notes": "Exact model measured on AE 2026 8 bpc (full 0..255 LUT, 0 mismatches in both visible settings): un-premultiply, c^2.4 (pure 2.4 power, not piecewise sRGB), *2^Exposure + Offset, max(0)^(1/Gamma), ^(1/2.4), clamp, re-premultiply; alpha untouched; fully transparent pixels stay 0. Bypass Linear Light Conversion (22) skips both 2.4 powers. Individual Channels (1 = 2) uses only the per-channel groups (Master ignored) - assumed from the AE UI, not measured against an AE render; same for Bypass (22). Unverified edge cases: a negative intermediate (negative Offset) is clamped to 0 before the gamma (identical for 8 bpc output whether AE clamps or uses a sign-preserving pow); AE in 32 bpc would keep values above 1 / below 0 (not reproduced, the Rive canvas is 8 bpc). Group headers 2/6/7/11/12/16/17/21 and Compositing Options (23) are not image parameters.",
+ "measured": {
+  "exposure_0": {
+   "offline": {
+    "mean": 0.0,
+    "pct_px_gt8": 0.0,
+    "max": 0
+   },
+   "rive": {
+    "mean": 0.006,
+    "pct_px_gt8": 0.0,
+    "max": 1
+   }
+  },
+  "exposure_1": {
+   "offline": {
+    "mean": 0.0,
+    "pct_px_gt8": 0.0,
+    "max": 0
+   },
+   "rive": {
+    "mean": 0.012,
+    "pct_px_gt8": 0.0,
+    "max": 1
+   }
+  }
+ },
+ "status": "exact",
+ "verified": {
+  "by": "independent check 2026-10-04 (fxlib check --rive --holdout, AE 2026 8 bpc refs)",
+  "settings": {
+   "exposure_0": {
+    "offline": {
+     "mean": 0.0,
+     "pct_px_gt8": 0.0,
+     "max": 0
+    },
+    "rive": {
+     "mean": 0.006,
+     "pct_px_gt8": 0.0,
+     "max": 1
+    }
+   },
+   "exposure_1": {
+    "offline": {
+     "mean": 0.0,
+     "pct_px_gt8": 0.0,
+     "max": 0
+    },
+    "rive": {
+     "mean": 0.012,
+     "pct_px_gt8": 0.0,
+     "max": 1
+    }
+   },
+   "exposure_2 (held out)": {
+    "offline": {
+     "mean": 0.0,
+     "pct_px_gt8": 0.0,
+     "max": 0
+    },
+    "rive": {
+     "mean": 0.005,
+     "pct_px_gt8": 0.0,
+     "max": 1
+    }
+   }
+  },
+  "worst_mean_pct": 0.012,
+  "worst_pct_px_gt8": 0.0
+ }
+}

@@ -1,0 +1,148 @@
+{
+ "slug": "drop_shadow",
+ "aeMatchName": "ADBE Drop Shadow",
+ "wgsl": "ae_drop_shadow.wgsl",
+ "passes": 2,
+ "textures": {
+  "origTex": "original"
+ },
+ "params": [
+  {
+   "ae": 1,
+   "field": "color",
+   "kind": "color",
+   "default": [
+    0,
+    0,
+    0,
+    1
+   ]
+  },
+  {
+   "ae": 2,
+   "field": "opacity",
+   "kind": "number",
+   "default": 127.5
+  },
+  {
+   "ae": 3,
+   "field": "direction",
+   "kind": "angle",
+   "default": 135
+  },
+  {
+   "ae": 4,
+   "field": "distance",
+   "kind": "number",
+   "default": 5
+  },
+  {
+   "ae": 5,
+   "field": "softness",
+   "kind": "number",
+   "default": 0
+  },
+  {
+   "ae": 6,
+   "field": "shadowOnly",
+   "kind": "bool",
+   "default": 0
+  }
+ ],
+ "notes": "Algorithm measured on AE 2026 8 bpc: shadow alpha = Opacity/255 * blur(layer alpha shifted by (trunc(d*sin th), trunc(-d*cos th))) (offset truncated toward zero to whole pixels, th = Direction from up, clockwise); blur = 3 successive box blurs, separable, fractional radius r = 0.1846*Softness (r = n+f: taps -n..n weight 1, +-(n+1) weight f; Softness 30 fits exactly with r in [5.534, 5.542]); shadow colour = Shadow Color rgb (its alpha ignored); output = original + shadow*(1 - original alpha), or the shadow alone when Shadow Only = 1. Pass 0 = horizontal blur stored as 16-bit packed in R,G (Rive keeps intermediate passes in RGBA8), pass 1 = vertical blur + tint + composite with origTex. Residual <= 1-2 levels comes from AE's integer arithmetic (some half-levels rounded down). Not reproduced: AE 7 Compositing Options (effect opacity / effect masks). Above 255 taps per axis (Softness > ~220 px) the taps are strided (approximation, still smooth). The shadow spills outside the layer in AE: in Rive give the node a `pad` >= |offset| + 3*(r+1) to see it.",
+ "measured": {
+  "drop_shadow_0": {
+   "offline": {
+    "mean": 0.001,
+    "pct_px_gt8": 0.0,
+    "max": 1
+   },
+   "rive": {
+    "mean": 0.007,
+    "pct_px_gt8": 0.0,
+    "max": 2
+   }
+  },
+  "drop_shadow_1": {
+   "offline": {
+    "mean": 0.005,
+    "pct_px_gt8": 0.0,
+    "max": 1
+   },
+   "rive": {
+    "mean": 0.016,
+    "pct_px_gt8": 0.0,
+    "max": 2
+   }
+  },
+  "drop_shadow_2": {
+   "offline": {
+    "mean": 0.0,
+    "pct_px_gt8": 0.0,
+    "max": 0
+   },
+   "rive": {
+    "mean": 0.0,
+    "pct_px_gt8": 0.0,
+    "max": 0
+   }
+  },
+  "rive_vs_offline_extra": "Shadow Only orange 200deg/12px/soft 20, cyan 300deg/40px/soft 400 (strided), d 0, white 90deg/3.9px: Rive vs offline mean <= 0.011, max 2"
+ },
+ "status": "exact",
+ "verified": {
+  "by": "independent check 2026-10-04 (fxlib check --rive --holdout, AE 2026 8 bpc refs)",
+  "settings": {
+   "drop_shadow_0": {
+    "offline": {
+     "mean": 0.001,
+     "pct_px_gt8": 0.0,
+     "max": 1
+    },
+    "rive": {
+     "mean": 0.007,
+     "pct_px_gt8": 0.0,
+     "max": 2
+    }
+   },
+   "drop_shadow_1": {
+    "offline": {
+     "mean": 0.005,
+     "pct_px_gt8": 0.0,
+     "max": 1
+    },
+    "rive": {
+     "mean": 0.016,
+     "pct_px_gt8": 0.0,
+     "max": 2
+    }
+   },
+   "drop_shadow_2": {
+    "offline": {
+     "mean": 0.0,
+     "pct_px_gt8": 0.0,
+     "max": 0
+    },
+    "rive": {
+     "mean": 0.0,
+     "pct_px_gt8": 0.0,
+     "max": 0
+    }
+   },
+   "drop_shadow_3 (held out)": {
+    "offline": {
+     "mean": 0.001,
+     "pct_px_gt8": 0.0,
+     "max": 1
+    },
+    "rive": {
+     "mean": 0.008,
+     "pct_px_gt8": 0.0,
+     "max": 2
+    }
+   }
+  },
+  "worst_mean_pct": 0.016,
+  "worst_pct_px_gt8": 0.0
+ }
+}

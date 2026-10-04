@@ -1,0 +1,112 @@
+{
+ "slug": "fast_blur_legacy",
+ "aeMatchName": "ADBE Fast Blur",
+ "wgsl": "ae_fast_blur_legacy.wgsl",
+ "passes": 2,
+ "textures": {},
+ "params": [
+  {
+   "ae": 1,
+   "field": "blurriness",
+   "kind": "number",
+   "default": 0
+  },
+  {
+   "ae": 2,
+   "field": "dims",
+   "kind": "enum",
+   "default": 1
+  },
+  {
+   "ae": 3,
+   "field": "repeatEdge",
+   "kind": "bool",
+   "default": 1
+  }
+ ],
+ "notes": "Algorithm measured on the AE refs (alpha step response at the layer edges, then whole-image least-squares fits of candidate models): per axis, THREE iterated box blurs of the PREMULTIPLIED colour, horizontal first then vertical; each box has a fractional radius rho = 0.369 * Blurriness px (weight 1 for |x| <= floor(rho), frac(rho) at floor(rho)+1, total width 2 rho + 1; fitted coefficient 0.369 +- 0.0002, no offset, same at Blurriness 10 and 25). Gaussian, 2/4/5-box and integer-radius 3-box models fit clearly worse. With Repeat Edge Pixels OFF, AE blurs on an unbounded transparent plane: the three box passes are not cropped to the layer (cropping each box costs up to 4 LSB near the canvas corner at Blurriness 25). AE rounds to 8 bits after every box (bit-level emulation: mean 0.006 / 0.017 %, max 1-2). The shader does 2 passes (pass 0 = horizontal, pass 1 = vertical) with the exact composite kernel b*b*b (built by walking its third difference, 16 impulses), so it rounds only once per axis (RGBA8 intermediate): <= 2 LSB from AE. Cost: 6 floor(rho) + 7 taps per pass, direct up to 300 taps (Blurriness <= ~132), exact bilinear pairs up to 600 taps (<= ~268), beyond that a coarse kernel sampled every G px (approximation: ~0.15 % mean difference from the exact kernel at Blurriness 400-1000; AE may also change algorithm at such sizes, unmeasured). Blur Dimensions 2 (Horizontal) / 3 (Vertical) skip the other pass (checked against the numpy model, not against AE refs). Repeat Edge Pixels ON (the AE default) = clamp-to-edge source, extended once before the blur (unverified vs AE: the visible refs all have it OFF; AE could instead clamp between its box passes, which would only differ within ~3 rho px of the layer edges). Wrapper notes for ae2rml: with Repeat Edge Pixels OFF AE grows the layer by the blur, so the node's pad should be >= 3 * (floor(0.369 * Blurriness) + 1) px when the content reaches the layer edges; with Repeat Edge Pixels ON keep pad = 0 (a transparent pad would be the 'edge' that gets repeated). Not reproduced: Compositing Options (AE 4: effect opacity / effect masks; effect opacity can be mapped to the node's amount). 16/32 bpc AE projects do not quantize between boxes (sub-LSB difference).",
+ "measured": {
+  "fast_blur_legacy_0 (Blurriness 10, Repeat Edge Pixels off)": {
+   "offline": {
+    "mean": 0.018,
+    "pct_px_gt8": 0.0,
+    "max": 2
+   },
+   "rive": {
+    "mean": 0.03,
+    "pct_px_gt8": 0.0,
+    "max": 3
+   }
+  },
+  "fast_blur_legacy_1 (Blurriness 25, Repeat Edge Pixels off)": {
+   "offline": {
+    "mean": 0.027,
+    "pct_px_gt8": 0.0,
+    "max": 2
+   },
+   "rive": {
+    "mean": 0.044,
+    "pct_px_gt8": 0.0,
+    "max": 3
+   }
+  },
+  "rive_vs_offline (Blurriness 16/10/200/400, dims 1/2/3, repeat edge 0/1)": {
+   "mean_max": 0.009,
+   "max": 1
+  },
+  "numpy_bit_model_per_box_rounding_vs_ae": {
+   "fast_blur_legacy_0": {
+    "mean": 0.006,
+    "max": 2
+   },
+   "fast_blur_legacy_1": {
+    "mean": 0.017,
+    "max": 1
+   }
+  }
+ },
+ "status": "exact",
+ "verified": {
+  "by": "independent check 2026-10-04 (fxlib check --rive --holdout, AE 2026 8 bpc refs)",
+  "settings": {
+   "fast_blur_legacy_0": {
+    "offline": {
+     "mean": 0.018,
+     "pct_px_gt8": 0.0,
+     "max": 2
+    },
+    "rive": {
+     "mean": 0.03,
+     "pct_px_gt8": 0.0,
+     "max": 3
+    }
+   },
+   "fast_blur_legacy_1": {
+    "offline": {
+     "mean": 0.027,
+     "pct_px_gt8": 0.0,
+     "max": 2
+    },
+    "rive": {
+     "mean": 0.044,
+     "pct_px_gt8": 0.0,
+     "max": 3
+    }
+   },
+   "fast_blur_legacy_2 (held out)": {
+    "offline": {
+     "mean": 0.022,
+     "pct_px_gt8": 0.0,
+     "max": 2
+    },
+    "rive": {
+     "mean": 0.035,
+     "pct_px_gt8": 0.0,
+     "max": 2
+    }
+   }
+  },
+  "worst_mean_pct": 0.044,
+  "worst_pct_px_gt8": 0.0
+ }
+}

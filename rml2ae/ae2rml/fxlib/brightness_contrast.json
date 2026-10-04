@@ -1,0 +1,83 @@
+{
+ "slug": "brightness_contrast",
+ "aeMatchName": "ADBE Brightness & Contrast 2",
+ "wgsl": "ae_brightness_contrast.wgsl",
+ "passes": 1,
+ "textures": {},
+ "params": [
+  {
+   "ae": 1,
+   "field": "brightness",
+   "kind": "number",
+   "default": 0
+  },
+  {
+   "ae": 2,
+   "field": "contrast",
+   "kind": "number",
+   "default": 0
+  },
+  {
+   "ae": 3,
+   "field": "legacy",
+   "kind": "bool",
+   "default": 0
+  }
+ ],
+ "notes": "Non-legacy (Photoshop/Camera Raw PV2003 curve) model, measured on AE 2026 8 bpc as per-channel LUTs on the straight 8-bit colour (each LUT is unique per input level, alpha untouched), brightness curve then contrast curve, one half-up rounding. Brightness B > 0: m = exp(0.0063 B); y = m x up to y = 0.5, then a cubic Hermite shoulder from (0.5/m, 0.5) slope m to (1, 1) slope s1 = 1/(1 + 12 (m - 1)) (B = 40: the linear part is exact for m in [1.28659, 1.28666] and the knee is exactly at y = 0.5). Brightness B < 0: the inverse function of the |B| curve (y = x/m up to x = 0.5, then the inverted shoulder, solved by bisection). Contrast C: a = 0.0076 C (C = 50 exact for a in [0.37995, 0.3810]); per half a parabola, lower u = 2x, y = ((1 - a) u + a u^2)/2, upper half mirrored (curve antisymmetric about 0.5, measured). The exp law, the slope law (12) and the brightness-then-contrast order were fitted jointly on brightness_contrast_0 (B 40) and brightness_contrast_2 (B -30, C -40): 1 LUT entry off by 1 in total. Extrapolation: |B| > ~140 makes the shoulder overshoot 1 (clamped). Use Legacy (AE 3 = 1) is NOT measured: Photoshop legacy formula y = x + B/255, then (y - 0.5) * f + 0.5 with f = 1 + C/100 (C < 0) or 1/(1 - C/100) (C > 0).",
+ "measured": {
+  "brightness_contrast_0": {
+   "offline": {
+    "mean": 0.001,
+    "pct_px_gt8": 0.0,
+    "max": 1
+   },
+   "rive": {
+    "mean": 0.009,
+    "pct_px_gt8": 0.0,
+    "max": 2
+   }
+  },
+  "brightness_contrast_1": {
+   "offline": {
+    "mean": 0.0,
+    "pct_px_gt8": 0.0,
+    "max": 0
+   },
+   "rive": {
+    "mean": 0.007,
+    "pct_px_gt8": 0.0,
+    "max": 1
+   }
+  },
+  "brightness_contrast_2": {
+   "offline": {
+    "mean": 0.0,
+    "pct_px_gt8": 0.0,
+    "max": 0
+   },
+   "rive": {
+    "mean": 0.007,
+    "pct_px_gt8": 0.0,
+    "max": 1
+   }
+  }
+ },
+ "status": "exact",
+ "verified": {
+  "by": "independent check 2026-10-04 (fxlib check --rive --holdout, AE 2026 8 bpc refs)",
+  "settings": {
+   "brightness_contrast_3 (held out)": {
+    "offline": {
+     "mean": 0.0,
+     "max": 0
+    },
+    "rive": {
+     "mean": 0.007,
+     "max": 1
+    }
+   }
+  },
+  "note": "the brightness law fitted on 2 settings holds on a third (B 20, C 30)"
+ }
+}

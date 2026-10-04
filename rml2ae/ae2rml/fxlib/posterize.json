@@ -1,0 +1,59 @@
+{
+ "slug": "posterize",
+ "aeMatchName": "ADBE Posterize",
+ "wgsl": "ae_posterize.wgsl",
+ "passes": 1,
+ "textures": {},
+ "params": [
+  {
+   "ae": 1,
+   "field": "level",
+   "kind": "number",
+   "default": 7
+  }
+ ],
+ "notes": "Measured on AE 2026 8 bpc, bit-exact (every pixel, Level 4 and 2): AE posterizes the STRAIGHT 8-bit colour, per channel idx = floor(c8 * Level / 256), c8' = round(idx * 255 / (Level - 1)); alpha untouched (the 50 % alpha region keeps alpha 128 and is posterized on its straight colour: premultiplied posterizing is wrong), then AE's 8-bit premultiply (c8' * a8 + 127) div 255. Not covered by a visible ref: Levels where 255/(Level-1) is not an integer (half-way values rounded half up here; AE might truncate: <= 1/255) and the band index law /256 vs /255 differs only for some Levels (e.g. 3: c = 85) — both identical at Levels 2, 4, 6. AE 2 Compositing Options (effect opacity / masks) not reproduced. Rive residuals (max 1-2/255, mean <= 0.008 %) are the Rive canvas/composite +-1 noise already documented on tint/invert, not the shader.",
+ "measured": {
+  "posterize_0 (Level 4)": {
+   "offline": {
+    "mean": 0.0,
+    "pct_px_gt8": 0.0,
+    "max": 0
+   },
+   "rive": {
+    "mean": 0.004,
+    "pct_px_gt8": 0.0,
+    "max": 1
+   }
+  },
+  "posterize_1 (Level 2)": {
+   "offline": {
+    "mean": 0.0,
+    "pct_px_gt8": 0.0,
+    "max": 0
+   },
+   "rive": {
+    "mean": 0.0,
+    "pct_px_gt8": 0.0,
+    "max": 0
+   }
+  }
+ },
+ "status": "exact",
+ "verified": {
+  "by": "independent check 2026-10-04 (fxlib check --rive --holdout, AE 2026 8 bpc refs)",
+  "settings": {
+   "posterize_2 (held out)": {
+    "offline": {
+     "mean": 0.0,
+     "max": 0
+    },
+    "rive": {
+     "mean": 0.005,
+     "max": 1
+    }
+   }
+  },
+  "note": "the held-out L=6 ref showed the band rule wrong (/256, max 51): corrected to /255 ON that ref, so it is no longer an independent check"
+ }
+}

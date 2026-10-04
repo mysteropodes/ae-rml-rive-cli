@@ -1,0 +1,157 @@
+{
+ "slug": "levels",
+ "aeMatchName": "ADBE Easy Levels2",
+ "wgsl": "ae_levels.wgsl",
+ "passes": 1,
+ "textures": {},
+ "params": [
+  {
+   "ae": 1,
+   "field": "channel",
+   "kind": "enum",
+   "default": 1
+  },
+  {
+   "ae": 3,
+   "field": "inBlack",
+   "kind": "number",
+   "default": 0
+  },
+  {
+   "ae": 4,
+   "field": "inWhite",
+   "kind": "number",
+   "default": 1
+  },
+  {
+   "ae": 5,
+   "field": "gamma",
+   "kind": "number",
+   "default": 1
+  },
+  {
+   "ae": 6,
+   "field": "outBlack",
+   "kind": "number",
+   "default": 0
+  },
+  {
+   "ae": 7,
+   "field": "outWhite",
+   "kind": "number",
+   "default": 1
+  },
+  {
+   "ae": 8,
+   "field": "clipBlack",
+   "kind": "enum",
+   "default": 3
+  },
+  {
+   "ae": 9,
+   "field": "clipWhite",
+   "kind": "enum",
+   "default": 3
+  }
+ ],
+ "notes": "Exact model measured on AE 2026 8 bpc (full 0..255 LUT on opaque pixels, 0 mismatches in the 3 visible settings, semi-transparent pixels exact too): un-premultiply, t = (c - Input Black) / (Input White - Input Black), clamp t to 0..1, out = Output Black + (Output White - Output Black) * t^(1/Gamma), re-premultiply; alpha untouched; fully transparent pixels stay 0. Level values are AE raw units 0..1 (the UI shows 0..255 in 8 bpc). AE rounds exact halves up (Output White 0.9 -> 229.5 -> 230): the shader adds 1e-6 before the 8-bit quantisation so f32 lands on the same side (checked against the double-precision LUT for the visible settings and gamma 1.4 / 0.1..0.9 input). Not measured against an AE render (no reference): Channel 2/3/4 (levels applied to Red/Green/Blue only) and 5 (Alpha only: the straight colour is kept and re-premultiplied with the levelled alpha, so transparent pixels can gain alpha); ExtendScript only exposes the 5 values of the channel shown in the popup, the other channels' hidden values are assumed identity. Clip To Output Black/White = Off (1) extrapolates beyond Input Black/White (t < 0 uses a sign-preserving power -- assumption), 2 = On and 3 = 'Off for 32 bpc Color' both clip (the Rive canvas is 8 bpc, AE in 32 bpc would keep values outside 0..1). Histogram (2) and Compositing Options (10) are not image parameters. Rive: the remaining +-1 errors come from the Rive pipeline itself (an identity Levels in Rive already differs from src by +-1 on 3.7 % of pixels, mean 0.007).",
+ "measured": {
+  "levels_0": {
+   "offline": {
+    "mean": 0.0,
+    "pct_px_gt8": 0.0,
+    "max": 0
+   },
+   "rive": {
+    "mean": 0.004,
+    "pct_px_gt8": 0.0,
+    "max": 1
+   }
+  },
+  "levels_1": {
+   "offline": {
+    "mean": 0.0,
+    "pct_px_gt8": 0.0,
+    "max": 0
+   },
+   "rive": {
+    "mean": 0.01,
+    "pct_px_gt8": 0.0,
+    "max": 1
+   }
+  },
+  "levels_2": {
+   "offline": {
+    "mean": 0.0,
+    "pct_px_gt8": 0.0,
+    "max": 0
+   },
+   "rive": {
+    "mean": 0.008,
+    "pct_px_gt8": 0.0,
+    "max": 1
+   }
+  },
+  "rive_identity_pipeline_noise": {
+   "mean": 0.007,
+   "max": 1,
+   "pct_px_ne": 3.72
+  }
+ },
+ "status": "exact",
+ "verified": {
+  "by": "independent check 2026-10-04 (fxlib check --rive --holdout, AE 2026 8 bpc refs)",
+  "settings": {
+   "levels_0": {
+    "offline": {
+     "mean": 0.0,
+     "pct_px_gt8": 0.0,
+     "max": 0
+    },
+    "rive": {
+     "mean": 0.004,
+     "pct_px_gt8": 0.0,
+     "max": 1
+    }
+   },
+   "levels_1": {
+    "offline": {
+     "mean": 0.0,
+     "pct_px_gt8": 0.0,
+     "max": 0
+    },
+    "rive": {
+     "mean": 0.01,
+     "pct_px_gt8": 0.0,
+     "max": 1
+    }
+   },
+   "levels_2": {
+    "offline": {
+     "mean": 0.0,
+     "pct_px_gt8": 0.0,
+     "max": 0
+    },
+    "rive": {
+     "mean": 0.008,
+     "pct_px_gt8": 0.0,
+     "max": 1
+    }
+   },
+   "levels_3 (held out)": {
+    "offline": {
+     "mean": 0.0,
+     "pct_px_gt8": 0.0,
+     "max": 0
+    },
+    "rive": {
+     "mean": 0.007,
+     "pct_px_gt8": 0.0,
+     "max": 1
+    }
+   }
+  },
+  "worst_mean_pct": 0.01,
+  "worst_pct_px_gt8": 0.0
+ }
+}

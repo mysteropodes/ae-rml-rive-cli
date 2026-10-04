@@ -1,0 +1,162 @@
+{
+ "slug": "gradient_ramp",
+ "aeMatchName": "ADBE Ramp",
+ "wgsl": "ae_gradient_ramp.wgsl",
+ "passes": 1,
+ "textures": {},
+ "params": [
+  {
+   "ae": 1,
+   "field": "startPoint",
+   "kind": "point",
+   "default": [
+    320,
+    0
+   ]
+  },
+  {
+   "ae": 2,
+   "field": "startColor",
+   "kind": "color",
+   "default": [
+    0,
+    0,
+    0,
+    1
+   ]
+  },
+  {
+   "ae": 3,
+   "field": "endPoint",
+   "kind": "point",
+   "default": [
+    320,
+    360
+   ]
+  },
+  {
+   "ae": 4,
+   "field": "endColor",
+   "kind": "color",
+   "default": [
+    1,
+    1,
+    1,
+    1
+   ]
+  },
+  {
+   "ae": 5,
+   "field": "rampShape",
+   "kind": "enum",
+   "default": 1
+  },
+  {
+   "ae": 6,
+   "field": "rampScatter",
+   "kind": "number",
+   "default": 0
+  },
+  {
+   "ae": 7,
+   "field": "blend",
+   "kind": "number",
+   "default": 0
+  }
+ ],
+ "notes": "Linear / Radial ramp, colours, points and alpha handling are pixel-exact vs AE 8 bpc (ramp evaluated at the pixel's integer corner, t clamped, straight colour quantised to 8 bits then premultiplied by the layer alpha; the layer colours are replaced, its alpha kept). Point defaults [320,0]/[320,360] are AE's top-centre/bottom-centre for the 640x360 test layer (AE uses the layer's own size). Ramp Scatter (6): AE's dither noise is proprietary and was not in the visible refs; approximated as a stable per-pixel uniform jitter of +-scatter/2 px along the ramp (structure only, not the AE noise pattern). Blend With Original (7): mix(ramp, original) in premultiplied space (alpha identical on both sides), not measured on a visible ref. Colour alpha components are ignored (AE colour params are RGB). Param 8 is an AE UI group end, 9 = Composite Options (not reproduced). Start == End: degenerate, guarded (t saturates to 1 past the start).",
+ "measured": {
+  "gradient_ramp_0": {
+   "offline": {
+    "mean": 0.001,
+    "pct_px_gt8": 0.0,
+    "max": 1
+   },
+   "rive": {
+    "mean": 0.002,
+    "pct_px_gt8": 0.0,
+    "max": 1
+   }
+  },
+  "gradient_ramp_1": {
+   "offline": {
+    "mean": 0.0,
+    "pct_px_gt8": 0.0,
+    "max": 0
+   },
+   "rive": {
+    "mean": 0.009,
+    "pct_px_gt8": 0.0,
+    "max": 1
+   }
+  },
+  "gradient_ramp_2": {
+   "offline": {
+    "mean": 0.0,
+    "pct_px_gt8": 0.0,
+    "max": 0
+   },
+   "rive": {
+    "mean": 0.007,
+    "pct_px_gt8": 0.0,
+    "max": 1
+   }
+  }
+ },
+ "status": "exact",
+ "verified": {
+  "by": "independent check 2026-10-04 (fxlib check --rive --holdout, AE 2026 8 bpc refs)",
+  "settings": {
+   "gradient_ramp_0": {
+    "offline": {
+     "mean": 0.001,
+     "pct_px_gt8": 0.0,
+     "max": 1
+    },
+    "rive": {
+     "mean": 0.012,
+     "pct_px_gt8": 0.0,
+     "max": 2
+    }
+   },
+   "gradient_ramp_1": {
+    "offline": {
+     "mean": 0.0,
+     "pct_px_gt8": 0.0,
+     "max": 0
+    },
+    "rive": {
+     "mean": 0.009,
+     "pct_px_gt8": 0.0,
+     "max": 1
+    }
+   },
+   "gradient_ramp_2": {
+    "offline": {
+     "mean": 0.0,
+     "pct_px_gt8": 0.0,
+     "max": 0
+    },
+    "rive": {
+     "mean": 0.007,
+     "pct_px_gt8": 0.0,
+     "max": 1
+    }
+   },
+   "gradient_ramp_3 (held out)": {
+    "offline": {
+     "mean": 0.033,
+     "pct_px_gt8": 0.0,
+     "max": 1
+    },
+    "rive": {
+     "mean": 0.053,
+     "pct_px_gt8": 0.0,
+     "max": 2
+    }
+   }
+  },
+  "worst_mean_pct": 0.053,
+  "worst_pct_px_gt8": 0.0
+ }
+}

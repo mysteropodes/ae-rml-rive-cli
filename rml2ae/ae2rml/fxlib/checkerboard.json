@@ -1,0 +1,135 @@
+{
+ "slug": "checkerboard",
+ "aeMatchName": "ADBE Checkerboard",
+ "wgsl": "ae_checkerboard.wgsl",
+ "passes": 1,
+ "textures": {},
+ "params": [
+  {
+   "ae": 1,
+   "field": "anchor",
+   "kind": "point",
+   "default": [
+    320,
+    180
+   ]
+  },
+  {
+   "ae": 2,
+   "field": "sizeFrom",
+   "kind": "enum",
+   "default": 2
+  },
+  {
+   "ae": 3,
+   "field": "corner",
+   "kind": "point",
+   "default": [
+    371.2,
+    208.8
+   ]
+  },
+  {
+   "ae": 4,
+   "field": "width",
+   "kind": "number",
+   "default": 16
+  },
+  {
+   "ae": 5,
+   "field": "height",
+   "kind": "number",
+   "default": 8
+  },
+  {
+   "ae": 7,
+   "field": "featherW",
+   "kind": "number",
+   "default": 0
+  },
+  {
+   "ae": 8,
+   "field": "featherH",
+   "kind": "number",
+   "default": 0
+  },
+  {
+   "ae": 10,
+   "field": "color",
+   "kind": "color",
+   "default": [
+    1,
+    1,
+    1,
+    1
+   ]
+  },
+  {
+   "ae": 11,
+   "field": "opacity",
+   "kind": "number",
+   "default": 100
+  },
+  {
+   "ae": 12,
+   "field": "blendMode",
+   "kind": "enum",
+   "default": 1
+  }
+ ],
+ "notes": "Measured on AE 2026 8 bpc, bit-exact on the 3 visible refs (Width slider 16 and 30, Width & Height 40x20 red at 50 %). Pattern evaluated with pixel CENTRES at integer layer coordinates (pixel i covers [i-0.5, i+0.5]: a boundary through the Anchor x = 320 half-covers pixel 320); check (floor((x-Ax)/W), floor((y-Ay)/H)) filled when the index sum is even; anti-aliasing = exact box-filter coverage, separable as (1 + <u><v>)/2 with <u> the mean of the +-1 square wave over the pixel (only half-pixel coverages are in the refs: 0.5 -> 127, 0.25*0.5 -> 63); alpha8 = floor(coverage * Opacity * 255) (AE truncates), colour (C8 * a8 + 127) div 255. Blending Mode 1 None renders ONLY the checkerboard (the layer content and its alpha are discarded, checks also fill the transparent area). Not covered by a visible ref: Size From 1 Corner Point (W, H = |Corner - Anchor|), Feather Width/Height (modelled as widening the coverage box by the feather, i.e. a linear ramp of that width across each edge), Blending Modes 2..23 (checks composited over the layer with the usual blend formulas; 19 Stencil Alpha, 20 Silhouette Alpha, 21 Alpha Add, 22 Luminescent Premul assumed from AE's 4-Color Gradient menu; the 23rd entry is unknown and treated as Normal). Points are in layer px (fxPad adds the canvas offset). AE 6 / 9 are UI group markers, 13 Compositing Options not reproduced. Rive residuals (max 1-2/255, mean <= 0.008 %) are the Rive canvas/composite +-1 noise already documented on tint/invert, not the shader.",
+ "measured": {
+  "checkerboard_0 (defaults)": {
+   "offline": {
+    "mean": 0.0,
+    "pct_px_gt8": 0.0,
+    "max": 0
+   },
+   "rive": {
+    "mean": 0.002,
+    "pct_px_gt8": 0.0,
+    "max": 1
+   }
+  },
+  "checkerboard_1 (Width 30)": {
+   "offline": {
+    "mean": 0.0,
+    "pct_px_gt8": 0.0,
+    "max": 0
+   },
+   "rive": {
+    "mean": 0.001,
+    "pct_px_gt8": 0.0,
+    "max": 1
+   }
+  },
+  "checkerboard_2 (40x20, red, 50 %)": {
+   "offline": {
+    "mean": 0.0,
+    "pct_px_gt8": 0.0,
+    "max": 0
+   },
+   "rive": {
+    "mean": 0.002,
+    "pct_px_gt8": 0.0,
+    "max": 1
+   }
+  }
+ },
+ "status": "exact",
+ "verified": {
+  "by": "independent check 2026-10-04 (fxlib check --rive --holdout, AE 2026 8 bpc refs)",
+  "settings": {
+   "checkerboard_3 (held out)": {
+    "offline": {
+     "mean": 0.0,
+     "max": 0
+    },
+    "rive": {
+     "mean": 0.001,
+     "max": 1
+    }
+   }
+  }
+ }
+}

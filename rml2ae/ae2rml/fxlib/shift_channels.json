@@ -1,0 +1,76 @@
+{
+ "slug": "shift_channels",
+ "aeMatchName": "ADBE Shift Channels",
+ "wgsl": "ae_shift_channels.wgsl",
+ "passes": 1,
+ "textures": {},
+ "params": [
+  {
+   "ae": 1,
+   "field": "takeAlpha",
+   "kind": "enum",
+   "default": 1
+  },
+  {
+   "ae": 2,
+   "field": "takeRed",
+   "kind": "enum",
+   "default": 2
+  },
+  {
+   "ae": 3,
+   "field": "takeGreen",
+   "kind": "enum",
+   "default": 3
+  },
+  {
+   "ae": 4,
+   "field": "takeBlue",
+   "kind": "enum",
+   "default": 4
+  }
+ ],
+ "notes": "Measured on AE 2026 8 bpc. Popup 1..10 per output channel (AE 1 alpha, 2 red, 3 green, 4 blue): 1 Alpha, 2 Red, 3 Green, 4 Blue, 5 Luminance, 6 Hue, 7 Lightness, 8 Saturation, 9 Full, 10 Off (order 1..5 measured; 6..10 assumed from AE's menu, its max is 10). Sources are read from the STRAIGHT 8-bit pixel (transparent pixels = black), the new straight colour is premultiplied by the new alpha ((c8 * a8 + 127) div 255). Channel swaps bit-exact; Luminance = round(255 * (0.299 R + 0.587 G + 0.114 B)) (Rec.601, rounded; 0.30/0.59/0.11 or flooring is worse) bit-exact where the straight colour is recoverable. The only offline residual (1/255 on the 5373 pixels of the 50 % alpha circle) is an input limitation: its straight colour (0,200,255) is premultiplied to (0,100,128) before the shader sees it and un-premultiplies to 199, so 199*146/255 -> 114 vs AE's 115 (AE has the straight footage). Hue / Lightness / Saturation = standard HLS components x 255 rounded (hue 0 = red, greys hue 0), Full = 255, Off = 0: not covered by a visible ref. AE 5 Compositing Options not reproduced. Rive residuals (max 1-2/255, mean <= 0.008 %) are the Rive canvas/composite +-1 noise already documented on tint/invert, not the shader.",
+ "measured": {
+  "shift_channels_0 (R<-G, G<-B, B<-R)": {
+   "offline": {
+    "mean": 0.0,
+    "pct_px_gt8": 0.0,
+    "max": 0
+   },
+   "rive": {
+    "mean": 0.007,
+    "pct_px_gt8": 0.0,
+    "max": 1
+   }
+  },
+  "shift_channels_1 (alpha <- Luminance)": {
+   "offline": {
+    "mean": 0.002,
+    "pct_px_gt8": 0.0,
+    "max": 1
+   },
+   "rive": {
+    "mean": 0.008,
+    "pct_px_gt8": 0.0,
+    "max": 2
+   }
+  }
+ },
+ "status": "exact",
+ "verified": {
+  "by": "independent check 2026-10-04 (fxlib check --rive --holdout, AE 2026 8 bpc refs)",
+  "settings": {
+   "shift_channels_2 (held out)": {
+    "offline": {
+     "mean": 0.0,
+     "max": 0
+    },
+    "rive": {
+     "mean": 0.002,
+     "max": 1
+    }
+   }
+  }
+ }
+}

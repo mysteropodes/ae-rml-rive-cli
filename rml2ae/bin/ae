@@ -1,0 +1,8 @@
+#!/bin/sh
+# rml2ae command line (see README « ae — ligne de commande »). Runs from any directory.
+SELF="$0"; while [ -L "$SELF" ]; do L="$(readlink "$SELF")"; case "$L" in /*) SELF="$L";; *) SELF="$(dirname "$SELF")/$L";; esac; done
+HERE="$(cd "$(dirname "$SELF")/.." && pwd)"
+ROOT="$(dirname "$HERE")"
+PY="$ROOT/.venv/bin/python"; [ -x "$PY" ] || PY="$ROOT/.venv/bin/python"; [ -x "$PY" ] || PY=python3
+AE_CWD="$(pwd)"; export AE_CWD            # the caller's directory: `ae import` resolves relative paths against it
+cd "$ROOT" && exec "$PY" -m rml2ae.ae "$@"

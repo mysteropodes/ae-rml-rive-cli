@@ -1,0 +1,79 @@
+{
+ "slug": "box_blur",
+ "aeMatchName": "ADBE Box Blur2",
+ "wgsl": "ae_box_blur.wgsl",
+ "passes": 2,
+ "textures": {},
+ "params": [
+  {
+   "ae": 1,
+   "field": "radius",
+   "kind": "number",
+   "default": 0
+  },
+  {
+   "ae": 2,
+   "field": "iterations",
+   "kind": "number",
+   "default": 3
+  },
+  {
+   "ae": 3,
+   "field": "dimensions",
+   "kind": "enum",
+   "default": 1
+  },
+  {
+   "ae": 4,
+   "field": "repeatEdge",
+   "kind": "bool",
+   "default": 1
+  }
+ ],
+ "notes": "",
+ "measured": {},
+ "status": "exact",
+ "verified": {
+  "by": "independent check 2026-10-04 (fxlib check --rive --holdout, AE 2026 8 bpc refs)",
+  "settings": {
+   "box_blur_0": {
+    "offline": {
+     "mean": 0.011,
+     "pct_px_gt8": 0.0,
+     "max": 1
+    },
+    "rive": {
+     "mean": 0.022,
+     "pct_px_gt8": 0.0,
+     "max": 2
+    }
+   },
+   "box_blur_1": {
+    "offline": {
+     "mean": 0.028,
+     "pct_px_gt8": 0.0,
+     "max": 2
+    },
+    "rive": {
+     "mean": 0.045,
+     "pct_px_gt8": 0.0,
+     "max": 2
+    }
+   },
+   "box_blur_2 (held out)": {
+    "offline": {
+     "mean": 0.027,
+     "pct_px_gt8": 0.0,
+     "max": 2
+    },
+    "rive": {
+     "mean": 0.044,
+     "pct_px_gt8": 0.0,
+     "max": 2
+    }
+   }
+  },
+  "worst_mean_pct": 0.045,
+  "worst_pct_px_gt8": 0.0
+ }
+}

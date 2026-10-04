@@ -1,0 +1,95 @@
+{
+ "slug": "minimax",
+ "aeMatchName": "ADBE Minimax",
+ "wgsl": "ae_minimax.wgsl",
+ "passes": 4,
+ "textures": {},
+ "params": [
+  {
+   "ae": 1,
+   "field": "operation",
+   "kind": "enum",
+   "default": 2
+  },
+  {
+   "ae": 2,
+   "field": "radius",
+   "kind": "number",
+   "default": 0
+  },
+  {
+   "ae": 3,
+   "field": "channel",
+   "kind": "enum",
+   "default": 1
+  },
+  {
+   "ae": 4,
+   "field": "direction",
+   "kind": "enum",
+   "default": 1
+  },
+  {
+   "ae": 5,
+   "field": "dontShrink",
+   "kind": "bool",
+   "default": 0
+  }
+ ],
+ "notes": "Measured pixel-exact on AE 2026 8 bpc (Minimum r 4, Maximum r 4, Maximum r 6 Alpha and Color): the window is a SQUARE (2r+1)^2, i.e. separable (disk / diamond / premultiplied models are clearly wrong, 0.2-1.6 % mean); it works on STRAIGHT 8-bit colour channel by channel and the result is premultiplied by the new alpha. Channel 1 = Color (RGB, alpha untouched), 2 = Alpha and Color (measured); 3 = Alpha, 4/5/6 = Red/Green/Blue are AE's menu order, unmeasured. Operation 1 Minimum, 2 Maximum (measured), 3 Minimum then Maximum, 4 Maximum then Minimum (second stage on the first stage's output with the same radius; checked against a numpy model only). Direction 1 = Horizontal and Vertical (measured), 2 = Just Horizontal, 3 = Just Vertical (numpy model only). Outside the layer = transparent black; Don't Shrink Edges = 1 ignores the outside instead (unmeasured: the refs' content is inset). Radius rounded to an integer (fractional radii unmeasured), capped at 1024 px (larger = clamped). 4 passes (stage 1 H, stage 1 V, stage 2 H, stage 2 V; unused passes copy through), intermediates hold straight colour + alpha in RGBA8 (exact, AE is 8-bit straight), the last pass premultiplies. Cost 2r+1 taps per pass. Not reproduced: Compositing Options (AE 6). Maximum with Alpha and Color can grow content past the layer edge: AE's behaviour there is unmeasured (pad 0 recommended).",
+ "measured": {
+  "minimax_0 (Minimum r 4, Color)": {
+   "offline": {
+    "mean": 0.0,
+    "pct_px_gt8": 0.0,
+    "max": 0
+   },
+   "rive": {
+    "mean": 0.006,
+    "pct_px_gt8": 0.0,
+    "max": 1
+   }
+  },
+  "minimax_1 (Maximum r 4, Color)": {
+   "offline": {
+    "mean": 0.0,
+    "pct_px_gt8": 0.0,
+    "max": 1
+   },
+   "rive": {
+    "mean": 0.007,
+    "pct_px_gt8": 0.0,
+    "max": 2
+   }
+  },
+  "minimax_2 (Maximum r 6, Alpha and Color)": {
+   "offline": {
+    "mean": 0.001,
+    "pct_px_gt8": 0.0,
+    "max": 1
+   },
+   "rive": {
+    "mean": 0.008,
+    "pct_px_gt8": 0.0,
+    "max": 2
+   }
+  },
+  "numpy_model_vs_offline (op 3/4, dirs 2/3, channel 1/2)": {
+   "mean_max": 0.0002,
+   "max": 1
+  }
+ },
+ "status": "exact",
+ "verified": {
+  "by": "independent check 2026-10-04 (fxlib check --holdout, offline wgpu vs AE 2026 8 bpc refs)",
+  "settings": {
+   "minimax_3 (held out)": {
+    "offline": {
+     "mean": 0.0,
+     "max": 0
+    }
+   }
+  },
+  "note": "channel 3 (Alpha), assumed from the menu order, is confirmed"
+ }
+}

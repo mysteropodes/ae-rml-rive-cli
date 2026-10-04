@@ -1,0 +1,188 @@
+{
+ "slug": "four_color_gradient",
+ "aeMatchName": "ADBE 4ColorGradient",
+ "wgsl": "ae_four_color_gradient.wgsl",
+ "passes": 1,
+ "textures": {},
+ "params": [
+  {
+   "ae": 2,
+   "field": "point1",
+   "kind": "point",
+   "default": [
+    64,
+    36
+   ]
+  },
+  {
+   "ae": 3,
+   "field": "color1",
+   "kind": "color",
+   "default": [
+    1,
+    1,
+    0,
+    1
+   ]
+  },
+  {
+   "ae": 4,
+   "field": "point2",
+   "kind": "point",
+   "default": [
+    576,
+    36
+   ]
+  },
+  {
+   "ae": 5,
+   "field": "color2",
+   "kind": "color",
+   "default": [
+    0,
+    1,
+    0,
+    1
+   ]
+  },
+  {
+   "ae": 6,
+   "field": "point3",
+   "kind": "point",
+   "default": [
+    64,
+    324
+   ]
+  },
+  {
+   "ae": 7,
+   "field": "color3",
+   "kind": "color",
+   "default": [
+    1,
+    0,
+    1,
+    1
+   ]
+  },
+  {
+   "ae": 8,
+   "field": "point4",
+   "kind": "point",
+   "default": [
+    576,
+    324
+   ]
+  },
+  {
+   "ae": 9,
+   "field": "color4",
+   "kind": "color",
+   "default": [
+    0,
+    0,
+    1,
+    1
+   ]
+  },
+  {
+   "ae": 11,
+   "field": "blend",
+   "kind": "number",
+   "default": 100
+  },
+  {
+   "ae": 12,
+   "field": "jitter",
+   "kind": "number",
+   "default": 0
+  },
+  {
+   "ae": 13,
+   "field": "opacity",
+   "kind": "number",
+   "default": 100
+  },
+  {
+   "ae": 14,
+   "field": "blendMode",
+   "kind": "enum",
+   "default": 1
+  }
+ ],
+ "notes": "Exact algorithm (fitted, 0-level error on the refs): evaluated at the integer pixel position (no +0.5); w_i = 1/(|p-Point_i|^2 + Blend^2); gradient = sum(w_i*Colour8_i)/sum(w_i), floored to 8 bits (G8); mode None: A = floor(srcA8*Opacity/100), premultiplied RGB = (G8*A+127) div 255. Point defaults (10%/90% of the layer) are the values AE gives a 640x360 layer. Not measured against AE: Jitter (proprietary noise; reproduced as a per-pixel dither of +-Jitter/200 of an 8-bit level before the floor), Blending Modes 2..22 (gradient blended over the straight original with the usual formulas, mixed by Opacity, layer alpha kept; modes 19..22 assumed to be Stencil Alpha, Silhouette Alpha, Alpha Add, Luminescent Premul). Colours are rounded to 8 bits before mixing. Groups 1 and 10 and Compositing Options (15) carry no pixel parameter.",
+ "measured": {
+  "four_color_gradient_0": {
+   "offline": {
+    "mean": 0.0,
+    "pct_px_gt8": 0.0,
+    "max": 1
+   },
+   "rive": {
+    "mean": 0.01,
+    "pct_px_gt8": 0.0,
+    "max": 1
+   }
+  },
+  "four_color_gradient_1": {
+   "offline": {
+    "mean": 0.0,
+    "pct_px_gt8": 0.0,
+    "max": 0
+   },
+   "rive": {
+    "mean": 0.007,
+    "pct_px_gt8": 0.0,
+    "max": 1
+   }
+  },
+  "offline_off_by_one_values": {
+   "four_color_gradient_0": 2,
+   "four_color_gradient_1": 0
+  }
+ },
+ "status": "exact",
+ "verified": {
+  "by": "independent check 2026-10-04 (fxlib check --rive --holdout, AE 2026 8 bpc refs)",
+  "settings": {
+   "four_color_gradient_0": {
+    "offline": {
+     "mean": 0.0,
+     "pct_px_gt8": 0.0,
+     "max": 1
+    },
+    "rive": {
+     "mean": 0.01,
+     "pct_px_gt8": 0.0,
+     "max": 1
+    }
+   },
+   "four_color_gradient_1": {
+    "offline": {
+     "mean": 0.0,
+     "pct_px_gt8": 0.0,
+     "max": 0
+    },
+    "rive": {
+     "mean": 0.007,
+     "pct_px_gt8": 0.0,
+     "max": 1
+    }
+   },
+   "four_color_gradient_2 (held out)": {
+    "offline": {
+     "mean": 0.0,
+     "pct_px_gt8": 0.0,
+     "max": 1
+    },
+    "rive": {
+     "mean": 0.011,
+     "pct_px_gt8": 0.0,
+     "max": 1
+    }
+   }
+  },
+  "worst_mean_pct": 0.011,
+  "worst_pct_px_gt8": 0.0
+ }
+}

@@ -1,0 +1,111 @@
+{
+ "slug": "magnify",
+ "aeMatchName": "ADBE Magnify",
+ "wgsl": "ae_magnify.wgsl",
+ "passes": 1,
+ "textures": {},
+ "params": [
+  {
+   "ae": 1,
+   "field": "shape",
+   "kind": "enum",
+   "default": 1
+  },
+  {
+   "ae": 2,
+   "field": "center",
+   "kind": "point",
+   "default": [
+    320,
+    180
+   ]
+  },
+  {
+   "ae": 3,
+   "field": "magnification",
+   "kind": "number",
+   "default": 150
+  },
+  {
+   "ae": 4,
+   "field": "link",
+   "kind": "enum",
+   "default": 1
+  },
+  {
+   "ae": 5,
+   "field": "lensSize",
+   "kind": "number",
+   "default": 100
+  },
+  {
+   "ae": 6,
+   "field": "feather",
+   "kind": "number",
+   "default": 0
+  },
+  {
+   "ae": 7,
+   "field": "opacity",
+   "kind": "number",
+   "default": 100
+  },
+  {
+   "ae": 8,
+   "field": "scaling",
+   "kind": "enum",
+   "default": 1
+  },
+  {
+   "ae": 9,
+   "field": "blendMode",
+   "kind": "enum",
+   "default": 2
+  },
+  {
+   "ae": 10,
+   "field": "resizeLayer",
+   "kind": "bool",
+   "default": 0
+  }
+ ],
+ "notes": "Measured model: inside the lens, pixel centre p shows the layer at Center + (p - Center)*100/Magnification, bilinear on premultiplied pixels (bit-exact). Lens = circle of radius Size or square of half-side Size; mask = smoothstep over the signed distance in [-h, +h], h = Feather + 0.72 px (one constant fits Feather 0 antialiasing and Feather 10); the square is a rounded square (SDF of a box of half-side Size - h, inflated by h) — measured on the feathered corner. Normal (Blending Mode 2) = mix(layer, magnified, mask * Opacity/100). Link (AE 4) has no effect on renders (Size 80, Magnification 300, Link 2 gives an 80 px lens): it only couples AE's sliders. Blending Mode popup from AE's dictionary: 1 None, 2 Normal, 3 (-, 4 Add, 5 Multiply, 6 Screen, 7 Overlay, 8 Soft Light, 9 Hard Light, 10 (-, 11 Color Dodge, 12 Color Burn, 13 (-, 14 Darken, 15 Lighten, 16 Difference, 17 Exclusion, 18 (-, 19 Hue, 20 Saturation, 21 Color, 22 Luminosity; only Normal is measured, the others use W3C formulas (lens over layer, faded by the mask), None = the lens alone — unverified. Opacity is applied as a mask multiplier (unmeasured). Not reproduced: Scaling Soft/Scatter (AE 8), Resize Layer (AE 10). Residual max 4 levels on the circle's antialiased rim.",
+ "measured": {
+  "magnify_0": {
+   "offline": {
+    "mean": 0.003,
+    "pct_px_gt8": 0.0,
+    "max": 4
+   },
+   "rive": {
+    "mean": 0.011,
+    "pct_px_gt8": 0.0,
+    "max": 4
+   }
+  },
+  "magnify_1": {
+   "offline": {
+    "mean": 0.008,
+    "pct_px_gt8": 0.0,
+    "max": 2
+   },
+   "rive": {
+    "mean": 0.017,
+    "pct_px_gt8": 0.0,
+    "max": 2
+   }
+  }
+ },
+ "status": "close",
+ "verified": {
+  "by": "independent check 2026-10-04 (fxlib check --holdout, offline wgpu vs AE 2026 8 bpc refs)",
+  "settings": {
+   "magnify_2 (held out)": {
+    "offline": {
+     "mean": 0.002,
+     "max": 3
+    }
+   }
+  }
+ }
+}

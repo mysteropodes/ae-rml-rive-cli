@@ -1,0 +1,94 @@
+{
+ "slug": "simple_choker",
+ "aeMatchName": "ADBE Simple Choker",
+ "wgsl": "ae_simple_choker.wgsl",
+ "passes": 2,
+ "textures": {
+  "origTex": "original"
+ },
+ "params": [
+  {
+   "ae": 1,
+   "field": "view",
+   "kind": "enum",
+   "default": 1
+  },
+  {
+   "ae": 2,
+   "field": "choke",
+   "kind": "number",
+   "default": 0
+  }
+ ],
+ "notes": "Measured model: Gaussian blur of the alpha (sigma^2 = 0.635*|choke| px^2, transparent outside the layer), then levels around a fixed level 7/8 (choke > 0) or 1/8 (choke < 0) with ramp width 3/(4|choke|), ends clamped to [0,1] (choke 0 = identity); colour = un-premultiplied original * new alpha (newly covered pixels are black, as in AE). Fitted on 2 visible settings (3, -4): the sigma ~ sqrt(|choke|) law, the fixed 7/8 / 1/8 centre and the 4|choke|/3 gain are consistent across both but extrapolation to other values (and |choke| < 3, where the clamps take over) is a model, not measured. AE's true kernel is slightly flatter-topped than a Gaussian (free-kernel fit), residual max 9/255 on corners. View 2 (Matte) renders the choked alpha as opaque grey (not checked against AE). Pass 0 stores the horizontal blur as 16-bit fixed point packed in R/G (Rive keeps intermediate passes in RGBA8).",
+ "measured": {
+  "simple_choker_0 (choke 3)": {
+   "offline": {
+    "mean": 0.008,
+    "pct_px_gt8": 0.0,
+    "max": 5
+   },
+   "rive": {
+    "mean": 0.013,
+    "pct_px_gt8": 0.0,
+    "max": 4
+   }
+  },
+  "simple_choker_1 (choke -4)": {
+   "offline": {
+    "mean": 0.008,
+    "pct_px_gt8": 0.0,
+    "max": 9
+   },
+   "rive": {
+    "mean": 0.01,
+    "pct_px_gt8": 0.0,
+    "max": 2
+   }
+  }
+ },
+ "status": "close",
+ "verified": {
+  "by": "independent check 2026-10-04 (fxlib check --rive --holdout, AE 2026 8 bpc refs)",
+  "settings": {
+   "simple_choker_0": {
+    "offline": {
+     "mean": 0.008,
+     "pct_px_gt8": 0.0,
+     "max": 5
+    },
+    "rive": {
+     "mean": 0.013,
+     "pct_px_gt8": 0.0,
+     "max": 4
+    }
+   },
+   "simple_choker_1": {
+    "offline": {
+     "mean": 0.008,
+     "pct_px_gt8": 0.0,
+     "max": 9
+    },
+    "rive": {
+     "mean": 0.01,
+     "pct_px_gt8": 0.0,
+     "max": 2
+    }
+   },
+   "simple_choker_2 (held out)": {
+    "offline": {
+     "mean": 0.15,
+     "pct_px_gt8": 0.749,
+     "max": 119
+    },
+    "rive": {
+     "mean": 0.129,
+     "pct_px_gt8": 0.731,
+     "max": 119
+    }
+   }
+  },
+  "worst_mean_pct": 0.15,
+  "worst_pct_px_gt8": 0.749
+ }
+}

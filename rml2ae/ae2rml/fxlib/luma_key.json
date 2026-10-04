@@ -1,0 +1,85 @@
+{
+ "slug": "luma_key",
+ "aeMatchName": "ADBE Luma Key",
+ "wgsl": "ae_luma_key.wgsl",
+ "passes": 4,
+ "textures": {
+  "origTex": "original"
+ },
+ "params": [
+  {
+   "ae": 1,
+   "field": "keyType",
+   "kind": "enum",
+   "default": 2
+  },
+  {
+   "ae": 2,
+   "field": "threshold",
+   "kind": "number",
+   "default": 0
+  },
+  {
+   "ae": 3,
+   "field": "tolerance",
+   "kind": "number",
+   "default": 0
+  },
+  {
+   "ae": 4,
+   "field": "edgeThin",
+   "kind": "number",
+   "default": 0
+  },
+  {
+   "ae": 5,
+   "field": "edgeFeather",
+   "kind": "number",
+   "default": 0
+  }
+ ],
+ "notes": "Measured on AE 2026 8 bpc. Luminance of the STRAIGHT 8-bit colour L = 0.30 R + 0.59 G + 0.11 B, unrounded (the only weights with zero misclassified pixels: Rec.601 .299/.587/.114 and Rec.709 misplace hundreds); transparent pixels count as black. Key Out Brighter (1): keyed when L > Threshold; Key Out Darker (2): keyed when L < Threshold; L == Threshold is kept (both measured, Darker bit-exact: 11976 pixels at exactly L = 100 kept). Tolerance does nothing for types 1/2 (measured: Tolerance 20 gives a hard key). Edge Feather: separable blur of the binary matte by three iterated fractional boxes of radii (0.494, 0.349, 0.194) x Feather (least-squares fit on the Feather 10 ref: max 1/255, 3 % of pixels off by 1; AE's Fast-Blur kernel 3 x 0.369 F gives max 3, a Gaussian / 2 boxes / 2D isotropic kernels max 3-28; the kernel has a flat top). The matte outside the layer is that of transparent black (kept for Key Out Brighter: the feather bleeds inwards at the layer edges, as AE does, measured). Output alpha = floor(alpha8 * matte) (AE truncates: complementary edge values sum to 254), straight colour kept, premultiplied (c8 * a + 127) div 255. Not covered by a visible ref (models): the linear scaling of the three radii with Feather (only Feather 10 seen), Key Out Similar (keyed when |L - Threshold| <= Tolerance) / Dissimilar (the complement), Edge Thin (> 0 erodes, < 0 dilates the matte by |n| px, square window, before the feather). Kernels wider than 255 taps are sampled every ceil(taps/255) px (approximation, Feather > ~120). 4 passes: matte + horizontal thin, vertical thin, horizontal blur (16-bit packed R/G), vertical blur + composite with origTex. AE 6 Compositing Options not reproduced. Rive residuals (max 1-2/255, mean <= 0.008 %) are the Rive canvas/composite +-1 noise already documented on tint/invert, not the shader.",
+ "measured": {
+  "luma_key_0 (Darker, Thr 100, Tol 20)": {
+   "offline": {
+    "mean": 0.0,
+    "pct_px_gt8": 0.0,
+    "max": 0
+   },
+   "rive": {
+    "mean": 0.005,
+    "pct_px_gt8": 0.0,
+    "max": 1
+   }
+  },
+  "luma_key_1 (Brighter, Thr 60, Feather 10)": {
+   "offline": {
+    "mean": 0.006,
+    "pct_px_gt8": 0.0,
+    "max": 1
+   },
+   "rive": {
+    "mean": 0.005,
+    "pct_px_gt8": 0.0,
+    "max": 2
+   }
+  }
+ },
+ "status": "close",
+ "verified": {
+  "by": "independent check 2026-10-04 (fxlib check --rive --holdout, AE 2026 8 bpc refs)",
+  "settings": {
+   "luma_key_2 (held out)": {
+    "offline": {
+     "mean": 0.061,
+     "max": 7
+    },
+    "rive": {
+     "mean": 0.052,
+     "max": 6
+    }
+   }
+  },
+  "note": "feather 5 + tolerance 40: max 7/255 on the matte edge — the feather kernel fitted on feather 10 does not scale exactly"
+ }
+}
