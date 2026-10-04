@@ -21,6 +21,8 @@ Each effect = `fxlib/ae_<slug>.wgsl` + `fxlib/<slug>.json` (manifest). Contract:
 CLI:
   python -m rml2ae.ae2rml.fxlib check <slug> [--rive] [--holdout] [--keep]   AE refs vs offline wgpu (and Rive CLI)
   python -m rml2ae.ae2rml.fxlib luau <slug>[,<slug>…]                           print the generated Rive node (stack)
+  python -m rml2ae.ae2rml.fxlib regress [<slug>…] [--update] [--summary FILE]  every reference (held-out included)
+      vs the recorded baseline fxref/baseline.json; fails when an effect gets further from After Effects (CI)
 """
 import json
 import math
@@ -595,11 +597,100 @@ def check(slug, rive=False, holdout=False, keep=False):
     return rows
 
 
+# ------------------------------------------------------------------ regression gate (CI)
+BASELINE = os.path.join(REF, "baseline.json")
+# allowed drift before a setting counts as worse: GPU drivers differ in the last bit of float maths and filtering
+TOL = {"mean": 0.02, "pct_px_gt8": 0.05, "max": 2}
+
+
+def manifest_problems(slug):
+    """Static checks of one manifest against its shader and the measured AE parameter lists."""
+    out = []
+    try:
+        m = manifest(slug)
+        fields, _ = struct_fields(open(wgsl_path(m)).read())
+    except Exception as ex:
+        return [f"{slug}: unreadable manifest or shader ({type(ex).__name__}: {ex})"]
+    names = {f[0] for f in fields}
+    for req in ("size", "passIndex"):
+        if req not in names:
+            out.append(f"{slug}: Params has no '{req}'")
+    for p in m.get("params", []):
+        if p.get("field") not in names:
+            out.append(f"{slug}: param ae {p.get('ae')} -> field '{p.get('field')}' is not in Params")
+        if p.get("kind") not in ("number", "point", "color", "enum", "bool", "angle"):
+            out.append(f"{slug}: param ae {p.get('ae')} has unknown kind {p.get('kind')!r}")
+    known = ae_params(m["aeMatchName"])
+    if known:
+        idx = {q["i"] for q in known}
+        for p in m.get("params", []):
+            if p.get("ae") not in idx:
+                out.append(f"{slug}: param ae {p.get('ae')} is not a parameter of {m['aeMatchName']}")
+    if m.get("status") not in ("exact", "close", "approx", "unverified"):
+        out.append(f"{slug}: unknown status {m.get('status')!r}")
+    return out
+
+
+def regress(slugs=None, update=False, summary=None):
+    """Measure every reference (held-out included) offline and compare with fxref/baseline.json.
+    Returns the number of problems (worse than the baseline, errors, missing baseline, manifest problems)."""
+    base = json.load(open(BASELINE)) if os.path.exists(BASELINE) else {}
+    slugs = slugs or all_slugs()
+    problems, rows_md, new = [], [], dict(base)
+    for slug in slugs:
+        problems += manifest_problems(slug)
+        new[slug] = {}
+        for row in check(slug, holdout=True):
+            got, name = row["offline"], row["setting"]
+            new[slug][name] = got
+            ref = base.get(slug, {}).get(name)
+            verdict = "ok"
+            if "error" in got:
+                verdict = "error"
+                problems.append(f"{name}: {got['error'][:300]}")
+            elif ref is None:
+                verdict = "new"
+                if not update:
+                    problems.append(f"{name}: no baseline (run `fxlib regress {slug} --update` and commit fxref/baseline.json)")
+            elif "error" not in ref:
+                worse = [k for k, t in TOL.items() if got[k] > ref[k] + t]
+                better = [k for k, t in TOL.items() if got[k] < ref[k] - t]
+                if worse:
+                    verdict = "worse: " + ", ".join(f"{k} {ref[k]} -> {got[k]}" for k in worse)
+                    problems.append(f"{name}: {verdict}")
+                elif better:
+                    verdict = "better: " + ", ".join(f"{k} {ref[k]} -> {got[k]}" for k in better)
+            held = " (held out)" if row["held"] else ""
+            line = f"| {slug} | {name}{held} | {got.get('mean', '-')} | {got.get('pct_px_gt8', '-')} | {got.get('max', '-')} | {verdict} |"
+            rows_md.append(line)
+            print(line, flush=True)
+    if update:
+        json.dump(dict(sorted(new.items())), open(BASELINE, "w"), indent=1)
+        open(BASELINE, "a").write("\n")
+        problems = [p for p in problems if "no baseline" not in p]
+    if summary:
+        with open(summary, "a") as f:
+            f.write("## fxlib: offline WGSL vs After Effects references\n\n"
+                    "mean = mean error in % of 255, >8 = % of pixels off by more than 8 levels, max = levels\n\n"
+                    "| effect | setting | mean | >8 | max | vs baseline |\n|---|---|---|---|---|---|\n")
+            f.write("\n".join(rows_md) + "\n\n")
+            if problems:
+                f.write("**Problems**\n\n" + "\n".join("- " + p for p in problems) + "\n")
+    for p in problems:
+        print("PROBLEM " + p)
+    print(f"fxlib regress: {len(slugs)} effect(s), {len(rows_md)} setting(s), {len(problems)} problem(s)")
+    return len(problems)
+
+
 if __name__ == "__main__":
     a = sys.argv[1:]
     if a and a[0] == "check":
         for row in check(a[1], rive="--rive" in a, holdout="--holdout" in a, keep="--keep" in a):
             print(json.dumps(row))
+    elif a and a[0] == "regress":
+        summ = a[a.index("--summary") + 1] if "--summary" in a else None
+        names = [x for x in a[1:] if not x.startswith("--") and x != summ]
+        sys.exit(1 if regress(names or None, update="--update" in a, summary=summ) else 0)
     elif a and a[0] == "luau":
         print(luau_for(a[1].split(",")))
     else:

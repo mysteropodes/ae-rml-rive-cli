@@ -113,12 +113,31 @@ repeats edge pixels.
 4. Real projects are used as a final test: an approximate effect that makes a real composition worse than leaving
    the effect out is marked `"auto": false`.
 
+The references live in `rml2ae/ae2rml/fxref/`: `spec.py` lists the settings of each effect (`held = 1` for the
+held-out ones) and writes `renders.json`; `render_refs.py` renders them in After Effects (macOS, After Effects open)
+into `ae/` and `ae_holdout/` from the synthetic source `src/src.png` (640 x 360) and `src/map.png`.
+
 Commands (from the repository root, with the project's Python environment):
 
 ```bash
 python -m rml2ae.ae2rml.fxlib check <slug> [--rive] [--holdout] [--keep]   # references vs offline wgpu (and Rive CLI)
 python -m rml2ae.ae2rml.fxlib luau <slug>[,<slug>...]                      # print the generated Rive node for a stack
+python -m rml2ae.ae2rml.fxlib regress [<slug>...] [--update]               # every reference vs fxref/baseline.json
+python rml2ae/ae2rml/fxref/spec.py && python rml2ae/ae2rml/fxref/render_refs.py <slug>   # new references (macOS + AE)
 ```
+
+### Regression gate (CI)
+
+`fxlib regress` measures every reference of every effect, held-out settings included, with wgpu on the CPU, and
+compares each one with `fxref/baseline.json`. It fails when a setting gets further from After Effects than the
+baseline (mean +0.02 %, pixels over 8 levels +0.05 %, or max +2 levels), when a shader stops compiling, when a
+reference has no baseline yet, or when a manifest names a `Params` field or an After Effects parameter that does not
+exist. The CI runs it on Linux with Mesa's software Vulkan (lavapipe) and `wgpu==0.32.0`, and prints the full table in
+the job summary. After a deliberate change (a better shader, a new effect), run it with `--update` and commit the
+new `baseline.json` with the change; the diff shows what moved.
+
+The baseline is a lavapipe measurement, not the status of the effect: the `status` and `verified` fields of each
+manifest come from the measurements made on macOS and stay the reference for "exact / close / approx".
 
 ### Reference renders (`rml2ae/ae2rml/fxref/`)
 
@@ -212,6 +231,8 @@ Notes:
   static or keyed parameters. `fxMix` becomes Effect Opacity (Compositing Options). A group's mix goes on each of its
   effects' Effect Opacity; the blend mode of an adjustment layer is reported (it needs an adjustment layer in After
   Effects).
-- **Adding an effect**: write `ae_<slug>.wgsl`, start a manifest from a similar effect, render After Effects
-  references (include at least one setting you keep to yourself), run `fxlib check <slug> --rive --holdout`, and
-  record `status` and `verified` in the manifest.
+- **Adding an effect**: write `ae_<slug>.wgsl`, start a manifest from a similar effect, add its settings to
+  `fxref/spec.py` (include at least one held-out setting chosen by someone else), render the references with
+  `fxref/render_refs.py`, run `fxlib check <slug> --rive --holdout`, record `status` and `verified` in the manifest,
+  then `fxlib regress <slug> --update`. Until it is measured, a new effect is `"status": "unverified"` with
+  `"auto": false`.
