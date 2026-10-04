@@ -169,6 +169,8 @@ Everything needed to measure an effect is in the repository:
 
 ## Effect table
 
+What is still missing, effect by effect, is in [fxlib-roadmap.md](fxlib-roadmap.md).
+
 37 measured effects: 27 exact, 8 close, 2 approx, plus 7 unverified ones (below the table). "Auto" is whether ae2rml applies the effect without being asked; the two effects
 marked `no` are measured to be further from After Effects than leaving the effect out, so they remain a
 `<!-- ae: effect ... -->` comment plus an entry in `effects_todo.json`.
@@ -208,7 +210,7 @@ marked `no` are measured to be further from After Effects than leaving the effec
 | Optics Compensation | `ADBE Optics Compensation` | `optics_compensation` | 1 | close | yes | After Effects softens edges at large FOV; not reproduced |
 | Posterize | `ADBE Posterize` | `posterize` | 1 | exact | yes |  |
 | Shift Channels | `ADBE Shift Channels` | `shift_channels` | 1 | exact | yes |  |
-| Simple Choker | `ADBE Simple Choker` | `simple_choker` | 2 | close | yes | Max 5 levels |
+| Simple Choker | `ADBE Simple Choker` | `simple_choker` | 2 | close | yes | Max 5 levels at chokes 3 and -4; the held-out choke 6 is off by up to 119 levels on 0.75 % of pixels (the law changes with the choke: renders of chokes 1, 10, 20, -10 requested in `fxref/spec.py`) |
 | Tint | `ADBE Tint` | `tint` | 1 | exact | yes |  |
 | Tritone | `ADBE Tritone` | `tritone` | 1 | exact | yes |  |
 | Turbulent Displace | `ADBE Turbulent Displace` | `turbulent_displace` | 1 | approx | no | After Effects noise is proprietary: same scale and strength, different pattern |
