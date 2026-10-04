@@ -82,6 +82,12 @@ jobs:
           mkdir -p "$HOME/.rive/bin"
           install -m 755 "$(find "$tmp" -type f -name rive | head -1)" "$HOME/.rive/bin/rive"
           echo "$HOME/.rive/bin" >> "$GITHUB_PATH"
+      # the Linux build links EGL/GL even headless; Mesa provides them (and software Vulkan, lavapipe) on the runner
+      - name: Rive CLI runtime libraries (Mesa)
+        run: |
+          sudo apt-get update -q
+          sudo apt-get install -y -q --no-install-recommends libegl1 libgl1 libgles2 libvulkan1 mesa-vulkan-drivers libegl-mesa0
+          ldd "$HOME/.rive/bin/rive" | grep "not found" && exit 1 || true
       - run: rive --version
       - name: Convert examples/demo.aep and verify it with the Rive CLI
         run: |
