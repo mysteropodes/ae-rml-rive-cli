@@ -171,7 +171,7 @@ Everything needed to measure an effect is in the repository:
 
 What is still missing, effect by effect, is in [fxlib-roadmap.md](fxlib-roadmap.md).
 
-37 measured effects: 27 exact, 8 close, 2 approx, plus 21 unverified ones (below the table). "Auto" is whether ae2rml applies the effect without being asked; the two effects
+37 measured effects: 27 exact, 8 close, 2 approx, plus 34 unverified ones (below the table). "Auto" is whether ae2rml applies the effect without being asked; the two effects
 marked `no` are measured to be further from After Effects than leaving the effect out, so they remain a
 `<!-- ae: effect ... -->` comment plus an entry in `effects_todo.json`.
 
@@ -243,6 +243,19 @@ real parameter list, then `render_refs.py <slug>`), add held-out settings, and m
 | Radial Blur | `ADBE Radial Blur` | `radial_blur` | Amount units per type; sampling |
 | CC Vignette | `CC Vignette` | `cc_vignette` | Falloff law and Angle of View |
 | Iris Wipe | `ADBE Iris Wipe` | `iris_wipe` | Polygon when Use Inner Radius is off; feather law |
+| Color Balance | `ADBE Color Balance 2` | `color_balance` | Tonal weights; Preserve Luminosity law |
+| Change Color | `ADBE Change Color` | `change_color` | Distance per Match Colors mode; transforms in HSL |
+| CC Toner | `CC Toner` | `cc_toner` | Gradient stops per Tones mode |
+| CC Color Offset | `CC Color Offset` | `cc_color_offset` | Overflow modes |
+| Arithmetic | `ADBE Arithmetic` | `arithmetic` | Operator menu order; rounding |
+| Remove Color Matting | `ADBE Remove Color Matting` | `remove_color_matting` | Clipping |
+| Color Key | `ADBE Color Key` | `color_key` | Distance; Edge Thin and Edge Feather |
+| Extract | `ADBE Extract` | `extract` | Softness ramps; luma weights |
+| Spill Suppressor | `ADBE Spill Suppressor` | `spill_suppressor` | Suppression law |
+| CC Threshold | `CC Threshold` | `cc_threshold` | Channel menu; >= vs > |
+| CC Threshold RGB | `CC Threshold RGB` | `cc_threshold_rgb` | Parameter order |
+| Color Emboss | `ADBE Color Emboss` | `color_emboss` | Built on the measured Emboss; base colour assumed |
+| Median | `ADBE Median` | `median` | Window shape (square here); radius cap 12 |
 Notes:
 
 - **Gaussian Blur (legacy)** and **Fast Blur (legacy)** share the same kernel (confirmed on a third setting).

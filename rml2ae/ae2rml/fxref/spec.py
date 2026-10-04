@@ -78,6 +78,20 @@ SPEC = {
     "radial_blur": ("ADBE Radial Blur", [({1: 20}, 0), ({1: 30, 3: 2}, 0), ({1: 15, 2: [200, 120]}, 0)]),
     "cc_vignette": ("CC Vignette", [({1: 80}, 0), ({1: 100, 2: 120}, 0), ({1: 60, 3: [200, 120]}, 0)]),
     "iris_wipe": ("ADBE Iris Wipe", [({3: 120}, 0), ({2: 10, 3: 150, 4: 1, 5: 60, 6: 20}, 0), ({1: [200, 140], 2: 8, 3: 100, 7: 15}, 0)]),
+    # lot 3 (unverified until rendered)
+    "color_balance": ("ADBE Color Balance 2", [({1: 40, 6: -30, 9: 50}, 0), ({4: 60, 5: -20, 10: 1}, 0)]),
+    "change_color": ("ADBE Change Color", [({2: 120, 5: [1, 0, 0, 1], 6: 30, 7: 10}, 0), ({1: 2, 5: [0, 0.4, 1, 1], 6: 20, 7: 20, 8: 2}, 0), ({2: -60, 3: 20, 5: [1, 1, 0, 1], 6: 40}, 0)]),
+    "cc_toner": ("CC Toner", [({}, 0), ({1: 1, 2: [1, 0.9, 0.6, 1], 6: [0.1, 0, 0.3, 1]}, 0), ({1: 3, 7: 30}, 0)]),
+    "cc_color_offset": ("CC Color Offset", [({1: 90, 2: 180, 3: 270}, 0), ({1: 120, 4: 2}, 0), ({2: 200, 4: 3}, 0)]),
+    "arithmetic": ("ADBE Arithmetic", [({1: 3, 2: 128, 3: 64, 4: 200}, 0), ({1: 4, 2: 100, 3: 100, 4: 100, 5: 0}, 0), ({1: 11, 2: 128, 3: 128, 4: 128}, 0)]),
+    "remove_color_matting": ("ADBE Remove Color Matting", [({1: [1, 1, 1, 1]}, 0), ({1: [0.5, 0.5, 0.5, 1]}, 0)]),
+    "color_key": ("ADBE Color Key", [({1: [1, 0.2, 0.2, 1], 2: 60}, 0), ({1: [0, 1, 0, 1], 2: 120, 4: 3}, 0)]),
+    "extract": ("ADBE Extract", [({3: 60, 4: 200}, 0), ({2: 2, 3: 100, 5: 40}, 0), ({3: 80, 4: 180, 7: 1}, 0)]),
+    "spill_suppressor": ("ADBE Spill Suppressor", [({}, 0), ({1: [0, 0, 1, 1], 3: 60}, 0)]),
+    "cc_threshold": ("CC Threshold", [({}, 0), ({1: 80, 2: 2, 3: 1}, 0), ({1: 160, 4: 40}, 0)]),
+    "cc_threshold_rgb": ("CC Threshold RGB", [({}, 0), ({1: 60, 2: 200, 3: 100, 5: 1}, 0)]),
+    "median": ("ADBE Median", [({1: 3}, 0), ({1: 8, 2: 1}, 0)]),
+    "color_emboss": ("ADBE Color Emboss", [({}, 0), ({1: 120, 2: 3, 3: 200}, 0)]),
 }
 NEEDS_MAP = {"displacement_map": {1: 2}}   # param 1 (map layer) = layer index 2 (the map footage)
 

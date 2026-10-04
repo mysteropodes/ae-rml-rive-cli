@@ -2293,5 +2293,414 @@
   },
   "held": false,
   "png": "ae/iris_wipe_2.png"
+ },
+ {
+  "slug": "color_balance",
+  "mn": "ADBE Color Balance 2",
+  "k": 0,
+  "vals": {
+   "1": 40,
+   "6": -30,
+   "9": 50
+  },
+  "held": false,
+  "png": "ae/color_balance_0.png"
+ },
+ {
+  "slug": "color_balance",
+  "mn": "ADBE Color Balance 2",
+  "k": 1,
+  "vals": {
+   "4": 60,
+   "5": -20,
+   "10": 1
+  },
+  "held": false,
+  "png": "ae/color_balance_1.png"
+ },
+ {
+  "slug": "change_color",
+  "mn": "ADBE Change Color",
+  "k": 0,
+  "vals": {
+   "2": 120,
+   "5": [
+    1,
+    0,
+    0,
+    1
+   ],
+   "6": 30,
+   "7": 10
+  },
+  "held": false,
+  "png": "ae/change_color_0.png"
+ },
+ {
+  "slug": "change_color",
+  "mn": "ADBE Change Color",
+  "k": 1,
+  "vals": {
+   "1": 2,
+   "5": [
+    0,
+    0.4,
+    1,
+    1
+   ],
+   "6": 20,
+   "7": 20,
+   "8": 2
+  },
+  "held": false,
+  "png": "ae/change_color_1.png"
+ },
+ {
+  "slug": "change_color",
+  "mn": "ADBE Change Color",
+  "k": 2,
+  "vals": {
+   "2": -60,
+   "3": 20,
+   "5": [
+    1,
+    1,
+    0,
+    1
+   ],
+   "6": 40
+  },
+  "held": false,
+  "png": "ae/change_color_2.png"
+ },
+ {
+  "slug": "cc_toner",
+  "mn": "CC Toner",
+  "k": 0,
+  "vals": {},
+  "held": false,
+  "png": "ae/cc_toner_0.png"
+ },
+ {
+  "slug": "cc_toner",
+  "mn": "CC Toner",
+  "k": 1,
+  "vals": {
+   "1": 1,
+   "2": [
+    1,
+    0.9,
+    0.6,
+    1
+   ],
+   "6": [
+    0.1,
+    0,
+    0.3,
+    1
+   ]
+  },
+  "held": false,
+  "png": "ae/cc_toner_1.png"
+ },
+ {
+  "slug": "cc_toner",
+  "mn": "CC Toner",
+  "k": 2,
+  "vals": {
+   "1": 3,
+   "7": 30
+  },
+  "held": false,
+  "png": "ae/cc_toner_2.png"
+ },
+ {
+  "slug": "cc_color_offset",
+  "mn": "CC Color Offset",
+  "k": 0,
+  "vals": {
+   "1": 90,
+   "2": 180,
+   "3": 270
+  },
+  "held": false,
+  "png": "ae/cc_color_offset_0.png"
+ },
+ {
+  "slug": "cc_color_offset",
+  "mn": "CC Color Offset",
+  "k": 1,
+  "vals": {
+   "1": 120,
+   "4": 2
+  },
+  "held": false,
+  "png": "ae/cc_color_offset_1.png"
+ },
+ {
+  "slug": "cc_color_offset",
+  "mn": "CC Color Offset",
+  "k": 2,
+  "vals": {
+   "2": 200,
+   "4": 3
+  },
+  "held": false,
+  "png": "ae/cc_color_offset_2.png"
+ },
+ {
+  "slug": "arithmetic",
+  "mn": "ADBE Arithmetic",
+  "k": 0,
+  "vals": {
+   "1": 3,
+   "2": 128,
+   "3": 64,
+   "4": 200
+  },
+  "held": false,
+  "png": "ae/arithmetic_0.png"
+ },
+ {
+  "slug": "arithmetic",
+  "mn": "ADBE Arithmetic",
+  "k": 1,
+  "vals": {
+   "1": 4,
+   "2": 100,
+   "3": 100,
+   "4": 100,
+   "5": 0
+  },
+  "held": false,
+  "png": "ae/arithmetic_1.png"
+ },
+ {
+  "slug": "arithmetic",
+  "mn": "ADBE Arithmetic",
+  "k": 2,
+  "vals": {
+   "1": 11,
+   "2": 128,
+   "3": 128,
+   "4": 128
+  },
+  "held": false,
+  "png": "ae/arithmetic_2.png"
+ },
+ {
+  "slug": "remove_color_matting",
+  "mn": "ADBE Remove Color Matting",
+  "k": 0,
+  "vals": {
+   "1": [
+    1,
+    1,
+    1,
+    1
+   ]
+  },
+  "held": false,
+  "png": "ae/remove_color_matting_0.png"
+ },
+ {
+  "slug": "remove_color_matting",
+  "mn": "ADBE Remove Color Matting",
+  "k": 1,
+  "vals": {
+   "1": [
+    0.5,
+    0.5,
+    0.5,
+    1
+   ]
+  },
+  "held": false,
+  "png": "ae/remove_color_matting_1.png"
+ },
+ {
+  "slug": "color_key",
+  "mn": "ADBE Color Key",
+  "k": 0,
+  "vals": {
+   "1": [
+    1,
+    0.2,
+    0.2,
+    1
+   ],
+   "2": 60
+  },
+  "held": false,
+  "png": "ae/color_key_0.png"
+ },
+ {
+  "slug": "color_key",
+  "mn": "ADBE Color Key",
+  "k": 1,
+  "vals": {
+   "1": [
+    0,
+    1,
+    0,
+    1
+   ],
+   "2": 120,
+   "4": 3
+  },
+  "held": false,
+  "png": "ae/color_key_1.png"
+ },
+ {
+  "slug": "extract",
+  "mn": "ADBE Extract",
+  "k": 0,
+  "vals": {
+   "3": 60,
+   "4": 200
+  },
+  "held": false,
+  "png": "ae/extract_0.png"
+ },
+ {
+  "slug": "extract",
+  "mn": "ADBE Extract",
+  "k": 1,
+  "vals": {
+   "2": 2,
+   "3": 100,
+   "5": 40
+  },
+  "held": false,
+  "png": "ae/extract_1.png"
+ },
+ {
+  "slug": "extract",
+  "mn": "ADBE Extract",
+  "k": 2,
+  "vals": {
+   "3": 80,
+   "4": 180,
+   "7": 1
+  },
+  "held": false,
+  "png": "ae/extract_2.png"
+ },
+ {
+  "slug": "spill_suppressor",
+  "mn": "ADBE Spill Suppressor",
+  "k": 0,
+  "vals": {},
+  "held": false,
+  "png": "ae/spill_suppressor_0.png"
+ },
+ {
+  "slug": "spill_suppressor",
+  "mn": "ADBE Spill Suppressor",
+  "k": 1,
+  "vals": {
+   "1": [
+    0,
+    0,
+    1,
+    1
+   ],
+   "3": 60
+  },
+  "held": false,
+  "png": "ae/spill_suppressor_1.png"
+ },
+ {
+  "slug": "cc_threshold",
+  "mn": "CC Threshold",
+  "k": 0,
+  "vals": {},
+  "held": false,
+  "png": "ae/cc_threshold_0.png"
+ },
+ {
+  "slug": "cc_threshold",
+  "mn": "CC Threshold",
+  "k": 1,
+  "vals": {
+   "1": 80,
+   "2": 2,
+   "3": 1
+  },
+  "held": false,
+  "png": "ae/cc_threshold_1.png"
+ },
+ {
+  "slug": "cc_threshold",
+  "mn": "CC Threshold",
+  "k": 2,
+  "vals": {
+   "1": 160,
+   "4": 40
+  },
+  "held": false,
+  "png": "ae/cc_threshold_2.png"
+ },
+ {
+  "slug": "cc_threshold_rgb",
+  "mn": "CC Threshold RGB",
+  "k": 0,
+  "vals": {},
+  "held": false,
+  "png": "ae/cc_threshold_rgb_0.png"
+ },
+ {
+  "slug": "cc_threshold_rgb",
+  "mn": "CC Threshold RGB",
+  "k": 1,
+  "vals": {
+   "1": 60,
+   "2": 200,
+   "3": 100,
+   "5": 1
+  },
+  "held": false,
+  "png": "ae/cc_threshold_rgb_1.png"
+ },
+ {
+  "slug": "median",
+  "mn": "ADBE Median",
+  "k": 0,
+  "vals": {
+   "1": 3
+  },
+  "held": false,
+  "png": "ae/median_0.png"
+ },
+ {
+  "slug": "median",
+  "mn": "ADBE Median",
+  "k": 1,
+  "vals": {
+   "1": 8,
+   "2": 1
+  },
+  "held": false,
+  "png": "ae/median_1.png"
+ },
+ {
+  "slug": "color_emboss",
+  "mn": "ADBE Color Emboss",
+  "k": 0,
+  "vals": {},
+  "held": false,
+  "png": "ae/color_emboss_0.png"
+ },
+ {
+  "slug": "color_emboss",
+  "mn": "ADBE Color Emboss",
+  "k": 1,
+  "vals": {
+   "1": 120,
+   "2": 3,
+   "3": 200
+  },
+  "held": false,
+  "png": "ae/color_emboss_1.png"
  }
 ]

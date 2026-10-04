@@ -1,0 +1,48 @@
+{
+ "slug": "extract",
+ "aeMatchName": "ADBE Extract",
+ "wgsl": "ae_extract.wgsl",
+ "passes": 1,
+ "textures": {},
+ "params": [
+  {
+   "ae": 2,
+   "field": "channel",
+   "kind": "enum",
+   "default": 1
+  },
+  {
+   "ae": 3,
+   "field": "blackPt",
+   "kind": "number",
+   "default": 0
+  },
+  {
+   "ae": 4,
+   "field": "whitePt",
+   "kind": "number",
+   "default": 255
+  },
+  {
+   "ae": 5,
+   "field": "blackSoft",
+   "kind": "number",
+   "default": 0
+  },
+  {
+   "ae": 6,
+   "field": "whiteSoft",
+   "kind": "number",
+   "default": 0
+  },
+  {
+   "ae": 7,
+   "field": "invert",
+   "kind": "bool",
+   "default": 0
+  }
+ ],
+ "status": "unverified",
+ "auto": false,
+ "notes": "Not yet measured against After Effects.  Parameter indices follow the After Effects parameter order as documented by Adobe; `render_refs.py --params` records the real list."
+}

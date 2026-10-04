@@ -43,7 +43,7 @@ plug-in. Some can come later through the Rive scene itself rather than as a shad
 
 | Effect | | Note |
 |---|---|---|
-| Arithmetic | ⬜ | |
+| Arithmetic | 🟡 | lot 3 |
 | Blend | ⬜ | needs a second layer |
 | Calculations | ⬜ | needs a second layer |
 | CC Composite | ⬜ | parameter list already measured |
@@ -51,7 +51,7 @@ plug-in. Some can come later through the Rive scene itself rather than as a shad
 | Compound Arithmetic | ⬜ | needs a second layer |
 | Invert | ✅ | |
 | Minimax | ✅ | |
-| Remove Color Matting | ⬜ | |
+| Remove Color Matting | 🟡 | lot 3 |
 | Set Channels | 🟡 | lot 1; the layer itself as source |
 | Set Matte | ⬜ | needs a second layer |
 | Shift Channels | ✅ | |
@@ -66,13 +66,13 @@ plug-in. Some can come later through the Rive scene itself rather than as a shad
 | Brightness & Contrast | ✅ | |
 | Broadcast Colors | ⬜ | |
 | CC Color Neutralizer | ⬜ | |
-| CC Color Offset | ⬜ | |
+| CC Color Offset | 🟡 | lot 3 |
 | CC Kernel | ⬜ | |
-| CC Toner | ⬜ | |
-| Change Color | ⬜ | |
+| CC Toner | 🟡 | lot 3 |
+| Change Color | 🟡 | lot 3 |
 | Change to Color | ⬜ | tolerance is a parameter group |
 | Channel Mixer | 🟡 | lot 1 |
-| Color Balance | ⬜ | |
+| Color Balance | 🟡 | lot 3 |
 | Color Balance (HLS) | ✅ | |
 | Color Link | ⛔ | samples another layer over time |
 | Color Stabilizer | ⛔ | tracks reference frames |
@@ -168,15 +168,15 @@ plug-in. Some can come later through the Rive scene itself rather than as a shad
 | Advanced Spill Suppressor | ⬜ | |
 | CC Simple Wire Removal | ⬜ | |
 | Color Difference Key | ⬜ | |
-| Color Key | ⬜ | |
+| Color Key | 🟡 | lot 3 |
 | Color Range | ⬜ | |
 | Difference Matte | ⬜ | needs a second layer |
-| Extract | ⬜ | |
+| Extract | 🟡 | lot 3 |
 | Inner/Outer Key | ⛔ | mask-driven |
 | Key Cleaner | ⬜ | |
 | Linear Color Key | ⬜ | |
 | Luma Key | ✅ | |
-| Spill Suppressor | ⬜ | |
+| Spill Suppressor | 🟡 | lot 3 |
 
 ## Matte
 
@@ -193,7 +193,7 @@ plug-in. Some can come later through the Rive scene itself rather than as a shad
 | Add Grain, Match Grain, Remove Grain | ⛔ | grain models and sampling over time |
 | Dust & Scratches | ⬜ | |
 | Fractal Noise, Turbulent Noise | ⬜ | proprietary noise: like Turbulent Displace, approx at best |
-| Median | ⬜ | |
+| Median | 🟡 | lot 3 |
 | Noise, Noise Alpha, Noise HLS, Noise HLS Auto | ⬜ | random; seed law to measure |
 
 ## Perspective
@@ -222,9 +222,9 @@ plug-in. Some can come later through the Rive scene itself rather than as a shad
 | CC Mr. Smoothie | ⬜ | |
 | CC Plastic | ⬜ | |
 | CC RepeTile | ⬜ | |
-| CC Threshold, CC Threshold RGB | ⬜ | |
+| CC Threshold, CC Threshold RGB | 🟡 | lot 3 |
 | CC Vignette | 🟡 | lot 2 |
-| Color Emboss | ⬜ | |
+| Color Emboss | 🟡 | lot 3 |
 | Emboss | ✅ | |
 | Find Edges | 🟡 | lot 2 |
 | Glow | ✅ | |

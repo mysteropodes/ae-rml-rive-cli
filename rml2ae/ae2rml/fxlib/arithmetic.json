@@ -1,0 +1,42 @@
+{
+ "slug": "arithmetic",
+ "aeMatchName": "ADBE Arithmetic",
+ "wgsl": "ae_arithmetic.wgsl",
+ "passes": 1,
+ "textures": {},
+ "params": [
+  {
+   "ae": 1,
+   "field": "op",
+   "kind": "enum",
+   "default": 1
+  },
+  {
+   "ae": 2,
+   "field": "rv",
+   "kind": "number",
+   "default": 0
+  },
+  {
+   "ae": 3,
+   "field": "gv",
+   "kind": "number",
+   "default": 0
+  },
+  {
+   "ae": 4,
+   "field": "bv",
+   "kind": "number",
+   "default": 0
+  },
+  {
+   "ae": 5,
+   "field": "clip",
+   "kind": "bool",
+   "default": 1
+  }
+ ],
+ "status": "unverified",
+ "auto": false,
+ "notes": "Not yet measured against After Effects.  Parameter indices follow the After Effects parameter order as documented by Adobe; `render_refs.py --params` records the real list."
+}

@@ -1,0 +1,72 @@
+{
+ "slug": "color_balance",
+ "aeMatchName": "ADBE Color Balance 2",
+ "wgsl": "ae_color_balance.wgsl",
+ "passes": 1,
+ "textures": {},
+ "params": [
+  {
+   "ae": 1,
+   "field": "sR",
+   "kind": "number",
+   "default": 0
+  },
+  {
+   "ae": 2,
+   "field": "sG",
+   "kind": "number",
+   "default": 0
+  },
+  {
+   "ae": 3,
+   "field": "sB",
+   "kind": "number",
+   "default": 0
+  },
+  {
+   "ae": 4,
+   "field": "mR",
+   "kind": "number",
+   "default": 0
+  },
+  {
+   "ae": 5,
+   "field": "mG",
+   "kind": "number",
+   "default": 0
+  },
+  {
+   "ae": 6,
+   "field": "mB",
+   "kind": "number",
+   "default": 0
+  },
+  {
+   "ae": 7,
+   "field": "hR",
+   "kind": "number",
+   "default": 0
+  },
+  {
+   "ae": 8,
+   "field": "hG",
+   "kind": "number",
+   "default": 0
+  },
+  {
+   "ae": 9,
+   "field": "hB",
+   "kind": "number",
+   "default": 0
+  },
+  {
+   "ae": 10,
+   "field": "preserve",
+   "kind": "bool",
+   "default": 0
+  }
+ ],
+ "status": "unverified",
+ "auto": false,
+ "notes": "Not yet measured against After Effects.  Parameter indices follow the After Effects parameter order as documented by Adobe; `render_refs.py --params` records the real list."
+}
