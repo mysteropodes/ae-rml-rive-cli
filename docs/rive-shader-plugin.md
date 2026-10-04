@@ -2,13 +2,14 @@
 
 Rive Shader is an After Effects effect (SmartFX, under **Rive > Rive Shader**, match name `RIVE RiveShader`) that
 runs a Rive `.wgsl` shader on a layer, unchanged. The layer is texture 0, the shader's `struct Params` becomes
-effect parameters, and extra textures become Layer parameters. Rendering uses wgpu-native (Metal) linked
-statically: upload, one full-screen pass, read back, at 8, 16 and 32 bits per channel.
+effect parameters, and extra textures become Layer parameters. Rendering uses wgpu-native linked statically (Metal on
+macOS, Direct3D 12 on Windows): upload, one full-screen pass, read back, at 8, 16 and 32 bits per channel.
 
 It exists so that a post-process written for Rive (and the [fxlib](fxlib.md) effects) can be seen in After Effects,
 and so that [rml2ae](../README.md) can reproduce Rive-only content such as image meshes.
 
-Platform: macOS, Apple Silicon, After Effects 2024 or later (developed and tested on 26.x).
+Platforms: macOS on Apple Silicon (developed and tested in After Effects 26.x), and Windows x64 (new: built by
+`build.ps1`, its GPU module checked in CI, not yet tested inside After Effects). After Effects 2024 or later.
 
 ## Build and install
 
@@ -19,7 +20,8 @@ Requirements:
 - the free **Adobe After Effects SDK**, downloaded from the Adobe developer console and unzipped where the build
   expects it (`~/.cache/ae-plugin-deps/AfterEffectsSDK`).
 
-wgpu-native is downloaded by the build (`~/.cache/ae-plugin-deps/wgpu-native`, macOS arm64 release).
+wgpu-native is downloaded by the build when missing (`~/.cache/ae-plugin-deps/wgpu-native`): the release pinned in
+`rml2ae/plugin/wgpu-native.txt`, sha256 checked.
 
 ```bash
 cd rml2ae/plugin
@@ -36,6 +38,24 @@ Restart After Effects after installing.
 **Unsigned plugin.** The build is signed ad hoc, not with an Apple Developer ID. The first time After Effects loads
 it, macOS blocks it: open **System Settings > Privacy & Security** and allow it once, then relaunch After Effects.
 
+### Windows
+
+Requirements: Visual Studio 2022 or its Build Tools with **Desktop development with C++**, and the After Effects SDK
+for Windows in `%LOCALAPPDATA%\ae-plugin-deps\AfterEffectsSDK` (or `AE_SDK`). From PowerShell:
+
+```powershell
+cd rml2ae\plugin
+.\build.ps1              # MSVC + Ninja, PiPL (cl /EP -> PiPLTool -> .rc), output RiveShader.aex, staged in %USERPROFILE%\AE-Dev-Plugins
+.\build.ps1 clean        # full rebuild
+.\build.ps1 install      # also copies to <After Effects>\Support Files\Plug-ins\Rive (After Effects closed, one UAC prompt)
+.\build.ps1 dist         # also makes a zip
+.\build.ps1 -GpuOnly     # only the GPU module and rs_apply, no SDK needed
+```
+
+`build.ps1` finds Visual Studio with `vswhere`, so a plain PowerShell window is enough. The Windows build uses the same
+sources as macOS, except the file picker (`RsDialog_win.cpp`, the common Open dialog) and the PiPL resource
+(`pipl_win.cmake`). Set `RS_WGPU_BACKEND` (`dx12`, `vulkan`, `gl`, `any`) to force a backend.
+
 ## Using it
 
 1. Apply **Rive > Rive Shader** to a layer.
@@ -44,7 +64,8 @@ it, macOS blocks it: open **System Settings > Privacy & Security** and allow it 
 3. Adjust the generated parameters.
 
 The shader is chosen by the integer **Shader** slider (scriptable). The id is resolved through
-`~/Library/Application Support/RiveShader/shaders.tsv`, lines of `id<TAB>path`.
+`shaders.tsv`, lines of `id<TAB>path` (UTF-8): `~/Library/Application Support/RiveShader/` on macOS,
+`%APPDATA%\RiveShader\` on Windows.
 
 ### WGSL conventions
 
@@ -99,7 +120,7 @@ For ExtendScript (`effect.property(i)`):
 
 An unknown shader id, an unreadable file, invalid WGSL or a missing GPU never opens a dialog. The input is passed
 through unchanged, the name of the **Shader** parameter says what failed, and the detail is written to
-`~/Library/Application Support/RiveShader/riveshader.log`.
+`riveshader.log` next to `shaders.tsv`.
 
 ## Behaviour inside an effect stack
 
@@ -143,6 +164,11 @@ not meant to be edited by hand.
 | `shadertest.py` | A shader in After Effects vs the oracle, tick, unknown id, broken shader | 0/255 (8 bit), within 1 (16 bit), pass-through on errors |
 | `maptest.py` | Layer textures, colour, point, sliders | 0/255 |
 | `stacktest.py` | Placement of the shader's output inside effect stacks and masks | 8 of 8 cases, 0/255 |
+
+In the repository, `rml2ae/plugin/tools/oracle_check.py <rs_apply>` compares the GPU module (`rs_apply`) with
+`wgsl_apply.py` on every single-pass fxlib setting of `fxref/renders.json`. On Linux (Vulkan, lavapipe) all 292
+renders are identical (0 levels apart). The CI's `windows` job runs it with the module built by MSVC on the
+software Direct3D 12 adapter.
 
 The harnesses refuse to run unless the open After Effects project is empty (or contains only their own items) and
 capture at most 10 frames per script. Long renders go through `aerender` on a saved copy.

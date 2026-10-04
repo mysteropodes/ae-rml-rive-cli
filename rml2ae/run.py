@@ -1,8 +1,10 @@
-"""Execute a .jsx in After Effects 2026 (AppleScript DoScriptFile), render comparison frames (AE vs `rive --screenshot`)."""
+"""Execute a .jsx in After Effects (macOS: AppleScript DoScriptFile, Windows: AfterFX.exe -r), render comparison frames
+(AE vs `rive --screenshot`)."""
 import os
 import subprocess
 import time
 
+from . import aeapp
 from .jsx import js
 
 
@@ -10,8 +12,7 @@ RIVE_SHOT_LAG = 1.0 / 60.0     # see shots(): the Rive CLI screenshot is one 60 
 
 
 def osa(jsx):
-    subprocess.Popen(["osascript", "-e", f'tell application "Adobe After Effects 2026" to DoScriptFile "{jsx}"'],
-                     stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+    aeapp.run_script(jsx)
 
 
 def run(jsx, log, timeout=900):

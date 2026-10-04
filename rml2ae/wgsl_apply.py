@@ -68,6 +68,8 @@ def apply(shader_path, src_png, out_png, values=None, textures=None, size=None):
     w, h = size or img.size
     values.setdefault("size", (w, h))
     adapter = wgpu.gpu.request_adapter_sync(power_preference="high-performance")
+    if adapter is None:      # no GPU (e.g. a CI machine): the software adapter (WARP on Windows, lavapipe on Linux)
+        adapter = wgpu.gpu.request_adapter_sync(power_preference="high-performance", force_fallback_adapter=True)
     device = adapter.request_device_sync()
     shader = device.create_shader_module(code=src)          # naga: WGSL -> MSL on macOS
     fmt = wgpu.TextureFormat.rgba8unorm

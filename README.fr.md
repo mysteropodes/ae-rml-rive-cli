@@ -21,9 +21,16 @@ Aller-retour entre **Adobe After Effects** et **Rive**, en ligne de commande, vi
 Le schéma, l'installation et l'usage sont dans `README.md` (identiques) :
 
 ```bash
-./install.sh                      # tout
+./install.sh                      # macOS : tout
 ./install.sh rml2ae ae2rml        # ou seulement certaines parties : rml2ae  ae2rml  review-kit  plugin  skills
 ```
+
+```powershell
+powershell -ExecutionPolicy Bypass -File install.ps1                  # Windows : tout
+powershell -ExecutionPolicy Bypass -File install.ps1 rml2ae ae2rml    # ou seulement certaines parties (mêmes noms)
+```
+
+Le plugin Rive Shader se compile avec `build.sh` sur macOS et `build.ps1` sur Windows (voir `docs/install.md`).
 
 Le **Rive CLI n'est pas dans ce dépôt** : l'installeur le récupère chez Rive (tap Homebrew `rive-app/tap` ou
 `releases.rive.app`, sha256 vérifié). Licence MIT.

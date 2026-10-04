@@ -6,10 +6,13 @@ vec3/vec4 whose comment mentions "color" -> Color slots; everything else -> gene
 textures at @binding(3+) -> Layer slots. Field values come from the Luau `buffer.writef32(b, offset, expr)` lines
 (`num(vm, "name", default)` -> the ViewModel value, else the default), else the comment's `default x`.
 
-The shader path is registered in ~/Library/Application Support/RiveShader/shaders.tsv (id = "Shader" slider value).
+The shader path is registered in the plugin's shaders.tsv (id = "Shader" slider value): macOS
+~/Library/Application Support/RiveShader, Windows %APPDATA%\\RiveShader (aeapp.shader_registry()).
 """
 import os
 import re
+
+from rml2ae import aeapp
 
 MATCH_NAME = "RIVE RiveShader"
 NUM_SLIDERS, NUM_COLORS, NUM_POINTS, NUM_TEXTURES = 16, 4, 4, 3
@@ -21,7 +24,7 @@ IDX_TEX1 = IDX_PT1 + NUM_POINTS        # 30
 HOST = ("size", "tick", "fxTick", "seed")
 TYPES = {"f32": (1, 4, 4), "i32": (1, 4, 4), "u32": (1, 4, 4), "vec2<f32>": (2, 8, 8), "vec3<f32>": (3, 12, 16), "vec4<f32>": (4, 16, 16),
          "vec2<i32>": (2, 8, 8), "vec2<u32>": (2, 8, 8), "vec2f": (2, 8, 8), "vec3f": (3, 12, 16), "vec4f": (4, 16, 16)}
-REGISTRY = os.path.expanduser("~/Library/Application Support/RiveShader/shaders.tsv")
+REGISTRY = aeapp.shader_registry()
 
 
 def is_host(name):

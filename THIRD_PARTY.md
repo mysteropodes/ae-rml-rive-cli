@@ -11,7 +11,7 @@ Nothing below is redistributed in this repository unless stated.
 | **Rive runtime** headers | `rml2ae/schema.json` is generated from the public headers of [rive-runtime](https://github.com/rive-app/rive-runtime) by `rml2ae/tools/make_schema.py`; the `.riv` reader follows the same format | MIT (© Rive) — `rml2ae/LICENSE.rive-runtime.txt` |
 | **py-aep** ([forticheprod/py-aep](https://github.com/forticheprod/py-aep)) | reads `.aep` files for ae2rml, without After Effects | MIT (© Fortiche Prod) — installed with pip |
 | **Adobe After Effects SDK** | builds the Rive Shader plugin | Adobe SDK terms (free download, compiled plugins may be distributed); not included |
-| **wgpu-native** | GPU backend of the plugin (static) | MIT / Apache-2.0 — downloaded by `build.sh` |
+| **wgpu-native** | GPU backend of the plugin (static) | MIT / Apache-2.0 — downloaded by `build.sh` / `build.ps1` (version and sha256 in `rml2ae/plugin/wgpu-native.txt`) |
 | **Montserrat** | font of the synthetic test case | SIL Open Font License 1.1 — `rml2ae/tests/cases/features/OFL-Montserrat.txt` |
 
 ae2rml reads a few bytes py-aep does not expose (default parameter values in `pard` blocks, pseudo-effect

@@ -4,7 +4,9 @@
 #   ./build.sh clean      wipe the build dir first
 # Deps (outside the synced drive):
 #   ~/.cache/ae-plugin-deps/AfterEffectsSDK   Adobe SDK (Examples/Headers, Examples/Resources, Examples/Util)
-#   ~/.cache/ae-plugin-deps/wgpu-native       wgpu-native release (include/webgpu, lib/)
+#   ~/.cache/ae-plugin-deps/wgpu-native       wgpu-native release (include/webgpu, lib/): downloaded when missing,
+#                                             sha256 checked against wgpu-native.txt
+# Windows: build.ps1.
 # Stage dir: ~/AE-Dev-Plugins — AE follows aliases/symlinks in its Plug-ins folder, so one-time (admin):
 #   sudo ln -s ~/AE-Dev-Plugins "/Applications/Adobe After Effects 2026/Plug-ins/RiveDev"
 set -euo pipefail
@@ -19,6 +21,19 @@ STAGE="$HOME/AE-Dev-Plugins"
 XCODE_SDK=/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk
 [[ -z "${SDKROOT:-}" && -d "$XCODE_SDK" ]] && export SDKROOT="$XCODE_SDK"
 mkdir -p "$BUILD" "$STAGE"
+
+# 0. wgpu-native, pinned in wgpu-native.txt (an existing ~/.cache/ae-plugin-deps/wgpu-native is used as it is)
+WGPU="$DEPS/wgpu-native"
+if [[ ! -f "$WGPU/lib/libwgpu_native.a" ]]; then
+    TAG="$(sed -n 's/^tag=//p' "$HERE/wgpu-native.txt")"
+    read -r ASSET SHA <<< "$(sed -n 's/^macos-aarch64=//p' "$HERE/wgpu-native.txt")"
+    ZIP="$DEPS/$ASSET"
+    curl -fsSL "https://github.com/gfx-rs/wgpu-native/releases/download/$TAG/$ASSET" -o "$ZIP"
+    GOT="$(shasum -a 256 "$ZIP" | cut -d' ' -f1)"
+    if [[ "$GOT" != "$SHA" ]]; then rm -f "$ZIP"; echo "wgpu-native: sha256 $GOT differs from wgpu-native.txt, archive deleted"; exit 1; fi
+    rm -rf "$WGPU" && mkdir -p "$WGPU" && unzip -q "$ZIP" -d "$WGPU" && rm -f "$ZIP"
+    echo "wgpu-native $TAG: sha256 ok, unpacked in $WGPU"
+fi
 
 cmake -S "$HERE" -B "$BUILD" -G Ninja -DCMAKE_BUILD_TYPE=Release -DAE_SDK="$AE_SDK" >/dev/null
 cmake --build "$BUILD" --target flagcheck RiveShader

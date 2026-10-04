@@ -30,16 +30,17 @@ import time
 HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, os.path.dirname(HERE))
 
-AE_APPS = sorted(glob.glob("/Applications/Adobe After Effects */"))
-AE_APP = AE_APPS[-1] if AE_APPS else None
-AERENDER = os.path.join(AE_APP, "aerender") if AE_APP else None
+from rml2ae import aeapp  # noqa: E402
+
+AE_APPS = aeapp.APPS
+AE_APP = aeapp.APP
+AERENDER = aeapp.AERENDER
 RS_DEFAULTS = ["Paramètres optimaux", "Best Settings"]
 OM_PNG_DEFAULTS = ["PNG", "PNG Sequence", "Séquence TIFF avec alpha", "TIFF Sequence with Alpha"]
 
 
 def ae_running():
-    r = subprocess.run(["pgrep", "-f", "Adobe After Effects .*app/Contents/MacOS/After Effects$"], capture_output=True, text=True)
-    return bool(r.stdout.strip())
+    return aeapp.running()
 
 
 def parse(argv):
@@ -76,7 +77,7 @@ def cmd_doctor(args, flags):
         ok = ok and good
         print(f"  [{'ok' if good else '!!'}] {label}{(' — ' + detail) if detail else ''}")
     print("ae doctor")
-    line("After Effects app", AE_APP is not None, AE_APP or "not found in /Applications")
+    line("After Effects app", AE_APP is not None, AE_APP or f"not found in {aeapp.WHERE}")
     line("After Effects running", ae_running(), "" if ae_running() else "open AE for build/watch")
     line("aerender", bool(AERENDER and os.path.exists(AERENDER)), AERENDER or "")
     rv = shutil.which("rive")
@@ -88,7 +89,8 @@ def cmd_doctor(args, flags):
         line("python deps (PIL, fontTools)", True)
     except Exception as e:
         line("python deps (PIL, fontTools)", False, str(e))
-    plug = glob.glob(os.path.expanduser("~/AE-Dev-Plugins/RiveShader.plugin")) + glob.glob(os.path.join(AE_APP or "", "Plug-ins", "**", "RiveShader.plugin"), recursive=True)
+    plug = glob.glob(os.path.join(os.path.expanduser("~"), "AE-Dev-Plugins", aeapp.PLUGIN_NAME)) + \
+        (glob.glob(os.path.join(aeapp.PLUGINS, "**", aeapp.PLUGIN_NAME), recursive=True) if aeapp.PLUGINS else [])
     line("Rive Shader plugin", bool(plug), plug[0] if plug else "not installed: shaders fall back to native AE effects")
     if args:
         p = os.path.abspath(args[0])

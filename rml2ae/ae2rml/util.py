@@ -5,6 +5,7 @@ import math
 import os
 import re
 import shutil
+import sys
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 PKG = os.path.dirname(HERE)                       # rml2ae/
@@ -210,10 +211,19 @@ def find_footage(path, aep_path, extra_dirs=()):
 
 
 # ------------------------------------------------------------------ fonts
-FONT_DIRS = [os.path.expanduser("~/Library/Fonts"), "/Library/Fonts", "/System/Library/Fonts",
-             "/System/Library/Fonts/Supplemental",
-             os.path.expanduser("~/Library/Application Support/Adobe/CoreSync/plugins/livetype/.r"),
-             os.path.expanduser("~/Library/Application Support/Adobe/CoreSync/plugins/livetype/r")]
+if sys.platform.startswith("win"):
+    _WINDIR = os.environ.get("WINDIR", r"C:\Windows")
+    _LOCAL = os.environ.get("LOCALAPPDATA", os.path.expanduser("~"))
+    _ROAMING = os.environ.get("APPDATA", os.path.expanduser("~"))
+    # system fonts, fonts installed for the current user only, Adobe Fonts (Creative Cloud) activated fonts
+    FONT_DIRS = [os.path.join(_WINDIR, "Fonts"), os.path.join(_LOCAL, "Microsoft", "Windows", "Fonts"),
+                 os.path.join(_ROAMING, "Adobe", "CoreSync", "plugins", "livetype", ".r"),
+                 os.path.join(_ROAMING, "Adobe", "CoreSync", "plugins", "livetype", "r")]
+else:
+    FONT_DIRS = [os.path.expanduser("~/Library/Fonts"), "/Library/Fonts", "/System/Library/Fonts",
+                 "/System/Library/Fonts/Supplemental",
+                 os.path.expanduser("~/Library/Application Support/Adobe/CoreSync/plugins/livetype/.r"),
+                 os.path.expanduser("~/Library/Application Support/Adobe/CoreSync/plugins/livetype/r")]
 _FONT_INDEX = None
 
 
@@ -276,7 +286,8 @@ def find_font(ps):
     return None
 
 
-STAND_IN_TTC = "/System/Library/Fonts/Helvetica.ttc"
+STAND_IN_TTC = (os.path.join(os.environ.get("WINDIR", r"C:\Windows"), "Fonts", "arial.ttf") if sys.platform.startswith("win")
+                else "/System/Library/Fonts/Helvetica.ttc")
 
 
 def copy_font(ps, out_dir, report):
