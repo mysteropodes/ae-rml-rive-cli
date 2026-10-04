@@ -93,6 +93,7 @@ python3 review-kit/review_install.py out/demo
 | [docs/ae2rml.md](docs/ae2rml.md) | After Effects → Rive: options, what converts, limits |
 | [docs/rml2ae.md](docs/rml2ae.md) | Rive → After Effects: the `ae` command, incremental builds, `ae pull`, limits |
 | [docs/fxlib.md](docs/fxlib.md) | the WGSL library of After Effects effects and how each one is measured |
+| [docs/fxlib-roadmap.md](docs/fxlib-roadmap.md) | every native After Effects effect: done, unverified, to do, not planned |
 | [docs/rive-shader-plugin.md](docs/rive-shader-plugin.md) | the After Effects plugin, WGSL conventions, image meshes |
 | [docs/review-kit.md](docs/review-kit.md) | review notes in the Rive Viewer |
 | [docs/agents.md](docs/agents.md) | using the tools from a coding agent |

@@ -169,6 +169,8 @@ Everything needed to measure an effect is in the repository:
 
 ## Effect table
 
+What is still missing, effect by effect, is in [fxlib-roadmap.md](fxlib-roadmap.md).
+
 37 measured effects: 27 exact, 8 close, 2 approx, plus 7 unverified ones (below the table). "Auto" is whether ae2rml applies the effect without being asked; the two effects
 marked `no` are measured to be further from After Effects than leaving the effect out, so they remain a
 `<!-- ae: effect ... -->` comment plus an entry in `effects_todo.json`.
