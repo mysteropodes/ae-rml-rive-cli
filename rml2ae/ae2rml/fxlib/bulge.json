@@ -1,0 +1,45 @@
+{
+ "slug": "bulge",
+ "aeMatchName": "ADBE Bulge",
+ "wgsl": "ae_bulge.wgsl",
+ "passes": 1,
+ "textures": {},
+ "params": [
+  {
+   "ae": 1,
+   "field": "hRadius",
+   "kind": "number",
+   "default": 50
+  },
+  {
+   "ae": 2,
+   "field": "vRadius",
+   "kind": "number",
+   "default": 50
+  },
+  {
+   "ae": 3,
+   "field": "center",
+   "kind": "point",
+   "default": [
+    320,
+    180
+   ]
+  },
+  {
+   "ae": 4,
+   "field": "height",
+   "kind": "number",
+   "default": 1
+  },
+  {
+   "ae": 5,
+   "field": "taper",
+   "kind": "number",
+   "default": 0
+  }
+ ],
+ "status": "unverified",
+ "auto": false,
+ "notes": "Not yet measured against After Effects.  Parameter indices follow the After Effects parameter order as documented by Adobe; `render_refs.py --params` records the real list."
+}

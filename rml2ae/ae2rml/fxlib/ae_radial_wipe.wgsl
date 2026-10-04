@@ -78,7 +78,7 @@ fn fs_main(in: VSOut) -> @location(0) vec4<f32> {
     if (w >= 360.0) {
         return vec4<f32>(0.0);
     }
-    let v = vec2<f32>(ip) + vec2<f32>(0.5) - P.layerRect.xy - P.center;
+    let v = vec2<f32>(ip) + vec2<f32>(0.5) - P.center;           // both in canvas px (the host adds fxPad to points)
     let x = aeAngle(v) - P.startAngle;
     var m = 0.5 * w;                          // clockwise: [0, w]
     let mode = i32(round(P.wipe));

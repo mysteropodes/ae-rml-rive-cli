@@ -1,7 +1,7 @@
 // After Effects "Offset" (ADBE Offset) — UNVERIFIED: written from the effect's definition, not yet measured against
 // After Effects renders. The layer is scrolled so that its centre lands on "Shift Center To" and wraps around (tiles):
 // out(p) = in((p - (shift - layer centre)) mod layer size), bilinear for fractional shifts (premultiplied).
-// Blend With Original mixes with the untouched layer. Positions in layer pixels; the wrap uses P.layerRect.
+// Blend With Original mixes with the untouched layer. The wrap uses P.layerRect; Shift Center To arrives in canvas px.
 struct Params {
     size: vec2<f32>,
     shift: vec2<f32>,     // AE 1 Shift Center To (layer px)
@@ -66,7 +66,7 @@ fn fs_main(in: VSOut) -> @location(0) vec4<f32> {
     if (p.x < 0.0 || p.y < 0.0 || p.x > f32(wh.x) || p.y > f32(wh.y)) {
         return vec4<f32>(0.0);
     }
-    let d = P.shift - 0.5 * vec2<f32>(wh);
+    let d = (P.shift - P.layerRect.xy) - 0.5 * vec2<f32>(wh);   // point: canvas px (host adds fxPad) -> layer px
     let q = p - d - vec2<f32>(0.5);                               // source position in texel space
     let q0 = vec2<i32>(floor(q));
     let f = q - floor(q);

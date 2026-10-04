@@ -63,6 +63,21 @@ SPEC = {
     "venetian_blinds": ("ADBE Venetian Blinds", [({1: 40}, 0), ({1: 60, 2: 30, 3: 25, 4: 5}, 0), ({1: 50, 2: 90, 3: 16}, 0)]),
     "photo_filter": ("ADBE Photo Filter", [({}, 0), ({1: 12, 3: 60}, 0), ({1: 4, 3: 80, 4: 0}, 0)]),
     "vibrance": ("ADBE Vibrance", [({1: 60}, 0), ({1: -50}, 0), ({1: 30, 2: 40}, 0), ({2: -80}, 0)]),
+    # lot 2 (unverified until rendered): visible settings only; held-out ones are to be added independently
+    "threshold": ("ADBE Threshold2", [({1: 128}, 0), ({1: 60}, 0), ({1: 200}, 0)]),
+    "gamma_pedestal_gain": ("ADBE Gamma/Pedestal/Gain", [({2: 0.6, 5: 1.4, 8: 1.0}, 0), ({3: 0.1, 4: 0.9, 10: 0.7}, 0), ({1: 2.0}, 0)]),
+    "leave_color": ("ADBE Leave Color", [({1: 100, 2: [1, 0, 0, 1], 3: 30, 4: 10}, 0), ({1: 100, 2: [0, 0.3, 1, 1], 3: 15, 4: 20, 5: 2}, 0), ({1: 60, 2: [1, 1, 0, 1], 3: 40}, 0)]),
+    "sharpen": ("ADBE Sharpen", [({1: 20}, 0), ({1: 60}, 0)]),
+    "find_edges": ("ADBE Find Edges", [({}, 0), ({1: 1}, 0), ({2: 50}, 0)]),
+    "unsharp_mask": ("ADBE Unsharp Mask2", [({1: 100, 2: 3}, 0), ({1: 200, 2: 8, 3: 10}, 0)]),
+    "mirror": ("ADBE Mirror", [({1: [320, 180]}, 0), ({1: [200, 150], 2: 30}, 0), ({1: [320, 100], 2: 90}, 0)]),
+    "polar_coordinates": ("ADBE Polar Coordinates", [({1: 100}, 0), ({1: 100, 2: 2}, 0), ({1: 50}, 0)]),
+    "twirl": ("ADBE Twirl", [({1: 90}, 0), ({1: -200, 2: 60}, 0), ({1: 45, 3: [200, 120], 2: 40}, 0)]),
+    "bulge": ("ADBE Bulge", [({1: 120, 2: 120}, 0), ({1: 150, 2: 80, 4: -0.8}, 0), ({1: 100, 2: 100, 3: [200, 120], 4: 2}, 0)]),
+    "spherize": ("ADBE Spherize", [({1: 150}, 0), ({1: 100, 2: [220, 140]}, 0)]),
+    "radial_blur": ("ADBE Radial Blur", [({1: 20}, 0), ({1: 30, 3: 2}, 0), ({1: 15, 2: [200, 120]}, 0)]),
+    "cc_vignette": ("CC Vignette", [({1: 80}, 0), ({1: 100, 2: 120}, 0), ({1: 60, 3: [200, 120]}, 0)]),
+    "iris_wipe": ("ADBE Iris Wipe", [({3: 120}, 0), ({2: 10, 3: 150, 4: 1, 5: 60, 6: 20}, 0), ({1: [200, 140], 2: 8, 3: 100, 7: 15}, 0)]),
 }
 NEEDS_MAP = {"displacement_map": {1: 2}}   # param 1 (map layer) = layer index 2 (the map footage)
 

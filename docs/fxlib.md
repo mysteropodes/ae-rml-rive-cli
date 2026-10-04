@@ -171,7 +171,7 @@ Everything needed to measure an effect is in the repository:
 
 What is still missing, effect by effect, is in [fxlib-roadmap.md](fxlib-roadmap.md).
 
-37 measured effects: 27 exact, 8 close, 2 approx, plus 7 unverified ones (below the table). "Auto" is whether ae2rml applies the effect without being asked; the two effects
+37 measured effects: 27 exact, 8 close, 2 approx, plus 21 unverified ones (below the table). "Auto" is whether ae2rml applies the effect without being asked; the two effects
 marked `no` are measured to be further from After Effects than leaving the effect out, so they remain a
 `<!-- ae: effect ... -->` comment plus an entry in `effects_todo.json`.
 
@@ -229,6 +229,20 @@ real parameter list, then `render_refs.py <slug>`), add held-out settings, and m
 | Venetian Blinds | `ADBE Venetian Blinds` | `venetian_blinds` | Stripe origin and direction convention, feather law |
 | Photo Filter | `ADBE Photo Filter` | `photo_filter` | Menu index of Custom; preset colours; luminosity law |
 | Vibrance | `ADBE Vibrance` | `vibrance` | Approximation: Adobe's vibrance law is undocumented |
+| Threshold | `ADBE Threshold2` | `threshold` | Luma weights, >= vs > |
+| Gamma/Pedestal/Gain | `ADBE Gamma/Pedestal/Gain` | `gamma_pedestal_gain` | Black Stretch law; order of gamma and pedestal/gain |
+| Leave Color | `ADBE Leave Color` | `leave_color` | Distance in RGB and in hue; softness ramp |
+| Sharpen | `ADBE Sharpen` | `sharpen` | Kernel and strength per Amount |
+| Find Edges | `ADBE Find Edges` | `find_edges` | Operator and scale |
+| Unsharp Mask | `ADBE Unsharp Mask2` | `unsharp_mask` | Radius to sigma; threshold per channel or luma |
+| Mirror | `ADBE Mirror` | `mirror` | Which side is kept at a given angle |
+| Polar Coordinates | `ADBE Polar Coordinates` | `polar_coordinates` | Radius normalisation, angle origin |
+| Twirl | `ADBE Twirl` | `twirl` | Radius reference and falloff |
+| Bulge | `ADBE Bulge` | `bulge` | Height law, taper, pinning |
+| Spherize | `ADBE Spherize` | `spherize` | Sphere law |
+| Radial Blur | `ADBE Radial Blur` | `radial_blur` | Amount units per type; sampling |
+| CC Vignette | `CC Vignette` | `cc_vignette` | Falloff law and Angle of View |
+| Iris Wipe | `ADBE Iris Wipe` | `iris_wipe` | Polygon when Use Inner Radius is off; feather law |
 Notes:
 
 - **Gaussian Blur (legacy)** and **Fast Blur (legacy)** share the same kernel (confirmed on a third setting).

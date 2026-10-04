@@ -1,0 +1,24 @@
+{
+ "slug": "polar_coordinates",
+ "aeMatchName": "ADBE Polar Coordinates",
+ "wgsl": "ae_polar_coordinates.wgsl",
+ "passes": 1,
+ "textures": {},
+ "params": [
+  {
+   "ae": 1,
+   "field": "interp",
+   "kind": "number",
+   "default": 0
+  },
+  {
+   "ae": 2,
+   "field": "kind",
+   "kind": "enum",
+   "default": 1
+  }
+ ],
+ "status": "unverified",
+ "auto": false,
+ "notes": "Not yet measured against After Effects.  Parameter indices follow the After Effects parameter order as documented by Adobe; `render_refs.py --params` records the real list."
+}

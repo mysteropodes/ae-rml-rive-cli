@@ -33,11 +33,11 @@ plug-in. Some can come later through the Rive scene itself rather than as a shad
 | Fast Blur (legacy) | ✅ | |
 | Gaussian Blur | ✅ | |
 | Gaussian Blur (legacy) | ✅ | |
-| Radial Blur | ⬜ | lot 2, in progress |
+| Radial Blur | 🟡 | lot 2 |
 | Reduce Interlace Flicker | ⬜ | |
-| Sharpen | ⬜ | lot 2, in progress |
+| Sharpen | 🟡 | lot 2 |
 | Smart Blur | ⬜ | |
-| Unsharp Mask | ⬜ | lot 2, in progress |
+| Unsharp Mask | 🟡 | lot 2 |
 
 ## Channel
 
@@ -80,9 +80,9 @@ plug-in. Some can come later through the Rive scene itself rather than as a shad
 | Curves | ⬜ | the curve is custom data: needs a reader for it |
 | Equalize | ⛔ | histogram of the frame |
 | Exposure | ✅ | |
-| Gamma/Pedestal/Gain | ⬜ | lot 2, in progress |
+| Gamma/Pedestal/Gain | 🟡 | lot 2 |
 | Hue/Saturation | ✅ | |
-| Leave Color | ⬜ | lot 2, in progress |
+| Leave Color | 🟡 | lot 2 |
 | Levels | ✅ | |
 | Levels (Individual Controls) | ⬜ | same maths as Levels, one parameter per channel |
 | Lumetri Color | ⛔ | too large for now (LUTs, curves, wheels); later |
@@ -99,7 +99,7 @@ plug-in. Some can come later through the Rive scene itself rather than as a shad
 | Effect | | Note |
 |---|---|---|
 | Bezier Warp | ⬜ | |
-| Bulge | ⬜ | lot 2, in progress |
+| Bulge | 🟡 | lot 2 |
 | CC Bend It, CC Bender | ⬜ | |
 | CC Blobbylize | ⬜ | |
 | CC Flo Motion | ⬜ | |
@@ -118,18 +118,18 @@ plug-in. Some can come later through the Rive scene itself rather than as a shad
 | Liquify | ⛔ | brush strokes stored in the effect |
 | Magnify | ✅ | |
 | Mesh Warp | ⬜ | |
-| Mirror | ⬜ | lot 2, in progress |
+| Mirror | 🟡 | lot 2 |
 | Offset | 🟡 | lot 1 |
 | Optics Compensation | ✅ | |
-| Polar Coordinates | ⬜ | lot 2, in progress |
+| Polar Coordinates | 🟡 | lot 2 |
 | Reshape | ⛔ | mask-driven |
 | Ripple | ⬜ | |
 | Rolling Shutter Repair | ⛔ | motion estimation |
 | Smear | ⛔ | mask-driven |
-| Spherize | ⬜ | lot 2, in progress |
+| Spherize | 🟡 | lot 2 |
 | Transform | ⬜ | |
 | Turbulent Displace | ✅ | approx: proprietary noise |
-| Twirl | ⬜ | lot 2, in progress |
+| Twirl | 🟡 | lot 2 |
 | Warp | ⬜ | |
 | Warp Stabilizer | ⛔ | motion estimation |
 | Wave Warp | ⬜ | |
@@ -223,10 +223,10 @@ plug-in. Some can come later through the Rive scene itself rather than as a shad
 | CC Plastic | ⬜ | |
 | CC RepeTile | ⬜ | |
 | CC Threshold, CC Threshold RGB | ⬜ | |
-| CC Vignette | ⬜ | lot 2, in progress |
+| CC Vignette | 🟡 | lot 2 |
 | Color Emboss | ⬜ | |
 | Emboss | ✅ | |
-| Find Edges | ⬜ | lot 2, in progress |
+| Find Edges | 🟡 | lot 2 |
 | Glow | ✅ | |
 | Mosaic | ✅ | |
 | Motion Tile | ✅ | |
@@ -235,7 +235,7 @@ plug-in. Some can come later through the Rive scene itself rather than as a shad
 | Scatter | ⬜ | random |
 | Strobe Light | ⛔ | depends on time |
 | Texturize | ⬜ | needs a texture layer |
-| Threshold | ⬜ | lot 2, in progress |
+| Threshold | 🟡 | lot 2 |
 
 ## Transition
 
@@ -253,7 +253,7 @@ plug-in. Some can come later through the Rive scene itself rather than as a shad
 | CC Twister | ⬜ | |
 | CC WarpoMatic | ⬜ | |
 | Gradient Wipe | ⬜ | needs a gradient layer |
-| Iris Wipe | ⬜ | lot 2, in progress |
+| Iris Wipe | 🟡 | lot 2 |
 | Linear Wipe | ✅ | |
 | Radial Wipe | 🟡 | lot 1 |
 | Venetian Blinds | 🟡 | lot 1 |

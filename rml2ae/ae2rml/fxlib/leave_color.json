@@ -1,0 +1,47 @@
+{
+ "slug": "leave_color",
+ "aeMatchName": "ADBE Leave Color",
+ "wgsl": "ae_leave_color.wgsl",
+ "passes": 1,
+ "textures": {},
+ "params": [
+  {
+   "ae": 1,
+   "field": "amount",
+   "kind": "number",
+   "default": 0
+  },
+  {
+   "ae": 2,
+   "field": "color",
+   "kind": "color",
+   "default": [
+    1,
+    0,
+    0,
+    1
+   ]
+  },
+  {
+   "ae": 3,
+   "field": "tolerance",
+   "kind": "number",
+   "default": 0
+  },
+  {
+   "ae": 4,
+   "field": "softness",
+   "kind": "number",
+   "default": 0
+  },
+  {
+   "ae": 5,
+   "field": "matchMode",
+   "kind": "enum",
+   "default": 1
+  }
+ ],
+ "status": "unverified",
+ "auto": false,
+ "notes": "Not yet measured against After Effects.  Parameter indices follow the After Effects parameter order as documented by Adobe; `render_refs.py --params` records the real list."
+}

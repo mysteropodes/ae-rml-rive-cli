@@ -1823,5 +1823,475 @@
   },
   "held": false,
   "png": "ae/vibrance_3.png"
+ },
+ {
+  "slug": "threshold",
+  "mn": "ADBE Threshold2",
+  "k": 0,
+  "vals": {
+   "1": 128
+  },
+  "held": false,
+  "png": "ae/threshold_0.png"
+ },
+ {
+  "slug": "threshold",
+  "mn": "ADBE Threshold2",
+  "k": 1,
+  "vals": {
+   "1": 60
+  },
+  "held": false,
+  "png": "ae/threshold_1.png"
+ },
+ {
+  "slug": "threshold",
+  "mn": "ADBE Threshold2",
+  "k": 2,
+  "vals": {
+   "1": 200
+  },
+  "held": false,
+  "png": "ae/threshold_2.png"
+ },
+ {
+  "slug": "gamma_pedestal_gain",
+  "mn": "ADBE Gamma/Pedestal/Gain",
+  "k": 0,
+  "vals": {
+   "2": 0.6,
+   "5": 1.4,
+   "8": 1.0
+  },
+  "held": false,
+  "png": "ae/gamma_pedestal_gain_0.png"
+ },
+ {
+  "slug": "gamma_pedestal_gain",
+  "mn": "ADBE Gamma/Pedestal/Gain",
+  "k": 1,
+  "vals": {
+   "3": 0.1,
+   "4": 0.9,
+   "10": 0.7
+  },
+  "held": false,
+  "png": "ae/gamma_pedestal_gain_1.png"
+ },
+ {
+  "slug": "gamma_pedestal_gain",
+  "mn": "ADBE Gamma/Pedestal/Gain",
+  "k": 2,
+  "vals": {
+   "1": 2.0
+  },
+  "held": false,
+  "png": "ae/gamma_pedestal_gain_2.png"
+ },
+ {
+  "slug": "leave_color",
+  "mn": "ADBE Leave Color",
+  "k": 0,
+  "vals": {
+   "1": 100,
+   "2": [
+    1,
+    0,
+    0,
+    1
+   ],
+   "3": 30,
+   "4": 10
+  },
+  "held": false,
+  "png": "ae/leave_color_0.png"
+ },
+ {
+  "slug": "leave_color",
+  "mn": "ADBE Leave Color",
+  "k": 1,
+  "vals": {
+   "1": 100,
+   "2": [
+    0,
+    0.3,
+    1,
+    1
+   ],
+   "3": 15,
+   "4": 20,
+   "5": 2
+  },
+  "held": false,
+  "png": "ae/leave_color_1.png"
+ },
+ {
+  "slug": "leave_color",
+  "mn": "ADBE Leave Color",
+  "k": 2,
+  "vals": {
+   "1": 60,
+   "2": [
+    1,
+    1,
+    0,
+    1
+   ],
+   "3": 40
+  },
+  "held": false,
+  "png": "ae/leave_color_2.png"
+ },
+ {
+  "slug": "sharpen",
+  "mn": "ADBE Sharpen",
+  "k": 0,
+  "vals": {
+   "1": 20
+  },
+  "held": false,
+  "png": "ae/sharpen_0.png"
+ },
+ {
+  "slug": "sharpen",
+  "mn": "ADBE Sharpen",
+  "k": 1,
+  "vals": {
+   "1": 60
+  },
+  "held": false,
+  "png": "ae/sharpen_1.png"
+ },
+ {
+  "slug": "find_edges",
+  "mn": "ADBE Find Edges",
+  "k": 0,
+  "vals": {},
+  "held": false,
+  "png": "ae/find_edges_0.png"
+ },
+ {
+  "slug": "find_edges",
+  "mn": "ADBE Find Edges",
+  "k": 1,
+  "vals": {
+   "1": 1
+  },
+  "held": false,
+  "png": "ae/find_edges_1.png"
+ },
+ {
+  "slug": "find_edges",
+  "mn": "ADBE Find Edges",
+  "k": 2,
+  "vals": {
+   "2": 50
+  },
+  "held": false,
+  "png": "ae/find_edges_2.png"
+ },
+ {
+  "slug": "unsharp_mask",
+  "mn": "ADBE Unsharp Mask2",
+  "k": 0,
+  "vals": {
+   "1": 100,
+   "2": 3
+  },
+  "held": false,
+  "png": "ae/unsharp_mask_0.png"
+ },
+ {
+  "slug": "unsharp_mask",
+  "mn": "ADBE Unsharp Mask2",
+  "k": 1,
+  "vals": {
+   "1": 200,
+   "2": 8,
+   "3": 10
+  },
+  "held": false,
+  "png": "ae/unsharp_mask_1.png"
+ },
+ {
+  "slug": "mirror",
+  "mn": "ADBE Mirror",
+  "k": 0,
+  "vals": {
+   "1": [
+    320,
+    180
+   ]
+  },
+  "held": false,
+  "png": "ae/mirror_0.png"
+ },
+ {
+  "slug": "mirror",
+  "mn": "ADBE Mirror",
+  "k": 1,
+  "vals": {
+   "1": [
+    200,
+    150
+   ],
+   "2": 30
+  },
+  "held": false,
+  "png": "ae/mirror_1.png"
+ },
+ {
+  "slug": "mirror",
+  "mn": "ADBE Mirror",
+  "k": 2,
+  "vals": {
+   "1": [
+    320,
+    100
+   ],
+   "2": 90
+  },
+  "held": false,
+  "png": "ae/mirror_2.png"
+ },
+ {
+  "slug": "polar_coordinates",
+  "mn": "ADBE Polar Coordinates",
+  "k": 0,
+  "vals": {
+   "1": 100
+  },
+  "held": false,
+  "png": "ae/polar_coordinates_0.png"
+ },
+ {
+  "slug": "polar_coordinates",
+  "mn": "ADBE Polar Coordinates",
+  "k": 1,
+  "vals": {
+   "1": 100,
+   "2": 2
+  },
+  "held": false,
+  "png": "ae/polar_coordinates_1.png"
+ },
+ {
+  "slug": "polar_coordinates",
+  "mn": "ADBE Polar Coordinates",
+  "k": 2,
+  "vals": {
+   "1": 50
+  },
+  "held": false,
+  "png": "ae/polar_coordinates_2.png"
+ },
+ {
+  "slug": "twirl",
+  "mn": "ADBE Twirl",
+  "k": 0,
+  "vals": {
+   "1": 90
+  },
+  "held": false,
+  "png": "ae/twirl_0.png"
+ },
+ {
+  "slug": "twirl",
+  "mn": "ADBE Twirl",
+  "k": 1,
+  "vals": {
+   "1": -200,
+   "2": 60
+  },
+  "held": false,
+  "png": "ae/twirl_1.png"
+ },
+ {
+  "slug": "twirl",
+  "mn": "ADBE Twirl",
+  "k": 2,
+  "vals": {
+   "1": 45,
+   "3": [
+    200,
+    120
+   ],
+   "2": 40
+  },
+  "held": false,
+  "png": "ae/twirl_2.png"
+ },
+ {
+  "slug": "bulge",
+  "mn": "ADBE Bulge",
+  "k": 0,
+  "vals": {
+   "1": 120,
+   "2": 120
+  },
+  "held": false,
+  "png": "ae/bulge_0.png"
+ },
+ {
+  "slug": "bulge",
+  "mn": "ADBE Bulge",
+  "k": 1,
+  "vals": {
+   "1": 150,
+   "2": 80,
+   "4": -0.8
+  },
+  "held": false,
+  "png": "ae/bulge_1.png"
+ },
+ {
+  "slug": "bulge",
+  "mn": "ADBE Bulge",
+  "k": 2,
+  "vals": {
+   "1": 100,
+   "2": 100,
+   "3": [
+    200,
+    120
+   ],
+   "4": 2
+  },
+  "held": false,
+  "png": "ae/bulge_2.png"
+ },
+ {
+  "slug": "spherize",
+  "mn": "ADBE Spherize",
+  "k": 0,
+  "vals": {
+   "1": 150
+  },
+  "held": false,
+  "png": "ae/spherize_0.png"
+ },
+ {
+  "slug": "spherize",
+  "mn": "ADBE Spherize",
+  "k": 1,
+  "vals": {
+   "1": 100,
+   "2": [
+    220,
+    140
+   ]
+  },
+  "held": false,
+  "png": "ae/spherize_1.png"
+ },
+ {
+  "slug": "radial_blur",
+  "mn": "ADBE Radial Blur",
+  "k": 0,
+  "vals": {
+   "1": 20
+  },
+  "held": false,
+  "png": "ae/radial_blur_0.png"
+ },
+ {
+  "slug": "radial_blur",
+  "mn": "ADBE Radial Blur",
+  "k": 1,
+  "vals": {
+   "1": 30,
+   "3": 2
+  },
+  "held": false,
+  "png": "ae/radial_blur_1.png"
+ },
+ {
+  "slug": "radial_blur",
+  "mn": "ADBE Radial Blur",
+  "k": 2,
+  "vals": {
+   "1": 15,
+   "2": [
+    200,
+    120
+   ]
+  },
+  "held": false,
+  "png": "ae/radial_blur_2.png"
+ },
+ {
+  "slug": "cc_vignette",
+  "mn": "CC Vignette",
+  "k": 0,
+  "vals": {
+   "1": 80
+  },
+  "held": false,
+  "png": "ae/cc_vignette_0.png"
+ },
+ {
+  "slug": "cc_vignette",
+  "mn": "CC Vignette",
+  "k": 1,
+  "vals": {
+   "1": 100,
+   "2": 120
+  },
+  "held": false,
+  "png": "ae/cc_vignette_1.png"
+ },
+ {
+  "slug": "cc_vignette",
+  "mn": "CC Vignette",
+  "k": 2,
+  "vals": {
+   "1": 60,
+   "3": [
+    200,
+    120
+   ]
+  },
+  "held": false,
+  "png": "ae/cc_vignette_2.png"
+ },
+ {
+  "slug": "iris_wipe",
+  "mn": "ADBE Iris Wipe",
+  "k": 0,
+  "vals": {
+   "3": 120
+  },
+  "held": false,
+  "png": "ae/iris_wipe_0.png"
+ },
+ {
+  "slug": "iris_wipe",
+  "mn": "ADBE Iris Wipe",
+  "k": 1,
+  "vals": {
+   "2": 10,
+   "3": 150,
+   "4": 1,
+   "5": 60,
+   "6": 20
+  },
+  "held": false,
+  "png": "ae/iris_wipe_1.png"
+ },
+ {
+  "slug": "iris_wipe",
+  "mn": "ADBE Iris Wipe",
+  "k": 2,
+  "vals": {
+   "1": [
+    200,
+    140
+   ],
+   "2": 8,
+   "3": 100,
+   "7": 15
+  },
+  "held": false,
+  "png": "ae/iris_wipe_2.png"
  }
 ]
