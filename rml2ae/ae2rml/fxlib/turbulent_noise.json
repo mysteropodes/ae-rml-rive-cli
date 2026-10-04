@@ -1,0 +1,144 @@
+{
+ "slug": "turbulent_noise",
+ "aeMatchName": "ADBE Turbulent Noise",
+ "wgsl": "ae_turbulent_noise.wgsl",
+ "passes": 1,
+ "textures": {},
+ "params": [
+  {
+   "ae": 1,
+   "field": "fractalType",
+   "kind": "enum",
+   "default": 1
+  },
+  {
+   "ae": 2,
+   "field": "noiseType",
+   "kind": "enum",
+   "default": 3
+  },
+  {
+   "ae": 3,
+   "field": "invert",
+   "kind": "bool",
+   "default": 0
+  },
+  {
+   "ae": 4,
+   "field": "contrast",
+   "kind": "number",
+   "default": 100
+  },
+  {
+   "ae": 5,
+   "field": "brightness",
+   "kind": "number",
+   "default": 0
+  },
+  {
+   "ae": 6,
+   "field": "overflow",
+   "kind": "enum",
+   "default": 4
+  },
+  {
+   "ae": 8,
+   "field": "rotation",
+   "kind": "angle",
+   "default": 0
+  },
+  {
+   "ae": 9,
+   "field": "uniform",
+   "kind": "bool",
+   "default": 1
+  },
+  {
+   "ae": 10,
+   "field": "scale",
+   "kind": "number",
+   "default": 100
+  },
+  {
+   "ae": 11,
+   "field": "scaleW",
+   "kind": "number",
+   "default": 100
+  },
+  {
+   "ae": 12,
+   "field": "scaleH",
+   "kind": "number",
+   "default": 100
+  },
+  {
+   "ae": 13,
+   "field": "offset",
+   "kind": "point",
+   "default": [
+    320,
+    180
+   ]
+  },
+  {
+   "ae": 16,
+   "field": "complexity",
+   "kind": "number",
+   "default": 6
+  },
+  {
+   "ae": 18,
+   "field": "subInfluence",
+   "kind": "number",
+   "default": 70
+  },
+  {
+   "ae": 19,
+   "field": "subScale",
+   "kind": "number",
+   "default": 56
+  },
+  {
+   "ae": 20,
+   "field": "subRotation",
+   "kind": "angle",
+   "default": 0
+  },
+  {
+   "ae": 21,
+   "field": "subOffset",
+   "kind": "point",
+   "default": [
+    0,
+    0
+   ]
+  },
+  {
+   "ae": 24,
+   "field": "evolution",
+   "kind": "angle",
+   "default": 0
+  },
+  {
+   "ae": 28,
+   "field": "seed",
+   "kind": "number",
+   "default": 0
+  },
+  {
+   "ae": 30,
+   "field": "opacity",
+   "kind": "number",
+   "default": 100
+  },
+  {
+   "ae": 31,
+   "field": "mode",
+   "kind": "enum",
+   "default": 2
+  }
+ ],
+ "status": "unverified",
+ "auto": false,
+ "notes": "Not yet measured against After Effects.  Parameter indices follow the After Effects parameter order as documented by Adobe; `render_refs.py --params` records the real list."
+}

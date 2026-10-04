@@ -183,6 +183,19 @@ SPEC = {
     "cc_repetile": ("CC RepeTile", [({1: 200, 3: 100}, 0), ({1: 100, 2: 100, 3: 100, 4: 100, 5: 5}, 0)]),
     "cc_burn_film": ("CC Burn Film", [({1: 30}, 0), ({1: 60, 2: [150, 100], 3: 7}, 0)]),
     "camera_lens_blur": ("ADBE Camera Lens Blur", [({1: 10}, 0), ({1: 16, 3: 1, 6: 20, 14: 30, 15: 200}, 0), ({1: 8, 4: 100, 5: 2}, 0)]),
+    # lot 12: noises, generators, stylize (unverified until rendered)
+    "fractal_noise": ("ADBE Fractal Noise", [({}, 0), ({1: 2, 4: 200, 10: 50}, 0), ({2: 1, 16: 3, 31: 4}, 0), ({1: 3, 24: 90, 31: 5, 30: 60}, 0)]),
+    "turbulent_noise": ("ADBE Turbulent Noise", [({}, 0), ({1: 2, 4: 200, 10: 50}, 0), ({2: 1, 16: 3, 31: 4}, 0), ({1: 3, 24: 90, 31: 5, 30: 60}, 0)]),
+    "cell_pattern": ("ADBE Cell Pattern", [({}, 0), ({1: 2, 6: 40}, 0), ({1: 5, 3: 150, 16: 3}, 0), ({1: 12, 6: 80}, 0)]),
+    "roughen_edges": ("ADBE Roughen Edges", [({}, 0), ({1: 2, 3: 20, 6: 60}, 0), ({1: 3, 3: 12, 4: 3}, 0)]),
+    "fractal": ("ADBE Fractal", [({}, 0), ({4: -0.745, 5: 0.11, 6: 6, 7: 300}, 0), ({1: 3, 4: -0.8, 5: 0.156}, 0)]),
+    "cc_plastic": ("CC Plastic", [({3: 5}, 0), ({3: 5, 4: 20, 5: 100, 19: 80, 21: 0}, 0)]),
+    "cc_blobbylize": ("CC Blobbylize", [({4: 12}, 0), ({4: 20, 5: 0.3, 3: 5}, 0)]),
+    "cc_glass_wipe": ("CC Glass Wipe", [({1: 40}, 0), ({1: 70, 4: 30, 5: 40}, 0)]),
+    "cc_threads": ("CC Threads", [({}, 0), ({1: 24, 2: 24, 4: 30, 6: 70, 8: 50}, 0), ({3: 2, 7: 30}, 0)]),
+    "advanced_lightning": ("ADBE Lightning 2", [({}, 0), ({4: 25, 6: 3, 10: 50, 14: 2.5}, 0)]),
+    "brush_strokes": ("ADBE Brush Strokes", [({2: 6, 3: 20}, 0), ({1: 45, 2: 10, 3: 40, 4: 2, 6: 3}, 0)]),
+    "noise_hls_auto": ("ADBE Noise HLS Auto", [({2: 20, 3: 20, 4: 20}, 0), ({1: 3, 3: 40, 5: 4}, 0)]),
 }
 NEEDS_MAP = {"displacement_map": {1: 2},   # param 1 (map layer) = layer index 2 (the map footage)
              "blend": {1: 2},
@@ -193,6 +206,7 @@ NEEDS_MAP = {"displacement_map": {1: 2},   # param 1 (map layer) = layer index 2
              "compound_blur": {1: 2},
              "cc_image_wipe": {5: 2},
              "three_d_glasses": {2: 2},
+             "cc_glass_wipe": {2: 2},
              }
 
 

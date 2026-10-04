@@ -1,0 +1,78 @@
+{
+ "slug": "fractal",
+ "aeMatchName": "ADBE Fractal",
+ "wgsl": "ae_fractal.wgsl",
+ "passes": 1,
+ "textures": {},
+ "params": [
+  {
+   "ae": 1,
+   "field": "setType",
+   "kind": "enum",
+   "default": 1
+  },
+  {
+   "ae": 4,
+   "field": "mx",
+   "kind": "number",
+   "default": -0.5
+  },
+  {
+   "ae": 5,
+   "field": "my",
+   "kind": "number",
+   "default": 0
+  },
+  {
+   "ae": 6,
+   "field": "mag",
+   "kind": "number",
+   "default": 0
+  },
+  {
+   "ae": 7,
+   "field": "escape",
+   "kind": "number",
+   "default": 100
+  },
+  {
+   "ae": 9,
+   "field": "jx",
+   "kind": "number",
+   "default": 0
+  },
+  {
+   "ae": 10,
+   "field": "jy",
+   "kind": "number",
+   "default": 0
+  },
+  {
+   "ae": 11,
+   "field": "jmag",
+   "kind": "number",
+   "default": 0
+  },
+  {
+   "ae": 20,
+   "field": "hue",
+   "kind": "angle",
+   "default": 0
+  },
+  {
+   "ae": 21,
+   "field": "steps",
+   "kind": "number",
+   "default": 32
+  },
+  {
+   "ae": 22,
+   "field": "cycleOffset",
+   "kind": "angle",
+   "default": 0
+  }
+ ],
+ "status": "unverified",
+ "auto": false,
+ "notes": "Not yet measured against After Effects.  Parameter indices follow the After Effects parameter order as documented by Adobe; `render_refs.py --params` records the real list."
+}

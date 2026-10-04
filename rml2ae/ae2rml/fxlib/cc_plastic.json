@@ -1,0 +1,101 @@
+{
+ "slug": "cc_plastic",
+ "aeMatchName": "CC Plastic",
+ "wgsl": "ae_cc_plastic.wgsl",
+ "passes": 1,
+ "textures": {},
+ "params": [
+  {
+   "ae": 11,
+   "field": "lightColor",
+   "kind": "color",
+   "default": [
+    1,
+    1,
+    1,
+    1
+   ]
+  },
+  {
+   "ae": 3,
+   "field": "property",
+   "kind": "enum",
+   "default": 1
+  },
+  {
+   "ae": 4,
+   "field": "softness",
+   "kind": "number",
+   "default": 10
+  },
+  {
+   "ae": 5,
+   "field": "height",
+   "kind": "number",
+   "default": 50
+  },
+  {
+   "ae": 10,
+   "field": "intensity",
+   "kind": "number",
+   "default": 100
+  },
+  {
+   "ae": 13,
+   "field": "lightHeight",
+   "kind": "number",
+   "default": 50
+  },
+  {
+   "ae": 15,
+   "field": "lightDir",
+   "kind": "angle",
+   "default": -45
+  },
+  {
+   "ae": 17,
+   "field": "ambient",
+   "kind": "number",
+   "default": 20
+  },
+  {
+   "ae": 18,
+   "field": "diffuse",
+   "kind": "number",
+   "default": 70
+  },
+  {
+   "ae": 19,
+   "field": "specular",
+   "kind": "number",
+   "default": 30
+  },
+  {
+   "ae": 20,
+   "field": "roughness",
+   "kind": "number",
+   "default": 0.05
+  },
+  {
+   "ae": 21,
+   "field": "metal",
+   "kind": "number",
+   "default": 50
+  },
+  {
+   "ae": 6,
+   "field": "cutMin",
+   "kind": "number",
+   "default": 0
+  },
+  {
+   "ae": 7,
+   "field": "cutMax",
+   "kind": "number",
+   "default": 1
+  }
+ ],
+ "status": "unverified",
+ "auto": false,
+ "notes": "Not yet measured against After Effects.  Parameter indices follow the After Effects parameter order as documented by Adobe; `render_refs.py --params` records the real list."
+}

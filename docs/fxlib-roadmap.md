@@ -102,7 +102,7 @@ plug-in. Some can come later through the Rive scene itself rather than as a shad
 | Bulge | 🟡 | lot 2 |
 | CC Bend It | 🟡 | lot 8 |
 | CC Bender | 🟡 | lot 10 |
-| CC Blobbylize | ⬜ | |
+| CC Blobbylize | 🟡 | lot 12 (the layer itself as blob layer) |
 | CC Flo Motion | 🟡 | lot 10 |
 | CC Griddler | 🟡 | lot 8 |
 | CC Lens | 🟡 | lot 6 |
@@ -141,21 +141,21 @@ plug-in. Some can come later through the Rive scene itself rather than as a shad
 | Effect | | Note |
 |---|---|---|
 | 4-Color Gradient | ✅ | |
-| Advanced Lightning | ⬜ | random; seed law to measure |
+| Advanced Lightning | 🟡 | lot 12 (one bolt; random, differs from AE) |
 | Audio Spectrum, Audio Waveform | ⛔ | audio |
 | Beam | 🟡 | lot 7 |
 | CC Glue Gun | ⬜ | |
 | CC Light Burst 2.5 | 🟡 | lot 5 |
 | CC Light Rays | 🟡 | lot 5 |
 | CC Light Sweep | 🟡 | lot 7 |
-| CC Threads | ⬜ | |
-| Cell Pattern | ⬜ | proprietary noise, like Fractal Noise |
+| CC Threads | 🟡 | lot 12 |
+| Cell Pattern | 🟡 | lot 12 (random draw differs from AE) |
 | Checkerboard | ✅ | |
 | Circle | 🟡 | lot 5 |
 | Ellipse | 🟡 | lot 4 |
 | Eyedropper Fill | 🟡 | lot 11 |
 | Fill | ✅ | |
-| Fractal | ⬜ | |
+| Fractal | 🟡 | lot 12 |
 | Gradient Ramp | ✅ | |
 | Grid | 🟡 | lot 4 |
 | Lens Flare | 🟡 | lot 8 (stylised: AE's flare elements are not reproduced) |
@@ -194,11 +194,11 @@ plug-in. Some can come later through the Rive scene itself rather than as a shad
 |---|---|---|
 | Add Grain, Match Grain, Remove Grain | ⛔ | grain models and sampling over time |
 | Dust & Scratches | 🟡 | lot 6 |
-| Fractal Noise, Turbulent Noise | ⬜ | proprietary noise: like Turbulent Displace, approx at best |
+| Fractal Noise, Turbulent Noise | 🟡 | lot 12 (proprietary noise: same parameters, different pattern) |
 | Median | 🟡 | lot 3 |
 | Noise | 🟡 | lot 5 (random pattern differs from AE) |
 | Noise Alpha, Noise HLS | 🟡 | lot 6 (random pattern differs from AE) |
-| Noise HLS Auto | ⬜ | random; animated |
+| Noise HLS Auto | 🟡 | lot 12 (static: no time in the node) |
 
 ## Perspective
 
@@ -216,7 +216,7 @@ plug-in. Some can come later through the Rive scene itself rather than as a shad
 
 | Effect | | Note |
 |---|---|---|
-| Brush Strokes | ⬜ | random strokes |
+| Brush Strokes | 🟡 | lot 12 (random strokes differ from AE) |
 | Cartoon | 🟡 | lot 11 |
 | CC Block Load | 🟡 | lot 8 |
 | CC Burn Film | 🟡 | lot 11 (random pattern differs from AE) |
@@ -224,7 +224,7 @@ plug-in. Some can come later through the Rive scene itself rather than as a shad
 | CC HexTile | 🟡 | lot 11 |
 | CC Kaleida | 🟡 | lot 6 |
 | CC Mr. Smoothie | ⬜ | |
-| CC Plastic | ⬜ | |
+| CC Plastic | 🟡 | lot 12 |
 | CC RepeTile | 🟡 | lot 11 |
 | CC Threshold, CC Threshold RGB | 🟡 | lot 3 |
 | CC Vignette | 🟡 | lot 2 |
@@ -235,7 +235,7 @@ plug-in. Some can come later through the Rive scene itself rather than as a shad
 | Mosaic | ✅ | |
 | Motion Tile | ✅ | |
 | Posterize | ✅ | |
-| Roughen Edges | ⬜ | parameter list already measured; proprietary noise |
+| Roughen Edges | 🟡 | lot 12 (proprietary noise) |
 | Scatter | 🟡 | lot 5 (random pattern differs from AE) |
 | Strobe Light | ⛔ | depends on time |
 | Texturize | 🟡 | lot 9 (second layer) |
@@ -248,7 +248,7 @@ plug-in. Some can come later through the Rive scene itself rather than as a shad
 | Block Dissolve | 🟡 | lot 5 (random pattern differs from AE) |
 | Card Wipe | ⛔ | 3D cards |
 | CC Image Wipe | 🟡 | lot 9 (second layer) |
-| CC Glass Wipe | ⬜ | needs two other layers (reveal + gradient) |
+| CC Glass Wipe | 🟡 | lot 12 (reveal = second layer; gradient = this layer) |
 | CC Grid Wipe | 🟡 | lot 8 |
 | CC Jaws | 🟡 | lot 7 |
 | CC Light Wipe | 🟡 | lot 7 |
@@ -281,7 +281,7 @@ own source artboard; other layer kinds (shapes, text, solids, video) leave the m
 make in After Effects) with the three kinds of map layer. Displacement Map (measured) and lot 9 (Blend, Calculations,
 Compound Arithmetic, Compound Blur, Difference Matte, 3D Glasses, Texturize, CC Image Wipe) use it. In the node the
 second layer is rendered at the layer's size, so AE's "If Layer Sizes Differ" / "Stretch to Fit" options have nothing
-left to choose. Still to do: CC Glass Wipe (two other layers: the one revealed and the gradient) and Gradient Wipe
+left to choose. CC Glass Wipe (lot 12) binds the revealed layer, its gradient is the layer itself. Still to do: Gradient Wipe
 with another layer (today it uses the layer itself).
 
 ## How a batch goes

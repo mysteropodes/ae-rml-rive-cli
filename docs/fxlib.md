@@ -173,7 +173,7 @@ Everything needed to measure an effect is in the repository:
 
 What is still missing, effect by effect, is in [fxlib-roadmap.md](fxlib-roadmap.md).
 
-37 measured effects: 27 exact, 8 close, 2 approx, plus 117 unverified ones (below the table). "Auto" is whether ae2rml applies the effect without being asked; the two effects
+37 measured effects: 27 exact, 8 close, 2 approx, plus 129 unverified ones (below the table). "Auto" is whether ae2rml applies the effect without being asked; the two effects
 marked `no` are measured to be further from After Effects than leaving the effect out, so they remain a
 `<!-- ae: effect ... -->` comment plus an entry in `effects_todo.json`.
 
@@ -341,6 +341,18 @@ real parameter list, then `render_refs.py <slug>`), add held-out settings, and m
 | CC RepeTile | `CC RepeTile` | `cc_repetile` | Tiling menu; Blend Borders (the node grows by the largest expansion) |
 | CC Burn Film | `CC Burn Film` | `cc_burn_film` | Random pattern cannot match AE; rim colours |
 | Camera Lens Blur | `ADBE Camera Lens Blur` | `camera_lens_blur` | Iris shape menu; highlight law; parameter positions |
+| Fractal Noise | `ADBE Fractal Noise` | `fractal_noise` | Proprietary noise: same parameters, different pattern; Fractal Type variants |
+| Turbulent Noise | `ADBE Turbulent Noise` | `turbulent_noise` | Parameter layout taken from Fractal Noise; proprietary noise |
+| Cell Pattern | `ADBE Cell Pattern` | `cell_pattern` | Pattern menu and shapes; random draw differs |
+| Roughen Edges | `ADBE Roughen Edges` | `roughen_edges` | Edge distance and noise laws (measured parameter list); proprietary noise |
+| Fractal | `ADBE Fractal` | `fractal` | Parameter positions; magnification units; palettes |
+| CC Plastic | `CC Plastic` | `cc_plastic` | Parameter positions; shading law |
+| CC Blobbylize | `CC Blobbylize` | `cc_blobbylize` | Parameter positions; cut-away and shading laws |
+| CC Glass Wipe | `CC Glass Wipe` | `cc_glass_wipe` | The gradient is this layer (a third layer is not bound); displacement law |
+| CC Threads | `CC Threads` | `cc_threads` | Weave, Overlaps and Texture laws |
+| Noise HLS Auto | `ADBE Noise HLS Auto` | `noise_hls_auto` | Animation over time not modelled (frame 0's draw); random draw differs |
+| Advanced Lightning | `ADBE Lightning 2` | `advanced_lightning` | One bolt only (no forks / decay / types); random; positions |
+| Brush Strokes | `ADBE Brush Strokes` | `brush_strokes` | Stroke placement is random: differs from AE |
 
 Notes:
 

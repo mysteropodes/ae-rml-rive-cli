@@ -1,0 +1,63 @@
+{
+ "slug": "cell_pattern",
+ "aeMatchName": "ADBE Cell Pattern",
+ "wgsl": "ae_cell_pattern.wgsl",
+ "passes": 1,
+ "textures": {},
+ "params": [
+  {
+   "ae": 1,
+   "field": "pattern",
+   "kind": "enum",
+   "default": 1
+  },
+  {
+   "ae": 2,
+   "field": "invert",
+   "kind": "bool",
+   "default": 0
+  },
+  {
+   "ae": 3,
+   "field": "contrast",
+   "kind": "number",
+   "default": 100
+  },
+  {
+   "ae": 5,
+   "field": "disperse",
+   "kind": "number",
+   "default": 1
+  },
+  {
+   "ae": 6,
+   "field": "cellSize",
+   "kind": "number",
+   "default": 60
+  },
+  {
+   "ae": 7,
+   "field": "offset",
+   "kind": "point",
+   "default": [
+    320,
+    180
+   ]
+  },
+  {
+   "ae": 12,
+   "field": "evolution",
+   "kind": "angle",
+   "default": 0
+  },
+  {
+   "ae": 16,
+   "field": "seed",
+   "kind": "number",
+   "default": 0
+  }
+ ],
+ "status": "unverified",
+ "auto": false,
+ "notes": "Not yet measured against After Effects.  Parameter indices follow the After Effects parameter order as documented by Adobe; `render_refs.py --params` records the real list."
+}
