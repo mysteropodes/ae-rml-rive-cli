@@ -44,14 +44,21 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python }}
-      - run: pip install pillow numpy fonttools py-aep
+      - name: pip install -e ".[ae2rml]"
+        run: pip install -e ".[ae2rml]"
       - name: rml2ae incremental rebuild (dry run, no After Effects)
         run: python -m rml2ae.tests.sim_incremental
-      - name: ae2rml converts examples/demo.aep
+      - name: ae2rml converts examples/demo.aep (console script)
         run: |
-          python -m rml2ae.ae2rml examples/demo.aep out/demo
+          ae2rml examples/demo.aep out/demo
           test -s out/demo/scene.rml
           grep -q "unsupported: 0" out/demo/build/ae2rml/report.md
+      - name: Non-editable install works outside the repository (package data included)
+        run: |
+          python -m venv /tmp/wheel-env
+          /tmp/wheel-env/bin/pip install -q ".[ae2rml]"
+          cd /tmp && /tmp/wheel-env/bin/ae2rml "$GITHUB_WORKSPACE/examples/demo.aep" /tmp/demo-wheel
+          diff "$GITHUB_WORKSPACE/out/demo/scene.rml" /tmp/demo-wheel/scene.rml
       - uses: actions/upload-artifact@v4
         if: always()
         with:
