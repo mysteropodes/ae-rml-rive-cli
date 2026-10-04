@@ -73,30 +73,22 @@ fn lerpSample(t: f32, other: f32, horiz: bool, L: f32, repeatEdge: bool) -> vec4
 
 // third-difference impulse table of K = b*b*b, b = fractional box (f at both ends, 1 inside); index = h * 4 + l,
 // impulse position s = h * N + l
-// One entry of the table: the same terms, added in the same order, as accumulating all 64 into a local array would
-// (that form does not compile with Direct3D's FXC: a loop writing a local array at a variable index, X3511).
-fn impulse(f: f32, idx: i32) -> f32 {
+fn impulses(f: f32) -> array<f32, 16> {
+    var cf: array<f32, 16>;
+    for (var i = 0; i < 16; i++) {
+        cf[i] = 0.0;
+    }
     let g = 1.0 - f;
     var c = array<f32, 4>(f, g, -g, -f);           // offsets 0, 1, N, N + 1
-    var v = 0.0;
     for (var i = 0; i < 64; i++) {
         let e0 = i & 3;
         let e1 = (i >> 2u) & 3;
         let e2 = (i >> 4u) & 3;
         let h = (e0 >> 1u) + (e1 >> 1u) + (e2 >> 1u);
         let l = (e0 & 1) + (e1 & 1) + (e2 & 1);
-        if (h * 4 + l == idx) {
-            v += c[e0] * c[e1] * c[e2];
-        }
+        cf[h * 4 + l] += c[e0] * c[e1] * c[e2];
     }
-    return v;
-}
-
-fn impulses(f: f32) -> array<f32, 16> {
-    // constant indices only
-    return array<f32, 16>(impulse(f, 0), impulse(f, 1), impulse(f, 2), impulse(f, 3), impulse(f, 4), impulse(f, 5),
-                          impulse(f, 6), impulse(f, 7), impulse(f, 8), impulse(f, 9), impulse(f, 10), impulse(f, 11),
-                          impulse(f, 12), impulse(f, 13), impulse(f, 14), impulse(f, 15));
+    return cf;
 }
 
 fn impulseAt(cf: ptr<function, array<f32, 16>>, s: i32, N: i32) -> f32 {
