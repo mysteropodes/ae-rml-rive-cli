@@ -64,7 +64,7 @@ plug-in. Some can come later through the Rive scene itself rather than as a shad
 | Auto Color, Auto Contrast, Auto Levels | ⛔ | statistics of the frame and its neighbours |
 | Black & White | ✅ | |
 | Brightness & Contrast | ✅ | |
-| Broadcast Colors | ⬜ | |
+| Broadcast Colors | 🟡 | lot 5 |
 | CC Color Neutralizer | ⬜ | |
 | CC Color Offset | 🟡 | lot 3 |
 | CC Kernel | ⬜ | |
@@ -143,13 +143,13 @@ plug-in. Some can come later through the Rive scene itself rather than as a shad
 | Audio Spectrum, Audio Waveform | ⛔ | audio |
 | Beam | ⬜ | |
 | CC Glue Gun | ⬜ | |
-| CC Light Burst 2.5 | ⬜ | |
-| CC Light Rays | ⬜ | |
+| CC Light Burst 2.5 | 🟡 | lot 5 |
+| CC Light Rays | 🟡 | lot 5 |
 | CC Light Sweep | ⬜ | |
 | CC Threads | ⬜ | |
 | Cell Pattern | ⬜ | proprietary noise, like Fractal Noise |
 | Checkerboard | ✅ | |
-| Circle | ⬜ | |
+| Circle | 🟡 | lot 5 |
 | Ellipse | 🟡 | lot 4 |
 | Eyedropper Fill | ⬜ | |
 | Fill | ✅ | |
@@ -194,7 +194,8 @@ plug-in. Some can come later through the Rive scene itself rather than as a shad
 | Dust & Scratches | ⬜ | |
 | Fractal Noise, Turbulent Noise | ⬜ | proprietary noise: like Turbulent Displace, approx at best |
 | Median | 🟡 | lot 3 |
-| Noise, Noise Alpha, Noise HLS, Noise HLS Auto | ⬜ | random; seed law to measure |
+| Noise | 🟡 | lot 5 (random pattern differs from AE) |
+| Noise Alpha, Noise HLS, Noise HLS Auto | ⬜ | random; seed law to measure |
 
 ## Perspective
 
@@ -204,7 +205,7 @@ plug-in. Some can come later through the Rive scene itself rather than as a shad
 | Bevel Alpha | 🟡 | lot 4 |
 | Bevel Edges | ⬜ | |
 | CC Cylinder, CC Sphere | ⬜ | |
-| CC Spotlight | ⬜ | |
+| CC Spotlight | 🟡 | lot 5 |
 | Drop Shadow | ✅ | |
 | Radial Shadow | 🟡 | lot 4 |
 
@@ -232,7 +233,7 @@ plug-in. Some can come later through the Rive scene itself rather than as a shad
 | Motion Tile | ✅ | |
 | Posterize | ✅ | |
 | Roughen Edges | ⬜ | parameter list already measured; proprietary noise |
-| Scatter | ⬜ | random |
+| Scatter | 🟡 | lot 5 (random pattern differs from AE) |
 | Strobe Light | ⛔ | depends on time |
 | Texturize | ⬜ | needs a texture layer |
 | Threshold | 🟡 | lot 2 |
@@ -241,7 +242,7 @@ plug-in. Some can come later through the Rive scene itself rather than as a shad
 
 | Effect | | Note |
 |---|---|---|
-| Block Dissolve | ⬜ | random; seed law to measure |
+| Block Dissolve | 🟡 | lot 5 (random pattern differs from AE) |
 | Card Wipe | ⛔ | 3D cards |
 | CC Glass Wipe, CC Image Wipe | ⬜ | need a second layer |
 | CC Grid Wipe | ⬜ | |
@@ -252,7 +253,7 @@ plug-in. Some can come later through the Rive scene itself rather than as a shad
 | CC Scale Wipe | ✅ | |
 | CC Twister | ⬜ | |
 | CC WarpoMatic | ⬜ | |
-| Gradient Wipe | ⬜ | needs a gradient layer |
+| Gradient Wipe | 🟡 | lot 5 (the layer itself as gradient) |
 | Iris Wipe | 🟡 | lot 2 |
 | Linear Wipe | ✅ | |
 | Radial Wipe | 🟡 | lot 1 |

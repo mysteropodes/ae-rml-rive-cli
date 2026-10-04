@@ -131,8 +131,9 @@ python rml2ae/ae2rml/fxref/spec.py && python rml2ae/ae2rml/fxref/render_refs.py 
 `fxlib regress` measures every reference of every effect, held-out settings included, with wgpu on the CPU, and
 compares each one with `fxref/baseline.json`. It fails when a setting gets further from After Effects than the
 baseline (mean +0.02 %, pixels over 8 levels +0.05 %, or max +2 levels), when a shader stops compiling, when a
-reference has no baseline yet, or when a manifest names a `Params` field or an After Effects parameter that does not
-exist. The CI runs it on Linux with Mesa's software Vulkan (lavapipe) and `wgpu==0.32.0`, and prints the full table in
+reference has no baseline yet, when a manifest names a `Params` field or an After Effects parameter that does not
+exist, or when an unverified effect that reads `layerRect` gives a different result once the node has a pad (the
+layer grown by transparent pixels, point parameters moved accordingly, as the Rive node does). The CI runs it on Linux with Mesa's software Vulkan (lavapipe) and `wgpu==0.32.0`, and prints the full table in
 the job summary. After a deliberate change (a better shader, a new effect), run it with `--update` and commit the
 new `baseline.json` with the change; the diff shows what moved.
 
@@ -171,7 +172,7 @@ Everything needed to measure an effect is in the repository:
 
 What is still missing, effect by effect, is in [fxlib-roadmap.md](fxlib-roadmap.md).
 
-37 measured effects: 27 exact, 8 close, 2 approx, plus 44 unverified ones (below the table). "Auto" is whether ae2rml applies the effect without being asked; the two effects
+37 measured effects: 27 exact, 8 close, 2 approx, plus 53 unverified ones (below the table). "Auto" is whether ae2rml applies the effect without being asked; the two effects
 marked `no` are measured to be further from After Effects than leaving the effect out, so they remain a
 `<!-- ae: effect ... -->` comment plus an entry in `effects_todo.json`.
 
@@ -266,6 +267,15 @@ real parameter list, then `render_refs.py <slug>`), add held-out settings, and m
 | Channel Blur | `ADBE Channel Blur` | `channel_blur` | Assumed legacy blur law (Gaussian of equal variance) |
 | CC Cross Blur | `CC Cross Blur` | `cc_cross_blur` | Kernel shape; Transfer Mode |
 | Bilateral Blur | `ADBE Bilateral Blur` | `bilateral_blur` | Spatial and range weights; Colorize |
+| Gradient Wipe | `ADBE Gradient Wipe` | `gradient_wipe` | The layer itself as gradient only; softness law |
+| Block Dissolve | `ADBE Block Dissolve` | `block_dissolve` | Random pattern cannot match AE; feather |
+| Circle | `ADBE Circle` | `circle` | Parameter positions after Radius; Edge and Feather |
+| CC Light Rays | `CC Light Rays` | `cc_light_rays` | Brightness weighting of the rays; Shape |
+| CC Light Burst 2.5 | `CC Light Burst 2.5` | `cc_light_burst` | Burst modes; Halo Alpha |
+| CC Spotlight | `CC Spotlight` | `cc_spotlight` | Cone geometry from Height and Cone Angle |
+| Noise | `ADBE Noise` | `noise` | Random pattern cannot match AE; amount law |
+| Scatter | `ADBE Scatter` | `scatter` | Random pattern cannot match AE |
+| Broadcast Colors | `ADBE Broadcast Colors` | `broadcast_colors` | Signal amplitude formula per locale |
 Notes:
 
 - **Gaussian Blur (legacy)** and **Fast Blur (legacy)** share the same kernel (confirmed on a third setting).

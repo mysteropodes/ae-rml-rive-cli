@@ -635,6 +635,46 @@ def manifest_problems(slug):
     return out
 
 
+def pad_problems(slug, pad=40):
+    """An effect must not depend on the node's pad: render its first setting (or its defaults) on the reference
+    source as is, then on the same source grown by `pad` transparent px with layerRect / point parameters moved
+    accordingly (what the Rive node does), and compare the layer area. Checked for unverified effects that read
+    layerRect (the measured ones are covered by their references)."""
+    import numpy as np
+    from PIL import Image
+    from rml2ae.wgsl_apply import apply
+    m = manifest(slug)
+    fields, _ = struct_fields(open(wgsl_path(m)).read())
+    if m.get("status") != "unverified" or "layerRect" not in {f[0] for f in fields} or int(m.get("passes", 1)) != 1:
+        return []
+    src = os.path.join(REF, "src", "src_premult.png")
+    vals = next((r["vals"] for r in json.load(open(os.path.join(REF, "renders.json"))) if r["slug"] == slug), {})
+    im = Image.open(src).convert("RGBA")
+    w, h = im.size
+    tmpd = tempfile.mkdtemp(prefix="fxpad_")
+    try:
+        big = Image.new("RGBA", (w + 2 * pad, h + 2 * pad), (0, 0, 0, 0))
+        big.paste(im, (pad, pad))
+        big.save(os.path.join(tmpd, "big.png"))
+        v1 = values_for(m, vals, (w, h))
+        v1["passIndex"] = 0.0
+        v2 = values_for(m, vals, (w + 2 * pad, h + 2 * pad))
+        v2["passIndex"] = 0.0
+        v2["layerRect"] = [pad, pad, w + pad, h + pad]
+        for p in m["params"]:
+            if p["kind"] == "point":
+                v2[p["field"]] = [v1[p["field"]][0] + pad, v1[p["field"]][1] + pad]
+        a, b = os.path.join(tmpd, "a.png"), os.path.join(tmpd, "b.png")
+        apply(wgsl_path(m), src, a, values=v1)
+        apply(wgsl_path(m), os.path.join(tmpd, "big.png"), b, values=v2)
+        x = np.asarray(Image.open(a)).astype(int)
+        y = np.asarray(Image.open(b)).astype(int)[pad:pad + h, pad:pad + w]
+        d = int(np.abs(x - y).max())
+    finally:
+        shutil.rmtree(tmpd, ignore_errors=True)
+    return [f"{slug}: depends on the node's pad (max {d} levels apart with a {pad} px pad)"] if d > 2 else []
+
+
 def regress(slugs=None, update=False, summary=None):
     """Measure every reference (held-out included) offline and compare with fxref/baseline.json.
     Returns the number of problems (worse than the baseline, errors, missing baseline, manifest problems)."""
@@ -643,6 +683,10 @@ def regress(slugs=None, update=False, summary=None):
     problems, rows_md, new = [], [], dict(base)
     for slug in slugs:
         problems += manifest_problems(slug)
+        try:
+            problems += pad_problems(slug)
+        except Exception as ex:
+            problems.append(f"{slug}: pad check failed ({type(ex).__name__}: {str(ex)[:200]})")
         new[slug] = {}
         for row in check(slug, holdout=True):
             name = row["setting"]

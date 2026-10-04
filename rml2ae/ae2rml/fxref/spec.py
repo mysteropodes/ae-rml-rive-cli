@@ -102,6 +102,16 @@ SPEC = {
     "channel_blur": ("ADBE Channel Blur", [({1: 20}, 0), ({1: 5, 2: 15, 3: 30, 6: 2}, 0), ({4: 12, 5: 1}, 0)]),
     "cc_cross_blur": ("CC Cross Blur", [({1: 20, 2: 20}, 0), ({1: 40, 2: 5, 4: 1}, 0)]),
     "bilateral_blur": ("ADBE Bilateral Blur", [({}, 0), ({1: 12, 2: 40}, 0)]),
+    # lot 5 (unverified until rendered; random effects: amount and scale only, AE's generator is not public)
+    "gradient_wipe": ("ADBE Gradient Wipe", [({1: 40}, 0), ({1: 50, 2: 30}, 0), ({1: 30, 5: 1}, 0)]),
+    "block_dissolve": ("ADBE Block Dissolve", [({1: 40, 2: 20, 3: 20}, 0), ({1: 70, 2: 8, 3: 40}, 0)]),
+    "circle": ("ADBE Circle", [({}, 0), ({1: [200, 120], 2: 100, 9: [1, 0.5, 0, 1], 11: 2}, 0)]),
+    "cc_light_rays": ("CC Light Rays", [({}, 0), ({1: 200, 2: [500, 100], 3: 70}, 0)]),
+    "cc_light_burst": ("CC Light Burst 2.5", [({}, 0), ({1: [200, 120], 3: 80, 4: 1}, 0)]),
+    "cc_spotlight": ("CC Spotlight", [({}, 0), ({1: [100, 50], 2: [400, 220], 4: 40, 5: 50, 6: [1, 0.8, 0.4, 1], 8: 2}, 0)]),
+    "noise": ("ADBE Noise", [({1: 30}, 0), ({1: 60, 2: 0}, 0)]),
+    "scatter": ("ADBE Scatter", [({1: 5}, 0), ({1: 12, 2: 2}, 0)]),
+    "broadcast_colors": ("ADBE Broadcast Colors", [({3: 90}, 0), ({2: 2, 3: 85}, 0), ({1: 2, 2: 3, 3: 95}, 0)]),
     "color_emboss": ("ADBE Color Emboss", [({}, 0), ({1: 120, 2: 3, 3: 200}, 0)]),
 }
 NEEDS_MAP = {"displacement_map": {1: 2}}   # param 1 (map layer) = layer index 2 (the map footage)

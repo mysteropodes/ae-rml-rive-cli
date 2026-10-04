@@ -1,0 +1,36 @@
+{
+ "slug": "block_dissolve",
+ "aeMatchName": "ADBE Block Dissolve",
+ "wgsl": "ae_block_dissolve.wgsl",
+ "passes": 1,
+ "textures": {},
+ "params": [
+  {
+   "ae": 1,
+   "field": "completion",
+   "kind": "number",
+   "default": 0
+  },
+  {
+   "ae": 2,
+   "field": "bw",
+   "kind": "number",
+   "default": 1
+  },
+  {
+   "ae": 3,
+   "field": "bh",
+   "kind": "number",
+   "default": 1
+  },
+  {
+   "ae": 4,
+   "field": "feather",
+   "kind": "number",
+   "default": 0
+  }
+ ],
+ "status": "unverified",
+ "auto": false,
+ "notes": "Not yet measured against After Effects.  Parameter indices follow the After Effects parameter order as documented by Adobe; `render_refs.py --params` records the real list."
+}

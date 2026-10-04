@@ -1,0 +1,39 @@
+{
+ "slug": "cc_light_burst",
+ "aeMatchName": "CC Light Burst 2.5",
+ "wgsl": "ae_cc_light_burst.wgsl",
+ "passes": 1,
+ "textures": {},
+ "params": [
+  {
+   "ae": 1,
+   "field": "center",
+   "kind": "point",
+   "default": [
+    320,
+    180
+   ]
+  },
+  {
+   "ae": 2,
+   "field": "intensity",
+   "kind": "number",
+   "default": 100
+  },
+  {
+   "ae": 3,
+   "field": "length",
+   "kind": "number",
+   "default": 50
+  },
+  {
+   "ae": 4,
+   "field": "burst",
+   "kind": "enum",
+   "default": 2
+  }
+ ],
+ "status": "unverified",
+ "auto": false,
+ "notes": "Not yet measured against After Effects.  Parameter indices follow the After Effects parameter order as documented by Adobe; `render_refs.py --params` records the real list."
+}

@@ -2981,6 +2981,246 @@
   "png": "ae/bilateral_blur_1.png"
  },
  {
+  "slug": "gradient_wipe",
+  "mn": "ADBE Gradient Wipe",
+  "k": 0,
+  "vals": {
+   "1": 40
+  },
+  "held": false,
+  "png": "ae/gradient_wipe_0.png"
+ },
+ {
+  "slug": "gradient_wipe",
+  "mn": "ADBE Gradient Wipe",
+  "k": 1,
+  "vals": {
+   "1": 50,
+   "2": 30
+  },
+  "held": false,
+  "png": "ae/gradient_wipe_1.png"
+ },
+ {
+  "slug": "gradient_wipe",
+  "mn": "ADBE Gradient Wipe",
+  "k": 2,
+  "vals": {
+   "1": 30,
+   "5": 1
+  },
+  "held": false,
+  "png": "ae/gradient_wipe_2.png"
+ },
+ {
+  "slug": "block_dissolve",
+  "mn": "ADBE Block Dissolve",
+  "k": 0,
+  "vals": {
+   "1": 40,
+   "2": 20,
+   "3": 20
+  },
+  "held": false,
+  "png": "ae/block_dissolve_0.png"
+ },
+ {
+  "slug": "block_dissolve",
+  "mn": "ADBE Block Dissolve",
+  "k": 1,
+  "vals": {
+   "1": 70,
+   "2": 8,
+   "3": 40
+  },
+  "held": false,
+  "png": "ae/block_dissolve_1.png"
+ },
+ {
+  "slug": "circle",
+  "mn": "ADBE Circle",
+  "k": 0,
+  "vals": {},
+  "held": false,
+  "png": "ae/circle_0.png"
+ },
+ {
+  "slug": "circle",
+  "mn": "ADBE Circle",
+  "k": 1,
+  "vals": {
+   "1": [
+    200,
+    120
+   ],
+   "2": 100,
+   "9": [
+    1,
+    0.5,
+    0,
+    1
+   ],
+   "11": 2
+  },
+  "held": false,
+  "png": "ae/circle_1.png"
+ },
+ {
+  "slug": "cc_light_rays",
+  "mn": "CC Light Rays",
+  "k": 0,
+  "vals": {},
+  "held": false,
+  "png": "ae/cc_light_rays_0.png"
+ },
+ {
+  "slug": "cc_light_rays",
+  "mn": "CC Light Rays",
+  "k": 1,
+  "vals": {
+   "1": 200,
+   "2": [
+    500,
+    100
+   ],
+   "3": 70
+  },
+  "held": false,
+  "png": "ae/cc_light_rays_1.png"
+ },
+ {
+  "slug": "cc_light_burst",
+  "mn": "CC Light Burst 2.5",
+  "k": 0,
+  "vals": {},
+  "held": false,
+  "png": "ae/cc_light_burst_0.png"
+ },
+ {
+  "slug": "cc_light_burst",
+  "mn": "CC Light Burst 2.5",
+  "k": 1,
+  "vals": {
+   "1": [
+    200,
+    120
+   ],
+   "3": 80,
+   "4": 1
+  },
+  "held": false,
+  "png": "ae/cc_light_burst_1.png"
+ },
+ {
+  "slug": "cc_spotlight",
+  "mn": "CC Spotlight",
+  "k": 0,
+  "vals": {},
+  "held": false,
+  "png": "ae/cc_spotlight_0.png"
+ },
+ {
+  "slug": "cc_spotlight",
+  "mn": "CC Spotlight",
+  "k": 1,
+  "vals": {
+   "1": [
+    100,
+    50
+   ],
+   "2": [
+    400,
+    220
+   ],
+   "4": 40,
+   "5": 50,
+   "6": [
+    1,
+    0.8,
+    0.4,
+    1
+   ],
+   "8": 2
+  },
+  "held": false,
+  "png": "ae/cc_spotlight_1.png"
+ },
+ {
+  "slug": "noise",
+  "mn": "ADBE Noise",
+  "k": 0,
+  "vals": {
+   "1": 30
+  },
+  "held": false,
+  "png": "ae/noise_0.png"
+ },
+ {
+  "slug": "noise",
+  "mn": "ADBE Noise",
+  "k": 1,
+  "vals": {
+   "1": 60,
+   "2": 0
+  },
+  "held": false,
+  "png": "ae/noise_1.png"
+ },
+ {
+  "slug": "scatter",
+  "mn": "ADBE Scatter",
+  "k": 0,
+  "vals": {
+   "1": 5
+  },
+  "held": false,
+  "png": "ae/scatter_0.png"
+ },
+ {
+  "slug": "scatter",
+  "mn": "ADBE Scatter",
+  "k": 1,
+  "vals": {
+   "1": 12,
+   "2": 2
+  },
+  "held": false,
+  "png": "ae/scatter_1.png"
+ },
+ {
+  "slug": "broadcast_colors",
+  "mn": "ADBE Broadcast Colors",
+  "k": 0,
+  "vals": {
+   "3": 90
+  },
+  "held": false,
+  "png": "ae/broadcast_colors_0.png"
+ },
+ {
+  "slug": "broadcast_colors",
+  "mn": "ADBE Broadcast Colors",
+  "k": 1,
+  "vals": {
+   "2": 2,
+   "3": 85
+  },
+  "held": false,
+  "png": "ae/broadcast_colors_1.png"
+ },
+ {
+  "slug": "broadcast_colors",
+  "mn": "ADBE Broadcast Colors",
+  "k": 2,
+  "vals": {
+   "1": 2,
+   "2": 3,
+   "3": 95
+  },
+  "held": false,
+  "png": "ae/broadcast_colors_2.png"
+ },
+ {
   "slug": "color_emboss",
   "mn": "ADBE Color Emboss",
   "k": 0,
