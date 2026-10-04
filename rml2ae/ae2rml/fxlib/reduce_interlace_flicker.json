@@ -1,0 +1,18 @@
+{
+ "slug": "reduce_interlace_flicker",
+ "aeMatchName": "ADBE Reduce Interlace Flicker",
+ "wgsl": "ae_reduce_interlace_flicker.wgsl",
+ "passes": 1,
+ "textures": {},
+ "params": [
+  {
+   "ae": 1,
+   "field": "softness",
+   "kind": "number",
+   "default": 1
+  }
+ ],
+ "status": "unverified",
+ "auto": false,
+ "notes": "Not yet measured against After Effects.  Parameter indices follow the After Effects parameter order as documented by Adobe; `render_refs.py --params` records the real list."
+}

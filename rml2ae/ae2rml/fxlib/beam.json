@@ -1,0 +1,88 @@
+{
+ "slug": "beam",
+ "aeMatchName": "ADBE Laser",
+ "wgsl": "ae_beam.wgsl",
+ "passes": 1,
+ "textures": {},
+ "params": [
+  {
+   "ae": 1,
+   "field": "a",
+   "kind": "point",
+   "default": [
+    160,
+    180
+   ]
+  },
+  {
+   "ae": 2,
+   "field": "b",
+   "kind": "point",
+   "default": [
+    480,
+    180
+   ]
+  },
+  {
+   "ae": 3,
+   "field": "len",
+   "kind": "number",
+   "default": 30
+  },
+  {
+   "ae": 4,
+   "field": "time",
+   "kind": "number",
+   "default": 100
+  },
+  {
+   "ae": 5,
+   "field": "t0",
+   "kind": "number",
+   "default": 8
+  },
+  {
+   "ae": 6,
+   "field": "t1",
+   "kind": "number",
+   "default": 20
+  },
+  {
+   "ae": 7,
+   "field": "softness",
+   "kind": "number",
+   "default": 60
+  },
+  {
+   "ae": 8,
+   "field": "inside",
+   "kind": "color",
+   "default": [
+    1,
+    1,
+    1,
+    1
+   ]
+  },
+  {
+   "ae": 9,
+   "field": "outside",
+   "kind": "color",
+   "default": [
+    0,
+    0,
+    1,
+    1
+   ]
+  },
+  {
+   "ae": 11,
+   "field": "composite",
+   "kind": "bool",
+   "default": 0
+  }
+ ],
+ "status": "unverified",
+ "auto": false,
+ "notes": "Not yet measured against After Effects.  Parameter indices follow the After Effects parameter order as documented by Adobe; `render_refs.py --params` records the real list."
+}

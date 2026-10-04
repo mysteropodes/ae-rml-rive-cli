@@ -1,0 +1,33 @@
+{
+ "slug": "radial_blur",
+ "aeMatchName": "ADBE Radial Blur",
+ "wgsl": "ae_radial_blur.wgsl",
+ "passes": 1,
+ "textures": {},
+ "params": [
+  {
+   "ae": 1,
+   "field": "amount",
+   "kind": "number",
+   "default": 10
+  },
+  {
+   "ae": 2,
+   "field": "center",
+   "kind": "point",
+   "default": [
+    320,
+    180
+   ]
+  },
+  {
+   "ae": 3,
+   "field": "kind",
+   "kind": "enum",
+   "default": 1
+  }
+ ],
+ "status": "unverified",
+ "auto": false,
+ "notes": "Not yet measured against After Effects.  Parameter indices follow the After Effects parameter order as documented by Adobe; `render_refs.py --params` records the real list."
+}

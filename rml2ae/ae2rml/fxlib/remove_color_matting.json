@@ -1,0 +1,29 @@
+{
+ "slug": "remove_color_matting",
+ "aeMatchName": "ADBE Remove Color Matting",
+ "wgsl": "ae_remove_color_matting.wgsl",
+ "passes": 1,
+ "textures": {},
+ "params": [
+  {
+   "ae": 1,
+   "field": "bg",
+   "kind": "color",
+   "default": [
+    0,
+    0,
+    0,
+    1
+   ]
+  },
+  {
+   "ae": 2,
+   "field": "clip",
+   "kind": "bool",
+   "default": 1
+  }
+ ],
+ "status": "unverified",
+ "auto": false,
+ "notes": "Not yet measured against After Effects.  Parameter indices follow the After Effects parameter order as documented by Adobe; `render_refs.py --params` records the real list."
+}

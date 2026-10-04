@@ -1,0 +1,71 @@
+{
+ "slug": "cc_spotlight",
+ "aeMatchName": "CC Spotlight",
+ "wgsl": "ae_cc_spotlight.wgsl",
+ "passes": 1,
+ "textures": {},
+ "params": [
+  {
+   "ae": 1,
+   "field": "fromPt",
+   "kind": "point",
+   "default": [
+    320,
+    0
+   ]
+  },
+  {
+   "ae": 2,
+   "field": "toPt",
+   "kind": "point",
+   "default": [
+    320,
+    180
+   ]
+  },
+  {
+   "ae": 3,
+   "field": "height",
+   "kind": "number",
+   "default": 50
+  },
+  {
+   "ae": 4,
+   "field": "cone",
+   "kind": "angle",
+   "default": 60
+  },
+  {
+   "ae": 5,
+   "field": "softness",
+   "kind": "number",
+   "default": 20
+  },
+  {
+   "ae": 6,
+   "field": "color",
+   "kind": "color",
+   "default": [
+    1,
+    1,
+    1,
+    1
+   ]
+  },
+  {
+   "ae": 7,
+   "field": "intensity",
+   "kind": "number",
+   "default": 100
+  },
+  {
+   "ae": 8,
+   "field": "render",
+   "kind": "enum",
+   "default": 3
+  }
+ ],
+ "status": "unverified",
+ "auto": false,
+ "notes": "Not yet measured against After Effects.  Parameter indices follow the After Effects parameter order as documented by Adobe; `render_refs.py --params` records the real list."
+}

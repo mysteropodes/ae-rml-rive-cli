@@ -6,7 +6,7 @@ Effects menu (English UI names).
 
 | Mark | Meaning |
 |---|---|
-| ✅ | In fxlib and measured (`exact`, `close` or `approx`, see the effect table in [fxlib.md](fxlib.md)) |
+| ✅ | In fxlib and measured (`exact`, `close` or `approx`, see the effect table in [fxlib.md](fxlib.md)), or converted natively by ae2rml |
 | 🟡 | In fxlib, **unverified**: written from the effect's definition, compiles and runs, waits for After Effects renders |
 | ⬜ | To do |
 | ⛔ | Not planned, with the reason |
@@ -19,31 +19,31 @@ plug-in. Some can come later through the Rive scene itself rather than as a shad
 
 | Effect | | Note |
 |---|---|---|
-| Bilateral Blur | ⬜ | |
+| Bilateral Blur | 🟡 | lot 4 |
 | Box Blur (Fast Box Blur) | ✅ | |
 | Camera Lens Blur | ⬜ | iris shapes; depth map layer optional |
 | Camera-Shake Deblur | ⛔ | motion estimation over several frames |
-| CC Cross Blur | ⬜ | |
+| CC Cross Blur | 🟡 | lot 4 |
 | CC Radial Blur | ✅ | |
 | CC Radial Fast Blur | ✅ | |
 | CC Vector Blur | ⬜ | |
-| Channel Blur | ⬜ | |
+| Channel Blur | 🟡 | lot 4 |
 | Compound Blur | ⬜ | needs a blur layer |
 | Directional Blur | ✅ | |
 | Fast Blur (legacy) | ✅ | |
 | Gaussian Blur | ✅ | |
 | Gaussian Blur (legacy) | ✅ | |
-| Radial Blur | ⬜ | lot 2, in progress |
-| Reduce Interlace Flicker | ⬜ | |
-| Sharpen | ⬜ | lot 2, in progress |
-| Smart Blur | ⬜ | |
-| Unsharp Mask | ⬜ | lot 2, in progress |
+| Radial Blur | 🟡 | lot 2 |
+| Reduce Interlace Flicker | 🟡 | lot 7 |
+| Sharpen | 🟡 | lot 2 |
+| Smart Blur | 🟡 | lot 7 |
+| Unsharp Mask | 🟡 | lot 2 |
 
 ## Channel
 
 | Effect | | Note |
 |---|---|---|
-| Arithmetic | ⬜ | |
+| Arithmetic | 🟡 | lot 3 |
 | Blend | ⬜ | needs a second layer |
 | Calculations | ⬜ | needs a second layer |
 | CC Composite | ⬜ | parameter list already measured |
@@ -51,11 +51,11 @@ plug-in. Some can come later through the Rive scene itself rather than as a shad
 | Compound Arithmetic | ⬜ | needs a second layer |
 | Invert | ✅ | |
 | Minimax | ✅ | |
-| Remove Color Matting | ⬜ | |
+| Remove Color Matting | 🟡 | lot 3 |
 | Set Channels | 🟡 | lot 1; the layer itself as source |
-| Set Matte | ⬜ | needs a second layer |
+| Set Matte | ✅ | converted natively by ae2rml (clip from the source layer), no shader needed |
 | Shift Channels | ✅ | |
-| Solid Composite | ⬜ | |
+| Solid Composite | 🟡 | lot 6 |
 
 ## Color Correction
 
@@ -64,15 +64,15 @@ plug-in. Some can come later through the Rive scene itself rather than as a shad
 | Auto Color, Auto Contrast, Auto Levels | ⛔ | statistics of the frame and its neighbours |
 | Black & White | ✅ | |
 | Brightness & Contrast | ✅ | |
-| Broadcast Colors | ⬜ | |
+| Broadcast Colors | 🟡 | lot 5 |
 | CC Color Neutralizer | ⬜ | |
-| CC Color Offset | ⬜ | |
+| CC Color Offset | 🟡 | lot 3 |
 | CC Kernel | ⬜ | |
-| CC Toner | ⬜ | |
-| Change Color | ⬜ | |
+| CC Toner | 🟡 | lot 3 |
+| Change Color | 🟡 | lot 3 |
 | Change to Color | ⬜ | tolerance is a parameter group |
 | Channel Mixer | 🟡 | lot 1 |
-| Color Balance | ⬜ | |
+| Color Balance | 🟡 | lot 3 |
 | Color Balance (HLS) | ✅ | |
 | Color Link | ⛔ | samples another layer over time |
 | Color Stabilizer | ⛔ | tracks reference frames |
@@ -80,9 +80,9 @@ plug-in. Some can come later through the Rive scene itself rather than as a shad
 | Curves | ⬜ | the curve is custom data: needs a reader for it |
 | Equalize | ⛔ | histogram of the frame |
 | Exposure | ✅ | |
-| Gamma/Pedestal/Gain | ⬜ | lot 2, in progress |
+| Gamma/Pedestal/Gain | 🟡 | lot 2 |
 | Hue/Saturation | ✅ | |
-| Leave Color | ⬜ | lot 2, in progress |
+| Leave Color | 🟡 | lot 2 |
 | Levels | ✅ | |
 | Levels (Individual Controls) | ⬜ | same maths as Levels, one parameter per channel |
 | Lumetri Color | ⛔ | too large for now (LUTs, curves, wheels); later |
@@ -99,40 +99,41 @@ plug-in. Some can come later through the Rive scene itself rather than as a shad
 | Effect | | Note |
 |---|---|---|
 | Bezier Warp | ⬜ | |
-| Bulge | ⬜ | lot 2, in progress |
+| Bulge | 🟡 | lot 2 |
 | CC Bend It, CC Bender | ⬜ | |
 | CC Blobbylize | ⬜ | |
 | CC Flo Motion | ⬜ | |
 | CC Griddler | ⬜ | |
-| CC Lens | ⬜ | |
+| CC Lens | 🟡 | lot 6 |
 | CC Page Turn | ⬜ | |
-| CC Power Pin | ⬜ | close to Corner Pin |
+| CC Power Pin | 🟡 | lot 6 (the measured Corner Pin law) |
 | CC Ripple Pulse | ⬜ | |
-| CC Slant | ⬜ | |
+| CC Slant | 🟡 | lot 6 |
 | CC Smear | ⬜ | |
-| CC Split, CC Split 2 | ⬜ | |
-| CC Tiler | ⬜ | |
+| CC Split | 🟡 | lot 6 |
+| CC Split 2 | ⬜ | |
+| CC Tiler | 🟡 | lot 4 |
 | Corner Pin | ✅ | |
 | Detail-preserving Upscale | ⛔ | learned upscaler |
 | Displacement Map | ✅ | |
 | Liquify | ⛔ | brush strokes stored in the effect |
 | Magnify | ✅ | |
 | Mesh Warp | ⬜ | |
-| Mirror | ⬜ | lot 2, in progress |
+| Mirror | 🟡 | lot 2 |
 | Offset | 🟡 | lot 1 |
 | Optics Compensation | ✅ | |
-| Polar Coordinates | ⬜ | lot 2, in progress |
+| Polar Coordinates | 🟡 | lot 2 |
 | Reshape | ⛔ | mask-driven |
-| Ripple | ⬜ | |
+| Ripple | 🟡 | lot 4 |
 | Rolling Shutter Repair | ⛔ | motion estimation |
 | Smear | ⛔ | mask-driven |
-| Spherize | ⬜ | lot 2, in progress |
-| Transform | ⬜ | |
+| Spherize | 🟡 | lot 2 |
+| Transform | ✅ | converted natively by ae2rml (exact transform nodes), no shader needed |
 | Turbulent Displace | ✅ | approx: proprietary noise |
-| Twirl | ⬜ | lot 2, in progress |
+| Twirl | 🟡 | lot 2 |
 | Warp | ⬜ | |
 | Warp Stabilizer | ⛔ | motion estimation |
-| Wave Warp | ⬜ | |
+| Wave Warp | 🟡 | lot 4 |
 
 ## Generate
 
@@ -141,21 +142,21 @@ plug-in. Some can come later through the Rive scene itself rather than as a shad
 | 4-Color Gradient | ✅ | |
 | Advanced Lightning | ⬜ | random; seed law to measure |
 | Audio Spectrum, Audio Waveform | ⛔ | audio |
-| Beam | ⬜ | |
+| Beam | 🟡 | lot 7 |
 | CC Glue Gun | ⬜ | |
-| CC Light Burst 2.5 | ⬜ | |
-| CC Light Rays | ⬜ | |
-| CC Light Sweep | ⬜ | |
+| CC Light Burst 2.5 | 🟡 | lot 5 |
+| CC Light Rays | 🟡 | lot 5 |
+| CC Light Sweep | 🟡 | lot 7 |
 | CC Threads | ⬜ | |
 | Cell Pattern | ⬜ | proprietary noise, like Fractal Noise |
 | Checkerboard | ✅ | |
-| Circle | ⬜ | |
-| Ellipse | ⬜ | |
+| Circle | 🟡 | lot 5 |
+| Ellipse | 🟡 | lot 4 |
 | Eyedropper Fill | ⬜ | |
 | Fill | ✅ | |
 | Fractal | ⬜ | |
 | Gradient Ramp | ✅ | |
-| Grid | ⬜ | |
+| Grid | 🟡 | lot 4 |
 | Lens Flare | ⬜ | |
 | Paint Bucket | ⬜ | flood fill |
 | Radio Waves | ⛔ | particles over time |
@@ -165,18 +166,18 @@ plug-in. Some can come later through the Rive scene itself rather than as a shad
 
 | Effect | | Note |
 |---|---|---|
-| Advanced Spill Suppressor | ⬜ | |
+| Advanced Spill Suppressor | 🟡 | lot 7 |
 | CC Simple Wire Removal | ⬜ | |
 | Color Difference Key | ⬜ | |
-| Color Key | ⬜ | |
+| Color Key | 🟡 | lot 3 |
 | Color Range | ⬜ | |
 | Difference Matte | ⬜ | needs a second layer |
-| Extract | ⬜ | |
+| Extract | 🟡 | lot 3 |
 | Inner/Outer Key | ⛔ | mask-driven |
 | Key Cleaner | ⬜ | |
-| Linear Color Key | ⬜ | |
+| Linear Color Key | 🟡 | lot 7 |
 | Luma Key | ✅ | |
-| Spill Suppressor | ⬜ | |
+| Spill Suppressor | 🟡 | lot 3 |
 
 ## Matte
 
@@ -191,22 +192,24 @@ plug-in. Some can come later through the Rive scene itself rather than as a shad
 | Effect | | Note |
 |---|---|---|
 | Add Grain, Match Grain, Remove Grain | ⛔ | grain models and sampling over time |
-| Dust & Scratches | ⬜ | |
+| Dust & Scratches | 🟡 | lot 6 |
 | Fractal Noise, Turbulent Noise | ⬜ | proprietary noise: like Turbulent Displace, approx at best |
-| Median | ⬜ | |
-| Noise, Noise Alpha, Noise HLS, Noise HLS Auto | ⬜ | random; seed law to measure |
+| Median | 🟡 | lot 3 |
+| Noise | 🟡 | lot 5 (random pattern differs from AE) |
+| Noise Alpha, Noise HLS | 🟡 | lot 6 (random pattern differs from AE) |
+| Noise HLS Auto | ⬜ | random; animated |
 
 ## Perspective
 
 | Effect | | Note |
 |---|---|---|
 | 3D Glasses | ⬜ | needs a second layer |
-| Bevel Alpha | ⬜ | |
-| Bevel Edges | ⬜ | |
+| Bevel Alpha | 🟡 | lot 4 |
+| Bevel Edges | 🟡 | lot 7 |
 | CC Cylinder, CC Sphere | ⬜ | |
-| CC Spotlight | ⬜ | |
+| CC Spotlight | 🟡 | lot 5 |
 | Drop Shadow | ✅ | |
-| Radial Shadow | ⬜ | |
+| Radial Shadow | 🟡 | lot 4 |
 
 ## Stylize
 
@@ -218,42 +221,42 @@ plug-in. Some can come later through the Rive scene itself rather than as a shad
 | CC Burn Film | ⬜ | |
 | CC Glass | ⬜ | |
 | CC HexTile | ⬜ | |
-| CC Kaleida | ⬜ | |
+| CC Kaleida | 🟡 | lot 6 |
 | CC Mr. Smoothie | ⬜ | |
 | CC Plastic | ⬜ | |
 | CC RepeTile | ⬜ | |
-| CC Threshold, CC Threshold RGB | ⬜ | |
-| CC Vignette | ⬜ | lot 2, in progress |
-| Color Emboss | ⬜ | |
+| CC Threshold, CC Threshold RGB | 🟡 | lot 3 |
+| CC Vignette | 🟡 | lot 2 |
+| Color Emboss | 🟡 | lot 3 |
 | Emboss | ✅ | |
-| Find Edges | ⬜ | lot 2, in progress |
+| Find Edges | 🟡 | lot 2 |
 | Glow | ✅ | |
 | Mosaic | ✅ | |
 | Motion Tile | ✅ | |
 | Posterize | ✅ | |
 | Roughen Edges | ⬜ | parameter list already measured; proprietary noise |
-| Scatter | ⬜ | random |
+| Scatter | 🟡 | lot 5 (random pattern differs from AE) |
 | Strobe Light | ⛔ | depends on time |
 | Texturize | ⬜ | needs a texture layer |
-| Threshold | ⬜ | lot 2, in progress |
+| Threshold | 🟡 | lot 2 |
 
 ## Transition
 
 | Effect | | Note |
 |---|---|---|
-| Block Dissolve | ⬜ | random; seed law to measure |
+| Block Dissolve | 🟡 | lot 5 (random pattern differs from AE) |
 | Card Wipe | ⛔ | 3D cards |
 | CC Glass Wipe, CC Image Wipe | ⬜ | need a second layer |
 | CC Grid Wipe | ⬜ | |
-| CC Jaws | ⬜ | |
-| CC Light Wipe | ⬜ | |
-| CC Line Sweep | ⬜ | |
-| CC Radial ScaleWipe | ⬜ | |
+| CC Jaws | 🟡 | lot 7 |
+| CC Light Wipe | 🟡 | lot 7 |
+| CC Line Sweep | 🟡 | lot 7 |
+| CC Radial ScaleWipe | 🟡 | lot 6 |
 | CC Scale Wipe | ✅ | |
 | CC Twister | ⬜ | |
 | CC WarpoMatic | ⬜ | |
-| Gradient Wipe | ⬜ | needs a gradient layer |
-| Iris Wipe | ⬜ | lot 2, in progress |
+| Gradient Wipe | 🟡 | lot 5 (the layer itself as gradient) |
+| Iris Wipe | 🟡 | lot 2 |
 | Linear Wipe | ✅ | |
 | Radial Wipe | 🟡 | lot 1 |
 | Venetian Blinds | 🟡 | lot 1 |
@@ -264,6 +267,14 @@ Time effects (Echo, Posterize Time, Time Difference, Time Displacement, Timewarp
 Motion Blur, CC Wide Time), 3D effects (CC Particle World, Shatter, Caustics, Wave World, Foam, Card Dance), text and
 expression controls, audio effects and the Immersive Video effects are outside fxlib: they need several frames, 3D
 geometry or audio, or are not image effects.
+
+## Effects that read a second layer
+
+Blend, Calculations, Compound Arithmetic, Compound Blur, Difference Matte, 3D Glasses, Texturize, CC Glass Wipe,
+CC Image Wipe and Gradient Wipe with another layer need the shader's `mapTex` bound to that layer. The Rive node
+already has the input for it (`e<i>_mapSource`, an artboard drawn into a canvas), but ae2rml does not fill it yet:
+even Displacement Map, measured offline, gets no map layer in a real conversion. Wiring it (the referenced layer as
+a sub-artboard, as for `fxSource`) and a test project with a map layer come before these effects.
 
 ## How a batch goes
 

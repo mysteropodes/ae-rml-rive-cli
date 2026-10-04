@@ -1,0 +1,54 @@
+{
+ "slug": "cc_threshold_rgb",
+ "aeMatchName": "CC Threshold RGB",
+ "wgsl": "ae_cc_threshold_rgb.wgsl",
+ "passes": 1,
+ "textures": {},
+ "params": [
+  {
+   "ae": 1,
+   "field": "rT",
+   "kind": "number",
+   "default": 127
+  },
+  {
+   "ae": 2,
+   "field": "gT",
+   "kind": "number",
+   "default": 127
+  },
+  {
+   "ae": 3,
+   "field": "bT",
+   "kind": "number",
+   "default": 127
+  },
+  {
+   "ae": 4,
+   "field": "rI",
+   "kind": "bool",
+   "default": 0
+  },
+  {
+   "ae": 5,
+   "field": "gI",
+   "kind": "bool",
+   "default": 0
+  },
+  {
+   "ae": 6,
+   "field": "bI",
+   "kind": "bool",
+   "default": 0
+  },
+  {
+   "ae": 7,
+   "field": "blend",
+   "kind": "number",
+   "default": 0
+  }
+ ],
+ "status": "unverified",
+ "auto": false,
+ "notes": "Not yet measured against After Effects.  Parameter indices follow the After Effects parameter order as documented by Adobe; `render_refs.py --params` records the real list."
+}

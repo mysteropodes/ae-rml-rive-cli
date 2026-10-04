@@ -131,8 +131,9 @@ python rml2ae/ae2rml/fxref/spec.py && python rml2ae/ae2rml/fxref/render_refs.py 
 `fxlib regress` measures every reference of every effect, held-out settings included, with wgpu on the CPU, and
 compares each one with `fxref/baseline.json`. It fails when a setting gets further from After Effects than the
 baseline (mean +0.02 %, pixels over 8 levels +0.05 %, or max +2 levels), when a shader stops compiling, when a
-reference has no baseline yet, or when a manifest names a `Params` field or an After Effects parameter that does not
-exist. The CI runs it on Linux with Mesa's software Vulkan (lavapipe) and `wgpu==0.32.0`, and prints the full table in
+reference has no baseline yet, when a manifest names a `Params` field or an After Effects parameter that does not
+exist, or when an unverified effect that reads `layerRect` gives a different result once the node has a pad (the
+layer grown by transparent pixels, point parameters moved accordingly, as the Rive node does). The CI runs it on Linux with Mesa's software Vulkan (lavapipe) and `wgpu==0.32.0`, and prints the full table in
 the job summary. After a deliberate change (a better shader, a new effect), run it with `--update` and commit the
 new `baseline.json` with the change; the diff shows what moved.
 
@@ -171,7 +172,7 @@ Everything needed to measure an effect is in the repository:
 
 What is still missing, effect by effect, is in [fxlib-roadmap.md](fxlib-roadmap.md).
 
-37 measured effects: 27 exact, 8 close, 2 approx, plus 7 unverified ones (below the table). "Auto" is whether ae2rml applies the effect without being asked; the two effects
+37 measured effects: 27 exact, 8 close, 2 approx, plus 73 unverified ones (below the table). "Auto" is whether ae2rml applies the effect without being asked; the two effects
 marked `no` are measured to be further from After Effects than leaving the effect out, so they remain a
 `<!-- ae: effect ... -->` comment plus an entry in `effects_todo.json`.
 
@@ -229,6 +230,72 @@ real parameter list, then `render_refs.py <slug>`), add held-out settings, and m
 | Venetian Blinds | `ADBE Venetian Blinds` | `venetian_blinds` | Stripe origin and direction convention, feather law |
 | Photo Filter | `ADBE Photo Filter` | `photo_filter` | Menu index of Custom; preset colours; luminosity law |
 | Vibrance | `ADBE Vibrance` | `vibrance` | Approximation: Adobe's vibrance law is undocumented |
+| Threshold | `ADBE Threshold2` | `threshold` | Luma weights, >= vs > |
+| Gamma/Pedestal/Gain | `ADBE Gamma/Pedestal/Gain` | `gamma_pedestal_gain` | Black Stretch law; order of gamma and pedestal/gain |
+| Leave Color | `ADBE Leave Color` | `leave_color` | Distance in RGB and in hue; softness ramp |
+| Sharpen | `ADBE Sharpen` | `sharpen` | Kernel and strength per Amount |
+| Find Edges | `ADBE Find Edges` | `find_edges` | Operator and scale |
+| Unsharp Mask | `ADBE Unsharp Mask2` | `unsharp_mask` | Radius to sigma; threshold per channel or luma |
+| Mirror | `ADBE Mirror` | `mirror` | Which side is kept at a given angle |
+| Polar Coordinates | `ADBE Polar Coordinates` | `polar_coordinates` | Radius normalisation, angle origin |
+| Twirl | `ADBE Twirl` | `twirl` | Radius reference and falloff |
+| Bulge | `ADBE Bulge` | `bulge` | Height law, taper, pinning |
+| Spherize | `ADBE Spherize` | `spherize` | Sphere law |
+| Radial Blur | `ADBE Radial Blur` | `radial_blur` | Amount units per type; sampling |
+| CC Vignette | `CC Vignette` | `cc_vignette` | Falloff law and Angle of View |
+| Iris Wipe | `ADBE Iris Wipe` | `iris_wipe` | Polygon when Use Inner Radius is off; feather law |
+| Color Balance | `ADBE Color Balance 2` | `color_balance` | Tonal weights; Preserve Luminosity law |
+| Change Color | `ADBE Change Color` | `change_color` | Distance per Match Colors mode; transforms in HSL |
+| CC Toner | `CC Toner` | `cc_toner` | Gradient stops per Tones mode |
+| CC Color Offset | `CC Color Offset` | `cc_color_offset` | Overflow modes |
+| Arithmetic | `ADBE Arithmetic` | `arithmetic` | Operator menu order; rounding |
+| Remove Color Matting | `ADBE Remove Color Matting` | `remove_color_matting` | Clipping |
+| Color Key | `ADBE Color Key` | `color_key` | Distance; Edge Thin and Edge Feather |
+| Extract | `ADBE Extract` | `extract` | Softness ramps; luma weights |
+| Spill Suppressor | `ADBE Spill Suppressor` | `spill_suppressor` | Suppression law |
+| CC Threshold | `CC Threshold` | `cc_threshold` | Channel menu; >= vs > |
+| CC Threshold RGB | `CC Threshold RGB` | `cc_threshold_rgb` | Parameter order |
+| Color Emboss | `ADBE Color Emboss` | `color_emboss` | Built on the measured Emboss; base colour assumed |
+| Median | `ADBE Median` | `median` | Window shape (square here); radius cap 12 |
+| Wave Warp | `ADBE Wave Warp` | `wave_warp` | Displacement axis; Wave Speed (time) not modelled |
+| Ripple | `ADBE Ripple` | `ripple` | Radius reference, falloff, Type |
+| CC Tiler | `CC Tiler` | `cc_tiler` | Tile origin |
+| Grid | `ADBE Grid` | `grid` | Parameter positions after Border; Feather |
+| Ellipse | `ADBE Ellipse` | `ellipse` | Ring geometry and softness |
+| Bevel Alpha | `ADBE Bevel Alpha` | `bevel_alpha` | Height field and shading law |
+| Radial Shadow | `ADBE Radial Shadow` | `radial_shadow` | Projection law; Softness |
+| Channel Blur | `ADBE Channel Blur` | `channel_blur` | Assumed legacy blur law (Gaussian of equal variance) |
+| CC Cross Blur | `CC Cross Blur` | `cc_cross_blur` | Kernel shape; Transfer Mode |
+| Bilateral Blur | `ADBE Bilateral Blur` | `bilateral_blur` | Spatial and range weights; Colorize |
+| Gradient Wipe | `ADBE Gradient Wipe` | `gradient_wipe` | The layer itself as gradient only; softness law |
+| Block Dissolve | `ADBE Block Dissolve` | `block_dissolve` | Random pattern cannot match AE; feather |
+| Circle | `ADBE Circle` | `circle` | Parameter positions after Radius; Edge and Feather |
+| CC Light Rays | `CC Light Rays` | `cc_light_rays` | Brightness weighting of the rays; Shape |
+| CC Light Burst 2.5 | `CC Light Burst 2.5` | `cc_light_burst` | Burst modes; Halo Alpha |
+| CC Spotlight | `CC Spotlight` | `cc_spotlight` | Cone geometry from Height and Cone Angle |
+| Noise | `ADBE Noise` | `noise` | Random pattern cannot match AE; amount law |
+| Scatter | `ADBE Scatter` | `scatter` | Random pattern cannot match AE |
+| Broadcast Colors | `ADBE Broadcast Colors` | `broadcast_colors` | Signal amplitude formula per locale |
+| CC Power Pin | `CC Power Pin` | `cc_power_pin` | The measured Corner Pin law; Perspective < 100 % and Expansion |
+| CC Radial ScaleWipe | `CC Radial ScaleWipe` | `cc_radial_scalewipe` | Push-out law; Reverse |
+| CC Slant | `CC Slant` | `cc_slant` | Shear origin; Stretching |
+| CC Split | `CC Split` | `cc_split` | Slit taper |
+| CC Lens | `CC Lens` | `cc_lens` | Lens law and size reference |
+| CC Kaleida | `CC Kaleida` | `cc_kaleida` | Wedge count; Mirroring modes |
+| Solid Composite | `ADBE Solid Composite` | `solid_composite` | Blending modes |
+| Dust & Scratches | `ADBE Dust & Scratches` | `dust_scratches` | Window and threshold test |
+| Noise Alpha | `ADBE Noise Alpha` | `noise_alpha` | Random pattern cannot match AE; modes |
+| Noise HLS | `ADBE Noise HLS2` | `noise_hls` | Random pattern cannot match AE; amounts |
+| CC Light Sweep | `CC Light Sweep` | `cc_light_sweep` | Band profiles; Edge Intensity |
+| Beam | `ADBE Laser` | `beam` | Length/Time window; 3D Perspective |
+| CC Jaws | `CC Jaws` | `cc_jaws` | Tooth shapes; travel distance |
+| CC Line Sweep | `CC Line Sweep` | `cc_line_sweep` | Staggering of the lines |
+| CC Light Wipe | `CC Light Wipe` | `cc_light_wipe` | Glow profile; shapes |
+| Bevel Edges | `ADBE Bevel Edges` | `bevel_edges` | Thickness reference; shading |
+| Linear Color Key | `ADBE Linear Color Key2` | `linear_color_key` | Parameter positions; distance |
+| Smart Blur | `ADBE Smart Blur` | `smart_blur` | Threshold test; edge modes |
+| Reduce Interlace Flicker | `ADBE Reduce Interlace Flicker` | `reduce_interlace_flicker` | Kernel |
+| Advanced Spill Suppressor | `ADBE Spill2` | `advanced_spill_suppressor` | Standard method only |
 Notes:
 
 - **Gaussian Blur (legacy)** and **Fast Blur (legacy)** share the same kernel (confirmed on a third setting).

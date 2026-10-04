@@ -1,0 +1,78 @@
+{
+ "slug": "gamma_pedestal_gain",
+ "aeMatchName": "ADBE Gamma/Pedestal/Gain",
+ "wgsl": "ae_gamma_pedestal_gain.wgsl",
+ "passes": 1,
+ "textures": {},
+ "params": [
+  {
+   "ae": 1,
+   "field": "blackStretch",
+   "kind": "number",
+   "default": 1
+  },
+  {
+   "ae": 2,
+   "field": "rGamma",
+   "kind": "number",
+   "default": 1
+  },
+  {
+   "ae": 3,
+   "field": "rPedestal",
+   "kind": "number",
+   "default": 0
+  },
+  {
+   "ae": 4,
+   "field": "rGain",
+   "kind": "number",
+   "default": 1
+  },
+  {
+   "ae": 5,
+   "field": "gGamma",
+   "kind": "number",
+   "default": 1
+  },
+  {
+   "ae": 6,
+   "field": "gPedestal",
+   "kind": "number",
+   "default": 0
+  },
+  {
+   "ae": 7,
+   "field": "gGain",
+   "kind": "number",
+   "default": 1
+  },
+  {
+   "ae": 8,
+   "field": "bGamma",
+   "kind": "number",
+   "default": 1
+  },
+  {
+   "ae": 9,
+   "field": "bPedestal",
+   "kind": "number",
+   "default": 0
+  },
+  {
+   "ae": 10,
+   "field": "bGain",
+   "kind": "number",
+   "default": 1
+  },
+  {
+   "ae": 11,
+   "field": "blend",
+   "kind": "number",
+   "default": 0
+  }
+ ],
+ "status": "unverified",
+ "auto": false,
+ "notes": "Not yet measured against After Effects.  Parameter indices follow the After Effects parameter order as documented by Adobe; `render_refs.py --params` records the real list."
+}

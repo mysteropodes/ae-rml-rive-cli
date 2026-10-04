@@ -1,0 +1,41 @@
+{
+ "slug": "color_key",
+ "aeMatchName": "ADBE Color Key",
+ "wgsl": "ae_color_key.wgsl",
+ "passes": 1,
+ "textures": {},
+ "params": [
+  {
+   "ae": 1,
+   "field": "key",
+   "kind": "color",
+   "default": [
+    0,
+    0,
+    1,
+    1
+   ]
+  },
+  {
+   "ae": 2,
+   "field": "tolerance",
+   "kind": "number",
+   "default": 0
+  },
+  {
+   "ae": 3,
+   "field": "thin",
+   "kind": "number",
+   "default": 0
+  },
+  {
+   "ae": 4,
+   "field": "feather",
+   "kind": "number",
+   "default": 0
+  }
+ ],
+ "status": "unverified",
+ "auto": false,
+ "notes": "Not yet measured against After Effects.  Parameter indices follow the After Effects parameter order as documented by Adobe; `render_refs.py --params` records the real list."
+}

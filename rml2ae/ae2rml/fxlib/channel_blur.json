@@ -1,0 +1,48 @@
+{
+ "slug": "channel_blur",
+ "aeMatchName": "ADBE Channel Blur",
+ "wgsl": "ae_channel_blur.wgsl",
+ "passes": 2,
+ "textures": {},
+ "params": [
+  {
+   "ae": 1,
+   "field": "rB",
+   "kind": "number",
+   "default": 0
+  },
+  {
+   "ae": 2,
+   "field": "gB",
+   "kind": "number",
+   "default": 0
+  },
+  {
+   "ae": 3,
+   "field": "bB",
+   "kind": "number",
+   "default": 0
+  },
+  {
+   "ae": 4,
+   "field": "aB",
+   "kind": "number",
+   "default": 0
+  },
+  {
+   "ae": 5,
+   "field": "repeatEdge",
+   "kind": "bool",
+   "default": 0
+  },
+  {
+   "ae": 6,
+   "field": "dims",
+   "kind": "enum",
+   "default": 1
+  }
+ ],
+ "status": "unverified",
+ "auto": false,
+ "notes": "Not yet measured against After Effects.  Parameter indices follow the After Effects parameter order as documented by Adobe; `render_refs.py --params` records the real list."
+}

@@ -1,0 +1,30 @@
+{
+ "slug": "bilateral_blur",
+ "aeMatchName": "ADBE Bilateral Blur",
+ "wgsl": "ae_bilateral_blur.wgsl",
+ "passes": 1,
+ "textures": {},
+ "params": [
+  {
+   "ae": 1,
+   "field": "radius",
+   "kind": "number",
+   "default": 5
+  },
+  {
+   "ae": 2,
+   "field": "threshold",
+   "kind": "number",
+   "default": 20
+  },
+  {
+   "ae": 3,
+   "field": "colorize",
+   "kind": "bool",
+   "default": 1
+  }
+ ],
+ "status": "unverified",
+ "auto": false,
+ "notes": "Not yet measured against After Effects.  Parameter indices follow the After Effects parameter order as documented by Adobe; `render_refs.py --params` records the real list."
+}

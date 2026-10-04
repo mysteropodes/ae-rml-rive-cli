@@ -1,0 +1,18 @@
+{
+ "slug": "threshold",
+ "aeMatchName": "ADBE Threshold2",
+ "wgsl": "ae_threshold.wgsl",
+ "passes": 1,
+ "textures": {},
+ "params": [
+  {
+   "ae": 1,
+   "field": "level",
+   "kind": "number",
+   "default": 128
+  }
+ ],
+ "status": "unverified",
+ "auto": false,
+ "notes": "Not yet measured against After Effects.  Parameter indices follow the After Effects parameter order as documented by Adobe; `render_refs.py --params` records the real list."
+}

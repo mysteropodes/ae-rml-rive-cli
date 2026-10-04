@@ -1,0 +1,71 @@
+{
+ "slug": "change_color",
+ "aeMatchName": "ADBE Change Color",
+ "wgsl": "ae_change_color.wgsl",
+ "passes": 1,
+ "textures": {},
+ "params": [
+  {
+   "ae": 1,
+   "field": "view",
+   "kind": "enum",
+   "default": 1
+  },
+  {
+   "ae": 2,
+   "field": "hue",
+   "kind": "angle",
+   "default": 0
+  },
+  {
+   "ae": 3,
+   "field": "light",
+   "kind": "number",
+   "default": 0
+  },
+  {
+   "ae": 4,
+   "field": "sat",
+   "kind": "number",
+   "default": 0
+  },
+  {
+   "ae": 5,
+   "field": "color",
+   "kind": "color",
+   "default": [
+    1,
+    0,
+    0,
+    1
+   ]
+  },
+  {
+   "ae": 6,
+   "field": "tolerance",
+   "kind": "number",
+   "default": 15
+  },
+  {
+   "ae": 7,
+   "field": "softness",
+   "kind": "number",
+   "default": 0
+  },
+  {
+   "ae": 8,
+   "field": "matchMode",
+   "kind": "enum",
+   "default": 1
+  },
+  {
+   "ae": 9,
+   "field": "invert",
+   "kind": "bool",
+   "default": 0
+  }
+ ],
+ "status": "unverified",
+ "auto": false,
+ "notes": "Not yet measured against After Effects.  Parameter indices follow the After Effects parameter order as documented by Adobe; `render_refs.py --params` records the real list."
+}
