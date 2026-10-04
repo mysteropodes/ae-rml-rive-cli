@@ -9,7 +9,9 @@ Round-trip between **Adobe After Effects** and **Rive**, driven from the command
   by [py-aep](https://github.com/forticheprod/py-aep)).
 - **rml2ae** — a Rive CLI project becomes an After Effects project (one comp per artboard, real keys, shape layers,
   text, mattes), rebuilt incrementally; edits made in AE come back with `ae pull`. A file from the **Rive Editor**
-  (`.rev`) goes to After Effects the same way, once the Rive CLI has turned it into a project (`rive create --from-rev`).
+  (`.rev`, or a file in your Rive account) goes to After Effects the same way, once the Rive CLI has turned it into a
+  project (`rive create --from-rev`, `rive create --from-remote-file`); `rive push` sends the project back to the Rive
+  Editor and `rive pull` brings the Editor's changes down.
 - **Rive Shader** — an After Effects effect plugin that runs a Rive post-process shader (`.wgsl`) as is.
 - **fxlib** — native After Effects effects re-implemented in WGSL and measured against AE renders, so that effects
   survive the trip both ways.
@@ -17,26 +19,30 @@ Round-trip between **Adobe After Effects** and **Rive**, driven from the command
   scrub, drawn and typed notes.
 
 ```mermaid
-flowchart TB
-  REV["Rive Editor file<br/>.rev"]
+flowchart LR
   AEP["After Effects project<br/>.aep"]
-  FX["fxlib<br/>AE effects as WGSL"]
-  RML["Rive CLI project<br/>rive.yaml · scene.rml · assets"]
-  RIV[".riv / web page"]
-  VIEW["Rive Viewer<br/>rive &lt;project&gt;"]
-  NOTES["review notes<br/>.review/notes.json"]
   COMPS["After Effects comps<br/>layers · keys · mattes"]
   SH["Rive Shader plugin<br/>.wgsl inside AE"]
+  FX["fxlib<br/>AE effects as WGSL"]
+  RML["Rive CLI project<br/>rive.yaml · scene.rml · assets"]
+  EDITOR["Rive Editor<br/>file in your Rive account"]
+  REV["Rive Editor file<br/>.rev"]
+  VIEW["Rive Viewer<br/>rive &lt;project&gt;"]
+  NOTES["review notes<br/>.review/notes.json"]
+  RIV["signed .riv<br/>apps and games"]
+  WEB["hosted web page"]
 
-  REV -->|"rive create --from-rev"| RML
-  AEP -->|"ae2rml · no AE needed"| RML
+  AEP -->|"ae2rml<br/>no AE needed"| RML
+  COMPS <-->|"rml2ae<br/>ae build / ae pull"| RML
   FX -.-> RML
-  RML -->|"rive · verify, publish"| RIV
-  RML -->|"rive · open"| VIEW
-  VIEW -->|"review kit"| NOTES
-  RML <-->|"rml2ae · ae build / ae pull"| COMPS
   FX -.-> SH
   SH -.-> COMPS
+  RML <-->|"rive push / rive pull<br/>create --from-remote-file"| EDITOR
+  RML <-->|"--rev / create --from-rev"| REV
+  RML -->|"rive &lt;project&gt;"| VIEW
+  VIEW -->|"review kit"| NOTES
+  RML -->|"--publish"| RIV
+  RML -->|"--publish=web"| WEB
 ```
 
 ## Install (macOS)
@@ -64,6 +70,9 @@ rive out/demo                                  # open it in the Rive Viewer
 
 # Rive Editor -> After Effects: first turn the editor file into a Rive CLI project
 rive create out/my_scene --from-rev=my_scene.rev
+
+# Rive CLI project <-> Rive Editor (rive login first)
+(cd out/demo && rive push)                     # upload to a Rive file in your account; `rive pull` brings changes back
 
 # Rive -> After Effects (After Effects open, "Allow Scripts to Write Files" on)
 ae doctor out/demo

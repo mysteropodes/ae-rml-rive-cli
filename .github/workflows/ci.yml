@@ -96,6 +96,8 @@ jobs:
           sudo apt-get install -y -q --no-install-recommends libegl1 libgl1 libgles2 libvulkan1 mesa-vulkan-drivers libegl-mesa0
           ldd "$HOME/.rive/bin/rive" | grep "not found" && exit 1 || true
       - run: rive --version
+      # the command names the README diagram relies on (push, pull, create --from-rev / --from-remote-file, --rev, --publish)
+      - run: rive --help || true
       - name: Convert examples/demo.aep and verify it with the Rive CLI
         run: |
           python -m rml2ae.ae2rml examples/demo.aep out/demo --verify | tee out-verify.txt
