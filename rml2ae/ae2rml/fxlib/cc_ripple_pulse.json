@@ -1,0 +1,45 @@
+{
+ "slug": "cc_ripple_pulse",
+ "aeMatchName": "CC Ripple Pulse",
+ "wgsl": "ae_cc_ripple_pulse.wgsl",
+ "passes": 1,
+ "textures": {},
+ "params": [
+  {
+   "ae": 1,
+   "field": "center",
+   "kind": "point",
+   "default": [
+    320,
+    180
+   ]
+  },
+  {
+   "ae": 2,
+   "field": "level",
+   "kind": "number",
+   "default": 0
+  },
+  {
+   "ae": 3,
+   "field": "span",
+   "kind": "number",
+   "default": 1
+  },
+  {
+   "ae": 4,
+   "field": "amplitude",
+   "kind": "number",
+   "default": 20
+  },
+  {
+   "ae": 5,
+   "field": "bump",
+   "kind": "bool",
+   "default": 0
+  }
+ ],
+ "status": "unverified",
+ "auto": false,
+ "notes": "Not yet measured against After Effects.  Parameter indices follow the After Effects parameter order as documented by Adobe; `render_refs.py --params` records the real list."
+}

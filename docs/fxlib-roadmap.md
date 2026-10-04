@@ -98,21 +98,21 @@ plug-in. Some can come later through the Rive scene itself rather than as a shad
 
 | Effect | | Note |
 |---|---|---|
-| Bezier Warp | ⬜ | |
+| Bezier Warp | 🟡 | lot 10 |
 | Bulge | 🟡 | lot 2 |
 | CC Bend It | 🟡 | lot 8 |
-| CC Bender | ⬜ | |
+| CC Bender | 🟡 | lot 10 |
 | CC Blobbylize | ⬜ | |
-| CC Flo Motion | ⬜ | |
+| CC Flo Motion | 🟡 | lot 10 |
 | CC Griddler | 🟡 | lot 8 |
 | CC Lens | 🟡 | lot 6 |
-| CC Page Turn | ⬜ | |
+| CC Page Turn | 🟡 | lot 10 (the back shows the layer itself) |
 | CC Power Pin | 🟡 | lot 6 (the measured Corner Pin law) |
-| CC Ripple Pulse | ⬜ | |
+| CC Ripple Pulse | 🟡 | lot 10 (Pulse Level only, not Time Span) |
 | CC Slant | 🟡 | lot 6 |
-| CC Smear | ⬜ | |
+| CC Smear | 🟡 | lot 10 |
 | CC Split | 🟡 | lot 6 |
-| CC Split 2 | ⬜ | |
+| CC Split 2 | 🟡 | lot 10 |
 | CC Tiler | 🟡 | lot 4 |
 | Corner Pin | ✅ | |
 | Detail-preserving Upscale | ⛔ | learned upscaler |
@@ -132,7 +132,7 @@ plug-in. Some can come later through the Rive scene itself rather than as a shad
 | Transform | ✅ | converted natively by ae2rml (exact transform nodes), no shader needed |
 | Turbulent Displace | ✅ | approx: proprietary noise |
 | Twirl | 🟡 | lot 2 |
-| Warp | ⬜ | |
+| Warp | 🟡 | lot 10 (approximate envelopes) |
 | Warp Stabilizer | ⛔ | motion estimation |
 | Wave Warp | 🟡 | lot 4 |
 
@@ -207,7 +207,7 @@ plug-in. Some can come later through the Rive scene itself rather than as a shad
 | 3D Glasses | 🟡 | lot 9 (right view = second layer, left = this layer) |
 | Bevel Alpha | 🟡 | lot 4 |
 | Bevel Edges | 🟡 | lot 7 |
-| CC Cylinder, CC Sphere | ⬜ | |
+| CC Cylinder, CC Sphere | 🟡 | lot 10 (Lambert shading only) |
 | CC Spotlight | 🟡 | lot 5 |
 | Drop Shadow | ✅ | |
 | Radial Shadow | 🟡 | lot 4 |
@@ -255,7 +255,7 @@ plug-in. Some can come later through the Rive scene itself rather than as a shad
 | CC Line Sweep | 🟡 | lot 7 |
 | CC Radial ScaleWipe | 🟡 | lot 6 |
 | CC Scale Wipe | ✅ | |
-| CC Twister | ⬜ | |
+| CC Twister | 🟡 | lot 10 |
 | CC WarpoMatic | ⬜ | |
 | Gradient Wipe | 🟡 | lot 5 (the layer itself as gradient) |
 | Iris Wipe | 🟡 | lot 2 |

@@ -1,0 +1,42 @@
+{
+ "slug": "cc_split2",
+ "aeMatchName": "CC Split 2",
+ "wgsl": "ae_cc_split2.wgsl",
+ "passes": 1,
+ "textures": {},
+ "params": [
+  {
+   "ae": 1,
+   "field": "a",
+   "kind": "point",
+   "default": [
+    320,
+    0
+   ]
+  },
+  {
+   "ae": 2,
+   "field": "b",
+   "kind": "point",
+   "default": [
+    320,
+    360
+   ]
+  },
+  {
+   "ae": 3,
+   "field": "split1",
+   "kind": "number",
+   "default": 0
+  },
+  {
+   "ae": 4,
+   "field": "split2",
+   "kind": "number",
+   "default": 0
+  }
+ ],
+ "status": "unverified",
+ "auto": false,
+ "notes": "Not yet measured against After Effects.  Parameter indices follow the After Effects parameter order as documented by Adobe; `render_refs.py --params` records the real list."
+}

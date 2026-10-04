@@ -173,7 +173,7 @@ Everything needed to measure an effect is in the repository:
 
 What is still missing, effect by effect, is in [fxlib-roadmap.md](fxlib-roadmap.md).
 
-37 measured effects: 27 exact, 8 close, 2 approx, plus 94 unverified ones (below the table). "Auto" is whether ae2rml applies the effect without being asked; the two effects
+37 measured effects: 27 exact, 8 close, 2 approx, plus 105 unverified ones (below the table). "Auto" is whether ae2rml applies the effect without being asked; the two effects
 marked `no` are measured to be further from After Effects than leaving the effect out, so they remain a
 `<!-- ae: effect ... -->` comment plus an entry in `effects_todo.json`.
 
@@ -318,6 +318,17 @@ real parameter list, then `render_refs.py <slug>`), add held-out settings, and m
 | Compound Blur | `ADBE Compound Blur` | `compound_blur` | Kernel shape (disc here) and the radius law |
 | CC Image Wipe | `CC Image Wipe` | `cc_image_wipe` | Parameter positions in the Gradient group; Property menu; Blur |
 | 3D Glasses | `ADBE 3D Glasses2` | `three_d_glasses` | 3D View menu order; Balance; the left view is this layer |
+| CC Bender | `CC Bender` | `cc_bender` | Bend profile per Style; Adjust To Distance |
+| CC Split 2 | `CC Split 2` | `cc_split2` | How the two splits blend along the slit |
+| CC Smear | `CC Smear` | `cc_smear` | Falloff and Reach law |
+| CC Ripple Pulse | `CC Ripple Pulse` | `cc_ripple_pulse` | Ring radius per Pulse Level, wavelength; Time Span |
+| CC Flo Motion | `CC Flo Motion` | `cc_flo_motion` | Pull law and Falloff |
+| CC Twister | `CC Twister` | `cc_twister` | Twist distribution along the axis; Backside layer |
+| CC Page Turn | `CC Page Turn` | `cc_page_turn` | Curl geometry; Controls presets; Back Page layer |
+| CC Sphere | `CC Sphere` | `cc_sphere` | Mapping orientation; light and shading parameter positions |
+| CC Cylinder | `CC Cylinder` | `cc_cylinder` | Radius reference; Rotation X / Z; shading parameter positions |
+| Warp | `ADBE WRPMESH` | `warp` | Match name; the 15 styles' envelopes; distortion law |
+| Bezier Warp | `ADBE BEZMESH` | `bezier_warp` | Match name; patch form (Coons here) |
 
 Notes:
 

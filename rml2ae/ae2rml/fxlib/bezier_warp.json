@@ -1,0 +1,126 @@
+{
+ "slug": "bezier_warp",
+ "aeMatchName": "ADBE BEZMESH",
+ "wgsl": "ae_bezier_warp.wgsl",
+ "passes": 1,
+ "textures": {},
+ "params": [
+  {
+   "ae": 1,
+   "field": "tlV",
+   "kind": "point",
+   "default": [
+    0,
+    0
+   ]
+  },
+  {
+   "ae": 2,
+   "field": "tlT",
+   "kind": "point",
+   "default": [
+    213.3,
+    0
+   ]
+  },
+  {
+   "ae": 3,
+   "field": "trT",
+   "kind": "point",
+   "default": [
+    426.7,
+    0
+   ]
+  },
+  {
+   "ae": 4,
+   "field": "trV",
+   "kind": "point",
+   "default": [
+    640,
+    0
+   ]
+  },
+  {
+   "ae": 5,
+   "field": "rtT",
+   "kind": "point",
+   "default": [
+    640,
+    120
+   ]
+  },
+  {
+   "ae": 6,
+   "field": "rbT",
+   "kind": "point",
+   "default": [
+    640,
+    240
+   ]
+  },
+  {
+   "ae": 7,
+   "field": "brV",
+   "kind": "point",
+   "default": [
+    640,
+    360
+   ]
+  },
+  {
+   "ae": 8,
+   "field": "brT",
+   "kind": "point",
+   "default": [
+    426.7,
+    360
+   ]
+  },
+  {
+   "ae": 9,
+   "field": "blT",
+   "kind": "point",
+   "default": [
+    213.3,
+    360
+   ]
+  },
+  {
+   "ae": 10,
+   "field": "blV",
+   "kind": "point",
+   "default": [
+    0,
+    360
+   ]
+  },
+  {
+   "ae": 11,
+   "field": "lbT",
+   "kind": "point",
+   "default": [
+    0,
+    240
+   ]
+  },
+  {
+   "ae": 12,
+   "field": "ltT",
+   "kind": "point",
+   "default": [
+    0,
+    120
+   ]
+  },
+  {
+   "ae": 13,
+   "field": "quality",
+   "kind": "number",
+   "default": 8
+  }
+ ],
+ "status": "unverified",
+ "auto": false,
+ "notes": "Not yet measured against After Effects.  Parameter indices follow the After Effects parameter order as documented by Adobe; `render_refs.py --params` records the real list."
+}

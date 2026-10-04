@@ -1,0 +1,62 @@
+{
+ "slug": "cc_page_turn",
+ "aeMatchName": "CC Page Turn",
+ "wgsl": "ae_cc_page_turn.wgsl",
+ "passes": 1,
+ "textures": {},
+ "params": [
+  {
+   "ae": 2,
+   "field": "foldPos",
+   "kind": "point",
+   "default": [
+    480,
+    120
+   ]
+  },
+  {
+   "ae": 3,
+   "field": "foldDir",
+   "kind": "angle",
+   "default": 45
+  },
+  {
+   "ae": 4,
+   "field": "radius",
+   "kind": "number",
+   "default": 20
+  },
+  {
+   "ae": 5,
+   "field": "light",
+   "kind": "angle",
+   "default": -45
+  },
+  {
+   "ae": 6,
+   "field": "render",
+   "kind": "enum",
+   "default": 1
+  },
+  {
+   "ae": 8,
+   "field": "backOpacity",
+   "kind": "number",
+   "default": 100
+  },
+  {
+   "ae": 9,
+   "field": "paper",
+   "kind": "color",
+   "default": [
+    1,
+    1,
+    1,
+    1
+   ]
+  }
+ ],
+ "status": "unverified",
+ "auto": false,
+ "notes": "Not yet measured against After Effects.  Parameter indices follow the After Effects parameter order as documented by Adobe; `render_refs.py --params` records the real list."
+}
