@@ -1,0 +1,33 @@
+{
+ "slug": "cc_burn_film",
+ "aeMatchName": "CC Burn Film",
+ "wgsl": "ae_cc_burn_film.wgsl",
+ "passes": 1,
+ "textures": {},
+ "params": [
+  {
+   "ae": 1,
+   "field": "burn",
+   "kind": "number",
+   "default": 0
+  },
+  {
+   "ae": 2,
+   "field": "center",
+   "kind": "point",
+   "default": [
+    320,
+    180
+   ]
+  },
+  {
+   "ae": 3,
+   "field": "seed",
+   "kind": "number",
+   "default": 0
+  }
+ ],
+ "status": "unverified",
+ "auto": false,
+ "notes": "Not yet measured against After Effects.  Parameter indices follow the After Effects parameter order as documented by Adobe; `render_refs.py --params` records the real list."
+}

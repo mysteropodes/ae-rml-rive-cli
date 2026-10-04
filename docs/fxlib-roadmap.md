@@ -21,7 +21,7 @@ plug-in. Some can come later through the Rive scene itself rather than as a shad
 |---|---|---|
 | Bilateral Blur | 🟡 | lot 4 |
 | Box Blur (Fast Box Blur) | ✅ | |
-| Camera Lens Blur | ⬜ | iris shapes; depth map layer optional |
+| Camera Lens Blur | 🟡 | lot 11 (no blur map layer) |
 | Camera-Shake Deblur | ⛔ | motion estimation over several frames |
 | CC Cross Blur | 🟡 | lot 4 |
 | CC Radial Blur | ✅ | |
@@ -65,7 +65,7 @@ plug-in. Some can come later through the Rive scene itself rather than as a shad
 | Black & White | ✅ | |
 | Brightness & Contrast | ✅ | |
 | Broadcast Colors | 🟡 | lot 5 |
-| CC Color Neutralizer | ⬜ | |
+| CC Color Neutralizer | 🟡 | lot 11 |
 | CC Color Offset | 🟡 | lot 3 |
 | CC Kernel | 🟡 | lot 8 |
 | CC Toner | 🟡 | lot 3 |
@@ -76,7 +76,7 @@ plug-in. Some can come later through the Rive scene itself rather than as a shad
 | Color Balance (HLS) | ✅ | |
 | Color Link | ⛔ | samples another layer over time |
 | Color Stabilizer | ⛔ | tracks reference frames |
-| Colorama | ⬜ | parameter list already measured; large |
+| Colorama | 🟡 | lot 11 (Hue Cycle output only; the custom wheel is custom data) |
 | Curves | ⬜ | the curve is custom data: needs a reader for it |
 | Equalize | ⛔ | histogram of the frame |
 | Exposure | ✅ | |
@@ -88,8 +88,8 @@ plug-in. Some can come later through the Rive scene itself rather than as a shad
 | Lumetri Color | ⛔ | too large for now (LUTs, curves, wheels); later |
 | Photo Filter | 🟡 | lot 1 |
 | PS Arbitrary Map | ⬜ | |
-| Selective Color | ⬜ | |
-| Shadow/Highlight | ⬜ | |
+| Selective Color | 🟡 | lot 11 |
+| Shadow/Highlight | 🟡 | lot 11 |
 | Tint | ✅ | |
 | Tritone | ✅ | |
 | Vibrance | 🟡 | lot 1 |
@@ -153,7 +153,7 @@ plug-in. Some can come later through the Rive scene itself rather than as a shad
 | Checkerboard | ✅ | |
 | Circle | 🟡 | lot 5 |
 | Ellipse | 🟡 | lot 4 |
-| Eyedropper Fill | ⬜ | |
+| Eyedropper Fill | 🟡 | lot 11 |
 | Fill | ✅ | |
 | Fractal | ⬜ | |
 | Gradient Ramp | ✅ | |
@@ -169,7 +169,7 @@ plug-in. Some can come later through the Rive scene itself rather than as a shad
 |---|---|---|
 | Advanced Spill Suppressor | 🟡 | lot 7 |
 | CC Simple Wire Removal | 🟡 | lot 8 (Frame Offset needs other frames) |
-| Color Difference Key | ⬜ | |
+| Color Difference Key | 🟡 | lot 11 |
 | Color Key | 🟡 | lot 3 |
 | Color Range | 🟡 | lot 8 |
 | Difference Matte | 🟡 | lot 9 (second layer) |
@@ -217,15 +217,15 @@ plug-in. Some can come later through the Rive scene itself rather than as a shad
 | Effect | | Note |
 |---|---|---|
 | Brush Strokes | ⬜ | random strokes |
-| Cartoon | ⬜ | |
+| Cartoon | 🟡 | lot 11 |
 | CC Block Load | 🟡 | lot 8 |
-| CC Burn Film | ⬜ | |
-| CC Glass | ⬜ | |
-| CC HexTile | ⬜ | |
+| CC Burn Film | 🟡 | lot 11 (random pattern differs from AE) |
+| CC Glass | 🟡 | lot 11 (the layer itself as bump map) |
+| CC HexTile | 🟡 | lot 11 |
 | CC Kaleida | 🟡 | lot 6 |
 | CC Mr. Smoothie | ⬜ | |
 | CC Plastic | ⬜ | |
-| CC RepeTile | ⬜ | |
+| CC RepeTile | 🟡 | lot 11 |
 | CC Threshold, CC Threshold RGB | 🟡 | lot 3 |
 | CC Vignette | 🟡 | lot 2 |
 | Color Emboss | 🟡 | lot 3 |

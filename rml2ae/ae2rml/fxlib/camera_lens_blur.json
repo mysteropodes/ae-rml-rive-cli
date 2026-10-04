@@ -1,0 +1,54 @@
+{
+ "slug": "camera_lens_blur",
+ "aeMatchName": "ADBE Camera Lens Blur",
+ "wgsl": "ae_camera_lens_blur.wgsl",
+ "passes": 1,
+ "textures": {},
+ "params": [
+  {
+   "ae": 1,
+   "field": "radius",
+   "kind": "number",
+   "default": 5
+  },
+  {
+   "ae": 3,
+   "field": "shape",
+   "kind": "enum",
+   "default": 4
+  },
+  {
+   "ae": 4,
+   "field": "roundness",
+   "kind": "number",
+   "default": 0
+  },
+  {
+   "ae": 5,
+   "field": "aspect",
+   "kind": "number",
+   "default": 1
+  },
+  {
+   "ae": 6,
+   "field": "rotation",
+   "kind": "angle",
+   "default": 0
+  },
+  {
+   "ae": 14,
+   "field": "gain",
+   "kind": "number",
+   "default": 0
+  },
+  {
+   "ae": 15,
+   "field": "threshold",
+   "kind": "number",
+   "default": 255
+  }
+ ],
+ "status": "unverified",
+ "auto": false,
+ "notes": "Not yet measured against After Effects.  Parameter indices follow the After Effects parameter order as documented by Adobe; `render_refs.py --params` records the real list."
+}

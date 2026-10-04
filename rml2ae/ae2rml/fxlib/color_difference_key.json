@@ -1,0 +1,107 @@
+{
+ "slug": "color_difference_key",
+ "aeMatchName": "ADBE Color Difference Key",
+ "wgsl": "ae_color_difference_key.wgsl",
+ "passes": 1,
+ "textures": {},
+ "params": [
+  {
+   "ae": 1,
+   "field": "view",
+   "kind": "enum",
+   "default": 1
+  },
+  {
+   "ae": 2,
+   "field": "key",
+   "kind": "color",
+   "default": [
+    0,
+    0,
+    1,
+    1
+   ]
+  },
+  {
+   "ae": 4,
+   "field": "aInB",
+   "kind": "number",
+   "default": 0
+  },
+  {
+   "ae": 5,
+   "field": "aInW",
+   "kind": "number",
+   "default": 255
+  },
+  {
+   "ae": 6,
+   "field": "aGam",
+   "kind": "number",
+   "default": 1
+  },
+  {
+   "ae": 7,
+   "field": "aOutB",
+   "kind": "number",
+   "default": 0
+  },
+  {
+   "ae": 8,
+   "field": "aOutW",
+   "kind": "number",
+   "default": 255
+  },
+  {
+   "ae": 9,
+   "field": "bInB",
+   "kind": "number",
+   "default": 0
+  },
+  {
+   "ae": 10,
+   "field": "bInW",
+   "kind": "number",
+   "default": 255
+  },
+  {
+   "ae": 11,
+   "field": "bGam",
+   "kind": "number",
+   "default": 1
+  },
+  {
+   "ae": 12,
+   "field": "bOutB",
+   "kind": "number",
+   "default": 0
+  },
+  {
+   "ae": 13,
+   "field": "bOutW",
+   "kind": "number",
+   "default": 255
+  },
+  {
+   "ae": 14,
+   "field": "mInB",
+   "kind": "number",
+   "default": 0
+  },
+  {
+   "ae": 15,
+   "field": "mInW",
+   "kind": "number",
+   "default": 255
+  },
+  {
+   "ae": 16,
+   "field": "mGam",
+   "kind": "number",
+   "default": 1
+  }
+ ],
+ "status": "unverified",
+ "auto": false,
+ "notes": "Not yet measured against After Effects.  Parameter indices follow the After Effects parameter order as documented by Adobe; `render_refs.py --params` records the real list."
+}

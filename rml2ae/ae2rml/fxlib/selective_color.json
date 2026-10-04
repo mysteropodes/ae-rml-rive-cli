@@ -1,0 +1,234 @@
+{
+ "slug": "selective_color",
+ "aeMatchName": "ADBE Selective Color",
+ "wgsl": "ae_selective_color.wgsl",
+ "passes": 1,
+ "textures": {},
+ "params": [
+  {
+   "ae": 1,
+   "field": "method",
+   "kind": "enum",
+   "default": 1
+  },
+  {
+   "ae": 9,
+   "field": "redC",
+   "kind": "number",
+   "default": 0
+  },
+  {
+   "ae": 10,
+   "field": "redM",
+   "kind": "number",
+   "default": 0
+  },
+  {
+   "ae": 11,
+   "field": "redY",
+   "kind": "number",
+   "default": 0
+  },
+  {
+   "ae": 12,
+   "field": "redK",
+   "kind": "number",
+   "default": 0
+  },
+  {
+   "ae": 14,
+   "field": "yelC",
+   "kind": "number",
+   "default": 0
+  },
+  {
+   "ae": 15,
+   "field": "yelM",
+   "kind": "number",
+   "default": 0
+  },
+  {
+   "ae": 16,
+   "field": "yelY",
+   "kind": "number",
+   "default": 0
+  },
+  {
+   "ae": 17,
+   "field": "yelK",
+   "kind": "number",
+   "default": 0
+  },
+  {
+   "ae": 19,
+   "field": "greC",
+   "kind": "number",
+   "default": 0
+  },
+  {
+   "ae": 20,
+   "field": "greM",
+   "kind": "number",
+   "default": 0
+  },
+  {
+   "ae": 21,
+   "field": "greY",
+   "kind": "number",
+   "default": 0
+  },
+  {
+   "ae": 22,
+   "field": "greK",
+   "kind": "number",
+   "default": 0
+  },
+  {
+   "ae": 24,
+   "field": "cyaC",
+   "kind": "number",
+   "default": 0
+  },
+  {
+   "ae": 25,
+   "field": "cyaM",
+   "kind": "number",
+   "default": 0
+  },
+  {
+   "ae": 26,
+   "field": "cyaY",
+   "kind": "number",
+   "default": 0
+  },
+  {
+   "ae": 27,
+   "field": "cyaK",
+   "kind": "number",
+   "default": 0
+  },
+  {
+   "ae": 29,
+   "field": "bluC",
+   "kind": "number",
+   "default": 0
+  },
+  {
+   "ae": 30,
+   "field": "bluM",
+   "kind": "number",
+   "default": 0
+  },
+  {
+   "ae": 31,
+   "field": "bluY",
+   "kind": "number",
+   "default": 0
+  },
+  {
+   "ae": 32,
+   "field": "bluK",
+   "kind": "number",
+   "default": 0
+  },
+  {
+   "ae": 34,
+   "field": "magC",
+   "kind": "number",
+   "default": 0
+  },
+  {
+   "ae": 35,
+   "field": "magM",
+   "kind": "number",
+   "default": 0
+  },
+  {
+   "ae": 36,
+   "field": "magY",
+   "kind": "number",
+   "default": 0
+  },
+  {
+   "ae": 37,
+   "field": "magK",
+   "kind": "number",
+   "default": 0
+  },
+  {
+   "ae": 39,
+   "field": "whiC",
+   "kind": "number",
+   "default": 0
+  },
+  {
+   "ae": 40,
+   "field": "whiM",
+   "kind": "number",
+   "default": 0
+  },
+  {
+   "ae": 41,
+   "field": "whiY",
+   "kind": "number",
+   "default": 0
+  },
+  {
+   "ae": 42,
+   "field": "whiK",
+   "kind": "number",
+   "default": 0
+  },
+  {
+   "ae": 44,
+   "field": "neuC",
+   "kind": "number",
+   "default": 0
+  },
+  {
+   "ae": 45,
+   "field": "neuM",
+   "kind": "number",
+   "default": 0
+  },
+  {
+   "ae": 46,
+   "field": "neuY",
+   "kind": "number",
+   "default": 0
+  },
+  {
+   "ae": 47,
+   "field": "neuK",
+   "kind": "number",
+   "default": 0
+  },
+  {
+   "ae": 49,
+   "field": "blaC",
+   "kind": "number",
+   "default": 0
+  },
+  {
+   "ae": 50,
+   "field": "blaM",
+   "kind": "number",
+   "default": 0
+  },
+  {
+   "ae": 51,
+   "field": "blaY",
+   "kind": "number",
+   "default": 0
+  },
+  {
+   "ae": 52,
+   "field": "blaK",
+   "kind": "number",
+   "default": 0
+  }
+ ],
+ "status": "unverified",
+ "auto": false,
+ "notes": "Not yet measured against After Effects.  Parameter indices follow the After Effects parameter order as documented by Adobe; `render_refs.py --params` records the real list."
+}

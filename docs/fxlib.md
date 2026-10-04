@@ -173,7 +173,7 @@ Everything needed to measure an effect is in the repository:
 
 What is still missing, effect by effect, is in [fxlib-roadmap.md](fxlib-roadmap.md).
 
-37 measured effects: 27 exact, 8 close, 2 approx, plus 105 unverified ones (below the table). "Auto" is whether ae2rml applies the effect without being asked; the two effects
+37 measured effects: 27 exact, 8 close, 2 approx, plus 117 unverified ones (below the table). "Auto" is whether ae2rml applies the effect without being asked; the two effects
 marked `no` are measured to be further from After Effects than leaving the effect out, so they remain a
 `<!-- ae: effect ... -->` comment plus an entry in `effects_todo.json`.
 
@@ -329,6 +329,18 @@ real parameter list, then `render_refs.py <slug>`), add held-out settings, and m
 | CC Cylinder | `CC Cylinder` | `cc_cylinder` | Radius reference; Rotation X / Z; shading parameter positions |
 | Warp | `ADBE WRPMESH` | `warp` | Match name; the 15 styles' envelopes; distortion law |
 | Bezier Warp | `ADBE BEZMESH` | `bezier_warp` | Match name; patch form (Coons here) |
+| Colorama | `APC Colorama` | `colorama` | Get Phase From menu; output presets (only the Hue Cycle here; the custom wheel is not read) |
+| Selective Color | `ADBE Selective Color` | `selective_color` | Parameter positions of the 9 colour groups; class weights; relative law |
+| Shadow/Highlight | `ADBE Shadow/Highlight` | `shadow_highlight` | Local luminance and tonal-width law; Auto Amounts |
+| CC Color Neutralizer | `CC Color Neutralizer` | `cc_color_neutralizer` | Band weights around Pivot; Contrast |
+| Color Difference Key | `ADBE Color Difference Key` | `color_difference_key` | Partial mattes A / B; parameter positions |
+| Eyedropper Fill | `ADBE Sample Fill` | `eyedropper_fill` | Match name; Average Pixel Colors menu |
+| Cartoon | `ADBE Cartoonify` | `cartoon` | Match name; smoothing, shading steps and edge laws |
+| CC Glass | `CC Glass` | `cc_glass` | Parameter positions; refraction and shading laws; the layer itself as bump map |
+| CC HexTile | `CC HexTile` | `cc_hextile` | What a tile shows; Smearing; Render |
+| CC RepeTile | `CC RepeTile` | `cc_repetile` | Tiling menu; Blend Borders (the node grows by the largest expansion) |
+| CC Burn Film | `CC Burn Film` | `cc_burn_film` | Random pattern cannot match AE; rim colours |
+| Camera Lens Blur | `ADBE Camera Lens Blur` | `camera_lens_blur` | Iris shape menu; highlight law; parameter positions |
 
 Notes:
 
