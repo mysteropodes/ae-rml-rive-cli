@@ -271,10 +271,13 @@ geometry or audio, or are not image effects.
 ## Effects that read a second layer
 
 Blend, Calculations, Compound Arithmetic, Compound Blur, Difference Matte, 3D Glasses, Texturize, CC Glass Wipe,
-CC Image Wipe and Gradient Wipe with another layer need the shader's `mapTex` bound to that layer. The Rive node
-already has the input for it (`e<i>_mapSource`, an artboard drawn into a canvas), but ae2rml does not fill it yet:
-even Displacement Map, measured offline, gets no map layer in a real conversion. Wiring it (the referenced layer as
-a sub-artboard, as for `fxSource`) and a test project with a map layer come before these effects.
+CC Image Wipe and Gradient Wipe with another layer read the shader's `mapTex` from a layer parameter (manifest
+`textureParams.mapTex` = its AE position). ae2rml binds it to the Rive node's `e<i>_mapSource` input: a precomp
+gives its comp artboard, a still image a sub-artboard with the image, the layer itself (AE's default) the effect's
+own source artboard; other layer kinds (shapes, text, solids, video) leave the map empty and are reported.
+Displacement Map uses it today; `rml2ae/tests/test_map_layer.py` checks the binding, and
+`examples/make_fx_map_aep.jsx` builds a test project (to make in After Effects) with the three kinds of map layer.
+The effects listed above come next.
 
 ## How a batch goes
 

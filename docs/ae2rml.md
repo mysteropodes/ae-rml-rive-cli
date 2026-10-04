@@ -161,6 +161,7 @@ through `comp("...")`.
 | Glow on shape/text layers | Feathered copy on top in screen blend mode (Rive has no additive mode) |
 | Posterize Time | All keys of the layer held at its rate |
 | Any other raster effect found in the [WGSL effect library](fxlib.md) | One generated Luau node running the WGSL passes for the layer's **whole effect stack**, in After Effects' order |
+| Effects that read another layer (Displacement Map) | The other layer's source is bound to the node: a precomp (its artboard), a still image, or the layer itself; other layer kinds leave the map empty (reported) |
 | Anything else | Kept as an `<!-- ae: effect ... -->` comment (so rml2ae can put it back) and listed in `effects_todo.json` |
 | Adjustment layers | Library effects: the layers below go into a sub-artboard and the adjustment layer's opacity and in/out window drive a mix pass. Several stacked adjustment layers give one node with one group per layer, and the layer's blend mode is applied by the rule measured in After Effects. Otherwise listed in `effects_todo.json` |
 

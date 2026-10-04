@@ -75,6 +75,7 @@ repeats edge pixels.
 | `field` | Name of the field in `Params` |
 | `kind` | `number`, `point`, `color`, `enum`, `bool` or `angle` |
 | `textures` | Extra textures the effect needs, for example `{"origTex": "original", "mapTex": "map"}` |
+| `textureParams` | For a `map` texture: the AE position of the layer parameter it comes from, e.g. `{"mapTex": 1}` (ae2rml binds that layer) |
 | `passes` | Number of times the shader runs |
 | `status` | `exact`, `close` or `approx` (below) |
 | `auto` | `false` means ae2rml does **not** apply the effect automatically |

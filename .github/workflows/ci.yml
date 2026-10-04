@@ -48,6 +48,14 @@ jobs:
         run: pip install -e ".[ae2rml]"
       - name: rml2ae incremental rebuild (dry run, no After Effects)
         run: python -m rml2ae.tests.sim_incremental
+      - name: ae2rml binds the second layer of map effects (Displacement Map)
+        run: |
+          python -m rml2ae.tests.test_map_layer
+          # examples/fx_map.aep is made in After Effects by examples/make_fx_map_aep.jsx: checked once it is committed
+          if [ -f examples/fx_map.aep ]; then
+            ae2rml examples/fx_map.aep out/fx_map
+            test "$(grep -c 'name="e1_mapSource"' out/fx_map/scene.rml)" -ge 3
+          fi
       - name: ae2rml converts examples/demo.aep (console script)
         run: |
           ae2rml examples/demo.aep out/demo
