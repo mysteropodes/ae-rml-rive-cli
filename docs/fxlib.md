@@ -171,7 +171,7 @@ Everything needed to measure an effect is in the repository:
 
 What is still missing, effect by effect, is in [fxlib-roadmap.md](fxlib-roadmap.md).
 
-37 measured effects: 27 exact, 8 close, 2 approx, plus 34 unverified ones (below the table). "Auto" is whether ae2rml applies the effect without being asked; the two effects
+37 measured effects: 27 exact, 8 close, 2 approx, plus 44 unverified ones (below the table). "Auto" is whether ae2rml applies the effect without being asked; the two effects
 marked `no` are measured to be further from After Effects than leaving the effect out, so they remain a
 `<!-- ae: effect ... -->` comment plus an entry in `effects_todo.json`.
 
@@ -256,6 +256,16 @@ real parameter list, then `render_refs.py <slug>`), add held-out settings, and m
 | CC Threshold RGB | `CC Threshold RGB` | `cc_threshold_rgb` | Parameter order |
 | Color Emboss | `ADBE Color Emboss` | `color_emboss` | Built on the measured Emboss; base colour assumed |
 | Median | `ADBE Median` | `median` | Window shape (square here); radius cap 12 |
+| Wave Warp | `ADBE Wave Warp` | `wave_warp` | Displacement axis; Wave Speed (time) not modelled |
+| Ripple | `ADBE Ripple` | `ripple` | Radius reference, falloff, Type |
+| CC Tiler | `CC Tiler` | `cc_tiler` | Tile origin |
+| Grid | `ADBE Grid` | `grid` | Parameter positions after Border; Feather |
+| Ellipse | `ADBE Ellipse` | `ellipse` | Ring geometry and softness |
+| Bevel Alpha | `ADBE Bevel Alpha` | `bevel_alpha` | Height field and shading law |
+| Radial Shadow | `ADBE Radial Shadow` | `radial_shadow` | Projection law; Softness |
+| Channel Blur | `ADBE Channel Blur` | `channel_blur` | Assumed legacy blur law (Gaussian of equal variance) |
+| CC Cross Blur | `CC Cross Blur` | `cc_cross_blur` | Kernel shape; Transfer Mode |
+| Bilateral Blur | `ADBE Bilateral Blur` | `bilateral_blur` | Spatial and range weights; Colorize |
 Notes:
 
 - **Gaussian Blur (legacy)** and **Fast Blur (legacy)** share the same kernel (confirmed on a third setting).

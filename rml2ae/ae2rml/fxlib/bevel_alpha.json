@@ -1,0 +1,41 @@
+{
+ "slug": "bevel_alpha",
+ "aeMatchName": "ADBE Bevel Alpha",
+ "wgsl": "ae_bevel_alpha.wgsl",
+ "passes": 1,
+ "textures": {},
+ "params": [
+  {
+   "ae": 1,
+   "field": "thickness",
+   "kind": "number",
+   "default": 2
+  },
+  {
+   "ae": 2,
+   "field": "angle",
+   "kind": "angle",
+   "default": -60
+  },
+  {
+   "ae": 3,
+   "field": "color",
+   "kind": "color",
+   "default": [
+    1,
+    1,
+    1,
+    1
+   ]
+  },
+  {
+   "ae": 4,
+   "field": "intensity",
+   "kind": "number",
+   "default": 0.4
+  }
+ ],
+ "status": "unverified",
+ "auto": false,
+ "notes": "Not yet measured against After Effects.  Parameter indices follow the After Effects parameter order as documented by Adobe; `render_refs.py --params` records the real list."
+}

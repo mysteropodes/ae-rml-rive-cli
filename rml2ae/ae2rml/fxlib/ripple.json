@@ -1,0 +1,57 @@
+{
+ "slug": "ripple",
+ "aeMatchName": "ADBE Ripple",
+ "wgsl": "ae_ripple.wgsl",
+ "passes": 1,
+ "textures": {},
+ "params": [
+  {
+   "ae": 1,
+   "field": "radius",
+   "kind": "number",
+   "default": 50
+  },
+  {
+   "ae": 2,
+   "field": "center",
+   "kind": "point",
+   "default": [
+    320,
+    180
+   ]
+  },
+  {
+   "ae": 3,
+   "field": "kind",
+   "kind": "enum",
+   "default": 1
+  },
+  {
+   "ae": 4,
+   "field": "speed",
+   "kind": "number",
+   "default": 1
+  },
+  {
+   "ae": 5,
+   "field": "width",
+   "kind": "number",
+   "default": 20
+  },
+  {
+   "ae": 6,
+   "field": "height",
+   "kind": "number",
+   "default": 20
+  },
+  {
+   "ae": 7,
+   "field": "phase",
+   "kind": "angle",
+   "default": 0
+  }
+ ],
+ "status": "unverified",
+ "auto": false,
+ "notes": "Not yet measured against After Effects.  Parameter indices follow the After Effects parameter order as documented by Adobe; `render_refs.py --params` records the real list."
+}

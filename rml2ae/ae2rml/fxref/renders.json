@@ -2684,6 +2684,303 @@
   "png": "ae/median_1.png"
  },
  {
+  "slug": "wave_warp",
+  "mn": "ADBE Wave Warp",
+  "k": 0,
+  "vals": {},
+  "held": false,
+  "png": "ae/wave_warp_0.png"
+ },
+ {
+  "slug": "wave_warp",
+  "mn": "ADBE Wave Warp",
+  "k": 1,
+  "vals": {
+   "1": 3,
+   "2": 20,
+   "3": 80,
+   "4": 30
+  },
+  "held": false,
+  "png": "ae/wave_warp_1.png"
+ },
+ {
+  "slug": "wave_warp",
+  "mn": "ADBE Wave Warp",
+  "k": 2,
+  "vals": {
+   "1": 2,
+   "2": 6,
+   "3": 25,
+   "7": 90
+  },
+  "held": false,
+  "png": "ae/wave_warp_2.png"
+ },
+ {
+  "slug": "ripple",
+  "mn": "ADBE Ripple",
+  "k": 0,
+  "vals": {},
+  "held": false,
+  "png": "ae/ripple_0.png"
+ },
+ {
+  "slug": "ripple",
+  "mn": "ADBE Ripple",
+  "k": 1,
+  "vals": {
+   "1": 80,
+   "5": 40,
+   "6": 10,
+   "7": 90
+  },
+  "held": false,
+  "png": "ae/ripple_1.png"
+ },
+ {
+  "slug": "ripple",
+  "mn": "ADBE Ripple",
+  "k": 2,
+  "vals": {
+   "2": [
+    200,
+    120
+   ],
+   "5": 12,
+   "6": 6
+  },
+  "held": false,
+  "png": "ae/ripple_2.png"
+ },
+ {
+  "slug": "cc_tiler",
+  "mn": "CC Tiler",
+  "k": 0,
+  "vals": {},
+  "held": false,
+  "png": "ae/cc_tiler_0.png"
+ },
+ {
+  "slug": "cc_tiler",
+  "mn": "CC Tiler",
+  "k": 1,
+  "vals": {
+   "1": 50,
+   "2": [
+    200,
+    120
+   ]
+  },
+  "held": false,
+  "png": "ae/cc_tiler_1.png"
+ },
+ {
+  "slug": "cc_tiler",
+  "mn": "CC Tiler",
+  "k": 2,
+  "vals": {
+   "1": 33,
+   "3": 40
+  },
+  "held": false,
+  "png": "ae/cc_tiler_2.png"
+ },
+ {
+  "slug": "grid",
+  "mn": "ADBE Grid",
+  "k": 0,
+  "vals": {},
+  "held": false,
+  "png": "ae/grid_0.png"
+ },
+ {
+  "slug": "grid",
+  "mn": "ADBE Grid",
+  "k": 1,
+  "vals": {
+   "2": 3,
+   "4": 60,
+   "5": 30,
+   "6": 4,
+   "9": [
+    1,
+    0,
+    0,
+    1
+   ],
+   "11": 2
+  },
+  "held": false,
+  "png": "ae/grid_1.png"
+ },
+ {
+  "slug": "ellipse",
+  "mn": "ADBE Ellipse",
+  "k": 0,
+  "vals": {},
+  "held": false,
+  "png": "ae/ellipse_0.png"
+ },
+ {
+  "slug": "ellipse",
+  "mn": "ADBE Ellipse",
+  "k": 1,
+  "vals": {
+   "2": 400,
+   "3": 200,
+   "4": 40,
+   "5": 50,
+   "6": [
+    1,
+    0.8,
+    0,
+    1
+   ],
+   "7": [
+    1,
+    0,
+    0.4,
+    1
+   ],
+   "8": 1
+  },
+  "held": false,
+  "png": "ae/ellipse_1.png"
+ },
+ {
+  "slug": "bevel_alpha",
+  "mn": "ADBE Bevel Alpha",
+  "k": 0,
+  "vals": {},
+  "held": false,
+  "png": "ae/bevel_alpha_0.png"
+ },
+ {
+  "slug": "bevel_alpha",
+  "mn": "ADBE Bevel Alpha",
+  "k": 1,
+  "vals": {
+   "1": 6,
+   "2": 45,
+   "4": 0.8
+  },
+  "held": false,
+  "png": "ae/bevel_alpha_1.png"
+ },
+ {
+  "slug": "radial_shadow",
+  "mn": "ADBE Radial Shadow",
+  "k": 0,
+  "vals": {
+   "3": [
+    100,
+    50
+   ],
+   "4": 20
+  },
+  "held": false,
+  "png": "ae/radial_shadow_0.png"
+ },
+ {
+  "slug": "radial_shadow",
+  "mn": "ADBE Radial Shadow",
+  "k": 1,
+  "vals": {
+   "1": [
+    0.4,
+    0,
+    0.6,
+    1
+   ],
+   "2": 80,
+   "3": [
+    500,
+    300
+   ],
+   "4": 40,
+   "8": 1
+  },
+  "held": false,
+  "png": "ae/radial_shadow_1.png"
+ },
+ {
+  "slug": "channel_blur",
+  "mn": "ADBE Channel Blur",
+  "k": 0,
+  "vals": {
+   "1": 20
+  },
+  "held": false,
+  "png": "ae/channel_blur_0.png"
+ },
+ {
+  "slug": "channel_blur",
+  "mn": "ADBE Channel Blur",
+  "k": 1,
+  "vals": {
+   "1": 5,
+   "2": 15,
+   "3": 30,
+   "6": 2
+  },
+  "held": false,
+  "png": "ae/channel_blur_1.png"
+ },
+ {
+  "slug": "channel_blur",
+  "mn": "ADBE Channel Blur",
+  "k": 2,
+  "vals": {
+   "4": 12,
+   "5": 1
+  },
+  "held": false,
+  "png": "ae/channel_blur_2.png"
+ },
+ {
+  "slug": "cc_cross_blur",
+  "mn": "CC Cross Blur",
+  "k": 0,
+  "vals": {
+   "1": 20,
+   "2": 20
+  },
+  "held": false,
+  "png": "ae/cc_cross_blur_0.png"
+ },
+ {
+  "slug": "cc_cross_blur",
+  "mn": "CC Cross Blur",
+  "k": 1,
+  "vals": {
+   "1": 40,
+   "2": 5,
+   "4": 1
+  },
+  "held": false,
+  "png": "ae/cc_cross_blur_1.png"
+ },
+ {
+  "slug": "bilateral_blur",
+  "mn": "ADBE Bilateral Blur",
+  "k": 0,
+  "vals": {},
+  "held": false,
+  "png": "ae/bilateral_blur_0.png"
+ },
+ {
+  "slug": "bilateral_blur",
+  "mn": "ADBE Bilateral Blur",
+  "k": 1,
+  "vals": {
+   "1": 12,
+   "2": 40
+  },
+  "held": false,
+  "png": "ae/bilateral_blur_1.png"
+ },
+ {
   "slug": "color_emboss",
   "mn": "ADBE Color Emboss",
   "k": 0,

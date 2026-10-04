@@ -6,7 +6,7 @@ Effects menu (English UI names).
 
 | Mark | Meaning |
 |---|---|
-| ✅ | In fxlib and measured (`exact`, `close` or `approx`, see the effect table in [fxlib.md](fxlib.md)) |
+| ✅ | In fxlib and measured (`exact`, `close` or `approx`, see the effect table in [fxlib.md](fxlib.md)), or converted natively by ae2rml |
 | 🟡 | In fxlib, **unverified**: written from the effect's definition, compiles and runs, waits for After Effects renders |
 | ⬜ | To do |
 | ⛔ | Not planned, with the reason |
@@ -19,15 +19,15 @@ plug-in. Some can come later through the Rive scene itself rather than as a shad
 
 | Effect | | Note |
 |---|---|---|
-| Bilateral Blur | ⬜ | |
+| Bilateral Blur | 🟡 | lot 4 |
 | Box Blur (Fast Box Blur) | ✅ | |
 | Camera Lens Blur | ⬜ | iris shapes; depth map layer optional |
 | Camera-Shake Deblur | ⛔ | motion estimation over several frames |
-| CC Cross Blur | ⬜ | |
+| CC Cross Blur | 🟡 | lot 4 |
 | CC Radial Blur | ✅ | |
 | CC Radial Fast Blur | ✅ | |
 | CC Vector Blur | ⬜ | |
-| Channel Blur | ⬜ | |
+| Channel Blur | 🟡 | lot 4 |
 | Compound Blur | ⬜ | needs a blur layer |
 | Directional Blur | ✅ | |
 | Fast Blur (legacy) | ✅ | |
@@ -53,7 +53,7 @@ plug-in. Some can come later through the Rive scene itself rather than as a shad
 | Minimax | ✅ | |
 | Remove Color Matting | 🟡 | lot 3 |
 | Set Channels | 🟡 | lot 1; the layer itself as source |
-| Set Matte | ⬜ | needs a second layer |
+| Set Matte | ✅ | converted natively by ae2rml (clip from the source layer), no shader needed |
 | Shift Channels | ✅ | |
 | Solid Composite | ⬜ | |
 
@@ -111,7 +111,7 @@ plug-in. Some can come later through the Rive scene itself rather than as a shad
 | CC Slant | ⬜ | |
 | CC Smear | ⬜ | |
 | CC Split, CC Split 2 | ⬜ | |
-| CC Tiler | ⬜ | |
+| CC Tiler | 🟡 | lot 4 |
 | Corner Pin | ✅ | |
 | Detail-preserving Upscale | ⛔ | learned upscaler |
 | Displacement Map | ✅ | |
@@ -123,16 +123,16 @@ plug-in. Some can come later through the Rive scene itself rather than as a shad
 | Optics Compensation | ✅ | |
 | Polar Coordinates | 🟡 | lot 2 |
 | Reshape | ⛔ | mask-driven |
-| Ripple | ⬜ | |
+| Ripple | 🟡 | lot 4 |
 | Rolling Shutter Repair | ⛔ | motion estimation |
 | Smear | ⛔ | mask-driven |
 | Spherize | 🟡 | lot 2 |
-| Transform | ⬜ | |
+| Transform | ✅ | converted natively by ae2rml (exact transform nodes), no shader needed |
 | Turbulent Displace | ✅ | approx: proprietary noise |
 | Twirl | 🟡 | lot 2 |
 | Warp | ⬜ | |
 | Warp Stabilizer | ⛔ | motion estimation |
-| Wave Warp | ⬜ | |
+| Wave Warp | 🟡 | lot 4 |
 
 ## Generate
 
@@ -150,12 +150,12 @@ plug-in. Some can come later through the Rive scene itself rather than as a shad
 | Cell Pattern | ⬜ | proprietary noise, like Fractal Noise |
 | Checkerboard | ✅ | |
 | Circle | ⬜ | |
-| Ellipse | ⬜ | |
+| Ellipse | 🟡 | lot 4 |
 | Eyedropper Fill | ⬜ | |
 | Fill | ✅ | |
 | Fractal | ⬜ | |
 | Gradient Ramp | ✅ | |
-| Grid | ⬜ | |
+| Grid | 🟡 | lot 4 |
 | Lens Flare | ⬜ | |
 | Paint Bucket | ⬜ | flood fill |
 | Radio Waves | ⛔ | particles over time |
@@ -201,12 +201,12 @@ plug-in. Some can come later through the Rive scene itself rather than as a shad
 | Effect | | Note |
 |---|---|---|
 | 3D Glasses | ⬜ | needs a second layer |
-| Bevel Alpha | ⬜ | |
+| Bevel Alpha | 🟡 | lot 4 |
 | Bevel Edges | ⬜ | |
 | CC Cylinder, CC Sphere | ⬜ | |
 | CC Spotlight | ⬜ | |
 | Drop Shadow | ✅ | |
-| Radial Shadow | ⬜ | |
+| Radial Shadow | 🟡 | lot 4 |
 
 ## Stylize
 

@@ -1,0 +1,83 @@
+{
+ "slug": "grid",
+ "aeMatchName": "ADBE Grid",
+ "wgsl": "ae_grid.wgsl",
+ "passes": 1,
+ "textures": {},
+ "params": [
+  {
+   "ae": 1,
+   "field": "anchor",
+   "kind": "point",
+   "default": [
+    320,
+    180
+   ]
+  },
+  {
+   "ae": 2,
+   "field": "sizeFrom",
+   "kind": "enum",
+   "default": 2
+  },
+  {
+   "ae": 3,
+   "field": "corner",
+   "kind": "point",
+   "default": [
+    352,
+    212
+   ]
+  },
+  {
+   "ae": 4,
+   "field": "width",
+   "kind": "number",
+   "default": 32
+  },
+  {
+   "ae": 5,
+   "field": "height",
+   "kind": "number",
+   "default": 32
+  },
+  {
+   "ae": 6,
+   "field": "border",
+   "kind": "number",
+   "default": 2
+  },
+  {
+   "ae": 8,
+   "field": "invert",
+   "kind": "bool",
+   "default": 0
+  },
+  {
+   "ae": 9,
+   "field": "color",
+   "kind": "color",
+   "default": [
+    1,
+    1,
+    1,
+    1
+   ]
+  },
+  {
+   "ae": 10,
+   "field": "opacity",
+   "kind": "number",
+   "default": 100
+  },
+  {
+   "ae": 11,
+   "field": "blendMode",
+   "kind": "enum",
+   "default": 1
+  }
+ ],
+ "status": "unverified",
+ "auto": false,
+ "notes": "Not yet measured against After Effects.  Parameter indices follow the After Effects parameter order as documented by Adobe; `render_refs.py --params` records the real list."
+}

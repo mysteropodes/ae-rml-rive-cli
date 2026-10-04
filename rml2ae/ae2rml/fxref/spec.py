@@ -91,6 +91,17 @@ SPEC = {
     "cc_threshold": ("CC Threshold", [({}, 0), ({1: 80, 2: 2, 3: 1}, 0), ({1: 160, 4: 40}, 0)]),
     "cc_threshold_rgb": ("CC Threshold RGB", [({}, 0), ({1: 60, 2: 200, 3: 100, 5: 1}, 0)]),
     "median": ("ADBE Median", [({1: 3}, 0), ({1: 8, 2: 1}, 0)]),
+    # lot 4 (unverified until rendered)
+    "wave_warp": ("ADBE Wave Warp", [({}, 0), ({1: 3, 2: 20, 3: 80, 4: 30}, 0), ({1: 2, 2: 6, 3: 25, 7: 90}, 0)]),
+    "ripple": ("ADBE Ripple", [({}, 0), ({1: 80, 5: 40, 6: 10, 7: 90}, 0), ({2: [200, 120], 5: 12, 6: 6}, 0)]),
+    "cc_tiler": ("CC Tiler", [({}, 0), ({1: 50, 2: [200, 120]}, 0), ({1: 33, 3: 40}, 0)]),
+    "grid": ("ADBE Grid", [({}, 0), ({2: 3, 4: 60, 5: 30, 6: 4, 9: [1, 0, 0, 1], 11: 2}, 0)]),
+    "ellipse": ("ADBE Ellipse", [({}, 0), ({2: 400, 3: 200, 4: 40, 5: 50, 6: [1, 0.8, 0, 1], 7: [1, 0, 0.4, 1], 8: 1}, 0)]),
+    "bevel_alpha": ("ADBE Bevel Alpha", [({}, 0), ({1: 6, 2: 45, 4: 0.8}, 0)]),
+    "radial_shadow": ("ADBE Radial Shadow", [({3: [100, 50], 4: 20}, 0), ({1: [0.4, 0, 0.6, 1], 2: 80, 3: [500, 300], 4: 40, 8: 1}, 0)]),
+    "channel_blur": ("ADBE Channel Blur", [({1: 20}, 0), ({1: 5, 2: 15, 3: 30, 6: 2}, 0), ({4: 12, 5: 1}, 0)]),
+    "cc_cross_blur": ("CC Cross Blur", [({1: 20, 2: 20}, 0), ({1: 40, 2: 5, 4: 1}, 0)]),
+    "bilateral_blur": ("ADBE Bilateral Blur", [({}, 0), ({1: 12, 2: 40}, 0)]),
     "color_emboss": ("ADBE Color Emboss", [({}, 0), ({1: 120, 2: 3, 3: 200}, 0)]),
 }
 NEEDS_MAP = {"displacement_map": {1: 2}}   # param 1 (map layer) = layer index 2 (the map footage)
