@@ -66,7 +66,7 @@ def migrate(project):
 
 
 def append_log(project, line):
-    with open(log_for(project), "a") as f:
+    with open(log_for(project), "a", encoding="utf-8") as f:
         f.write(time.strftime("%Y-%m-%d %H:%M:%S") + " " + line.rstrip("\n") + "\n")
 
 
@@ -74,7 +74,7 @@ def load(project):
     migrate(project)
     p = path_for(project)
     if os.path.exists(p):
-        with open(p) as f:
+        with open(p, encoding="utf-8") as f:
             return json.load(f)
     return {"notes": []}
 
@@ -83,7 +83,7 @@ def save(project, data):
     """atomic write: a temporary file then a replace, never a half-written file"""
     p = path_for(project)
     tmp = p + ".tmp"
-    with open(tmp, "w") as f:
+    with open(tmp, "w", encoding="utf-8") as f:
         json.dump(data, f, ensure_ascii=False, indent=1)
     os.replace(tmp, p)
 
@@ -152,7 +152,7 @@ def running(project):
     if not os.path.exists(p):
         return None
     try:
-        pid = int(open(p).read().strip())
+        pid = int(open(p, encoding="utf-8").read().strip())
         os.kill(pid, 0)
         return pid
     except (ValueError, OSError):
@@ -206,11 +206,11 @@ def main(argv):
                 print(f"a session is already running (pid {running(project)}) — run `stop` first")
                 return 1
             here = os.path.abspath(__file__)
-            out = open(out_path(project), "a")
+            out = open(out_path(project), "a", encoding="utf-8")
             args = [sys.executable, here, "open", project] + ([artboard] if artboard else []) + extra
             child = subprocess.Popen(args, stdout=out, stderr=subprocess.STDOUT,
                                      stdin=subprocess.DEVNULL, start_new_session=True)
-            with open(pid_path(project), "w") as f:
+            with open(pid_path(project), "w", encoding="utf-8") as f:
                 f.write(str(child.pid))
             print(f"session {child.pid} started — notes go to {path_for(project)}")
             print(f"  python3 {os.path.basename(here)} list {project} --new     # what has arrived since")
@@ -265,7 +265,7 @@ def main(argv):
         if not os.path.exists(p):
             print(f"no journal in {p}")
             return 1
-        with open(p) as f:
+        with open(p, encoding="utf-8") as f:
             for line in f:
                 feed(data, line, stamp=line[:19])
         save(project, data)
@@ -279,11 +279,11 @@ def main(argv):
             # "since last time": the timestamp of when the note was taken, kept in .review/seen
             last = ""
             if os.path.exists(seen_path(project)):
-                last = open(seen_path(project)).read().strip()
+                last = open(seen_path(project), encoding="utf-8").read().strip()
             notes = [n for n in notes if str(n.get("at", "")) > last]
             stamps = [str(n.get("at", "")) for n in data["notes"] if n.get("at")]
             if stamps:
-                with open(seen_path(project), "w") as f:
+                with open(seen_path(project), "w", encoding="utf-8") as f:
                     f.write(max(stamps))
         for n in notes:
             print(("- " if md else "") + show(n))

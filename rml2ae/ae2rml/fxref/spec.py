@@ -164,5 +164,5 @@ def renders():
 
 if __name__ == "__main__":
     rs = renders()
-    json.dump(rs, open(os.path.join(D, "renders.json"), "w"), indent=1)
+    json.dump(rs, open(os.path.join(D, "renders.json"), "w", encoding="utf-8"), indent=1)
     print(len(rs), "renders,", sum(r["held"] for r in rs), "held out,", len(SPEC), "effects")

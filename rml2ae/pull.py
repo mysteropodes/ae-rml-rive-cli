@@ -281,7 +281,7 @@ def prepare(out_dir):
     dump_jsx = os.path.join(out_dir, "_pull.jsx")
     dump_json = os.path.join(out_dir, "_pull.json")
     log = os.path.join(out_dir, "_pull.log")
-    open(dump_jsx, "w").write(DUMP_JSX.replace("__LOG__", js(log)).replace("__OUT__", js(dump_json)))
+    open(dump_jsx, "w", encoding="utf-8").write(DUMP_JSX.replace("__LOG__", js(log)).replace("__OUT__", js(dump_json)))
     return dump_jsx, dump_json, log
 
 
@@ -337,7 +337,7 @@ def apply(project_dir, out_dir, dry=False, only_comp=None):
     dump_json = os.path.join(out_dir, "_pull.json")
     if not os.path.exists(dump_json):
         raise SystemExit("no dump: run the pull script in After Effects first")
-    comps = json.load(open(dump_json))
+    comps = json.load(open(dump_json, encoding="utf-8"))
     files = {p: RmlText(p) for p in sorted(glob.glob(os.path.join(project_dir, "*.rml")))}
 
     def file_of(oid):
@@ -349,7 +349,7 @@ def apply(project_dir, out_dir, dry=False, only_comp=None):
     changes = []
     pulled_ids = set()
     gpath = os.path.join(out_dir, proj.name + ".groups.json")
-    side = json.load(open(gpath)) if os.path.exists(gpath) else {}
+    side = json.load(open(gpath, encoding="utf-8")) if os.path.exists(gpath) else {}
     group_ids = {tag: {tuple(pth): oid for pth, oid in lst} for tag, lst in (side.get("groups") or {}).items()}
     folds = side.get("folds") or {}
     chains = side.get("chains") or {}
@@ -472,13 +472,13 @@ def apply(project_dir, out_dir, dry=False, only_comp=None):
         conv = Converter(Project(project_dir), out_dir, keep_project=True, replay=False, replace=True)
         conv.incremental_mode = True
         conv.convert()
-        old = json.load(open(mpath))
+        old = json.load(open(mpath, encoding="utf-8"))
         n = 0
         for k, h in conv.manifest.items():
             if any(("#rive:" + i) == k[k.index("#"):] if "#" in k else k.startswith("rive:" + i + "|") for i in pulled_ids):
                 if old.get(k) != h:
                     old[k] = h
                     n += 1
-        json.dump(old, open(mpath, "w"))
+        json.dump(old, open(mpath, "w", encoding="utf-8"))
         changes.append(f"manifest: {n} block(s) marked up to date (no rebuild of the pulled layers at the next build)")
     return changes

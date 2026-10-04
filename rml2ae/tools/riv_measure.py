@@ -429,17 +429,17 @@ def main(argv):
             print()
             dump[m][res[m]["file"]] = dumpable(res[m])
             if per_file:
-                with open(os.path.join(study_dir(f), f"{SUFFIX[m]}.txt"), "w") as fh:
+                with open(os.path.join(study_dir(f), f"{SUFFIX[m]}.txt"), "w", encoding="utf-8") as fh:
                     fh.write(rep + "\n")
     if out_json:
         if os.path.isdir(out_json) or out_json.endswith("/"):
             for m in modes:
                 p = os.path.join(out_json, f"{SUFFIX[m]}.json")
-                json.dump(dump[m], open(p, "w"), indent=1)
+                json.dump(dump[m], open(p, "w", encoding="utf-8"), indent=1)
                 print("wrote", p)
         else:
             m = modes[0]
-            json.dump(dump[m], open(out_json, "w"), indent=1)
+            json.dump(dump[m], open(out_json, "w", encoding="utf-8"), indent=1)
             print("wrote", out_json)
 
 

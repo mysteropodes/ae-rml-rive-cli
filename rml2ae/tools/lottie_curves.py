@@ -130,7 +130,7 @@ def scalar_keys(keys):
 
 
 def analyse(path):
-    d = json.load(open(path))
+    d = json.load(open(path, encoding="utf-8"))
     fr = d.get("fr", 60)
     acc = walk_layers(d.get("layers", []), d.get("assets", []), fr)
     lines = [f"== {os.path.basename(path)}: {d.get('w')}x{d.get('h')} @ {fr} fps, {(d.get('op', 0) - d.get('ip', 0)) / fr:.2f} s, "
@@ -201,7 +201,7 @@ def main(argv):
         print()
         everything[os.path.basename(f)] = acc
     if out_json:
-        json.dump(everything, open(out_json, "w"), indent=1)
+        json.dump(everything, open(out_json, "w", encoding="utf-8"), indent=1)
 
 
 if __name__ == "__main__":

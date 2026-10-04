@@ -10,7 +10,7 @@ import re
 import xml.etree.ElementTree as ET
 
 HERE = os.path.dirname(os.path.abspath(__file__))
-SCHEMA = json.load(open(os.path.join(HERE, "schema.json")))
+SCHEMA = json.load(open(os.path.join(HERE, "schema.json"), encoding="utf-8"))
 TYPES = SCHEMA["types"]
 KEYS = {int(k): tuple(v) for k, v in SCHEMA["keys"].items()}       # property key -> (owner type, name, type)
 _AMP = re.compile(r"&(?!(amp|lt|gt|quot|apos|#\d+|#x[0-9a-fA-F]+);)")
@@ -174,7 +174,7 @@ class Project:
         self.yaml = {}
         yml = os.path.join(self.dir, "rive.yaml")
         if os.path.exists(yml):
-            for line in open(yml):
+            for line in open(yml, encoding="utf-8"):
                 m = re.match(r"^(\w+):\s*(\S.*)$", line)
                 if m:
                     self.yaml[m.group(1)] = m.group(2).strip()

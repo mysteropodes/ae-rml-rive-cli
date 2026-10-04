@@ -1,6 +1,7 @@
 #include "RsGpu.h"
 #include <webgpu/webgpu.h>
 #include <webgpu/wgpu.h>
+#include <cstdlib>
 #include <cstring>
 #include <cstdio>
 
@@ -23,6 +24,36 @@ void logCallback(WGPULogLevel level, WGPUStringView message, void*) {
 }
 void uncapturedError(WGPUDevice const*, WGPUErrorType type, WGPUStringView message, void*, void*) {
     appendLog("wgpu uncaptured error (" + std::to_string((int)type) + "): " + str(message));
+}
+// The platform's native backend: Metal on macOS, Direct3D 12 on Windows, Vulkan elsewhere (rs_apply on Linux).
+// RS_WGPU_BACKEND=metal|dx12|vulkan|gl|any overrides it; RS_WGPU_FALLBACK=1 asks for the software adapter (WARP on
+// Windows), which is what a GPU-less CI machine has.
+WGPUBackendType nativeBackend() {
+#if defined(__APPLE__)
+    WGPUBackendType b = WGPUBackendType_Metal;
+#elif defined(_WIN32)
+    WGPUBackendType b = WGPUBackendType_D3D12;
+#else
+    WGPUBackendType b = WGPUBackendType_Vulkan;
+#endif
+    if (const char* e = std::getenv("RS_WGPU_BACKEND")) {
+        std::string v(e);
+        if (v == "metal") b = WGPUBackendType_Metal;
+        else if (v == "dx12" || v == "d3d12") b = WGPUBackendType_D3D12;
+        else if (v == "vulkan") b = WGPUBackendType_Vulkan;
+        else if (v == "gl") b = WGPUBackendType_OpenGL;
+        else if (v == "any") b = WGPUBackendType_Undefined;
+    }
+    return b;
+}
+const char* backendName(WGPUBackendType b) {
+    switch (b) {
+        case WGPUBackendType_Metal: return "Metal";
+        case WGPUBackendType_D3D12: return "Direct3D 12";
+        case WGPUBackendType_Vulkan: return "Vulkan";
+        case WGPUBackendType_OpenGL: return "OpenGL";
+        default: return "any";
+    }
 }
 void deviceLost(WGPUDevice const*, WGPUDeviceLostReason reason, WGPUStringView message, void*, void*) {
     appendLog("wgpu device lost (" + std::to_string((int)reason) + "): " + str(message));
@@ -99,21 +130,34 @@ std::unique_ptr<Gpu> Gpu::create(std::string& err) {
     I.instance = wgpuCreateInstance(nullptr);
     if (!I.instance) { err = "wgpuCreateInstance failed"; return nullptr; }
 
-    WGPURequestAdapterOptions opts{};
-    opts.featureLevel = WGPUFeatureLevel_Core;
-    opts.powerPreference = WGPUPowerPreference_HighPerformance;
-    opts.backendType = WGPUBackendType_Metal;
-    struct AOut { WGPUAdapter adapter = nullptr; std::string msg; bool done = false; } aout;
-    WGPURequestAdapterCallbackInfo acb{};
-    acb.mode = WGPUCallbackMode_AllowProcessEvents;
-    acb.userdata1 = &aout;
-    acb.callback = [](WGPURequestAdapterStatus status, WGPUAdapter adapter, WGPUStringView message, void* u1, void*) {
-        AOut* o = (AOut*)u1;
-        o->done = true;
-        if (status == WGPURequestAdapterStatus_Success) o->adapter = adapter; else o->msg = str(message);
+    struct AOut { WGPUAdapter adapter = nullptr; std::string msg; bool done = false; };
+    auto request = [&](WGPUBackendType backend, AOut& aout) -> bool {
+        WGPURequestAdapterOptions opts{};
+        opts.featureLevel = WGPUFeatureLevel_Core;
+        opts.powerPreference = WGPUPowerPreference_HighPerformance;
+        opts.backendType = backend;
+        const char* fb = std::getenv("RS_WGPU_FALLBACK");
+        opts.forceFallbackAdapter = (fb && fb[0] == '1') ? 1 : 0;
+        WGPURequestAdapterCallbackInfo acb{};
+        acb.mode = WGPUCallbackMode_AllowProcessEvents;
+        acb.userdata1 = &aout;
+        acb.callback = [](WGPURequestAdapterStatus status, WGPUAdapter adapter, WGPUStringView message, void* u1, void*) {
+            AOut* o = (AOut*)u1;
+            o->done = true;
+            if (status == WGPURequestAdapterStatus_Success) o->adapter = adapter; else o->msg = str(message);
+        };
+        return I.wait(wgpuInstanceRequestAdapter(I.instance, &opts, acb), aout.done, err);
     };
-    if (!I.wait(wgpuInstanceRequestAdapter(I.instance, &opts, acb), aout.done, err)) return nullptr;
-    if (!aout.adapter) { err = "no Metal adapter: " + aout.msg; return nullptr; }
+    const WGPUBackendType backend = nativeBackend();
+    AOut aout;
+    if (!request(backend, aout)) return nullptr;
+    if (!aout.adapter && backend != WGPUBackendType_Undefined) {
+        // e.g. a Windows machine without Direct3D 12: let wgpu pick any backend it has (Vulkan, OpenGL)
+        AOut any;
+        if (!request(WGPUBackendType_Undefined, any)) return nullptr;
+        if (any.adapter) aout = any;
+    }
+    if (!aout.adapter) { err = std::string("no ") + backendName(backend) + " adapter: " + aout.msg; return nullptr; }
     I.adapter = aout.adapter;
     WGPUAdapterInfo ainfo{};
     if (wgpuAdapterGetInfo(I.adapter, &ainfo) == WGPUStatus_Success) { g->adapterName_ = str(ainfo.device); wgpuAdapterInfoFreeMembers(ainfo); }

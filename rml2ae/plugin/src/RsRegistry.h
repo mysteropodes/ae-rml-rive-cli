@@ -1,5 +1,5 @@
-// Shader registry + source cache. `~/Library/Application Support/RiveShader/shaders.tsv` maps an integer id (the
-// "Shader" slider value, scriptable from ExtendScript) to a .wgsl path; rml2ae and the "Load .wgsl…" button write it.
+// Shader registry + source cache. `shaders.tsv` in supportDir() maps an integer id (the "Shader" slider value,
+// scriptable from ExtendScript) to a .wgsl path (UTF-8); rml2ae and the "Load .wgsl…" button write it.
 #pragma once
 #include "RsShader.h"
 #include <memory>
@@ -7,7 +7,8 @@
 
 namespace rs {
 
-std::string supportDir();                 // ~/Library/Application Support/RiveShader (created on demand)
+std::string supportDir();                 // macOS ~/Library/Application Support/RiveShader, Windows %APPDATA%\\RiveShader
+                                          // (created on demand)
 std::string registryPath();               // .../shaders.tsv
 std::string logPath();                    // .../riveshader.log
 void logLine(const std::string& s);       // append a timestamped line (never throws)

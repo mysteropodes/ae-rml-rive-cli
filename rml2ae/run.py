@@ -1,8 +1,10 @@
-"""Execute a .jsx in After Effects 2026 (AppleScript DoScriptFile), render comparison frames (AE vs `rive --screenshot`)."""
+"""Execute a .jsx in After Effects (macOS: AppleScript DoScriptFile, Windows: AfterFX.exe -r), render comparison frames
+(AE vs `rive --screenshot`)."""
 import os
 import subprocess
 import time
 
+from . import aeapp
 from .jsx import js
 
 
@@ -10,8 +12,7 @@ RIVE_SHOT_LAG = 1.0 / 60.0     # see shots(): the Rive CLI screenshot is one 60 
 
 
 def osa(jsx):
-    subprocess.Popen(["osascript", "-e", f'tell application "Adobe After Effects 2026" to DoScriptFile "{jsx}"'],
-                     stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+    aeapp.run_script(jsx)
 
 
 def run(jsx, log, timeout=900):
@@ -21,11 +22,11 @@ def run(jsx, log, timeout=900):
     t0 = time.time()
     while time.time() - t0 < timeout:
         if os.path.exists(log):
-            txt = open(log, errors="replace").read()
+            txt = open(log, errors="replace", encoding="utf-8").read()
             if "DONE" in txt or "TOP FAILED" in txt:
                 return txt
         time.sleep(2)
-    return "timeout\n" + (open(log, errors="replace").read() if os.path.exists(log) else "")
+    return "timeout\n" + (open(log, errors="replace", encoding="utf-8").read() if os.path.exists(log) else "")
 
 
 def shots(project_dir, out_dir, comp_name, artboard, times, fps=25):
@@ -44,7 +45,7 @@ def shots(project_dir, out_dir, comp_name, artboard, times, fps=25):
     done = os.path.join(shot_dir, "_shots.log")
     lines.append(f'var f = new File({js(done)}); f.open("w"); f.write(out.join("\\n")); f.close();')
     runner = os.path.join(out_dir, "_shots.jsx")
-    open(runner, "w").write("\n".join(lines))
+    open(runner, "w", encoding="utf-8").write("\n".join(lines))
     if os.path.exists(done):
         os.remove(done)
     osa(runner)

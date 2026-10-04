@@ -1,0 +1,6 @@
+# wgpu-native release used by the Rive Shader plugin. build.sh (macOS) and build.ps1 (Windows) download it from
+# https://github.com/gfx-rs/wgpu-native/releases when it is missing and check its sha256 against this file.
+# The same wgpu-native version as the Python wgpu package (0.32.0) used by rml2ae/wgsl_apply.py and the CI.
+tag=v29.0.1.1
+macos-aarch64=wgpu-macos-aarch64-release.zip a5797a37b1adf720bcd5dcffb291edbbd5b7b14be0a3874c28e6393a655a7a3e
+windows-x86_64=wgpu-windows-x86_64-msvc-release.zip 7e67d7445c42aeb85e30f88930fd8d7d83ee769e3390aeb1ada75ebf3cf78132

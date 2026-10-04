@@ -88,9 +88,9 @@ def record_params(slugs):
     for f in (log, rows):
         if os.path.exists(f):
             os.remove(f)
-    open(jsx, "w").write(params_jsx(mns, log, rows))
+    open(jsx, "w", encoding="utf-8").write(params_jsx(mns, log, rows))
     run_jsx(jsx, log)
-    txt = open(log).read() if os.path.exists(log) else "timeout"
+    txt = open(log, encoding="utf-8").read() if os.path.exists(log) else "timeout"
     print(txt)
     if not os.path.exists(rows):
         return 1
@@ -165,7 +165,7 @@ def main():
     for b in range(0, len(rs), 8):
         chunk = rs[b:b + 8]
         log, jsx = os.path.join(tmp, f"batch_{b // 8}.log"), os.path.join(tmp, f"batch_{b // 8}.jsx")
-        open(jsx, "w").write(batch_jsx(chunk, log))
+        open(jsx, "w", encoding="utf-8").write(batch_jsx(chunk, log))
         if os.path.exists(log):
             os.remove(log)
         subprocess.Popen(["osascript", "-e", f'tell application "{AE_APP}" to DoScriptFile "{jsx}"'],
@@ -173,7 +173,7 @@ def main():
         t0 = time.time()
         while time.time() - t0 < 600 and not os.path.exists(log):
             time.sleep(1)
-        txt = open(log).read() if os.path.exists(log) else "timeout"
+        txt = open(log, encoding="utf-8").read() if os.path.exists(log) else "timeout"
         if txt.startswith("TOP") or txt == "timeout":
             print("stopped:", txt[:300])
             return 1

@@ -30,16 +30,17 @@ import time
 HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, os.path.dirname(HERE))
 
-AE_APPS = sorted(glob.glob("/Applications/Adobe After Effects */"))
-AE_APP = AE_APPS[-1] if AE_APPS else None
-AERENDER = os.path.join(AE_APP, "aerender") if AE_APP else None
+from rml2ae import aeapp  # noqa: E402
+
+AE_APPS = aeapp.APPS
+AE_APP = aeapp.APP
+AERENDER = aeapp.AERENDER
 RS_DEFAULTS = ["Paramètres optimaux", "Best Settings"]
 OM_PNG_DEFAULTS = ["PNG", "PNG Sequence", "Séquence TIFF avec alpha", "TIFF Sequence with Alpha"]
 
 
 def ae_running():
-    r = subprocess.run(["pgrep", "-f", "Adobe After Effects .*app/Contents/MacOS/After Effects$"], capture_output=True, text=True)
-    return bool(r.stdout.strip())
+    return aeapp.running()
 
 
 def parse(argv):
@@ -76,7 +77,7 @@ def cmd_doctor(args, flags):
         ok = ok and good
         print(f"  [{'ok' if good else '!!'}] {label}{(' — ' + detail) if detail else ''}")
     print("ae doctor")
-    line("After Effects app", AE_APP is not None, AE_APP or "not found in /Applications")
+    line("After Effects app", AE_APP is not None, AE_APP or f"not found in {aeapp.WHERE}")
     line("After Effects running", ae_running(), "" if ae_running() else "open AE for build/watch")
     line("aerender", bool(AERENDER and os.path.exists(AERENDER)), AERENDER or "")
     rv = shutil.which("rive")
@@ -88,7 +89,8 @@ def cmd_doctor(args, flags):
         line("python deps (PIL, fontTools)", True)
     except Exception as e:
         line("python deps (PIL, fontTools)", False, str(e))
-    plug = glob.glob(os.path.expanduser("~/AE-Dev-Plugins/RiveShader.plugin")) + glob.glob(os.path.join(AE_APP or "", "Plug-ins", "**", "RiveShader.plugin"), recursive=True)
+    plug = glob.glob(os.path.join(os.path.expanduser("~"), "AE-Dev-Plugins", aeapp.PLUGIN_NAME)) + \
+        (glob.glob(os.path.join(aeapp.PLUGINS, "**", aeapp.PLUGIN_NAME), recursive=True) if aeapp.PLUGINS else [])
     line("Rive Shader plugin", bool(plug), plug[0] if plug else "not installed: shaders fall back to native AE effects")
     if args:
         p = os.path.abspath(args[0])
@@ -113,7 +115,7 @@ def cmd_templates(args, flags):
     tmp = os.path.join(os.path.expanduser("~/.cache/rml2ae"), "templates.txt")
     os.makedirs(os.path.dirname(tmp), exist_ok=True)
     jsx = tmp + ".jsx"
-    open(jsx, "w").write(f'''var out = []; try {{ app.beginUndoGroup("ae templates"); var comp = app.project.items.addComp("__ae_tpl", 16, 16, 1, 1, 25);
+    open(jsx, "w", encoding="utf-8").write(f'''var out = []; try {{ app.beginUndoGroup("ae templates"); var comp = app.project.items.addComp("__ae_tpl", 16, 16, 1, 1, 25);
 var item = app.project.renderQueue.items.add(comp); out.push("render settings: " + item.templates.join(" | ")); out.push("output modules: " + item.outputModule(1).templates.join(" | "));
 item.remove(); comp.remove(); app.endUndoGroup(); }} catch (e) {{ out.push("ERR " + e.toString()); }}
 var f = new File({js(tmp)}); f.open("w"); f.write(out.join("\\n")); f.close();''')
@@ -125,7 +127,7 @@ var f = new File({js(tmp)}); f.open("w"); f.write(out.join("\\n")); f.close();''
         if os.path.exists(tmp):
             break
         time.sleep(1)
-    print(open(tmp).read() if os.path.exists(tmp) else "no answer from AE")
+    print(open(tmp, encoding="utf-8").read() if os.path.exists(tmp) else "no answer from AE")
     return 0
 
 
@@ -147,13 +149,13 @@ def build(project, flags, replace=False, incremental=False):
         for l in conv.stats_lines():
             print(l)
     jsx = os.path.join(out_dir, proj.name + ".jsx")
-    open(jsx, "w").write(text)
-    open(os.path.join(out_dir, proj.name + ".ae-report.md"), "w").write(conv.rep.markdown())
+    open(jsx, "w", encoding="utf-8").write(text)
+    open(os.path.join(out_dir, proj.name + ".ae-report.md"), "w", encoding="utf-8").write(conv.rep.markdown())
     t0 = time.time()
     log = runner.run(jsx, conv.log)
     for l in log.splitlines():
         if l.startswith("project "):
-            open(os.path.join(out_dir, proj.name + ".project.txt"), "w").write(l[8:].strip())
+            open(os.path.join(out_dir, proj.name + ".project.txt"), "w", encoding="utf-8").write(l[8:].strip())
     tail = [l for l in log.splitlines() if "FAILED" in l or "DONE" in l or "saved" in l]
     print(f"build {proj.name}: {time.time() - t0:.0f}s — " + ("; ".join(tail[-3:]) if tail else log[-300:]))
     return 0 if "DONE" in log and "FAILED" not in log else 1
@@ -197,7 +199,7 @@ def cmd_render(args, flags, single=None):
     aep = os.path.join(project, "build", "rml2ae", proj.name + ".aep")
     pf = os.path.join(project, "build", "rml2ae", proj.name + ".project.txt")
     if os.path.exists(pf):                       # the last build's AE project (the open one in --replace / watch mode)
-        last = open(pf).read().strip()
+        last = open(pf, encoding="utf-8").read().strip()
         if last == "unsaved":
             print("the AE project of the last build is unsaved: save it in AE (Cmd-S), then render again")
             return 1
@@ -206,7 +208,7 @@ def cmd_render(args, flags, single=None):
         print(f"no {aep}: run `ae build` first")
         return 1
     topf = os.path.join(project, "build", "rml2ae", proj.name + ".topcomp.txt")
-    comp = flags.get("comp") or (open(topf).read().strip() if os.path.exists(topf) else proj.default_artboard().name)
+    comp = flags.get("comp") or (open(topf, encoding="utf-8").read().strip() if os.path.exists(topf) else proj.default_artboard().name)
     fps = 25.0
     try:
         chain, _, _ = proj.entry_chain(proj.default_artboard())
@@ -270,7 +272,7 @@ def cmd_diff(args, flags):
         print("After Effects must be running (frames come from the open project)")
         return 1
     topf = os.path.join(project, "build", "rml2ae", proj.name + ".topcomp.txt")
-    top = open(topf).read().strip() if os.path.exists(topf) else main_ab.name
+    top = open(topf, encoding="utf-8").read().strip() if os.path.exists(topf) else main_ab.name
     for p in runner.shots(project, os.path.join(project, "build", "rml2ae"), top, main_ab.name, flags.get("times", [1.0])):
         print("wrote", p)
     return 0

@@ -59,9 +59,9 @@ def main(argv):
         for l in conv.stats_lines():
             print(l)
     jsx = os.path.join(out_dir, proj.name + ".jsx")
-    open(jsx, "w").write(jsx_text)
+    open(jsx, "w", encoding="utf-8").write(jsx_text)
     rep = os.path.join(out_dir, proj.name + ".ae-report.md")
-    open(rep, "w").write(conv.rep.markdown(f"comp fps {conv.fps} · main artboard '{conv.main_artboard().name}' · output {jsx}"))
+    open(rep, "w", encoding="utf-8").write(conv.rep.markdown(f"comp fps {conv.fps} · main artboard '{conv.main_artboard().name}' · output {jsx}"))
     print("wrote", jsx, f"({len(jsx_text.splitlines())} lines)")
     print("wrote", rep)
     from collections import Counter
@@ -69,7 +69,7 @@ def main(argv):
     print("report:", dict(c))
     if "run" in flags:
         print(runner.run(jsx, conv.log))
-    open(os.path.join(out_dir, proj.name + ".topcomp.txt"), "w").write(conv.top_name or conv.main_artboard().name)
+    open(os.path.join(out_dir, proj.name + ".topcomp.txt"), "w", encoding="utf-8").write(conv.top_name or conv.main_artboard().name)
     if "shots" in flags:
         main_ab = conv.main_artboard()
         for p in runner.shots(pdir, out_dir, conv.top_name or main_ab.name, main_ab.name, flags["shots"], conv.fps):

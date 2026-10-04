@@ -1,4 +1,6 @@
-# Installation (macOS)
+# Installation
+
+macOS first; the [Windows](#windows) section says what differs.
 
 The repository installs as a whole or part by part. After Effects 2024 or later is needed for rml2ae and the plugin (developed and measured on After Effects 2026); `ae2rml` and the review kit do not need After Effects.
 
@@ -83,3 +85,52 @@ The `ae` wrapper (`rml2ae/bin/ae`) uses `.venv/bin/python` at the repository roo
 - Save the After Effects project before `ae build --replace` or `ae watch` (they build in the open project).
 - Do not leave a dialog open in After Effects during a build: scripts would be blocked.
 - Optional per-project side files (`ae_passes.json`, `ae_audio.json`) are described in [rml2ae.md](rml2ae.md).
+
+## Windows
+
+The same parts install with `install.ps1`, from PowerShell at the repository root:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File install.ps1                          # everything
+powershell -ExecutionPolicy Bypass -File install.ps1 rml2ae ae2rml review-kit plugin skills
+```
+
+| Step | Windows |
+|---|---|
+| Python | Python 3.9+ from python.org (tick "Add python.exe to PATH") or `winget install Python.Python.3.12`. The installer creates `.venv` and runs `pip install -e ".[ae2rml]"`: the `ae`, `ae2rml` and `rml2ae` commands land in `.venv\Scripts`, and it offers to add that folder to your user PATH. |
+| Rive CLI | Rive publishes a Windows build (`windows-x64` in the `releases.rive.app` manifest): downloaded, sha256 checked, into `%USERPROFILE%\.rive\bin`. Should the manifest ever lack it, the installer says so and lists the platforms it has. |
+| ffmpeg | Optional: `winget install Gyan.FFmpeg`. |
+| Panel | `Rive.jsx` with the repository path written in, copied to `<After Effects>\Support Files\Scripts\ScriptUI Panels` (one administrator prompt). |
+| Plugin | `rml2ae\plugin\build.ps1 install` when the After Effects SDK is found (see below). |
+| Skills | Copied into `%USERPROFILE%\.claude\skills`. |
+
+After Effects is looked for in `C:\Program Files\Adobe\Adobe After Effects <version>`. `ae build`, `ae pull` and the
+panel send their scripts with `AfterFX.exe -r <script.jsx>`, which hands the script to the running After Effects;
+`ae render` uses `aerender.exe`. Fonts are read from `C:\Windows\Fonts`, the per-user fonts folder and Adobe Fonts.
+The plugin's shader registry is `%APPDATA%\RiveShader\shaders.tsv`.
+
+### The Rive Shader plugin on Windows
+
+1. Visual Studio 2022, or its free Build Tools, with the **Desktop development with C++** workload (it brings MSVC,
+   CMake and Ninja).
+2. The After Effects SDK **for Windows**, unzipped into `%LOCALAPPDATA%\ae-plugin-deps\AfterEffectsSDK` (or set
+   `AE_SDK`).
+3. `powershell -ExecutionPolicy Bypass -File rml2ae\plugin\build.ps1 install`, After Effects closed. The script
+   downloads wgpu-native (the release pinned in `rml2ae/plugin/wgpu-native.txt`, sha256 checked), builds
+   `RiveShader.aex` and copies it to `<After Effects>\Support Files\Plug-ins\Rive` (one administrator prompt).
+
+The plugin renders with Direct3D 12 (any other backend wgpu finds if Direct3D 12 is missing).
+
+### What has been checked on Windows
+
+| Part | Checked | How |
+|---|---|---|
+| Python package, `ae2rml` on the demo, the unit tests | yes | CI on a Windows runner (`windows` job) |
+| The Rive CLI for Windows (fetched as `install.ps1` does) and `--verify` on the demo | yes | CI |
+| Every fxlib effect compiles and runs on Direct3D 12 (FXC) | yes | CI: `oracle_check.py --compile-all`, 123 effects; Motion Tile, Corner Pin and CC Power Pin were rewritten for it (pixel-identical) |
+| The plugin's GPU module (`rs_apply`, built with MSVC by `build.ps1`) | yes | CI: the 292 single-pass fxlib settings render exactly like `wgsl_apply.py` (software Direct3D 12, WARP) |
+| The plugin in After Effects, the PiPL resource, the file dialog | no | needs a Windows machine with After Effects and the SDK |
+| The panel, `ae build` / `ae pull` through `AfterFX.exe -r` | no | needs a Windows machine with After Effects |
+| `install.ps1` end to end | no | parsed by PowerShell 7 only |
+
+Please report what fails on your machine; the macOS path is the one measured in After Effects.

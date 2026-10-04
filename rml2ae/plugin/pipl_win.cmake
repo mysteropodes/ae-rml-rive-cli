@@ -1,0 +1,42 @@
+# Windows PiPL resource, run by CMakeLists.txt (cmake -P). The same chain as the AE SDK's Windows samples:
+#   RiveShaderPiPL.r.in + flagcheck values -> .r -> cl /EP -> .rr -> PiPLTool -> .rrc -> cl /D MSWindows /EP -> .rc
+# (/Tc: the .r and .rrc files are preprocessed as C, whatever their extension.)
+# Inputs: FLAGCHECK, TEMPLATE, CL, PIPLTOOL, INCLUDES (list), WORK, OUT.
+
+# 1. constants from the compiled header (never hand-copied), as build.sh does on macOS
+execute_process(COMMAND "${FLAGCHECK}" OUTPUT_VARIABLE flags RESULT_VARIABLE rc)
+if(NOT rc EQUAL 0)
+    message(FATAL_ERROR "flagcheck failed (${rc})")
+endif()
+file(READ "${TEMPLATE}" text)
+string(REPLACE "\r" "" flags "${flags}")
+string(REPLACE "\n" ";" lines "${flags}")
+foreach(line IN LISTS lines)
+    if(line MATCHES "^([A-Z0-9_]+)=(.*)$")
+        string(REPLACE "@${CMAKE_MATCH_1}@" "${CMAKE_MATCH_2}" text "${text}")
+    endif()
+endforeach()
+if(text MATCHES "@RS_[A-Z0-9_]+@")
+    message(FATAL_ERROR "PiPL template: unreplaced ${CMAKE_MATCH_0}")
+endif()
+set(r "${WORK}/RiveShaderPiPL.r")
+file(WRITE "${r}" "${text}")
+
+# 2. preprocess (AEConfig.h sets AE_OS_WIN from _WIN32), 3. PiPLTool, 4. preprocess the resource script again
+set(inc "")
+foreach(d IN LISTS INCLUDES)
+    list(APPEND inc "/I${d}")
+endforeach()
+execute_process(COMMAND "${CL}" /nologo ${inc} /EP "/Tc${r}" OUTPUT_FILE "${WORK}/RiveShaderPiPL.rr" RESULT_VARIABLE rc)
+if(NOT rc EQUAL 0)
+    message(FATAL_ERROR "cl /EP RiveShaderPiPL.r failed (${rc})")
+endif()
+execute_process(COMMAND "${PIPLTOOL}" "${WORK}/RiveShaderPiPL.rr" "${WORK}/RiveShaderPiPL.rrc" RESULT_VARIABLE rc)
+if(NOT rc EQUAL 0)
+    message(FATAL_ERROR "PiPLTool failed (${rc})")
+endif()
+execute_process(COMMAND "${CL}" /nologo /D MSWindows /EP "/Tc${WORK}/RiveShaderPiPL.rrc" OUTPUT_FILE "${OUT}" RESULT_VARIABLE rc)
+if(NOT rc EQUAL 0)
+    message(FATAL_ERROR "cl /EP RiveShaderPiPL.rrc failed (${rc})")
+endif()
+message(STATUS "PiPL: ${OUT}")

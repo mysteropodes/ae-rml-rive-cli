@@ -45,7 +45,7 @@ MIX_WGSL = os.path.join(LIB, "_ae_fx_mix.wgsl")
 
 
 def manifest(slug):
-    return json.load(open(os.path.join(LIB, slug + ".json")))
+    return json.load(open(os.path.join(LIB, slug + ".json"), encoding="utf-8"))
 
 
 def all_slugs():
@@ -488,8 +488,8 @@ def test_project(slugs, ae_vals_list, d, src_png, map_png=None):
     shutil.copy(src_png, os.path.join(d, "src.png"))
     shutil.copy(MIX_WGSL, os.path.join(d, "_ae_fx_mix.wgsl"))
     name = stack_name(slugs)
-    open(os.path.join(d, name + ".luau"), "w").write(luau_for(slugs))
-    open(os.path.join(d, "rive.yaml"), "w").write(f"name: {name}\n")
+    open(os.path.join(d, name + ".luau"), "w", encoding="utf-8").write(luau_for(slugs))
+    open(os.path.join(d, "rive.yaml"), "w", encoding="utf-8").write(f"name: {name}\n")
     ins, has_map = [], False
     for i, (slug, ae_vals) in enumerate(zip(slugs, ae_vals_list), 1):
         m = manifest(slug)
@@ -530,7 +530,7 @@ def test_project(slugs, ae_vals_list, d, src_png, map_png=None):
 <ScriptAsset file="{name}.luau" name="{name}" id="0:9"/>
 </Rive>
 """
-    open(os.path.join(d, "scene.rml"), "w").write(rml)
+    open(os.path.join(d, "scene.rml"), "w", encoding="utf-8").write(rml)
     return d
 
 
@@ -563,7 +563,7 @@ def compare(a_png, b_png, rgb_only=False):
 
 def check(slug, rive=False, holdout=False, keep=False):
     m = manifest(slug)
-    rs = json.load(open(os.path.join(REF, "renders.json")))
+    rs = json.load(open(os.path.join(REF, "renders.json"), encoding="utf-8"))
     rows = []
     src = os.path.join(REF, "src", "src_premult.png")
     mp = os.path.join(REF, "src", "map.png")
@@ -612,7 +612,7 @@ def manifest_problems(slug):
     out = []
     try:
         m = manifest(slug)
-        fields, _ = struct_fields(open(wgsl_path(m)).read())
+        fields, _ = struct_fields(open(wgsl_path(m), encoding="utf-8").read())
     except Exception as ex:
         return [f"{slug}: unreadable manifest or shader ({type(ex).__name__}: {ex})"]
     names = {f[0] for f in fields}
@@ -646,11 +646,11 @@ def pad_problems(slug, pad=40):
     from PIL import Image
     from rml2ae.wgsl_apply import apply
     m = manifest(slug)
-    fields, _ = struct_fields(open(wgsl_path(m)).read())
+    fields, _ = struct_fields(open(wgsl_path(m), encoding="utf-8").read())
     if m.get("status") != "unverified" or "layerRect" not in {f[0] for f in fields} or int(m.get("passes", 1)) != 1:
         return []
     src = os.path.join(REF, "src", "src_premult.png")
-    vals = next((r["vals"] for r in json.load(open(os.path.join(REF, "renders.json"))) if r["slug"] == slug), {})
+    vals = next((r["vals"] for r in json.load(open(os.path.join(REF, "renders.json"), encoding="utf-8")) if r["slug"] == slug), {})
     im = Image.open(src).convert("RGBA")
     w, h = im.size
     tmpd = tempfile.mkdtemp(prefix="fxpad_")
@@ -680,7 +680,7 @@ def pad_problems(slug, pad=40):
 def regress(slugs=None, update=False, summary=None):
     """Measure every reference (held-out included) offline and compare with fxref/baseline.json.
     Returns the number of problems (worse than the baseline, errors, missing baseline, manifest problems)."""
-    base = json.load(open(BASELINE)) if os.path.exists(BASELINE) else {}
+    base = json.load(open(BASELINE, encoding="utf-8")) if os.path.exists(BASELINE) else {}
     slugs = slugs or all_slugs()
     problems, rows_md, new = [], [], dict(base)
     for slug in slugs:
@@ -721,11 +721,11 @@ def regress(slugs=None, update=False, summary=None):
             rows_md.append(line)
             print(line, flush=True)
     if update:
-        json.dump(dict(sorted(new.items())), open(BASELINE, "w"), indent=1)
-        open(BASELINE, "a").write("\n")
+        json.dump(dict(sorted(new.items())), open(BASELINE, "w", encoding="utf-8"), indent=1)
+        open(BASELINE, "a", encoding="utf-8").write("\n")
         problems = [p for p in problems if "no baseline" not in p]
     if summary:
-        with open(summary, "a") as f:
+        with open(summary, "a", encoding="utf-8") as f:
             f.write("## fxlib: offline WGSL vs After Effects references\n\n"
                     "mean = mean error in % of 255, >8 = % of pixels off by more than 8 levels, max = levels\n\n"
                     "| effect | setting | mean | >8 | max | vs baseline |\n|---|---|---|---|---|---|\n")

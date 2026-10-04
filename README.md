@@ -48,7 +48,9 @@ flowchart LR
   RML -->|"--publish=web"| WEB
 ```
 
-## Install (macOS)
+## Install
+
+macOS:
 
 ```bash
 git clone https://github.com/mysteropodes/ae-rml-rive-cli.git && cd ae-rml-rive-cli
@@ -56,13 +58,23 @@ git clone https://github.com/mysteropodes/ae-rml-rive-cli.git && cd ae-rml-rive-
 ./install.sh rml2ae ae2rml        # or only some parts: rml2ae  ae2rml  review-kit  plugin  skills
 ```
 
+Windows (PowerShell):
+
+```powershell
+git clone https://github.com/mysteropodes/ae-rml-rive-cli.git; cd ae-rml-rive-cli
+powershell -ExecutionPolicy Bypass -File install.ps1                  # everything
+powershell -ExecutionPolicy Bypass -File install.ps1 rml2ae ae2rml    # or only some parts (same names)
+```
+
 - The **Rive CLI is not part of this repository**: the installer gets it from Rive (Homebrew tap `rive-app/tap`, or
-  `releases.rive.app` with its sha256 checked).
+  `releases.rive.app` with its sha256 checked; Rive publishes a `windows-x64` build there).
 - Python 3.9+ (a `.venv` is created at the root). Without the installer: `pip install -e ".[ae2rml]"` gives the
   `ae`, `ae2rml` and `rml2ae` commands (see [docs/install.md](docs/install.md#running-without-the-installer)).
 - After Effects 2024+ for rml2ae and the plugin.
-- The plugin is built from source and needs the free Adobe After Effects SDK (see `rml2ae/plugin/README.md`). It is
-  not signed with an Apple Developer ID: macOS asks you to allow it once (System Settings › Privacy & Security).
+- The plugin is built from source and needs the free Adobe After Effects SDK (see `rml2ae/plugin/README.md`):
+  `build.sh` on macOS (Apple Silicon, Xcode), `build.ps1` on Windows (x64, Visual Studio 2022 C++ tools). On macOS it
+  is not signed with an Apple Developer ID: macOS asks you to allow it once (System Settings › Privacy & Security).
+- Windows support is new: see [docs/install.md](docs/install.md#windows) for what has been checked on Windows so far.
 
 ## Use
 

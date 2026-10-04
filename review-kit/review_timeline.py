@@ -64,7 +64,7 @@ def load_notes(project_dir):
     if not os.path.exists(p):
         return ""
     try:
-        with open(p) as f:
+        with open(p, encoding="utf-8") as f:
             notes = json.load(f).get("notes", [])
     except (OSError, ValueError):
         return ""

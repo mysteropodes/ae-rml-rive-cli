@@ -1,4 +1,4 @@
-// Rive Shader — After Effects SmartFX effect running a Rive .wgsl through wgpu-native (Metal).
+// Rive Shader — After Effects SmartFX effect running a Rive .wgsl through wgpu-native (Metal on macOS, Direct3D 12 on Windows).
 //
 // SDK rules followed (ae-plugins.docsforadobe.dev):
 //  - SmartFX: PRE_RENDER checks the input out (one id per use), RENDER checks pixels out once per id, then the

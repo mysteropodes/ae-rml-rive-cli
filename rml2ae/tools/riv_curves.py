@@ -18,7 +18,7 @@ import sys
 from collections import Counter, defaultdict
 
 HERE = os.path.dirname(os.path.abspath(__file__))
-SCHEMA = json.load(open(os.path.join(HERE, "..", "schema.json")))
+SCHEMA = json.load(open(os.path.join(HERE, "..", "schema.json"), encoding="utf-8"))
 TYPES_BY_KEY = {v["typeKey"]: v for v in SCHEMA["types"].values() if v.get("typeKey") is not None}
 KEYS = {int(k): tuple(v) for k, v in SCHEMA["keys"].items()}          # key -> (owner, name, type)
 
@@ -393,7 +393,7 @@ def main(argv):
             everything[os.path.basename(f)] = {"version": riv["version"], "stats": stats,
                                                "artboards": [{"name": ab["name"], "width": ab.get("width"), "height": ab.get("height"), "animations": curves_of(ab)} for ab in abs_]}
     if out_json:
-        json.dump(everything, open(out_json, "w"), indent=1)
+        json.dump(everything, open(out_json, "w", encoding="utf-8"), indent=1)
         print("wrote", out_json)
 
 

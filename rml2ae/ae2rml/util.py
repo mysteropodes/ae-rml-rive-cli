@@ -5,6 +5,7 @@ import math
 import os
 import re
 import shutil
+import sys
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 PKG = os.path.dirname(HERE)                       # rml2ae/
@@ -74,7 +75,7 @@ class IdPool:
         self.map = {}
         if path and os.path.exists(path):
             try:
-                self.map = json.load(open(path))
+                self.map = json.load(open(path, encoding="utf-8"))
             except Exception:
                 self.map = {}
         self.used = set()
@@ -107,7 +108,7 @@ class IdPool:
         if self.path:
             os.makedirs(os.path.dirname(self.path), exist_ok=True)
             keep = {k: v for k, v in self.map.items() if v in self.used}
-            json.dump(keep, open(self.path, "w"), indent=0, sort_keys=True)
+            json.dump(keep, open(self.path, "w", encoding="utf-8"), indent=0, sort_keys=True)
 
 
 # ------------------------------------------------------------------ report
@@ -210,10 +211,19 @@ def find_footage(path, aep_path, extra_dirs=()):
 
 
 # ------------------------------------------------------------------ fonts
-FONT_DIRS = [os.path.expanduser("~/Library/Fonts"), "/Library/Fonts", "/System/Library/Fonts",
-             "/System/Library/Fonts/Supplemental",
-             os.path.expanduser("~/Library/Application Support/Adobe/CoreSync/plugins/livetype/.r"),
-             os.path.expanduser("~/Library/Application Support/Adobe/CoreSync/plugins/livetype/r")]
+if sys.platform.startswith("win"):
+    _WINDIR = os.environ.get("WINDIR", r"C:\Windows")
+    _LOCAL = os.environ.get("LOCALAPPDATA", os.path.expanduser("~"))
+    _ROAMING = os.environ.get("APPDATA", os.path.expanduser("~"))
+    # system fonts, fonts installed for the current user only, Adobe Fonts (Creative Cloud) activated fonts
+    FONT_DIRS = [os.path.join(_WINDIR, "Fonts"), os.path.join(_LOCAL, "Microsoft", "Windows", "Fonts"),
+                 os.path.join(_ROAMING, "Adobe", "CoreSync", "plugins", "livetype", ".r"),
+                 os.path.join(_ROAMING, "Adobe", "CoreSync", "plugins", "livetype", "r")]
+else:
+    FONT_DIRS = [os.path.expanduser("~/Library/Fonts"), "/Library/Fonts", "/System/Library/Fonts",
+                 "/System/Library/Fonts/Supplemental",
+                 os.path.expanduser("~/Library/Application Support/Adobe/CoreSync/plugins/livetype/.r"),
+                 os.path.expanduser("~/Library/Application Support/Adobe/CoreSync/plugins/livetype/r")]
 _FONT_INDEX = None
 
 
@@ -232,7 +242,7 @@ def _font_index():
                         files.append(os.path.join(root, f))
     stamp = len(files)
     try:
-        c = json.load(open(cache))
+        c = json.load(open(cache, encoding="utf-8"))
         if c.get("stamp") == stamp:
             _FONT_INDEX = c["index"]
             return _FONT_INDEX
@@ -256,7 +266,7 @@ def _font_index():
     _FONT_INDEX = index
     try:
         os.makedirs(os.path.dirname(cache), exist_ok=True)
-        json.dump({"stamp": stamp, "index": index}, open(cache, "w"))
+        json.dump({"stamp": stamp, "index": index}, open(cache, "w", encoding="utf-8"))
     except Exception:
         pass
     return index
@@ -276,7 +286,8 @@ def find_font(ps):
     return None
 
 
-STAND_IN_TTC = "/System/Library/Fonts/Helvetica.ttc"
+STAND_IN_TTC = (os.path.join(os.environ.get("WINDIR", r"C:\Windows"), "Fonts", "arial.ttf") if sys.platform.startswith("win")
+                else "/System/Library/Fonts/Helvetica.ttc")
 
 
 def copy_font(ps, out_dir, report):

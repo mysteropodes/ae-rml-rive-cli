@@ -35,7 +35,7 @@ def main():
     shutil.copytree(os.path.join(HERE, "cases", "features"), sim, dirs_exist_ok=True, ignore=shutil.ignore_patterns("build"))
     rml = os.path.join(sim, "scene.rml")
     conv, text = build(sim, False)
-    json.dump(conv.manifest, open(conv.manifest_path, "w"))
+    json.dump(conv.manifest, open(conv.manifest_path, "w", encoding="utf-8"))
     assert "__MANIFEST__" not in text
     # 1. nothing changed -> nothing rebuilt
     conv, text = build(sim, True)
@@ -43,8 +43,8 @@ def main():
     assert st["els_rebuilt"] == 0 and not st["comps_rebuilt"] and st["els_removed"] == 0, st
     assert not rebuilt_tags(text)
     # 2. one colour inside a group -> only that shape, in place, the group kept
-    src = open(rml).read()
-    open(rml, "w").write(src.replace('colorValue="FFFF2266"', 'colorValue="FF00FF00"', 1))
+    src = open(rml, encoding="utf-8").read()
+    open(rml, "w", encoding="utf-8").write(src.replace('colorValue="FFFF2266"', 'colorValue="FF00FF00"', 1))
     conv, text = build(sim, True)
     if LAYOUT == "industry":
         # the group is ONE shape layer (its shapes are vector groups): a colour inside it rebuilds that layer
@@ -53,17 +53,17 @@ def main():
         assert set(rebuilt_tags(text)) == {"rive:0:118"}, rebuilt_tags(text)        # once per animation comp
         assert re.search(r'var nul\d+ = layerTag\(c\d+, "rive:0:116"\)', text), "the group should be kept (looked up)"
     assert conv.stats["els_removed"] == 0
-    json.dump(conv.manifest, open(conv.manifest_path, "w"))
+    json.dump(conv.manifest, open(conv.manifest_path, "w", encoding="utf-8"))
     # 3. a child removed from the Solo -> the Solo rebuilt (its slider rows changed), the child's layers removed
-    src = open(rml).read()
-    open(rml, "w").write(re.sub(r'<Shape name="S2" id="0:125">.*?</Shape>', "", src, count=1))
+    src = open(rml, encoding="utf-8").read()
+    open(rml, "w", encoding="utf-8").write(re.sub(r'<Shape name="S2" id="0:125">.*?</Shape>', "", src, count=1))
     conv, text = build(sim, True)
     assert "rive:0:123" in rebuilt_tags(text) and conv.stats["els_removed"] >= 1, (rebuilt_tags(text), conv.stats)
     assert 'removeTagged(c4, ["rive:0:125"])' in text or '"rive:0:125"' in text
-    json.dump(conv.manifest, open(conv.manifest_path, "w"))
+    json.dump(conv.manifest, open(conv.manifest_path, "w", encoding="utf-8"))
     # 4. a new element -> built and placed above its previous sibling (the group), nothing else touched
-    src = open(rml).read()
-    open(rml, "w").write(src.replace('<Node x="950" y="150" opacity="0.5" name="Group" id="0:116">',
+    src = open(rml, encoding="utf-8").read()
+    open(rml, "w", encoding="utf-8").write(src.replace('<Node x="950" y="150" opacity="0.5" name="Group" id="0:116">',
                                      '<Shape x="600" y="400" name="NEW" id="0:999"><Rectangle width="50" height="50" name="R"/>'
                                      '<Fill name="F"><SolidColor colorValue="FF000000" name="C"/></Fill></Shape>\n'
                                      '<Node x="950" y="150" opacity="0.5" name="Group" id="0:116">', 1))
@@ -76,9 +76,9 @@ def main():
     above = r'\["rive:0:116"\]' if LAYOUT == "industry" else r'\["rive:0:116","rive:0:118","rive:0:117"\]'
     assert re.search(r'anchor\(c\d+, \["rive:0:999"\], ' + above, text), "new element not anchored above the group"
     # 5. artboard background changed -> the comps' heads changed -> whole comps rebuilt and relinked
-    json.dump(conv.manifest, open(conv.manifest_path, "w"))
-    src = open(rml).read()
-    open(rml, "w").write(src.replace('colorValue="FFF3F0E8"', 'colorValue="FFFFFFFF"', 1))
+    json.dump(conv.manifest, open(conv.manifest_path, "w", encoding="utf-8"))
+    src = open(rml, encoding="utf-8").read()
+    open(rml, "w", encoding="utf-8").write(src.replace('colorValue="FFF3F0E8"', 'colorValue="FFFFFFFF"', 1))
     conv, text = build(sim, True)
     assert conv.stats["comps_rebuilt"] and "relinkComp(" in text, conv.stats
     shutil.rmtree(sim)

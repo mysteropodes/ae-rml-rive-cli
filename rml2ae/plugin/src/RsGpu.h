@@ -1,4 +1,5 @@
-// wgpu-native (Metal) backend for Rive Shader: one device for the process, a pipeline cache keyed by shader,
+// wgpu-native backend for Rive Shader (Metal on macOS, Direct3D 12 on Windows): one device for the process, a
+// pipeline cache keyed by shader,
 // and a synchronous upload -> full-screen pass -> readback. Transposed 1:1 from rml2ae/wgsl_apply.py.
 #pragma once
 #include "RsShader.h"
@@ -34,7 +35,7 @@ struct RenderRequest {
 
 class Gpu {
 public:
-    // nullptr + message when no Metal adapter/device is available.
+    // nullptr + message when no GPU adapter/device is available.
     static std::unique_ptr<Gpu> create(std::string& err);
     ~Gpu();
 
