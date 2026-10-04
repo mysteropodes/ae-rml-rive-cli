@@ -33,7 +33,10 @@ SPEC = {
     "directional_blur": ("ADBE Motion Blur", [({1: 0, 2: 20}, 0), ({1: 45, 2: 30}, 0), ({1: 120, 2: 15}, 1)]),
     "cc_radial_fast_blur": ("CC Radial Fast Blur", [({2: 50}, 0), ({2: 80, 3: 2}, 0), ({1: [200, 120], 2: 60, 3: 3}, 0), ({2: 30, 1: [400, 200]}, 1)]),
     "cc_radial_blur": ("CC Radial Blur", [({1: 1, 2: 30}, 0), ({1: 4, 2: 20}, 0), ({1: 6, 2: 40}, 0), ({1: 3, 2: 25}, 1)]),
-    "simple_choker": ("ADBE Simple Choker", [({2: 3}, 0), ({2: -4}, 0), ({2: 6}, 1)]),
+    # 3..7: how blur width, threshold and ramp change with the choke (choke 6, held out, is off by up to 119 levels);
+    # 7 = View Matte (the alpha alone, as grey) at choke 10
+    "simple_choker": ("ADBE Simple Choker", [({2: 3}, 0), ({2: -4}, 0), ({2: 6}, 1), ({2: 1}, 0), ({2: 10}, 0),
+                                             ({2: 20}, 0), ({2: -10}, 0), ({1: 2, 2: 10}, 0)]),
     "minimax": ("ADBE Minimax", [({1: 1, 2: 4}, 0), ({1: 2, 2: 4}, 0), ({1: 2, 2: 6, 3: 2}, 0), ({1: 3, 2: 3}, 1)]),
     "mosaic": ("ADBE Mosaic", [({1: 20, 2: 10}, 0), ({1: 40, 2: 20, 3: 1}, 0), ({1: 13, 2: 7}, 1)]),
     "motion_tile": ("ADBE Tile", [({2: 50, 3: 50}, 0), ({2: 50, 3: 50, 6: 1}, 0), ({2: 40, 3: 60, 7: 30, 8: 1}, 0), ({1: [200, 150], 2: 60, 3: 60, 6: 1}, 1)]),

@@ -835,6 +835,57 @@
   "png": "ae_holdout/simple_choker_2.png"
  },
  {
+  "slug": "simple_choker",
+  "mn": "ADBE Simple Choker",
+  "k": 3,
+  "vals": {
+   "2": 1
+  },
+  "held": false,
+  "png": "ae/simple_choker_3.png"
+ },
+ {
+  "slug": "simple_choker",
+  "mn": "ADBE Simple Choker",
+  "k": 4,
+  "vals": {
+   "2": 10
+  },
+  "held": false,
+  "png": "ae/simple_choker_4.png"
+ },
+ {
+  "slug": "simple_choker",
+  "mn": "ADBE Simple Choker",
+  "k": 5,
+  "vals": {
+   "2": 20
+  },
+  "held": false,
+  "png": "ae/simple_choker_5.png"
+ },
+ {
+  "slug": "simple_choker",
+  "mn": "ADBE Simple Choker",
+  "k": 6,
+  "vals": {
+   "2": -10
+  },
+  "held": false,
+  "png": "ae/simple_choker_6.png"
+ },
+ {
+  "slug": "simple_choker",
+  "mn": "ADBE Simple Choker",
+  "k": 7,
+  "vals": {
+   "1": 2,
+   "2": 10
+  },
+  "held": false,
+  "png": "ae/simple_choker_7.png"
+ },
+ {
   "slug": "minimax",
   "mn": "ADBE Minimax",
   "k": 0,
