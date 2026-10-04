@@ -36,48 +36,38 @@ fn vs_main(@builtin(vertex_index) vid: u32) -> VSOut {
 
 const MAXPAIRS: i32 = 12;                                   // exact box up to 24 layer px per axis (144 taps max)
 
-// Box [a, b] over the layer (texel k covers [k, k+1]) as weighted bilinear taps: two adjacent texels are merged into
-// one tap (pos = k + 0.5 + w1 / (w0 + w1)), texels outside the layer weigh 0 (transparent). Wider boxes fall back to
-// MAXPAIRS evenly spaced bilinear taps (approximate box).
-struct Taps {
-    pos: array<f32, 12>,
-    wt: array<f32, 12>,
-    n: i32,
-};
-
-fn taps1d(a: f32, b: f32, n: f32) -> Taps {
-    var t: Taps;
-    t.n = 0;
+// i-th merged tap of the box [a, b] on an axis of n texels (texel k covers [k, k+1]): (position, weight, 1), or
+// (0, 0, 0) when there is none. Two adjacent texels are merged into one bilinear tap (pos = k + 0.5 + w1 / (w0 + w1)),
+// texels outside the layer weigh 0 (transparent); footprints wider than 2*MAXPAIRS texels fall back to MAXPAIRS evenly
+// spaced bilinear taps (approximate box). Computed per index, not stored in an array: Direct3D's FXC compiler cannot
+// build a loop that writes into a local array at a variable index (X3511 "forced to unroll loop"). Same taps, same
+// order, same arithmetic as the stored list it replaces.
+fn tapAt(a: f32, b: f32, n: f32, i: i32) -> vec3<f32> {
     let k0 = floor(a);
     let k1 = ceil(b) - 1.0;
     if (k1 - k0 + 1.0 <= f32(2 * MAXPAIRS)) {
-        var k = k0;
-        for (var i = 0; i < MAXPAIRS; i = i + 1) {
-            if (k > k1) { break; }
-            var w0 = min(b, k + 1.0) - max(a, k);
-            var w1 = select(0.0, min(b, k + 2.0) - max(a, k + 1.0), k + 1.0 <= k1);
-            if (k < 0.0 || k >= n) { w0 = 0.0; }
-            if (k + 1.0 < 0.0 || k + 1.0 >= n) { w1 = 0.0; }
-            let w = w0 + w1;
-            if (w > 0.0) {
-                t.pos[t.n] = k + 0.5 + w1 / w;
-                t.wt[t.n] = w;
-                t.n = t.n + 1;
-            }
-            k = k + 2.0;
-        }
-    } else {
-        let L = (b - a) / f32(MAXPAIRS);
-        for (var i = 0; i < MAXPAIRS; i = i + 1) {
-            let c = a + (f32(i) + 0.5) * L;
-            if (c >= 0.0 && c <= n) {
-                t.pos[t.n] = clamp(c, 0.5, n - 0.5);
-                t.wt[t.n] = L;
-                t.n = t.n + 1;
-            }
-        }
+        let k = k0 + 2.0 * f32(i);
+        if (k > k1) { return vec3<f32>(0.0); }
+        var w0 = min(b, k + 1.0) - max(a, k);
+        var w1 = select(0.0, min(b, k + 2.0) - max(a, k + 1.0), k + 1.0 <= k1);
+        if (k < 0.0 || k >= n) { w0 = 0.0; }
+        if (k + 1.0 < 0.0 || k + 1.0 >= n) { w1 = 0.0; }
+        let w = w0 + w1;
+        if (w > 0.0) { return vec3<f32>(k + 0.5 + w1 / w, w, 1.0); }
+        return vec3<f32>(0.0);
     }
-    return t;
+    let L = (b - a) / f32(MAXPAIRS);
+    let c = a + (f32(i) + 0.5) * L;
+    if (c >= 0.0 && c <= n) { return vec3<f32>(clamp(c, 0.5, n - 0.5), L, 1.0); }
+    return vec3<f32>(0.0);
+}
+
+fn tapCount(a: f32, b: f32, n: f32) -> i32 {
+    var c = 0;
+    for (var i = 0; i < MAXPAIRS; i = i + 1) {
+        if (tapAt(a, b, n, i).z > 0.0) { c = c + 1; }
+    }
+    return c;
 }
 
 fn texel(x: f32, y: f32) -> vec4<f32> {
@@ -104,22 +94,26 @@ fn exactTap(pos: vec2<f32>) -> vec4<f32> {
 // mean of the layer over the box centred at X (texel k covers [k, k+1]) of size f
 fn boxAvg(X: vec2<f32>, f: vec2<f32>) -> vec4<f32> {
     let r = 0.5 * f;
-    let tx = taps1d(X.x - r.x, X.x + r.x, P.size.x);
-    let ty = taps1d(X.y - r.y, X.y + r.y, P.size.y);
-    let exact = tx.n * ty.n <= 16;                           // small boxes (<= 8x8 texels): exact loads
+    let ax = X.x - r.x;
+    let bx = X.x + r.x;
+    let ay = X.y - r.y;
+    let by = X.y + r.y;
+    let exact = tapCount(ax, bx, P.size.x) * tapCount(ay, by, P.size.y) <= 16;                           // small boxes (<= 8x8 texels): exact loads
     var acc = vec4<f32>(0.0);
     for (var j = 0; j < MAXPAIRS; j = j + 1) {
-        if (j >= ty.n) { break; }
+        let ty = tapAt(ay, by, P.size.y, j);
+        if (ty.z == 0.0) { continue; }
         for (var i = 0; i < MAXPAIRS; i = i + 1) {
-            if (i >= tx.n) { break; }
-            let q = vec2<f32>(tx.pos[i], ty.pos[j]);
+            let tx = tapAt(ax, bx, P.size.x, i);
+            if (tx.z == 0.0) { continue; }
+            let q = vec2<f32>(tx.x, ty.x);
             var s: vec4<f32>;
             if (exact) {
                 s = exactTap(q);
             } else {
                 s = textureSampleLevel(srcTex, srcSamp, q / P.size, 0.0);
             }
-            acc = acc + tx.wt[i] * ty.wt[j] * s;
+            acc = acc + tx.y * ty.y * s;
         }
     }
     return acc / (f.x * f.y);
