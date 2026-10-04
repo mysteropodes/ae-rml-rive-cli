@@ -33,7 +33,7 @@
    ]
   }
  ],
- "notes": "Type popup (from the plug-in's resources): 1 Straight Zoom, 2 Fading Zoom, 3 Centered Zoom, 4 '(-' separator, 5 Rotate, 6 Scratch, 7 Rotate Fading (AE default 6). Measured: the blur spans Amount/200 of the full range. Straight Zoom (Amount 30): average of the layer at scales s = 1 - (Amount/200)*i/n, i = 0..n-1 (one-sided towards Center), nonparametric kernel fit confirmed the uniform range [0.85, 1]. Scratch (Amount 40): average of the rotations in [-a, +a], 2a = Amount/200 turn (+-36 deg), n+1 samples including both ends (nonparametric angular kernel fit: uniform over +-36 deg). Sample count per pixel n = ceil(L / 1.9 px) at Quality 50, L = streak length at that pixel (Amount/200 * r for zooms, 2a*r for rotations) — this reproduces AE's alternating 2-px stepping in the streaks and the ghosting near Center. Bilinear, transparent outside the layer, output truncated (floor) to 8 bits. Type 4 (separator) renders nothing in AE: reproduced exactly. Residuals: Straight Zoom 0.10 % mean, max 21 (sample-placement details); Scratch 0.41 % mean, max 34, mostly within ~150 px of Center where AE shows a finer pixel moire than this model (nearest sampling and fixed counts were worse). NOT measured (inferred): Fading Zoom / Rotate Fading weights fading linearly to 0 at the far end, Centered Zoom = scales [1 - Amount/400, 1 + Amount/400], Rotate = the Scratch model, Rotate Fading one-sided [0, Amount/200 turn], negative Amounts (mirrored), Quality (sample spacing 1.9*50/Quality px). More than 512 samples are spread evenly.",
+ "notes": "Type popup (from the plug-in's resources): 1 Straight Zoom, 2 Fading Zoom, 3 Centered Zoom, 4 '(-' separator, 5 Rotate, 6 Scratch, 7 Rotate Fading (AE default 6). Measured: the blur spans Amount/200 of the full range. Straight Zoom (Amount 30): average of the layer at scales s = 1 - (Amount/200)*i/n, i = 0..n-1 (one-sided towards Center), nonparametric kernel fit confirmed the uniform range [0.85, 1]. Scratch (Amount 40): average of the rotations in [-a, +a], 2a = Amount/200 turn (+-36 deg), n+1 samples including both ends (nonparametric angular kernel fit: uniform over +-36 deg). Sample count per pixel n = ceil(L / 1.9 px) at Quality 50, L = streak length at that pixel (Amount/200 * r for zooms, 2a*r for rotations) \u2014 this reproduces AE's alternating 2-px stepping in the streaks and the ghosting near Center. Bilinear, transparent outside the layer, output truncated (floor) to 8 bits. Type 4 (separator) renders nothing in AE: reproduced exactly. Residuals: Straight Zoom 0.10 % mean, max 21 (sample-placement details); Scratch 0.41 % mean, max 34, mostly within ~150 px of Center where AE shows a finer pixel moire than this model (nearest sampling and fixed counts were worse). Centered Zoom (fitted on the held-out cc_radial_blur_3, Amount 25): uniform over the scales [1 - Amount/400, 1 + Amount/400] (nonparametric kernel fit), n = ceil(L/1.9) samples at t = (i+1)/n, inner end included and outer end excluded (other placements: 9-30 % px > 8). NOT measured (inferred): Fading Zoom / Rotate Fading weights fading linearly to 0 at the far end, Rotate = the Scratch model, Rotate Fading one-sided [0, Amount/200 turn], negative Amounts (mirrored), Quality (sample spacing 1.9*50/Quality px). More than 512 samples are spread evenly.",
  "measured": {
   "cc_radial_blur_0": {
    "offline": {
@@ -81,10 +81,15 @@
      "mean": 1.154,
      "pct_px_gt8": 23.1,
      "max": 89
+    },
+    "offline_after_fix": {
+     "mean": 0.079,
+     "pct_px_gt8": 0.496,
+     "max": 46
     }
    }
   },
-  "note": "type 3 Centered Zoom (inferred, no visible ref) is WRONG: 23 % of pixels > 8 levels; types 1, 4, 6 measured"
+  "note": "type 3 Centered Zoom was wrong (23 % px > 8): refitted on that held-out setting, which is therefore no longer independent; after the fix 0.079 % mean, 0.50 % px > 8, max 46 (offline, wgpu), the level of the measured types 1 and 6. Types 2, 5, 7 remain inferred."
  },
  "auto": false,
  "auto_note": "not applied by ae2rml (04/10): promo-test 12 s went 0.07 % -> 7.3 % from AE with it (its zoom types are inferred, Centered Zoom measured wrong)"

@@ -72,9 +72,9 @@
    "max": 34
   },
   "cc_radial_blur_3": {
-   "mean": 1.152,
-   "pct_px_gt8": 23.1,
-   "max": 89
+   "mean": 0.079,
+   "pct_px_gt8": 0.496,
+   "max": 46
   }
  },
  "cc_radial_fast_blur": {
@@ -537,7 +537,7 @@
  },
  "mosaic": {
   "mosaic_0": {
-   "mean": 0.025,
+   "mean": 0.023,
    "pct_px_gt8": 0.0,
    "max": 1
   },
@@ -547,9 +547,9 @@
    "max": 0
   },
   "mosaic_2": {
-   "mean": 0.688,
-   "pct_px_gt8": 2.659,
-   "max": 193
+   "mean": 0.026,
+   "pct_px_gt8": 0.0,
+   "max": 2
   }
  },
  "motion_tile": {

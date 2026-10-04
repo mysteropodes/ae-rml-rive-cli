@@ -169,7 +169,7 @@ Everything needed to measure an effect is in the repository:
 
 ## Effect table
 
-37 effects: 26 exact, 8 close, 3 approx. "Auto" is whether ae2rml applies the effect without being asked; the two effects
+37 effects: 27 exact, 8 close, 2 approx. "Auto" is whether ae2rml applies the effect without being asked; the two effects
 marked `no` are measured to be further from After Effects than leaving the effect out, so they remain a
 `<!-- ae: effect ... -->` comment plus an entry in `effects_todo.json`.
 
@@ -178,7 +178,7 @@ marked `no` are measured to be further from After Effects than leaving the effec
 | Black & White | `ADBE Black&White` | `black_white` | 1 | close | yes | Exact without the Tint option; Tint option within +-1 level in clipped shadows/highlights |
 | Box Blur | `ADBE Box Blur2` | `box_blur` | 2 | exact | yes |  |
 | Brightness & Contrast | `ADBE Brightness & Contrast 2` | `brightness_contrast` | 1 | exact | yes |  |
-| CC Radial Blur | `CC Radial Blur` | `cc_radial_blur` | 1 | approx | no | Centered Zoom type was inferred and is wrong (23 % of pixels off by more than 8 levels) |
+| CC Radial Blur | `CC Radial Blur` | `cc_radial_blur` | 1 | approx | no | Straight Zoom, Centered Zoom and Scratch measured (0.1-0.4 % mean); Fading Zoom, Rotate, Rotate Fading inferred |
 | CC Radial Fast Blur | `CC Radial Fast Blur` | `cc_radial_fast_blur` | 64 | close | yes | Within 12 levels |
 | CC Scale Wipe | `CC Scale Wipe` | `cc_scale_wipe` | 1 | exact | yes |  |
 | Checkerboard | `ADBE Checkerboard` | `checkerboard` | 1 | exact | yes |  |
@@ -203,7 +203,7 @@ marked `no` are measured to be further from After Effects than leaving the effec
 | Luma Key | `ADBE Luma Key` | `luma_key` | 4 | close | yes | Max 7 levels on the feathered matte edge |
 | Magnify | `ADBE Magnify` | `magnify` | 1 | close | yes |  |
 | Minimax | `ADBE Minimax` | `minimax` | 4 | exact | yes |  |
-| Mosaic | `ADBE Mosaic` | `mosaic` | 4 | approx | yes | Non-integer tile sizes differ |
+| Mosaic | `ADBE Mosaic` | `mosaic` | 4 | exact | yes | Fractional tiles are area-sampled |
 | Motion Tile | `ADBE Tile` | `motion_tile` | 1 | exact | yes |  |
 | Optics Compensation | `ADBE Optics Compensation` | `optics_compensation` | 1 | close | yes | After Effects softens edges at large FOV; not reproduced |
 | Posterize | `ADBE Posterize` | `posterize` | 1 | exact | yes |  |
@@ -218,8 +218,10 @@ Notes:
 - **Motion Tile** is the effect named `ADBE Tile`.
 - **Drop Shadow**, **Glow**, **Linear Wipe** and the multi-pass blurs use several passes; for the stack as a whole
   ae2rml runs every pass in one node.
-- **CC Radial Blur**: types 1, 4 and 6 were measured; the "Centered Zoom" type was inferred without a visible
-  reference and is wrong.
+- **CC Radial Blur**: types 1, 3, 4 and 6 are measured. Centered Zoom (3) was first inferred and wrong; it was refitted
+  on its held-out reference (uniform scales [1 - Amount/400, 1 + Amount/400], inner end sampled, outer end not).
+- **Mosaic**: tiles cut at fractional positions (layer size not a multiple of the block count) are area-sampled: a
+  pixel on a boundary mixes the two tiles by coverage. Found and fixed on the held-out 13 x 7 reference.
 - **Turbulent Displace**: After Effects' noise function is proprietary. Scale, strength and pinning match; the noise
   pattern differs. Measured on real compositions, the missing effect is closer to After Effects than the approximate one.
 
