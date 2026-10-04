@@ -13,7 +13,8 @@ Round-trip between **Adobe After Effects** and **Rive**, driven from the command
 - **Rive Shader** — an After Effects effect plugin that runs a Rive post-process shader (`.wgsl`) as is.
 - **fxlib** — native After Effects effects re-implemented in WGSL and measured against AE renders, so that effects
   survive the trip both ways.
-- **review kit** — Frame.io-like review inside the Rive CLI viewer: timeline, scrub, drawn and typed notes.
+- **review kit** — Frame.io-like review inside the **Rive Viewer** (`rive <project>`, the Rive CLI's viewer): timeline,
+  scrub, drawn and typed notes.
 
 ```mermaid
 flowchart TB
@@ -22,6 +23,7 @@ flowchart TB
   FX["fxlib<br/>AE effects as WGSL"]
   RML["Rive CLI project<br/>rive.yaml · scene.rml · assets"]
   RIV[".riv / web page"]
+  VIEW["Rive Viewer<br/>rive &lt;project&gt;"]
   NOTES["review notes<br/>.review/notes.json"]
   COMPS["After Effects comps<br/>layers · keys · mattes"]
   SH["Rive Shader plugin<br/>.wgsl inside AE"]
@@ -29,8 +31,9 @@ flowchart TB
   REV -->|"rive create --from-rev"| RML
   AEP -->|"ae2rml · no AE needed"| RML
   FX -.-> RML
-  RML -->|"rive · view, verify, publish"| RIV
-  RML -->|"review kit"| NOTES
+  RML -->|"rive · verify, publish"| RIV
+  RML -->|"rive · open"| VIEW
+  VIEW -->|"review kit"| NOTES
   RML <-->|"rml2ae · ae build / ae pull"| COMPS
   FX -.-> SH
   SH -.-> COMPS
@@ -57,7 +60,7 @@ git clone https://github.com/mysteropodes/ae-rml-rive-cli.git && cd ae-rml-rive-
 ```bash
 # After Effects -> Rive (no After Effects needed)
 .venv/bin/python -m rml2ae.ae2rml examples/demo.aep out/demo --verify --shot 1 3.5
-rive out/demo                                  # open it in the Rive CLI viewer
+rive out/demo                                  # open it in the Rive Viewer
 
 # Rive Editor -> After Effects: first turn the editor file into a Rive CLI project
 rive create out/my_scene --from-rev=my_scene.rev
@@ -67,7 +70,7 @@ ae doctor out/demo
 ae build out/demo                              # builds / updates the comps in the open project
 ae pull out/demo                               # brings AE edits (transforms, keys) back into scene.rml
 
-# review notes in the viewer
+# review notes in the Rive Viewer
 python3 review-kit/review_install.py out/demo
 ```
 
@@ -82,7 +85,7 @@ python3 review-kit/review_install.py out/demo
 | [docs/rml2ae.md](docs/rml2ae.md) | Rive → After Effects: the `ae` command, incremental builds, `ae pull`, limits |
 | [docs/fxlib.md](docs/fxlib.md) | the WGSL library of After Effects effects and how each one is measured |
 | [docs/rive-shader-plugin.md](docs/rive-shader-plugin.md) | the After Effects plugin, WGSL conventions, image meshes |
-| [docs/review-kit.md](docs/review-kit.md) | review notes in the Rive CLI viewer |
+| [docs/review-kit.md](docs/review-kit.md) | review notes in the Rive Viewer |
 | [docs/agents.md](docs/agents.md) | using the tools from a coding agent |
 
 Every conversion also writes a report (`build/ae2rml/report.md`, `build/rml2ae/<name>.ae-report.md`) listing what was
