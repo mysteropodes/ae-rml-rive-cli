@@ -1,0 +1,66 @@
+{
+ "slug": "cartoon",
+ "aeMatchName": "ADBE Cartoonify",
+ "wgsl": "ae_cartoon.wgsl",
+ "passes": 1,
+ "textures": {},
+ "params": [
+  {
+   "ae": 1,
+   "field": "render",
+   "kind": "enum",
+   "default": 3
+  },
+  {
+   "ae": 2,
+   "field": "radius",
+   "kind": "number",
+   "default": 8
+  },
+  {
+   "ae": 3,
+   "field": "threshold",
+   "kind": "number",
+   "default": 10
+  },
+  {
+   "ae": 5,
+   "field": "steps",
+   "kind": "number",
+   "default": 8
+  },
+  {
+   "ae": 6,
+   "field": "smoothness",
+   "kind": "number",
+   "default": 70
+  },
+  {
+   "ae": 8,
+   "field": "edgeThr",
+   "kind": "number",
+   "default": 1.6
+  },
+  {
+   "ae": 9,
+   "field": "edgeWidth",
+   "kind": "number",
+   "default": 1.5
+  },
+  {
+   "ae": 10,
+   "field": "edgeSoft",
+   "kind": "number",
+   "default": 60
+  },
+  {
+   "ae": 11,
+   "field": "edgeOpacity",
+   "kind": "number",
+   "default": 100
+  }
+ ],
+ "status": "unverified",
+ "auto": false,
+ "notes": "Not yet measured against After Effects.  Parameter indices follow the After Effects parameter order as documented by Adobe; `render_refs.py --params` records the real list."
+}

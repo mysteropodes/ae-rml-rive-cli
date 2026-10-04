@@ -3882,6 +3882,10 @@ class LayerBuild:
             g = v(4, 5.0) + 3 * v(5) / 4.6
         elif slug in ("directional_blur", "minimax", "simple_choker"):
             g = v(2)
+        elif slug == "cc_repetile":
+            g = max(v(1), v(2), v(3), v(4))           # the largest expansion (the canvas grows on every side)
+        elif slug == "camera_lens_blur":
+            g = v(1, 5.0) * max(1.0, v(5, 1.0))       # blur radius, stretched by the iris aspect ratio
         else:
             g = 0.0
         return float(min(512, math.ceil(g)))

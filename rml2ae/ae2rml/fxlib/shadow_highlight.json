@@ -1,0 +1,66 @@
+{
+ "slug": "shadow_highlight",
+ "aeMatchName": "ADBE Shadow/Highlight",
+ "wgsl": "ae_shadow_highlight.wgsl",
+ "passes": 1,
+ "textures": {},
+ "params": [
+  {
+   "ae": 1,
+   "field": "autoAmt",
+   "kind": "bool",
+   "default": 1
+  },
+  {
+   "ae": 2,
+   "field": "shadow",
+   "kind": "number",
+   "default": 50
+  },
+  {
+   "ae": 3,
+   "field": "highlight",
+   "kind": "number",
+   "default": 0
+  },
+  {
+   "ae": 7,
+   "field": "shWidth",
+   "kind": "number",
+   "default": 50
+  },
+  {
+   "ae": 8,
+   "field": "shRadius",
+   "kind": "number",
+   "default": 30
+  },
+  {
+   "ae": 9,
+   "field": "hiWidth",
+   "kind": "number",
+   "default": 50
+  },
+  {
+   "ae": 10,
+   "field": "hiRadius",
+   "kind": "number",
+   "default": 30
+  },
+  {
+   "ae": 11,
+   "field": "colorCorr",
+   "kind": "number",
+   "default": 20
+  },
+  {
+   "ae": 15,
+   "field": "original",
+   "kind": "number",
+   "default": 0
+  }
+ ],
+ "status": "unverified",
+ "auto": false,
+ "notes": "Not yet measured against After Effects.  Parameter indices follow the After Effects parameter order as documented by Adobe; `render_refs.py --params` records the real list."
+}

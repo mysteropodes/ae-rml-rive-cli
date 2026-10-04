@@ -1,0 +1,89 @@
+{
+ "slug": "cc_glass",
+ "aeMatchName": "CC Glass",
+ "wgsl": "ae_cc_glass.wgsl",
+ "passes": 1,
+ "textures": {},
+ "params": [
+  {
+   "ae": 3,
+   "field": "property",
+   "kind": "enum",
+   "default": 1
+  },
+  {
+   "ae": 4,
+   "field": "softness",
+   "kind": "number",
+   "default": 10
+  },
+  {
+   "ae": 5,
+   "field": "height",
+   "kind": "number",
+   "default": 50
+  },
+  {
+   "ae": 6,
+   "field": "displacement",
+   "kind": "number",
+   "default": 100
+  },
+  {
+   "ae": 9,
+   "field": "intensity",
+   "kind": "number",
+   "default": 100
+  },
+  {
+   "ae": 10,
+   "field": "lightColor",
+   "kind": "color",
+   "default": [
+    1,
+    1,
+    1,
+    1
+   ]
+  },
+  {
+   "ae": 12,
+   "field": "lightHeight",
+   "kind": "number",
+   "default": 50
+  },
+  {
+   "ae": 14,
+   "field": "lightDir",
+   "kind": "angle",
+   "default": -45
+  },
+  {
+   "ae": 16,
+   "field": "ambient",
+   "kind": "number",
+   "default": 75
+  },
+  {
+   "ae": 17,
+   "field": "diffuse",
+   "kind": "number",
+   "default": 25
+  },
+  {
+   "ae": 18,
+   "field": "specular",
+   "kind": "number",
+   "default": 25
+  },
+  {
+   "ae": 19,
+   "field": "roughness",
+   "kind": "number",
+   "default": 0.05
+  }
+ ],
+ "status": "unverified",
+ "auto": false,
+ "notes": "Not yet measured against After Effects.  Parameter indices follow the After Effects parameter order as documented by Adobe; `render_refs.py --params` records the real list."
+}

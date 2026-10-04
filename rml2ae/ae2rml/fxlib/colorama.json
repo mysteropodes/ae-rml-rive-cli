@@ -1,0 +1,60 @@
+{
+ "slug": "colorama",
+ "aeMatchName": "APC Colorama",
+ "wgsl": "ae_colorama.wgsl",
+ "passes": 1,
+ "textures": {},
+ "params": [
+  {
+   "ae": 2,
+   "field": "phaseFrom",
+   "kind": "enum",
+   "default": 1
+  },
+  {
+   "ae": 6,
+   "field": "shift",
+   "kind": "angle",
+   "default": 0
+  },
+  {
+   "ae": 9,
+   "field": "preset",
+   "kind": "enum",
+   "default": 1
+  },
+  {
+   "ae": 11,
+   "field": "repeats",
+   "kind": "number",
+   "default": 1
+  },
+  {
+   "ae": 15,
+   "field": "modify",
+   "kind": "enum",
+   "default": 1
+  },
+  {
+   "ae": 16,
+   "field": "modAlpha",
+   "kind": "bool",
+   "default": 1
+  },
+  {
+   "ae": 29,
+   "field": "composite",
+   "kind": "bool",
+   "default": 1
+  },
+  {
+   "ae": 30,
+   "field": "original",
+   "kind": "number",
+   "default": 0
+  }
+ ],
+ "status": "unverified",
+ "auto": false,
+ "notes": "Not yet measured against After Effects.  Parameter indices follow the After Effects parameter order as documented by Adobe; `render_refs.py --params` records the real list."
+}

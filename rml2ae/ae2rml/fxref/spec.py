@@ -170,6 +170,19 @@ SPEC = {
     "cc_cylinder": ("CC Cylinder", [({}, 0), ({1: 60, 4: 90}, 0), ({6: 3, 4: 45}, 0)]),
     "warp": ("ADBE WRPMESH", [({1: 1}, 0), ({1: 5, 3: 60}, 0), ({1: 8, 3: 40, 2: 2}, 0), ({1: 15, 3: 70}, 0), ({1: 4, 3: -50, 4: 30}, 0)]),
     "bezier_warp": ("ADBE BEZMESH", [({2: [213.3, 80], 3: [426.7, -80], 8: [426.7, 280], 9: [213.3, 440]}, 0), ({1: [60, 40], 4: [600, 0], 7: [640, 320], 10: [20, 360], 5: [560, 120], 11: [80, 240]}, 0)]),
+    # lot 11: colour, keying, stylize (unverified until rendered)
+    "colorama": ("APC Colorama", [({}, 0), ({2: 5, 6: 90, 11: 2}, 0), ({15: 2, 30: 30}, 0)]),
+    "selective_color": ("ADBE Selective Color", [({9: -50, 11: 30}, 0), ({1: 2, 19: 40, 20: -30, 44: 20}, 0), ({39: -40, 40: 20}, 0)]),
+    "shadow_highlight": ("ADBE Shadow/Highlight", [({}, 0), ({1: 0, 2: 80, 3: 40}, 0), ({1: 0, 2: 30, 7: 80, 8: 10}, 0)]),
+    "cc_color_neutralizer": ("CC Color Neutralizer", [({3: [0.6, 0.45, 0.4, 1]}, 0), ({1: [0.05, 0.0, 0.15, 1], 5: [1, 0.95, 0.8, 1], 8: 20}, 0)]),
+    "color_difference_key": ("ADBE Color Difference Key", [({2: [0, 0.3, 1, 1], 4: 60, 5: 140}, 0), ({2: [1, 0, 0, 1], 1: 3, 14: 40, 15: 200}, 0)]),
+    "eyedropper_fill": ("ADBE Sample Fill", [({1: [100, 60], 2: 20}, 0), ({1: [500, 280], 2: 40, 4: 1, 5: 30}, 0)]),
+    "cartoon": ("ADBE Cartoonify", [({}, 0), ({1: 1, 5: 4, 6: 0}, 0), ({1: 2, 8: 0.8}, 0)]),
+    "cc_glass": ("CC Glass", [({3: 5}, 0), ({3: 5, 4: 20, 5: 100, 6: 300}, 0)]),
+    "cc_hextile": ("CC HexTile", [({}, 0), ({2: 30, 4: 30, 5: 50}, 0)]),
+    "cc_repetile": ("CC RepeTile", [({1: 200, 3: 100}, 0), ({1: 100, 2: 100, 3: 100, 4: 100, 5: 5}, 0)]),
+    "cc_burn_film": ("CC Burn Film", [({1: 30}, 0), ({1: 60, 2: [150, 100], 3: 7}, 0)]),
+    "camera_lens_blur": ("ADBE Camera Lens Blur", [({1: 10}, 0), ({1: 16, 3: 1, 6: 20, 14: 30, 15: 200}, 0), ({1: 8, 4: 100, 5: 2}, 0)]),
 }
 NEEDS_MAP = {"displacement_map": {1: 2},   # param 1 (map layer) = layer index 2 (the map footage)
              "blend": {1: 2},
