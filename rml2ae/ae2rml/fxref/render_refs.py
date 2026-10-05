@@ -10,8 +10,9 @@ Effects' UI freezes beyond about 10 per script) and skips references already ren
 match name, name (in the After Effects UI language), value type, default value and range; effects already in
 _ae_params.json are kept unless named. The project is forced to 8 bpc without colour management (the references are
 display values; a colour-managed project's saveFrameToPng writes its linear working buffer), and the run stops if After
-Effects keeps another state. The newest installed After Effects is used (macOS: AppleScript, set AE_APP to override the
-application name; Windows: AfterFX.exe -r).
+Effects keeps another state. When After Effects stops on a modal dialog (a script error, a missing file), the run stops
+and prints the dialog's text instead of waiting for the timeout. The newest installed After Effects is used (macOS:
+AppleScript, set AE_APP to override the application name; Windows: AfterFX.exe -r).
 """
 import json
 import os
@@ -99,10 +100,9 @@ def record_params(slugs):
         if os.path.exists(f):
             os.remove(f)
     open(jsx, "w", encoding="utf-8").write(params_jsx(mns, log, rows))
-    run_jsx(jsx, log)
-    txt = open(log, encoding="utf-8").read() if os.path.exists(log) else "timeout"
+    txt = run_jsx(jsx, log)
     print(txt)
-    if not os.path.exists(rows):
+    if txt.startswith("TOP") or not os.path.exists(rows):
         return 1
     path = os.path.join(lib, "_ae_params.json")
     known = json.load(open(path, encoding="utf-8"))
@@ -116,10 +116,18 @@ def record_params(slugs):
 
 
 def run_jsx(jsx, log, timeout=600):
+    """Run the script and wait for its log. Returns the log's text, "timeout", or "TOP After Effects shows a dialog: ..."
+    when After Effects stops on a modal dialog (an error, a missing file) that waits for a click."""
     aeapp.run_script(jsx)
     t0 = time.time()
+    watch = aeapp.DialogWatch()
     while time.time() - t0 < timeout and not os.path.exists(log):
+        dialog = watch.check()
+        if dialog:
+            return "TOP After Effects shows a dialog: " + dialog
         time.sleep(1)
+    time.sleep(0.5)                        # the log is written in one go, but let the file close
+    return open(log, encoding="utf-8").read() if os.path.exists(log) else "timeout"
 
 
 def batch_jsx(rs, log):
@@ -178,16 +186,18 @@ def main():
         open(jsx, "w", encoding="utf-8").write(batch_jsx(chunk, log))
         if os.path.exists(log):
             os.remove(log)
-        aeapp.run_script(jsx)
         t0 = time.time()
-        while time.time() - t0 < 600 and not os.path.exists(log):
-            time.sleep(1)
-        txt = open(log, encoding="utf-8").read() if os.path.exists(log) else "timeout"
+        txt = run_jsx(jsx, log)
         if txt.startswith("TOP") or txt == "timeout":
             print("stopped:", txt[:300])
             return 1
-        pngs = [os.path.join(D, r["png"]) for r in chunk]
-        aeapp.wait_settled(pngs)              # saveFrameToPng is asynchronous: wait for every PNG to stop growing
+        done = {ln[3:].strip() for ln in txt.split("\n") if ln.startswith("ok ")}
+        pngs = [os.path.join(D, r["png"]) for r in chunk if f"{r['slug']}_{r['k']}" in done]   # not the failed ones
+        try:                                  # saveFrameToPng is asynchronous: wait for every PNG to stop growing
+            aeapp.wait_settled(pngs, watch=aeapp.DialogWatch(grace=0))
+        except RuntimeError as e:
+            print("stopped:", str(e)[:300])
+            return 1
         fails = [ln for ln in txt.split("\n") if not ln.startswith("ok")]
         print(f"batch {b // 8}: {len(chunk)} renders, {time.time() - t0:.0f}s", "; ".join(fails)[:600], flush=True)
 

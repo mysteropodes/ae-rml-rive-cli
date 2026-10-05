@@ -79,6 +79,13 @@ def cmd_doctor(args, flags):
     print("ae doctor")
     line("After Effects app", AE_APP is not None, AE_APP or f"not found in {aeapp.WHERE}")
     line("After Effects running", ae_running(), "" if ae_running() else "open AE for build/watch")
+    if ae_running():
+        dialog = aeapp.modal_dialog()
+        if dialog is None:      # optional: without it a blocked After Effects is only noticed at the timeout
+            print("  [--] dialog detection unavailable"
+                  + (": allow this terminal in System Settings > Privacy & Security > Accessibility" if sys.platform == "darwin" else ""))
+        else:
+            line("After Effects not blocked by a dialog", not dialog, dialog[:200])
     line("aerender", bool(AERENDER and os.path.exists(AERENDER)), AERENDER or "")
     rv = shutil.which("rive")
     ver = subprocess.run(["rive", "--version"], capture_output=True, text=True).stdout.strip() if rv else ""

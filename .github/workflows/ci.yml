@@ -48,7 +48,7 @@ jobs:
         run: pip install -e ".[ae2rml]"
       - name: rml2ae incremental rebuild (dry run, no After Effects)
         run: python -m rml2ae.tests.sim_incremental
-      - name: aeapp helpers (frame wait, app name, colour check)
+      - name: aeapp helpers (frame wait, app name, colour check, dialog watch)
         run: python -m rml2ae.tests.test_aeapp
       - name: ae2rml binds the second layer of map effects (Displacement Map)
         run: |
@@ -161,6 +161,8 @@ jobs:
           if (-not (Select-String -Path out/demo/build/ae2rml/report.md -Pattern "unsupported: 0" -Quiet)) { exit 1 }
       - run: python -m rml2ae.tests.test_map_layer
       - run: python -m rml2ae.tests.sim_incremental
+      # includes the modal-dialog probe (PowerShell + C#) against a real message box shown by the test itself
+      - run: python -m rml2ae.tests.test_aeapp
       - name: rml2ae finds no After Effects here, and says so
         run: python -m rml2ae.ae doctor; exit 0
       # the Rive CLI for Windows, fetched the way install.ps1 does (manifest, sha256, tar), then --verify on the demo
