@@ -48,6 +48,8 @@ jobs:
         run: pip install -e ".[ae2rml]"
       - name: rml2ae incremental rebuild (dry run, no After Effects)
         run: python -m rml2ae.tests.sim_incremental
+      - name: aeapp helpers (frame wait, app name, colour check)
+        run: python -m rml2ae.tests.test_aeapp
       - name: ae2rml binds the second layer of map effects (Displacement Map)
         run: |
           python -m rml2ae.tests.test_map_layer
