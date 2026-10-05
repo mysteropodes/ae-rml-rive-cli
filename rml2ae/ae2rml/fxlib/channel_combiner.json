@@ -6,31 +6,31 @@
  "textures": {},
  "params": [
   {
-   "ae": 1,
+   "ae": 2,
    "field": "use2nd",
    "kind": "bool",
    "default": 0
   },
   {
-   "ae": 3,
+   "ae": 5,
    "field": "fromMode",
-   "kind": "enum",
-   "default": 5
-  },
-  {
-   "ae": 4,
-   "field": "toMode",
    "kind": "enum",
    "default": 1
   },
   {
-   "ae": 5,
+   "ae": 6,
+   "field": "toMode",
+   "kind": "enum",
+   "default": 7
+  },
+  {
+   "ae": 7,
    "field": "invert",
    "kind": "bool",
    "default": 0
   },
   {
-   "ae": 6,
+   "ae": 8,
    "field": "solid",
    "kind": "bool",
    "default": 0
@@ -38,5 +38,5 @@
  ],
  "status": "unverified",
  "auto": false,
- "notes": "Not yet measured against After Effects.  Parameter indices follow the After Effects parameter order as documented by Adobe; `render_refs.py --params` records the real list."
+ "notes": "Not yet measured against After Effects. Param indices checked against AE 26 parameter list (_ae_params.json): 1 and 4 are group headers, 3 is the source layer: Use 2nd Layer 2, From 5, To 6, Invert 7, Solid Alpha 8; To defaults to 7. The From/To menus (19/17 entries with separators) do not match the shader's assumed 13/7-entry lists: menu mapping doubtful until measured."
 }

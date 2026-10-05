@@ -15,7 +15,7 @@
    "ae": 4,
    "field": "mx",
    "kind": "number",
-   "default": -0.5
+   "default": -0.70300000905991
   },
   {
    "ae": 5,
@@ -33,40 +33,46 @@
    "ae": 7,
    "field": "escape",
    "kind": "number",
-   "default": 100
+   "default": 300
   },
   {
-   "ae": 9,
+   "ae": 10,
    "field": "jx",
    "kind": "number",
    "default": 0
   },
   {
-   "ae": 10,
+   "ae": 11,
    "field": "jy",
    "kind": "number",
    "default": 0
   },
   {
-   "ae": 11,
+   "ae": 12,
    "field": "jmag",
    "kind": "number",
    "default": 0
   },
   {
-   "ae": 20,
+   "ae": 13,
+   "field": "jescape",
+   "kind": "number",
+   "default": 300
+  },
+  {
+   "ae": 23,
    "field": "hue",
    "kind": "angle",
    "default": 0
   },
   {
-   "ae": 21,
+   "ae": 24,
    "field": "steps",
    "kind": "number",
-   "default": 32
+   "default": 29
   },
   {
-   "ae": 22,
+   "ae": 25,
    "field": "cycleOffset",
    "kind": "angle",
    "default": 0
@@ -74,5 +80,5 @@
  ],
  "status": "unverified",
  "auto": false,
- "notes": "Not yet measured against After Effects.  Parameter indices follow the After Effects parameter order as documented by Adobe; `render_refs.py --params` records the real list."
+ "notes": "Not yet measured against After Effects.  Parameter indices follow the After Effects parameter order as documented by Adobe; `render_refs.py --params` records the real list. Param indices/kinds/defaults checked against AE 26 parameter list (_ae_params.json): Julia X/Y/Magnification are 10-12 (9 is the Julia group header) and Julia has its own Escape Limit (13, new field jescape); colour params Hue 23, Cycle Steps 24 (default 29), Cycle Offset 25 (20-22 are Overlay/Transparency/Palette, not modelled); Mandelbrot X default -0.703, Escape Limit 300. Set Type has 6 entries in AE: shader now reads 1 Mandelbrot, 2 Mandelbrot Inverse, 3/4 '... over Julia' (drawn as 1/2, approximation), 5 Julia, 6 Julia Inverse (documented order). Equation (2) not modelled."
 }

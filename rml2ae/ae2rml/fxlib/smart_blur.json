@@ -19,12 +19,6 @@
   },
   {
    "ae": 3,
-   "field": "quality",
-   "kind": "enum",
-   "default": 1
-  },
-  {
-   "ae": 4,
    "field": "mode",
    "kind": "enum",
    "default": 1
@@ -32,5 +26,5 @@
  ],
  "status": "unverified",
  "auto": false,
- "notes": "Not yet measured against After Effects.  Parameter indices follow the After Effects parameter order as documented by Adobe; `render_refs.py --params` records the real list."
+ "notes": "Not yet measured against After Effects. Param indices checked against AE 26 parameter list (_ae_params.json): there is no Quality parameter: Mode is 3 (4 is the Compositing Options group); quality field removed from manifest and shader. Threshold (AE range 0.1..100) is still compared with 0..255 channel differences."
 }

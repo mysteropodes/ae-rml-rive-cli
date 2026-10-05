@@ -1,6 +1,6 @@
 {
  "slug": "turbulent_noise",
- "aeMatchName": "ADBE Turbulent Noise",
+ "aeMatchName": "ADBE AIF Perlin Noise 3D",
  "wgsl": "ae_turbulent_noise.wgsl",
  "passes": 1,
  "textures": {},
@@ -99,40 +99,25 @@
    "default": 56
   },
   {
-   "ae": 20,
-   "field": "subRotation",
-   "kind": "angle",
-   "default": 0
-  },
-  {
    "ae": 21,
-   "field": "subOffset",
-   "kind": "point",
-   "default": [
-    0,
-    0
-   ]
-  },
-  {
-   "ae": 24,
    "field": "evolution",
    "kind": "angle",
    "default": 0
   },
   {
-   "ae": 28,
+   "ae": 24,
    "field": "seed",
    "kind": "number",
    "default": 0
   },
   {
-   "ae": 30,
+   "ae": 26,
    "field": "opacity",
    "kind": "number",
    "default": 100
   },
   {
-   "ae": 31,
+   "ae": 27,
    "field": "mode",
    "kind": "enum",
    "default": 2
@@ -140,5 +125,5 @@
  ],
  "status": "unverified",
  "auto": false,
- "notes": "Not yet measured against After Effects.  Parameter indices follow the After Effects parameter order as documented by Adobe; `render_refs.py --params` records the real list."
+ "notes": "Not yet measured against After Effects. Param indices checked against AE 26 parameter list (_ae_params.json): Turbulent Noise has its own layout (not Fractal Noise): no Sub Rotation / Sub Offset (removed from manifest and shader), Evolution 21, Random Seed 24, Opacity 26, Blending Mode 27. Perspective Offset (14) and Turbulence Factor (23) not modelled; the blending-mode menu order is still assumed."
 }

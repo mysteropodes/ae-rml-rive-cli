@@ -1,5 +1,6 @@
 // After Effects "Gamma/Pedestal/Gain" (ADBE Gamma/Pedestal/Gain) — UNVERIFIED: written from the effect's definition, not yet measured against After Effects renders (fxref/spec.py, fxlib check <slug> --holdout).
-// Per channel on the straight colour: v = Pedestal + (Gain - Pedestal) * c^Gamma, then Blend With Original. Black
+// Per channel on the straight colour: v = Pedestal + (Gain - Pedestal) * c^Gamma, no Blend With Original in AE (param 11 is the
+// Compositing Options group). Black
 // Stretch (1..4) lifts the low values of every channel before that: c' = 1 - (1 - c)^BlackStretch (a guess, to be
 // measured; 1 = identity). Alpha untouched; 8-bit rounding, premultiplied.
 struct Params {
@@ -14,7 +15,7 @@ struct Params {
     bGamma: f32,          // AE 8 Blue Gamma
     bPedestal: f32,       // AE 9 Blue Pedestal
     bGain: f32,           // AE 10 Blue Gain
-    blend: f32,           // AE 11 Blend With Original (%)
+    pad0: f32,
     passIndex: f32,
 };
 @group(0) @binding(0) var srcTex: texture_2d<f32>;
@@ -66,5 +67,5 @@ fn fs_main(in: VSOut) -> @location(0) vec4<f32> {
     let ped = vec3<f32>(P.rPedestal, P.gPedestal, P.bPedestal);
     let gain = vec3<f32>(P.rGain, P.gGain, P.bGain);
     let v = ped + (gain - ped) * pow(cs, gam);
-    return out8(mix(v, c, clamp(P.blend / 100.0, 0.0, 1.0)), s.a);
+    return out8(v, s.a);
 }

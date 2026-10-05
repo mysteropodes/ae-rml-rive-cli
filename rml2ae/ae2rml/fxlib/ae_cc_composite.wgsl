@@ -7,9 +7,9 @@
 // original; RGB Only keeps the result's alpha.
 struct Params {
     size: vec2<f32>,
-    opacity: f32,         // AE 1 Opacity (%)
-    mode: f32,            // AE 2 Composite Original (menu)
-    rgbOnly: f32,         // AE 3 RGB Only
+    opacity: f32,         // AE 2 Opacity (%)
+    mode: f32,            // AE 3 Transfer Mode (menu, 41 entries)
+    rgbOnly: f32,         // AE 4 RGB Only
     passIndex: f32,
 };
 @group(0) @binding(0) var srcTex: texture_2d<f32>;

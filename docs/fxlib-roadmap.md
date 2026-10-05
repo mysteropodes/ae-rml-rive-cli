@@ -48,14 +48,14 @@ plug-in. Some can come later through the Rive scene itself rather than as a shad
 | Calculations | 🟡 | lot 9 (second layer) |
 | CC Composite | 🟡 | lot 13 (texture role "layer": the layer before its effects) |
 | Channel Combiner | 🟡 | lot 8; the layer itself as source |
-| Compound Arithmetic | 🟡 | lot 9 (second layer) |
+| Compound Arithmetic | ✅ | lot 9 (second layer) |
 | Invert | ✅ | |
 | Minimax | ✅ | |
 | Remove Color Matting | 🟡 | lot 3 |
 | Set Channels | 🟡 | lot 1; the layer itself as source |
 | Set Matte | ✅ | converted natively by ae2rml (clip from the source layer), no shader needed |
 | Shift Channels | ✅ | |
-| Solid Composite | 🟡 | lot 6 |
+| Solid Composite | ✅ | lot 6 |
 
 ## Color Correction
 
@@ -67,11 +67,11 @@ plug-in. Some can come later through the Rive scene itself rather than as a shad
 | Broadcast Colors | 🟡 | lot 5 |
 | CC Color Neutralizer | 🟡 | lot 11 |
 | CC Color Offset | 🟡 | lot 3 |
-| CC Kernel | 🟡 | lot 8 |
-| CC Toner | 🟡 | lot 3 |
+| CC Kernel | ✅ | lot 8 |
+| CC Toner | ✅ | lot 3 |
 | Change Color | 🟡 | lot 3 |
 | Change to Color | 🟡 | lot 8 |
-| Channel Mixer | 🟡 | lot 1 |
+| Channel Mixer | ✅ | lot 1 |
 | Color Balance | 🟡 | lot 3 |
 | Color Balance (HLS) | ✅ | |
 | Color Link | ⛔ | samples another layer over time |
@@ -84,7 +84,7 @@ plug-in. Some can come later through the Rive scene itself rather than as a shad
 | Hue/Saturation | ✅ | |
 | Leave Color | 🟡 | lot 2 |
 | Levels | ✅ | |
-| Levels (Individual Controls) | 🟡 | lot 8 (the measured Levels law per channel) |
+| Levels (Individual Controls) | ✅ | lot 8 (the measured Levels law per channel) |
 | Lumetri Color | ⛔ | too large for now (LUTs, curves, wheels); later |
 | Photo Filter | 🟡 | lot 1 |
 | PS Arbitrary Map | ⬜ | |
@@ -153,7 +153,7 @@ plug-in. Some can come later through the Rive scene itself rather than as a shad
 | Checkerboard | ✅ | |
 | Circle | 🟡 | lot 5 |
 | Ellipse | 🟡 | lot 4 |
-| Eyedropper Fill | 🟡 | lot 11 |
+| Eyedropper Fill | ✅ | lot 11 |
 | Fill | ✅ | |
 | Fractal | 🟡 | lot 12 |
 | Gradient Ramp | ✅ | |
@@ -225,10 +225,10 @@ plug-in. Some can come later through the Rive scene itself rather than as a shad
 | CC Kaleida | 🟡 | lot 6 |
 | CC Mr. Smoothie | 🟡 | lot 13 |
 | CC Plastic | 🟡 | lot 12 |
-| CC RepeTile | 🟡 | lot 11 |
+| CC RepeTile | ✅ | lot 11 |
 | CC Threshold, CC Threshold RGB | 🟡 | lot 3 |
 | CC Vignette | 🟡 | lot 2 |
-| Color Emboss | 🟡 | lot 3 |
+| Color Emboss | ✅ | lot 3 |
 | Emboss | ✅ | |
 | Find Edges | 🟡 | lot 2 |
 | Glow | ✅ | |
@@ -239,7 +239,7 @@ plug-in. Some can come later through the Rive scene itself rather than as a shad
 | Scatter | 🟡 | lot 5 (random pattern differs from AE) |
 | Strobe Light | ⛔ | depends on time |
 | Texturize | 🟡 | lot 9 (second layer) |
-| Threshold | 🟡 | lot 2 |
+| Threshold | ✅ | lot 2 |
 
 ## Transition
 

@@ -1,12 +1,13 @@
 // After Effects "Radial Blur" (ADBE Radial Blur) — UNVERIFIED: written from the effect's definition, not yet measured against After Effects renders (fxref/spec.py, fxlib check <slug> --holdout).
 // Spin (Type 1): average of the rotations in [-A/2, +A/2] degrees around Center, A = Amount (a guess: AE's Amount is
 // documented in degrees for Spin). Zoom (Type 2): average of the scales in [1 - Amount/100, 1] towards Center.
-// Samples: one per pixel of streak length (up to 256), bilinear, transparent outside the layer. Antialiasing ignored.
+// Samples: one per pixel of streak length (up to 256), bilinear, transparent outside the layer. Antialiasing (5) and Random Seed (6)
+// ignored; AE 1 is a group header.
 struct Params {
     size: vec2<f32>,
-    center: vec2<f32>,    // AE 2 Center (layer px)
-    amount: f32,          // AE 1 Amount
-    kind: f32,            // AE 3 Type: 1 Spin, 2 Zoom
+    center: vec2<f32>,    // AE 3 Center (layer px)
+    amount: f32,          // AE 2 Amount
+    kind: f32,            // AE 4 Type: 1 Spin, 2 Zoom
     passIndex: f32,
     pad0: f32,
     layerRect: vec4<f32>, // reserved, filled by the host: the layer's rect in the canvas (x0, y0, x1, y1)

@@ -9,8 +9,8 @@ struct Params {
     b: vec2<f32>,         // AE 2 Point B (layer px)
     style: f32,           // AE 3 Removal Style (menu)
     thickness: f32,       // AE 4 Thickness (px)
-    slope: f32,           // AE 5 Slope (%)
-    mirror: f32,          // AE 6 Mirror Blend (%)
+    slope: f32,           // AE 5 Slope (raw 0..1)
+    mirror: f32,          // AE 6 Mirror Blend (raw 0..1)
     frameOffset: f32,     // AE 7 Frame Offset
     passIndex: f32,
     layerRect: vec4<f32>, // reserved, filled by the host: the layer's rect in the canvas (x0, y0, x1, y1)
@@ -114,8 +114,8 @@ fn fs_main(in: VSOut) -> @location(0) vec4<f32> {
         let hi = tapL(base + n * (hw + 1.0));
         r = mix(lo, hi, (d + hw) / (2.0 * hw));
     }
-    r = mix(r, tapL(q - 2.0 * n * d), clamp(P.mirror / 100.0, 0.0, 1.0));
-    let edge = clamp(P.slope / 100.0, 0.0, 1.0) * hw;
+    r = mix(r, tapL(q - 2.0 * n * d), clamp(P.mirror, 0.0, 1.0));
+    let edge = clamp(P.slope, 0.0, 1.0) * hw;
     var w = 1.0;
     if (edge > 0.0) {
         w = clamp((hw - abs(d)) / edge, 0.0, 1.0);

@@ -18,7 +18,7 @@
    "ae": 2,
    "field": "level",
    "kind": "number",
-   "default": 0
+   "default": 100
   },
   {
    "ae": 3,
@@ -30,7 +30,7 @@
    "ae": 4,
    "field": "amplitude",
    "kind": "number",
-   "default": 20
+   "default": 100
   },
   {
    "ae": 5,
@@ -41,5 +41,5 @@
  ],
  "status": "unverified",
  "auto": false,
- "notes": "Not yet measured against After Effects.  Parameter indices follow the After Effects parameter order as documented by Adobe; `render_refs.py --params` records the real list."
+ "notes": "Not yet measured against After Effects. Param indices checked against AE 26 parameter list (_ae_params.json): Pulse Level default 100 and Amplitude default 100 in AE (were 0 / 20). The ring model (radius = level % of the diagonal, 40 px wavelength) is a guess; Time Span and Render Bump Map not modelled."
 }

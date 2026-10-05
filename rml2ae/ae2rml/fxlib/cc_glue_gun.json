@@ -10,27 +10,27 @@
    "field": "brush",
    "kind": "point",
    "default": [
-    320,
-    180
+    32,
+    32
    ]
   },
   {
    "ae": 2,
    "field": "width",
    "kind": "number",
-   "default": 50
+   "default": 4
   },
   {
    "ae": 3,
    "field": "density",
    "kind": "number",
-   "default": 100
+   "default": 25
   },
   {
    "ae": 4,
    "field": "timeSpan",
    "kind": "number",
-   "default": 1
+   "default": 0
   },
   {
    "ae": 5,
@@ -42,10 +42,10 @@
    "ae": 6,
    "field": "strength",
    "kind": "number",
-   "default": 50
+   "default": 100
   }
  ],
  "status": "unverified",
  "auto": false,
- "notes": "Not yet measured against After Effects.  Parameter indices follow the After Effects parameter order as documented by Adobe; `render_refs.py --params` records the real list."
+ "notes": "Not yet measured against After Effects.  Parameter indices follow the After Effects parameter order as documented by Adobe; `render_refs.py --params` records the real list. Param indices/kinds/defaults checked against AE 26 parameter list (_ae_params.json): defaults set to AE's (width 4, density 25, time span 0, strength 100); Style/Light/Shading groups (8-27) not modelled."
 }

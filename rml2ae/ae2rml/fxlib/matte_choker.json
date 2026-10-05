@@ -23,7 +23,7 @@
    "ae": 3,
    "field": "gray1",
    "kind": "number",
-   "default": 10
+   "default": 0.10000610351562
   },
   {
    "ae": 4,
@@ -41,7 +41,7 @@
    "ae": 6,
    "field": "gray2",
    "kind": "number",
-   "default": 100
+   "default": 1
   },
   {
    "ae": 7,
@@ -52,5 +52,5 @@
  ],
  "status": "unverified",
  "auto": false,
- "notes": "Not yet measured against After Effects.  Parameter indices follow the After Effects parameter order as documented by Adobe; `render_refs.py --params` records the real list."
+ "notes": "Not yet measured against After Effects. Param indices checked against AE 26 parameter list (_ae_params.json): Gray Level Softness 1/2 are raw 0..1 (defaults 0.1 / 1; were x100): the shader now reads them raw."
 }

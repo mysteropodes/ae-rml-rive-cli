@@ -3,13 +3,13 @@
 // others: g' = min(g, (r + b) / 2), mixed by Suppression %. Color Accuracy is ignored. Alpha untouched.
 struct Params {
     size: vec2<f32>,
-    accuracy: f32,        // AE 2 Color Accuracy (menu)
-    amount: f32,          // AE 3 Suppression (%)
+    amount: f32,          // AE 2 Suppression (%, 0..200)
     color: vec4<f32>,     // AE 1 Color To Suppress
     passIndex: f32,
     pad0: f32,
     pad1: f32,
     pad2: f32,
+    pad3: f32,
 };
 @group(0) @binding(0) var srcTex: texture_2d<f32>;
 @group(0) @binding(1) var srcSamp: sampler;

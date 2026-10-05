@@ -2,20 +2,20 @@
 // One bolt from Origin to Direction (Lightning Type 1 Direction; the other types are drawn the same way here), its path
 // displaced sideways by a fractal noise of Turbulence (Conductivity State seeds it). Core of Core Radius px, Core
 // Opacity %, Core Color; Glow of Glow Radius px, Glow Opacity %, Glow Color, added over the layer. Forks, Decay, Alpha
-// Obstacle and the other types are not modelled. Positions assumed (groups counted). AE's bolts are random: they differ.
+// Obstacle and the other types are not modelled. Indices checked against AE 26. AE's bolts are random: they differ.
 struct Params {
     size: vec2<f32>,
     origin: vec2<f32>,    // AE 2 Origin (layer px)
     toPt: vec2<f32>,      // AE 3 Direction (layer px)
     coreColor: vec4<f32>, // AE 8 Core Color
-    glowColor: vec4<f32>, // AE 12 Glow Color
+    glowColor: vec4<f32>, // AE 13 Glow Color
     kind: f32,            // AE 1 Lightning Type (menu)
     conductivity: f32,    // AE 4 Conductivity State
     coreRadius: f32,      // AE 6 Core Radius (px)
     coreOpacity: f32,     // AE 7 Core Opacity (%)
-    glowRadius: f32,      // AE 10 Glow Radius (px)
-    glowOpacity: f32,     // AE 11 Glow Opacity (%)
-    turbulence: f32,      // AE 14 Turbulence
+    glowRadius: f32,      // AE 11 Glow Radius (px)
+    glowOpacity: f32,     // AE 12 Glow Opacity (%)
+    turbulence: f32,      // AE 16 Turbulence
     passIndex: f32,
     layerRect: vec4<f32>, // reserved, filled by the host: the layer's rect in the canvas (x0, y0, x1, y1)
 };

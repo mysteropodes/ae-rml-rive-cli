@@ -4,7 +4,7 @@
 // inverse. Interpolation mixes the source position between identity (0 %) and the full transform (100 %).
 struct Params {
     size: vec2<f32>,
-    interp: f32,          // AE 1 Interpolation (%)
+    interp: f32,          // AE 1 Interpolation (raw 0..1)
     kind: f32,            // AE 2 Type of Conversion: 1 Rect to Polar, 2 Polar to Rect
     passIndex: f32,
     pad0: f32,
@@ -102,6 +102,6 @@ fn fs_main(in: VSOut) -> @location(0) vec4<f32> {
         let t = fract(atan2(v.x, -v.y) / TAU + 1.0);
         q = vec2<f32>(t * wh.x, length(v) / R * wh.y);
     }
-    let s = mix(p, q, clamp(P.interp / 100.0, 0.0, 1.0));
+    let s = mix(p, q, clamp(P.interp, 0.0, 1.0));
     return round(tapL(s) * 255.0) / 255.0;
 }

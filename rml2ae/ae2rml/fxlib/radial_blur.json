@@ -6,13 +6,13 @@
  "textures": {},
  "params": [
   {
-   "ae": 1,
+   "ae": 2,
    "field": "amount",
    "kind": "number",
    "default": 10
   },
   {
-   "ae": 2,
+   "ae": 3,
    "field": "center",
    "kind": "point",
    "default": [
@@ -21,7 +21,7 @@
    ]
   },
   {
-   "ae": 3,
+   "ae": 4,
    "field": "kind",
    "kind": "enum",
    "default": 1
@@ -29,5 +29,5 @@
  ],
  "status": "unverified",
  "auto": false,
- "notes": "Not yet measured against After Effects.  Parameter indices follow the After Effects parameter order as documented by Adobe; `render_refs.py --params` records the real list."
+ "notes": "Not yet measured against After Effects. Param indices checked against AE 26 parameter list (_ae_params.json): 1 is a group header: Amount 2, Center 3, Type 4 (5 Antialiasing, 6 Random Seed not modelled)."
 }

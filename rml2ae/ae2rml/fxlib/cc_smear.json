@@ -10,7 +10,7 @@
    "field": "fromPt",
    "kind": "point",
    "default": [
-    240,
+    320,
     180
    ]
   },
@@ -19,8 +19,8 @@
    "field": "toPt",
    "kind": "point",
    "default": [
-    400,
-    180
+    480,
+    90
    ]
   },
   {
@@ -33,10 +33,10 @@
    "ae": 4,
    "field": "radius",
    "kind": "number",
-   "default": 50
+   "default": 80
   }
  ],
  "status": "unverified",
  "auto": false,
- "notes": "Not yet measured against After Effects.  Parameter indices follow the After Effects parameter order as documented by Adobe; `render_refs.py --params` records the real list."
+ "notes": "Not yet measured against After Effects. Param indices checked against AE 26 parameter list (_ae_params.json): Radius default 80 in AE (was 50); From/To defaults are AE (layer centre / three-quarter width, quarter height) scaled to the 640x360 test layer. Tip Type (5) not modelled."
 }

@@ -21,13 +21,13 @@
    "default": 75
   },
   {
-   "ae": 8,
+   "ae": 9,
    "field": "invert",
    "kind": "bool",
    "default": 0
   },
   {
-   "ae": 9,
+   "ae": 10,
    "field": "color",
    "kind": "color",
    "default": [
@@ -38,13 +38,13 @@
    ]
   },
   {
-   "ae": 10,
+   "ae": 11,
    "field": "opacity",
    "kind": "number",
    "default": 100
   },
   {
-   "ae": 11,
+   "ae": 12,
    "field": "blendMode",
    "kind": "enum",
    "default": 1
@@ -52,5 +52,5 @@
  ],
  "status": "unverified",
  "auto": false,
- "notes": "Not yet measured against After Effects.  Parameter indices follow the After Effects parameter order as documented by Adobe; `render_refs.py --params` records the real list."
+ "notes": "Not yet measured against After Effects. Param indices checked against AE 26 parameter list (_ae_params.json): Invert Circle is 9, Color 10, Opacity 11 (0..100), Blending Mode 12 (8 is a group end). Edge (3), edge thickness (4) and feathers (6/7) not modelled."
 }

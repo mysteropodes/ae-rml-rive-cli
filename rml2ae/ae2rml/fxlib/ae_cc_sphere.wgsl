@@ -5,17 +5,17 @@
 // parameter positions); specular, metal and reflection maps are not modelled.
 struct Params {
     size: vec2<f32>,
-    offset: vec2<f32>,    // AE 5 Offset (layer px)
-    rx: f32,              // AE 1 Rotation X (degrees)
-    ry: f32,              // AE 2 Rotation Y
-    rz: f32,              // AE 3 Rotation Z
-    radius: f32,          // AE 4 Radius (px)
-    render: f32,          // AE 6 Render (menu)
-    lightIntensity: f32,  // AE 8 Light Intensity
-    lightHeight: f32,     // AE 10 Light Height
-    lightDir: f32,        // AE 11 Light Direction (degrees)
-    ambient: f32,         // AE 13 Ambient
-    diffuse: f32,         // AE 14 Diffuse
+    offset: vec2<f32>,    // AE 8 Offset (layer px)
+    rx: f32,              // AE 2 Rotation X (degrees)
+    ry: f32,              // AE 3 Rotation Y
+    rz: f32,              // AE 4 Rotation Z
+    radius: f32,          // AE 7 Radius (px)
+    render: f32,          // AE 9 Render (menu)
+    lightIntensity: f32,  // AE 11 Light Intensity
+    lightHeight: f32,     // AE 13 Light Height
+    lightDir: f32,        // AE 14 Light Direction (degrees)
+    ambient: f32,         // AE 17 Ambient
+    diffuse: f32,         // AE 18 Diffuse
     passIndex: f32,
     layerRect: vec4<f32>, // reserved, filled by the host: the layer's rect in the canvas (x0, y0, x1, y1)
 };

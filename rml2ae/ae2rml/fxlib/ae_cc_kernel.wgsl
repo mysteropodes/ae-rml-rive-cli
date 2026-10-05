@@ -3,17 +3,17 @@
 // when they sum to 0); Absolute Value takes |result|. Transparent pixels count as black. Alpha untouched.
 struct Params {
     size: vec2<f32>,
-    k1: f32,               // AE 1 Top Left
-    k2: f32,               // AE 2 Top
-    k3: f32,               // AE 3 Top Right
-    k4: f32,               // AE 4 Left
-    k5: f32,               // AE 5 Middle
-    k6: f32,               // AE 6 Right
-    k7: f32,               // AE 7 Bottom Left
-    k8: f32,               // AE 8 Bottom
-    k9: f32,               // AE 9 Bottom Right
-    divider: f32,         // AE 10 Divider
-    absolute: f32,        // AE 11 Absolute Value
+    k1: f32,              // AE 2 Line 1 col 1
+    k2: f32,              // AE 3 Line 1 col 2
+    k3: f32,              // AE 4 Line 1 col 3
+    k4: f32,              // AE 7 Line 2 col 1
+    k5: f32,              // AE 8 Line 2 col 2
+    k6: f32,              // AE 9 Line 2 col 3
+    k7: f32,              // AE 12 Line 3 col 1
+    k8: f32,              // AE 13 Line 3 col 2
+    k9: f32,              // AE 14 Line 3 col 3
+    divider: f32,         // AE 16 Divider
+    absolute: f32,        // AE 17 Absolute Values
     passIndex: f32,
 };
 @group(0) @binding(0) var srcTex: texture_2d<f32>;

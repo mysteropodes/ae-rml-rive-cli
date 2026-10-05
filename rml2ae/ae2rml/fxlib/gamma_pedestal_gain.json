@@ -1,6 +1,6 @@
 {
  "slug": "gamma_pedestal_gain",
- "aeMatchName": "ADBE Gamma/Pedestal/Gain",
+ "aeMatchName": "ADBE Gamma/Pedestal/Gain2",
  "wgsl": "ae_gamma_pedestal_gain.wgsl",
  "passes": 1,
  "textures": {},
@@ -64,15 +64,9 @@
    "field": "bGain",
    "kind": "number",
    "default": 1
-  },
-  {
-   "ae": 11,
-   "field": "blend",
-   "kind": "number",
-   "default": 0
   }
  ],
  "status": "unverified",
  "auto": false,
- "notes": "Not yet measured against After Effects.  Parameter indices follow the After Effects parameter order as documented by Adobe; `render_refs.py --params` records the real list."
+ "notes": "Not yet measured against After Effects. Param indices checked against AE 26 parameter list (_ae_params.json): 1-10 were right; there is no Blend With Original (11 is the Compositing Options group): removed from manifest and shader."
 }

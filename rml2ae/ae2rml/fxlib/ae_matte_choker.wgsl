@@ -6,10 +6,10 @@ struct Params {
     size: vec2<f32>,
     geo1: f32,            // AE 1 Geometric Softness 1 (px)
     choke1: f32,          // AE 2 Choke 1
-    gray1: f32,           // AE 3 Gray Level Softness 1 (%)
+    gray1: f32,           // AE 3 Gray Level Softness 1 (raw 0..1)
     geo2: f32,            // AE 4 Geometric Softness 2 (px)
     choke2: f32,          // AE 5 Choke 2
-    gray2: f32,           // AE 6 Gray Level Softness 2 (%)
+    gray2: f32,           // AE 6 Gray Level Softness 2 (raw 0..1)
     iterations: f32,      // AE 7 Iterations
     passIndex: f32,
 };
@@ -81,7 +81,7 @@ fn stage(p: vec2<i32>, geo: f32, choke: f32, gray: f32) -> f32 {
         b = acc / ws;
     }
     let t = 0.5 + clamp(choke, -127.0, 127.0) / 254.0;
-    let w = max(gray / 100.0, 1e-3);
+    let w = max(gray, 1e-3);
     return clamp((b - t) / w + 0.5, 0.0, 1.0);
 }
 

@@ -33,7 +33,7 @@
    "ae": 5,
    "field": "repeatEdge",
    "kind": "bool",
-   "default": 0
+   "default": 1
   },
   {
    "ae": 6,
@@ -44,5 +44,5 @@
  ],
  "status": "unverified",
  "auto": false,
- "notes": "Not yet measured against After Effects.  Parameter indices follow the After Effects parameter order as documented by Adobe; `render_refs.py --params` records the real list."
+ "notes": "Not yet measured against After Effects.  Parameter indices follow the After Effects parameter order as documented by Adobe; `render_refs.py --params` records the real list. Param indices/kinds/defaults checked against AE 26 parameter list (_ae_params.json): Repeat Edge Pixels defaults to on (1) in AE."
 }

@@ -11,19 +11,13 @@
    "kind": "color",
    "default": [
     0,
-    1,
     0,
+    1,
     1
    ]
   },
   {
    "ae": 2,
-   "field": "accuracy",
-   "kind": "enum",
-   "default": 1
-  },
-  {
-   "ae": 3,
    "field": "amount",
    "kind": "number",
    "default": 100
@@ -31,5 +25,5 @@
  ],
  "status": "unverified",
  "auto": false,
- "notes": "Not yet measured against After Effects.  Parameter indices follow the After Effects parameter order as documented by Adobe; `render_refs.py --params` records the real list."
+ "notes": "Not yet measured against After Effects. Param indices checked against AE 26 parameter list (_ae_params.json): AE 26 has no Color Accuracy: Suppression is param 2 (0..200, default 100; was 3 = Compositing Options); accuracy removed from manifest and shader. Color To Suppress default is blue in AE. Suppression above 100 % is clamped to 100 % by the shader."
 }

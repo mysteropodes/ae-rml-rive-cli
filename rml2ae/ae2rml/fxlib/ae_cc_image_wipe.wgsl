@@ -4,8 +4,8 @@
 // passes its gradient value, over Border Softness % (Auto Softness: a soft edge of 10 %). Blur is not modelled.
 struct Params {
     size: vec2<f32>,
-    completion: f32,      // AE 1 Completion (%)
-    softness: f32,        // AE 2 Border Softness (%)
+    completion: f32,      // AE 1 Completion (raw 0..1)
+    softness: f32,        // AE 2 Border Softness (raw 0..1)
     autoSoft: f32,        // AE 3 Auto Softness
     property: f32,        // AE 6 Gradient: Property (menu)
     blur: f32,            // AE 7 Gradient: Blur
@@ -159,21 +159,22 @@ fn fs_main(in: VSOut) -> @location(0) vec4<f32> {
     let m = mapAt(layerPos(in.uv));
     let c = straight8(m);
     let pr = i32(round(P.property));
-    var g = dot(c, vec3<f32>(0.299, 0.587, 0.114));
-    if (pr == 2) { g = c.r; }
-    else if (pr == 3) { g = c.g; }
-    else if (pr == 4) { g = c.b; }
-    else if (pr == 5) { g = m.a; }
+    var g = dot(c, vec3<f32>(0.299, 0.587, 0.114));    // 5 Luminance (menu order guessed: R, G, B, Alpha, Luminance, Lightness, Hue, Saturation)
+    if (pr == 1) { g = c.r; }
+    else if (pr == 2) { g = c.g; }
+    else if (pr == 3) { g = c.b; }
+    else if (pr == 4) { g = m.a; }
     else if (pr == 6) { g = rgb2hls(c).y; }
-    else if (pr == 7) { g = rgb2hls(c).z; }
+    else if (pr == 7) { g = rgb2hls(c).x; }
+    else if (pr == 8) { g = rgb2hls(c).z; }
     if (P.inverse > 0.5) {
         g = 1.0 - g;
     }
-    var w = P.softness / 100.0;
+    var w = P.softness;
     if (P.autoSoft > 0.5) {
         w = max(w, 0.1);
     }
-    let t = clamp(P.completion / 100.0, 0.0, 1.0) * (1.0 + w);
+    let t = clamp(P.completion, 0.0, 1.0) * (1.0 + w);
     let v = clamp((g + w - t) / max(w, 1e-4), 0.0, 1.0);
     return round(s * v * 255.0) / 255.0;
 }

@@ -7,13 +7,13 @@ struct Params {
     size: vec2<f32>,
     a: vec2<f32>,         // AE 1 Starting Point (layer px)
     b: vec2<f32>,         // AE 2 Ending Point (layer px)
-    len: f32,             // AE 3 Length (%)
-    time: f32,            // AE 4 Time (%)
+    len: f32,             // AE 3 Length (raw 0..1)
+    time: f32,            // AE 4 Time (raw 0..1)
     t0: f32,              // AE 5 Starting Thickness (px)
     t1: f32,              // AE 6 Ending Thickness (px)
     inside: vec4<f32>,    // AE 8 Inside Color
     outside: vec4<f32>,   // AE 9 Outside Color
-    softness: f32,        // AE 7 Softness (%)
+    softness: f32,        // AE 7 Softness (raw 0..1)
     composite: f32,       // AE 11 Composite On Original
     passIndex: f32,
     pad0: f32,
@@ -101,12 +101,12 @@ fn fs_main(in: VSOut) -> @location(0) vec4<f32> {
     let ab = layerPt(P.b) - a;
     let L2 = max(dot(ab, ab), 1e-6);
     let u = dot(p - a, ab) / L2;                       // 0 at the start, 1 at the end
-    let te = clamp(P.time / 100.0, 0.0, 1.0);
-    let ts = max(te - clamp(P.len / 100.0, 0.0, 1.0), 0.0);
+    let te = clamp(P.time, 0.0, 1.0);
+    let ts = max(te - clamp(P.len, 0.0, 1.0), 0.0);
     let uc = clamp(u, ts, te);
     let d = length(p - (a + ab * uc));
     let half = 0.5 * mix(P.t0, P.t1, uc);
-    let soft = max(P.softness / 100.0 * half, 0.5);
+    let soft = max(P.softness * half, 0.5);
     let cov = clamp((half - d) / soft + 0.5, 0.0, 1.0) * select(0.0, 1.0, te > ts);
     let col = mix(P.inside.rgb, P.outside.rgb, clamp(d / max(half, 1e-3), 0.0, 1.0));
     let bp = vec4<f32>(col * cov, cov);

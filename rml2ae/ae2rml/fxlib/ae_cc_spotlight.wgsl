@@ -1,14 +1,15 @@
 // After Effects "CC Spotlight" (CC Spotlight) — UNVERIFIED: written from the effect's definition, not yet measured against After Effects renders (fxref/spec.py, fxlib check <slug> --holdout).
 // A spot aimed at To: an elliptical pool around To whose radius grows with Cone Angle and Height, stretched along the
-// From -> To direction, with Edge Softness % of the radius. Render 1 Light Only (the pool), 2 Light + Layer (pool added
-// to the layer), 3 Light on Layer (the layer lit by the pool, darkened elsewhere). Colour x Intensity / 100.
+// From -> To direction, with Edge Softness (0..1) of the radius. Render 1 Light Only (the pool), 2 Light + Layer (pool added
+// to the layer), 3 Light on Layer (the layer lit by the pool, darkened elsewhere); AE has 9 Render entries (default 4), 4+ and the
+// Gel Layer (9) are not modelled. Colour x Intensity / 100.
 struct Params {
     size: vec2<f32>,
     fromPt: vec2<f32>,    // AE 1 From (layer px)
     toPt: vec2<f32>,      // AE 2 To (layer px)
     height: f32,          // AE 3 Height (%)
     cone: f32,            // AE 4 Cone Angle (degrees)
-    softness: f32,        // AE 5 Edge Softness (%)
+    softness: f32,        // AE 5 Edge Softness (raw 0..1)
     intensity: f32,       // AE 7 Intensity (%)
     color: vec4<f32>,     // AE 6 Color
     render: f32,          // AE 8 Render (menu)
@@ -106,7 +107,7 @@ fn fs_main(in: VSOut) -> @location(0) vec4<f32> {
     let v = p - t;
     let e = vec2<f32>(dot(v, dir) / stretch, dot(v, vec2<f32>(-dir.y, dir.x)));
     let d = length(e) / rad;
-    let soft = max(P.softness / 100.0, 0.01);
+    let soft = max(P.softness, 0.01);
     let pool = clamp((1.0 - d) / soft, 0.0, 1.0) * P.intensity / 100.0;
     let light = P.color.rgb * pool;
     let mode = i32(round(P.render));

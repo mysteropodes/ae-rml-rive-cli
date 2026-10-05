@@ -1,6 +1,6 @@
 {
  "slug": "ellipse",
- "aeMatchName": "ADBE Ellipse",
+ "aeMatchName": "ADBE ELLIPSE",
  "wgsl": "ae_ellipse.wgsl",
  "passes": 1,
  "textures": {},
@@ -18,25 +18,25 @@
    "ae": 2,
    "field": "width",
    "kind": "number",
-   "default": 200
+   "default": 50
   },
   {
    "ae": 3,
    "field": "height",
    "kind": "number",
-   "default": 200
+   "default": 50
   },
   {
    "ae": 4,
    "field": "thickness",
    "kind": "number",
-   "default": 20
+   "default": 8
   },
   {
    "ae": 5,
    "field": "softness",
    "kind": "number",
-   "default": 0
+   "default": 0.5
   },
   {
    "ae": 6,
@@ -44,9 +44,9 @@
    "kind": "color",
    "default": [
     1,
-    1,
-    1,
-    1
+    0.74509803921569,
+    0.98039215686275,
+    0.72549019607843
    ]
   },
   {
@@ -54,10 +54,10 @@
    "field": "outside",
    "kind": "color",
    "default": [
-    0,
-    0,
-    0,
-    1
+    1,
+    0.09803921568627,
+    0.09803921568627,
+    0.58823529411765
    ]
   },
   {
@@ -69,5 +69,5 @@
  ],
  "status": "unverified",
  "auto": false,
- "notes": "Not yet measured against After Effects.  Parameter indices follow the After Effects parameter order as documented by Adobe; `render_refs.py --params` records the real list."
+ "notes": "Not yet measured against After Effects. Param indices checked against AE 26 parameter list (_ae_params.json): indices 1-8 were right; Softness is raw 0..1 (shader fixed, was /100); defaults set to AE's (50x50, Thickness 8, Softness 0.5, and the colours with their alpha, which the shader now applies)."
 }

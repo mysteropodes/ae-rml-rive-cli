@@ -14,7 +14,7 @@ struct Params {
     hiWidth: f32,         // AE 9 Highlight Tonal Width (%)
     hiRadius: f32,        // AE 10 Highlight Radius (px)
     colorCorr: f32,       // AE 11 Color Correction (%)
-    original: f32,        // AE 15 Blend With Original (%)
+    original: f32,        // AE 16 Blend With Original (%)
     passIndex: f32,
 };
 @group(0) @binding(0) var srcTex: texture_2d<f32>;

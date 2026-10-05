@@ -4,12 +4,12 @@
 // Tile Edges repeats the layer instead of leaving it transparent outside; Antialiasing is not modelled.
 struct Params {
     size: vec2<f32>,
-    knot1: vec2<f32>,     // AE 1 Knot 1 (layer px)
-    knot2: vec2<f32>,     // AE 3 Knot 2 (layer px)
-    amount1: f32,         // AE 2 Amount 1
-    amount2: f32,         // AE 4 Amount 2
-    tile: f32,            // AE 5 Tile Edges
-    falloff: f32,         // AE 7 Falloff
+    knot1: vec2<f32>,     // AE 2 Knot 1 (layer px)
+    knot2: vec2<f32>,     // AE 4 Knot 2 (layer px)
+    amount1: f32,         // AE 3 Amount 1
+    amount2: f32,         // AE 5 Amount 2
+    tile: f32,            // AE 6 Tile Edges
+    falloff: f32,         // AE 8 Falloff
     passIndex: f32,
     pad0: f32,
     pad1: f32,

@@ -21,7 +21,7 @@
    "ae": 3,
    "field": "width",
    "kind": "number",
-   "default": 10
+   "default": 20
   },
   {
    "ae": 4,
@@ -32,5 +32,5 @@
  ],
  "status": "unverified",
  "auto": false,
- "notes": "Not yet measured against After Effects: written from the effect's definition. Status stays 'unverified' and auto false until fxref renders are measured (fxlib check <slug> --rive --holdout). Parameter indices come from the After Effects parameter order as documented by Adobe; `render_refs.py --params` records the real list."
+ "notes": "Not yet measured against After Effects: written from the effect's definition. Status stays 'unverified' and auto false until fxref renders are measured (fxlib check <slug> --rive --holdout). Param indices checked against AE 26 parameter list (_ae_params.json): 1-4 were right (Completion really is 0..100); Width defaults to 20."
 }

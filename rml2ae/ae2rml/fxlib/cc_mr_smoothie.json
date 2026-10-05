@@ -9,21 +9,21 @@
    "ae": 2,
    "field": "property",
    "kind": "enum",
-   "default": 1
+   "default": 5
   },
   {
    "ae": 3,
    "field": "smoothness",
    "kind": "number",
-   "default": 0.5
+   "default": 4
   },
   {
    "ae": 4,
    "field": "a",
    "kind": "point",
    "default": [
-    100,
-    180
+    160,
+    90
    ]
   },
   {
@@ -31,8 +31,8 @@
    "field": "b",
    "kind": "point",
    "default": [
-    540,
-    180
+    480,
+    270
    ]
   },
   {
@@ -46,15 +46,9 @@
    "field": "loops",
    "kind": "number",
    "default": 1
-  },
-  {
-   "ae": 8,
-   "field": "original",
-   "kind": "number",
-   "default": 0
   }
  ],
  "status": "unverified",
  "auto": false,
- "notes": "Not yet measured against After Effects.  Parameter indices follow the After Effects parameter order as documented by Adobe; `render_refs.py --params` records the real list."
+ "notes": "Not yet measured against After Effects. Param indices checked against AE 26 parameter list (_ae_params.json): Property default 5, Smoothness is 0..511 (default 4, was treated as 0..1; the shader now scales it by 1/100 - spread heuristic, not measured). There is no Blend w. Original parameter (8 = Compositing Options): removed from manifest and shader. Property menu order guessed (1-3 R/G/B, 4 alpha, 5 luminance, 6 lightness, 7-8 hue/saturation fall back to luminance). Sample A/B defaults are AE quarter/three-quarter points of the layer, scaled to the 640x360 test layer. Flow Layer (1) not modelled (the layer itself is used)."
 }

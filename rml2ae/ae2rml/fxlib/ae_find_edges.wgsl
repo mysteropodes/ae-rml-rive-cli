@@ -72,5 +72,5 @@ fn fs_main(in: VSOut) -> @location(0) vec4<f32> {
     if (P.invert > 0.5) {
         o = e;
     }
-    return out8(mix(o, straight8(s), clamp(P.blend / 100.0, 0.0, 1.0)), s.a);
+    return out8(mix(o, straight8(s), clamp(P.blend, 0.0, 1.0)), s.a);
 }

@@ -1,13 +1,13 @@
 // After Effects "Smart Blur" (ADBE Smart Blur) — UNVERIFIED: written from the effect's definition, not yet measured against After Effects renders (fxref/spec.py, fxlib check <slug> --holdout).
 // Each pixel averages the neighbours within Radius (at most 16) whose straight colour differs from it by less than
 // Threshold (0..255, max channel difference). Mode 1 Normal; 2 Edge Only (white edges on black where the blur was
-// cut); 3 Overlay Edge (those edges drawn white over the result). Quality is ignored.
+// cut); 3 Overlay Edge (those edges drawn white over the result). AE has no Quality parameter (Mode is 3).
 struct Params {
     size: vec2<f32>,
     radius: f32,          // AE 1 Radius (px)
     threshold: f32,       // AE 2 Threshold (0..255)
-    quality: f32,         // AE 3 Quality (not modelled)
-    mode: f32,            // AE 4 Mode (menu)
+    mode: f32,            // AE 3 Mode (menu)
+    pad1: f32,
     passIndex: f32,
     pad0: f32,
 };

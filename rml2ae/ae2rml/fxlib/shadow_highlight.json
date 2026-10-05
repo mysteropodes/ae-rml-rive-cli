@@ -1,6 +1,6 @@
 {
  "slug": "shadow_highlight",
- "aeMatchName": "ADBE Shadow/Highlight",
+ "aeMatchName": "ADBE ShadowHighlight",
  "wgsl": "ae_shadow_highlight.wgsl",
  "passes": 1,
  "textures": {},
@@ -54,7 +54,7 @@
    "default": 20
   },
   {
-   "ae": 15,
+   "ae": 16,
    "field": "original",
    "kind": "number",
    "default": 0
@@ -62,5 +62,5 @@
  ],
  "status": "unverified",
  "auto": false,
- "notes": "Not yet measured against After Effects.  Parameter indices follow the After Effects parameter order as documented by Adobe; `render_refs.py --params` records the real list."
+ "notes": "Not yet measured against After Effects.  Parameter indices follow the After Effects parameter order as documented by Adobe; `render_refs.py --params` records the real list. Param indices/kinds/defaults checked against AE 26 parameter list (_ae_params.json): Blend With Original is 16 (6 and 15 are the More Options group headers); Temporal Smoothing/Scene Detect (4, 5), Midtone Contrast (12) and Black/White Clip (13, 14) not modelled."
 }

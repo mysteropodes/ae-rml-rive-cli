@@ -6,13 +6,13 @@
  "textures": {},
  "params": [
   {
-   "ae": 1,
+   "ae": 2,
    "field": "view",
    "kind": "enum",
-   "default": 1
+   "default": 8
   },
   {
-   "ae": 2,
+   "ae": 3,
    "field": "key",
    "kind": "color",
    "default": [
@@ -23,79 +23,79 @@
    ]
   },
   {
-   "ae": 4,
+   "ae": 5,
    "field": "aInB",
    "kind": "number",
    "default": 0
   },
   {
-   "ae": 5,
+   "ae": 6,
    "field": "aInW",
    "kind": "number",
    "default": 255
   },
   {
-   "ae": 6,
+   "ae": 7,
    "field": "aGam",
    "kind": "number",
    "default": 1
   },
   {
-   "ae": 7,
+   "ae": 8,
    "field": "aOutB",
    "kind": "number",
    "default": 0
   },
   {
-   "ae": 8,
+   "ae": 9,
    "field": "aOutW",
    "kind": "number",
    "default": 255
   },
   {
-   "ae": 9,
+   "ae": 10,
    "field": "bInB",
    "kind": "number",
    "default": 0
   },
   {
-   "ae": 10,
+   "ae": 11,
    "field": "bInW",
    "kind": "number",
    "default": 255
   },
   {
-   "ae": 11,
+   "ae": 12,
    "field": "bGam",
    "kind": "number",
    "default": 1
   },
   {
-   "ae": 12,
+   "ae": 13,
    "field": "bOutB",
    "kind": "number",
    "default": 0
   },
   {
-   "ae": 13,
+   "ae": 14,
    "field": "bOutW",
    "kind": "number",
    "default": 255
   },
   {
-   "ae": 14,
+   "ae": 15,
    "field": "mInB",
    "kind": "number",
    "default": 0
   },
   {
-   "ae": 15,
+   "ae": 16,
    "field": "mInW",
    "kind": "number",
    "default": 255
   },
   {
-   "ae": 16,
+   "ae": 17,
    "field": "mGam",
    "kind": "number",
    "default": 1
@@ -103,5 +103,5 @@
  ],
  "status": "unverified",
  "auto": false,
- "notes": "Not yet measured against After Effects.  Parameter indices follow the After Effects parameter order as documented by Adobe; `render_refs.py --params` records the real list."
+ "notes": "Not yet measured against After Effects.  Parameter indices follow the After Effects parameter order as documented by Adobe; `render_refs.py --params` records the real list. Param indices/kinds/defaults checked against AE 26 parameter list (_ae_params.json): AE 1 is the Preview group header: View is 2 (10 entries, default 8 = Final Output), Key Color 3, Color Matching Accuracy 4 (not modelled), Partial A 5-9, Partial B 10-14, Matte 15-17. Shader View menu now follows Adobe's documented order (1 Source, 2/3 uncorrected/corrected Partial A, 4/5 Partial B, 6/7 uncorrected/corrected Matte, 8 Final Output, 9 Source Only, 10 Matte Only); the partial-matte model itself is still a guess (doubtful)."
 }

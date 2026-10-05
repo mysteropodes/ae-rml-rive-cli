@@ -1,6 +1,6 @@
 // After Effects "Turbulent Noise" (ADBE Turbulent Noise) — UNVERIFIED: written from the effect's definition, not yet measured against After Effects renders (fxref/spec.py, fxlib check <slug> --holdout).
-// Parameter positions: Fractal Noise's measured list (fxlib/_ae_params.json); Turbulent Noise taken as the same layout.
-// A value-noise sum over Complexity octaves (Sub Influence %, Sub Scaling %, Sub Rotation, Sub Offset per octave),
+// Parameter positions: Turbulent Noise's own measured list (fxlib/_ae_params.json, AE 26); unlike Fractal Noise it has no Sub Rotation / Sub Offset.
+// A value-noise sum over Complexity octaves (Sub Influence %, Sub Scaling % per octave),
 // Noise Type 1 Block, 2 Linear, 3 Soft Linear, 4 Spline; Fractal Type 1 Basic (signed sum), 2-4 Turbulent (sum of
 // |octaves|), others as Basic. Scale / Scale Width / Height % (100 % = 100 px lattice), Rotation, Offset Turbulence;
 // Contrast %, Brightness, Invert, Overflow 1 Clip (others clamp too in 8 bpc). Blending Mode 1 None (the noise alone),
@@ -11,7 +11,6 @@
 struct Params {
     size: vec2<f32>,
     offset: vec2<f32>,    // AE 13 Offset Turbulence (layer px)
-    subOffset: vec2<f32>, // AE 21 Sub Offset
     fractalType: f32,     // AE 1 Fractal Type (menu)
     noiseType: f32,       // AE 2 Noise Type (menu)
     invert: f32,          // AE 3 Invert
@@ -26,11 +25,10 @@ struct Params {
     complexity: f32,      // AE 16 Complexity
     subInfluence: f32,    // AE 18 Sub Influence (%)
     subScale: f32,        // AE 19 Sub Scaling (%)
-    subRotation: f32,     // AE 20 Sub Rotation (degrees)
-    evolution: f32,       // AE 24 Evolution (degrees)
-    seed: f32,            // AE 28 Random Seed
-    opacity: f32,         // AE 30 Opacity (%)
-    mode: f32,            // AE 31 Blending Mode (menu)
+    evolution: f32,       // AE 21 Evolution (degrees)
+    seed: f32,            // AE 24 Random Seed
+    opacity: f32,         // AE 26 Opacity (%)
+    mode: f32,            // AE 27 Blending Mode (menu)
     passIndex: f32,
     pad0: f32,
     layerRect: vec4<f32>, // reserved, filled by the host: the layer's rect in the canvas (x0, y0, x1, y1)
@@ -241,7 +239,7 @@ fn field(q: vec2<f32>) -> f32 {
         sum += w * n;
         total += w;
         infl *= clamp(P.subInfluence / 100.0, 0.0, 1.0);
-        u = rot2(u, -P.subRotation) * (100.0 / max(P.subScale, 1.0)) + layerPt(P.subOffset) / sc;
+        u = u * (100.0 / max(P.subScale, 1.0));     // Turbulent Noise has no Sub Rotation / Sub Offset
     }
     var v = 0.5 + 0.5 * sum / max(total, 1e-6) * 1.6;
     if (ft == 4) { v = pow(clamp(v, 0.0, 1.0), 2.0); }

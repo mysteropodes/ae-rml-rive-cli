@@ -9,7 +9,7 @@
    "ae": 1,
    "field": "bend",
    "kind": "number",
-   "default": 10
+   "default": 0
   },
   {
    "ae": 2,
@@ -17,7 +17,7 @@
    "kind": "point",
    "default": [
     320,
-    60
+    270
    ]
   },
   {
@@ -26,14 +26,14 @@
    "kind": "point",
    "default": [
     320,
-    300
+    90
    ]
   },
   {
    "ae": 4,
    "field": "prestart",
    "kind": "enum",
-   "default": 1
+   "default": 3
   },
   {
    "ae": 5,
@@ -44,5 +44,5 @@
  ],
  "status": "unverified",
  "auto": false,
- "notes": "Not yet measured against After Effects.  Parameter indices follow the After Effects parameter order as documented by Adobe; `render_refs.py --params` records the real list."
+ "notes": "Not yet measured against After Effects. Param indices checked against AE 26 parameter list (_ae_params.json): indices 1-5 were right; defaults set to AE's (Bend 0, Render Prestart 3; Start/End scaled from AE's 64x64 probe layer: Start below End). Render Prestart has 4 entries in AE, the shader models 1-3."
 }

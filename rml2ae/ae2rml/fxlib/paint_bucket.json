@@ -26,7 +26,7 @@
    "ae": 3,
    "field": "tolerance",
    "kind": "number",
-   "default": 10
+   "default": 50
   },
   {
    "ae": 4,
@@ -35,13 +35,13 @@
    "default": 0
   },
   {
-   "ae": 9,
+   "ae": 7,
    "field": "invert",
    "kind": "bool",
    "default": 0
   },
   {
-   "ae": 10,
+   "ae": 8,
    "field": "color",
    "kind": "color",
    "default": [
@@ -52,7 +52,7 @@
    ]
   },
   {
-   "ae": 11,
+   "ae": 9,
    "field": "opacity",
    "kind": "number",
    "default": 100
@@ -60,5 +60,5 @@
  ],
  "status": "unverified",
  "auto": false,
- "notes": "Not yet measured against After Effects.  Parameter indices follow the After Effects parameter order as documented by Adobe; `render_refs.py --params` records the real list."
+ "notes": "Not yet measured against After Effects. Param indices checked against AE 26 parameter list (_ae_params.json): Tolerance default 50, Invert Fill is 7, Color 8, Opacity 9 (were 9/10/11). Stroke (5), its slider (6) and Blending Mode (10, AE default 2 = Normal, the only one painted) not modelled."
 }

@@ -11,7 +11,7 @@
    "kind": "point",
    "default": [
     320,
-    180
+    90
    ]
   },
   {
@@ -24,7 +24,7 @@
    "ae": 3,
    "field": "shape",
    "kind": "enum",
-   "default": 1
+   "default": 3
   },
   {
    "ae": 4,
@@ -36,7 +36,7 @@
    "ae": 5,
    "field": "intensity",
    "kind": "number",
-   "default": 50
+   "default": 25
   },
   {
    "ae": 8,
@@ -44,8 +44,8 @@
    "kind": "color",
    "default": [
     1,
-    1,
-    1,
+    0.98039215686275,
+    0.94117647058824,
     1
    ]
   },
@@ -58,5 +58,5 @@
  ],
  "status": "unverified",
  "auto": false,
- "notes": "Not yet measured against After Effects.  Parameter indices follow the After Effects parameter order as documented by Adobe; `render_refs.py --params` records the real list."
+ "notes": "Not yet measured against After Effects. Param indices checked against AE 26 parameter list (_ae_params.json): Shape default 3 (Sharp), Sweep Intensity default 25, Light Color default from AE; Center default = AE (half width, quarter height) scaled to the 640x360 test layer. Edge Intensity (6) and Edge Thickness (7) not modelled."
 }

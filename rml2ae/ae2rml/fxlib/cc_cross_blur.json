@@ -1,6 +1,6 @@
 {
  "slug": "cc_cross_blur",
- "aeMatchName": "CC Cross Blur",
+ "aeMatchName": "CS CrossBlur",
  "wgsl": "ae_cc_cross_blur.wgsl",
  "passes": 1,
  "textures": {},
@@ -27,10 +27,10 @@
    "ae": 4,
    "field": "repeatEdge",
    "kind": "bool",
-   "default": 0
+   "default": 1
   }
  ],
  "status": "unverified",
  "auto": false,
- "notes": "Not yet measured against After Effects.  Parameter indices follow the After Effects parameter order as documented by Adobe; `render_refs.py --params` records the real list."
+ "notes": "Not yet measured against After Effects. Param indices checked against AE 26 parameter list (_ae_params.json): indices 1-4 were right; Repeat Edge Pixels defaults to 1 in AE."
 }

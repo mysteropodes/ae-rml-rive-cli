@@ -1,6 +1,6 @@
 {
  "slug": "cc_line_sweep",
- "aeMatchName": "CC Line Sweep",
+ "aeMatchName": "CS LineSweep",
  "wgsl": "ae_cc_line_sweep.wgsl",
  "passes": 1,
  "textures": {},
@@ -15,19 +15,19 @@
    "ae": 2,
    "field": "direction",
    "kind": "angle",
-   "default": 0
+   "default": 180
   },
   {
    "ae": 3,
    "field": "thickness",
    "kind": "number",
-   "default": 20
+   "default": 50
   },
   {
    "ae": 4,
    "field": "slant",
-   "kind": "angle",
-   "default": 0
+   "kind": "number",
+   "default": 50
   },
   {
    "ae": 5,
@@ -38,5 +38,5 @@
  ],
  "status": "unverified",
  "auto": false,
- "notes": "Not yet measured against After Effects.  Parameter indices follow the After Effects parameter order as documented by Adobe; `render_refs.py --params` records the real list."
+ "notes": "Not yet measured against After Effects. Param indices checked against AE 26 parameter list (_ae_params.json): indices 1-5 were right; Completion really is 0..100; defaults set to AE's (Direction 180, Thickness 50, Slant 50). Slant is a 0..99 value, not an angle: kind number, shader now maps it to a tilt Slant/(100-Slant) (guess)."
 }

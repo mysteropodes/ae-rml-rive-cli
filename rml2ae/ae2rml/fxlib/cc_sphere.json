@@ -6,76 +6,76 @@
  "textures": {},
  "params": [
   {
-   "ae": 1,
+   "ae": 2,
    "field": "rx",
    "kind": "angle",
    "default": 0
   },
   {
-   "ae": 2,
+   "ae": 3,
    "field": "ry",
    "kind": "angle",
    "default": 0
   },
   {
-   "ae": 3,
+   "ae": 4,
    "field": "rz",
    "kind": "angle",
    "default": 0
   },
   {
-   "ae": 4,
+   "ae": 7,
    "field": "radius",
    "kind": "number",
-   "default": 120
+   "default": 200
   },
   {
-   "ae": 5,
+   "ae": 8,
    "field": "offset",
    "kind": "point",
    "default": [
-    320,
-    180
+    32,
+    32
    ]
   },
   {
-   "ae": 6,
+   "ae": 9,
    "field": "render",
    "kind": "enum",
    "default": 1
   },
   {
-   "ae": 8,
+   "ae": 11,
    "field": "lightIntensity",
    "kind": "number",
    "default": 100
   },
   {
-   "ae": 10,
+   "ae": 13,
    "field": "lightHeight",
    "kind": "number",
-   "default": 50
-  },
-  {
-   "ae": 11,
-   "field": "lightDir",
-   "kind": "angle",
-   "default": -45
-  },
-  {
-   "ae": 13,
-   "field": "ambient",
-   "kind": "number",
-   "default": 8
+   "default": 40
   },
   {
    "ae": 14,
+   "field": "lightDir",
+   "kind": "angle",
+   "default": -85
+  },
+  {
+   "ae": 17,
+   "field": "ambient",
+   "kind": "number",
+   "default": 10
+  },
+  {
+   "ae": 18,
    "field": "diffuse",
    "kind": "number",
-   "default": 65
+   "default": 100
   }
  ],
  "status": "unverified",
  "auto": false,
- "notes": "Not yet measured against After Effects.  Parameter indices follow the After Effects parameter order as documented by Adobe; `render_refs.py --params` records the real list."
+ "notes": "Not yet measured against After Effects.  Parameter indices follow the After Effects parameter order as documented by Adobe; `render_refs.py --params` records the real list. Param indices/kinds/defaults checked against AE 26 parameter list (_ae_params.json): all indices shifted by the Rotation/Light/Shading group headers (1, 6, 10, 15, 16): Rotation X/Y/Z 2-4, Radius 7, Offset 8, Render 9, Light Intensity 11, Light Height 13, Light Direction 14, Ambient 17, Diffuse 18; defaults set to AE's. Not modelled: Rotation Order (5), Light Color (12), Specular/Roughness/Metal/Reflective/Reflection Map/Internal Shadows/Transparency Falloff (19-25)."
 }

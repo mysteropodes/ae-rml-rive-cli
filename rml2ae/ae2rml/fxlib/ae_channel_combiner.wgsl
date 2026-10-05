@@ -2,14 +2,15 @@
 // From (assumed menu order): 1 RGB to HLS, 2 HLS to RGB, 3 RGB to YUV, 4 YUV to RGB, 5 Lightness, 6 Hue,
 // 7 Saturation, 8 Red, 9 Green, 10 Blue, 11 Alpha, 12 Min RGB, 13 Max RGB. The four conversions rewrite the colour;
 // the single values go To: 1 Red Only, 2 Green Only, 3 Blue Only, 4 Alpha Only, 5 Lightness, 6 Hue, 7 Saturation.
-// Invert inverts the result; Solid Alpha makes the layer opaque. Use 2nd Layer is not modelled (the layer itself).
+// Invert inverts the result; Solid Alpha makes the layer opaque. Use 2nd Layer / Source Layer (3) are not modelled (the layer
+// itself). AE's menus (19 / 17 entries, To default 7) contain separators: both orders are still to be measured.
 struct Params {
     size: vec2<f32>,
-    use2nd: f32,          // AE 1 Use 2nd Layer
-    fromMode: f32,        // AE 3 From (menu)
-    toMode: f32,          // AE 4 To (menu)
-    invert: f32,          // AE 5 Invert
-    solid: f32,           // AE 6 Solid Alpha
+    use2nd: f32,          // AE 2 Use 2nd Layer
+    fromMode: f32,        // AE 5 From (menu, 19 entries in AE)
+    toMode: f32,          // AE 6 To (menu, 17 entries in AE)
+    invert: f32,          // AE 7 Invert
+    solid: f32,           // AE 8 Solid Alpha
     passIndex: f32,
 };
 @group(0) @binding(0) var srcTex: texture_2d<f32>;

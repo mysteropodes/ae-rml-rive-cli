@@ -9,10 +9,35 @@
    "ae": 1,
    "field": "level",
    "kind": "number",
-   "default": 128
+   "default": 0.5
   }
  ],
- "status": "unverified",
- "auto": false,
- "notes": "Not yet measured against After Effects.  Parameter indices follow the After Effects parameter order as documented by Adobe; `render_refs.py --params` records the real list."
+ "status": "exact",
+ "notes": "Not yet measured against After Effects. Param indices checked against AE 26 parameter list (_ae_params.json): Level is stored raw 0..1 (default 0.5 = UI 128): shader compares luma with Level * 255; spec values converted.",
+ "verified": {
+  "by": "fxlib regress 2026-10-05 (offline wgpu, AE 2026 8 bpc refs)",
+  "settings": {
+   "threshold_0": {
+    "offline": {
+     "mean": 0.0,
+     "pct_px_gt8": 0.0,
+     "max": 0
+    }
+   },
+   "threshold_1": {
+    "offline": {
+     "mean": 0.0,
+     "pct_px_gt8": 0.0,
+     "max": 0
+    }
+   },
+   "threshold_2": {
+    "offline": {
+     "mean": 0.0,
+     "pct_px_gt8": 0.0,
+     "max": 0
+    }
+   }
+  }
+ }
 }

@@ -1,6 +1,6 @@
 {
  "slug": "selective_color",
- "aeMatchName": "ADBE Selective Color",
+ "aeMatchName": "ADBE SelectiveColor",
  "wgsl": "ae_selective_color.wgsl",
  "passes": 1,
  "textures": {},
@@ -36,193 +36,193 @@
    "default": 0
   },
   {
-   "ae": 14,
+   "ae": 15,
    "field": "yelC",
    "kind": "number",
    "default": 0
   },
   {
-   "ae": 15,
+   "ae": 16,
    "field": "yelM",
    "kind": "number",
    "default": 0
   },
   {
-   "ae": 16,
+   "ae": 17,
    "field": "yelY",
    "kind": "number",
    "default": 0
   },
   {
-   "ae": 17,
+   "ae": 18,
    "field": "yelK",
    "kind": "number",
    "default": 0
   },
   {
-   "ae": 19,
+   "ae": 21,
    "field": "greC",
    "kind": "number",
    "default": 0
   },
   {
-   "ae": 20,
+   "ae": 22,
    "field": "greM",
    "kind": "number",
    "default": 0
   },
   {
-   "ae": 21,
+   "ae": 23,
    "field": "greY",
    "kind": "number",
    "default": 0
   },
   {
-   "ae": 22,
+   "ae": 24,
    "field": "greK",
    "kind": "number",
    "default": 0
   },
   {
-   "ae": 24,
+   "ae": 27,
    "field": "cyaC",
    "kind": "number",
    "default": 0
   },
   {
-   "ae": 25,
+   "ae": 28,
    "field": "cyaM",
    "kind": "number",
    "default": 0
   },
   {
-   "ae": 26,
+   "ae": 29,
    "field": "cyaY",
    "kind": "number",
    "default": 0
   },
   {
-   "ae": 27,
+   "ae": 30,
    "field": "cyaK",
    "kind": "number",
    "default": 0
   },
   {
-   "ae": 29,
+   "ae": 33,
    "field": "bluC",
    "kind": "number",
    "default": 0
   },
   {
-   "ae": 30,
+   "ae": 34,
    "field": "bluM",
    "kind": "number",
    "default": 0
   },
   {
-   "ae": 31,
+   "ae": 35,
    "field": "bluY",
    "kind": "number",
    "default": 0
   },
   {
-   "ae": 32,
+   "ae": 36,
    "field": "bluK",
    "kind": "number",
    "default": 0
   },
   {
-   "ae": 34,
+   "ae": 39,
    "field": "magC",
    "kind": "number",
    "default": 0
   },
   {
-   "ae": 35,
+   "ae": 40,
    "field": "magM",
    "kind": "number",
    "default": 0
   },
   {
-   "ae": 36,
+   "ae": 41,
    "field": "magY",
    "kind": "number",
    "default": 0
   },
   {
-   "ae": 37,
+   "ae": 42,
    "field": "magK",
    "kind": "number",
    "default": 0
   },
   {
-   "ae": 39,
+   "ae": 45,
    "field": "whiC",
    "kind": "number",
    "default": 0
   },
   {
-   "ae": 40,
+   "ae": 46,
    "field": "whiM",
    "kind": "number",
    "default": 0
   },
   {
-   "ae": 41,
+   "ae": 47,
    "field": "whiY",
    "kind": "number",
    "default": 0
   },
   {
-   "ae": 42,
+   "ae": 48,
    "field": "whiK",
    "kind": "number",
    "default": 0
   },
   {
-   "ae": 44,
+   "ae": 51,
    "field": "neuC",
    "kind": "number",
    "default": 0
   },
   {
-   "ae": 45,
+   "ae": 52,
    "field": "neuM",
    "kind": "number",
    "default": 0
   },
   {
-   "ae": 46,
+   "ae": 53,
    "field": "neuY",
    "kind": "number",
    "default": 0
   },
   {
-   "ae": 47,
+   "ae": 54,
    "field": "neuK",
    "kind": "number",
    "default": 0
   },
   {
-   "ae": 49,
+   "ae": 57,
    "field": "blaC",
    "kind": "number",
    "default": 0
   },
   {
-   "ae": 50,
+   "ae": 58,
    "field": "blaM",
    "kind": "number",
    "default": 0
   },
   {
-   "ae": 51,
+   "ae": 59,
    "field": "blaY",
    "kind": "number",
    "default": 0
   },
   {
-   "ae": 52,
+   "ae": 60,
    "field": "blaK",
    "kind": "number",
    "default": 0
@@ -230,5 +230,5 @@
  ],
  "status": "unverified",
  "auto": false,
- "notes": "Not yet measured against After Effects.  Parameter indices follow the After Effects parameter order as documented by Adobe; `render_refs.py --params` records the real list."
+ "notes": "Not yet measured against After Effects. Param indices checked against AE 26 parameter list (_ae_params.json): Each colour class is a group (header + 4 sliders + group end): Reds 9-12, Yellows 15-18, Greens 21-24, Cyans 27-30, Blues 33-36, Magentas 39-42, Whites 45-48, Neutrals 51-54, Blacks 57-60 (Yellows onward were shifted). Colors menu (2) and the proxy sliders 3-6 (they show the class picked in the menu) are not mapped."
 }

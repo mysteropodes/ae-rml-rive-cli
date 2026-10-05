@@ -15,7 +15,7 @@
    "ae": 2,
    "field": "amount",
    "kind": "number",
-   "default": 10
+   "default": 0
   },
   {
    "ae": 3,
@@ -27,22 +27,22 @@
    "ae": 4,
    "field": "ridge",
    "kind": "number",
-   "default": 0
+   "default": 1
   },
   {
    "ae": 6,
    "field": "property",
    "kind": "enum",
-   "default": 5
+   "default": 6
   },
   {
    "ae": 7,
    "field": "softness",
    "kind": "number",
-   "default": 0
+   "default": 15
   }
  ],
  "status": "unverified",
  "auto": false,
- "notes": "Not yet measured against After Effects.  Parameter indices follow the After Effects parameter order as documented by Adobe; `render_refs.py --params` records the real list."
+ "notes": "Not yet measured against After Effects. Param indices checked against AE 26 parameter list (_ae_params.json): indices were right (5 = Vector Map layer, not modelled: the layer itself is the map); defaults set to AE's (Amount 0, Ridge Smoothness 1, Property 6, Map Softness 15). Property menu (8 entries) order still assumed."
 }

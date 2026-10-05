@@ -1,6 +1,6 @@
 {
  "slug": "cc_block_load",
- "aeMatchName": "CC Block Load",
+ "aeMatchName": "CS BlockLoad",
  "wgsl": "ae_cc_block_load.wgsl",
  "passes": 1,
  "textures": {},
@@ -14,8 +14,8 @@
   {
    "ae": 2,
    "field": "scanlines",
-   "kind": "bool",
-   "default": 0
+   "kind": "number",
+   "default": 4
   },
   {
    "ae": 3,
@@ -32,5 +32,5 @@
  ],
  "status": "unverified",
  "auto": false,
- "notes": "Not yet measured against After Effects.  Parameter indices follow the After Effects parameter order as documented by Adobe; `render_refs.py --params` records the real list."
+ "notes": "Not yet measured against After Effects.  Parameter indices follow the After Effects parameter order as documented by Adobe; `render_refs.py --params` records the real list. Param indices/kinds/defaults checked against AE 26 parameter list (_ae_params.json): Scans (2) is a 1..16 count (not a checkbox), default 4; the shader still uses 7 fixed refinement levels and ignores Scans (doubtful)."
 }

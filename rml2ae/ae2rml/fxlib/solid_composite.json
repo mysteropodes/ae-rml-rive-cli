@@ -35,7 +35,25 @@
    "default": 1
   }
  ],
- "status": "unverified",
- "auto": false,
- "notes": "Not yet measured against After Effects.  Parameter indices follow the After Effects parameter order as documented by Adobe; `render_refs.py --params` records the real list."
+ "status": "exact",
+ "notes": "Not yet measured against After Effects.  Parameter indices follow the After Effects parameter order as documented by Adobe; `render_refs.py --params` records the real list.",
+ "verified": {
+  "by": "fxlib regress 2026-10-05 (offline wgpu, AE 2026 8 bpc refs)",
+  "settings": {
+   "solid_composite_0": {
+    "offline": {
+     "mean": 0.0,
+     "pct_px_gt8": 0.0,
+     "max": 0
+    }
+   },
+   "solid_composite_1": {
+    "offline": {
+     "mean": 0.099,
+     "pct_px_gt8": 0.0,
+     "max": 1
+    }
+   }
+  }
+ }
 }

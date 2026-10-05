@@ -1,18 +1,30 @@
-// After Effects "CC Color Neutralizer" (CC Color Neutralizer) — UNVERIFIED: written from the effect's definition, not yet measured against After Effects renders (fxref/spec.py, fxlib check <slug> --holdout).
+// After Effects "CC Color Neutralizer" (CS Color Neutralizer) — UNVERIFIED: written from the effect's definition, not yet measured against After Effects renders (fxref/spec.py, fxlib check <slug> --holdout).
 // Removes a colour cast per tonal band: each Unbalance colour's departure from its own grey is subtracted from the
-// pixels of that band (Shadows / Midtones / Highlights amounts in %), band weights from the luminance around Pivot
-// (smooth ramps); Contrast (%) then scales around Pivot.
+// pixels of that band (band weights from the luminance: shadows below 0.5, highlights above, midtones peaking at 0.5),
+// then the band's Red / Green / Blue sliders (-100..100) add +-50 % of that channel in the band. Black / White Point
+// (%) stretch the result, Blend w. Original (%) mixes the original back. Pinning and View (2, 3) are not modelled.
+// Model re-fitted on AE 26's real parameter list (the strengths are a guess).
 struct Params {
     size: vec2<f32>,
     shColor: vec4<f32>,   // AE 1 Shadows Unbalance
-    midColor: vec4<f32>,  // AE 3 Midtones Unbalance
-    hiColor: vec4<f32>,   // AE 5 Highlights Unbalance
-    shadows: f32,         // AE 2 Shadows (%)
-    midtones: f32,        // AE 4 Midtones (%)
-    highlights: f32,      // AE 6 Highlights (%)
-    pivot: f32,           // AE 7 Pivot (0..1)
-    contrast: f32,        // AE 8 Contrast (%)
+    midColor: vec4<f32>,  // AE 7 Midtones Unbalance
+    hiColor: vec4<f32>,   // AE 13 Highlights Unbalance
+    shR: f32,             // AE 3 Red - Shadows (-100..100)
+    shG: f32,             // AE 4 Green - Shadows
+    shB: f32,             // AE 5 Blue - Shadows
+    midR: f32,            // AE 9 Red - Midtones
+    midG: f32,            // AE 10 Green - Midtones
+    midB: f32,            // AE 11 Blue - Midtones
+    hiR: f32,             // AE 15 Red - Highlights
+    hiG: f32,             // AE 16 Green - Highlights
+    hiB: f32,             // AE 17 Blue - Highlights
+    pinning: f32,         // AE 19 Pinning (%, not modelled)
+    blend: f32,           // AE 20 Blend w. Original (%)
+    view: f32,            // AE 22 View (menu, 1 = result only)
+    blackPt: f32,         // AE 23 Black Point (%)
+    whitePt: f32,         // AE 24 White Point (%)
     passIndex: f32,
+    pad0: f32,
 };
 @group(0) @binding(0) var srcTex: texture_2d<f32>;
 @group(0) @binding(1) var srcSamp: sampler;
@@ -64,12 +76,15 @@ fn fs_main(in: VSOut) -> @location(0) vec4<f32> {
     let s = textureLoad(srcTex, pixelOf(in.uv), 0);
     let c = straight8(s);
     let L = luma(c);
-    let pv = clamp(P.pivot, 0.01, 0.99);
-    let ws = 1.0 - smoothstep(0.0, pv, L);
-    let wh = smoothstep(pv, 1.0, L);
-    let wm = 1.0 - abs(L - pv) / max(pv, 1.0 - pv);
-    var o = c - castOf(P.shColor.rgb) * ws * P.shadows / 100.0 - castOf(P.midColor.rgb) * wm * P.midtones / 100.0
-              - castOf(P.hiColor.rgb) * wh * P.highlights / 100.0;
-    o = vec3<f32>(pv) + (o - vec3<f32>(pv)) * (1.0 + P.contrast / 100.0);
+    let ws = 1.0 - smoothstep(0.0, 0.5, L);
+    let wh = smoothstep(0.5, 1.0, L);
+    let wm = 1.0 - abs(L - 0.5) * 2.0;
+    var o = c - castOf(P.shColor.rgb) * ws - castOf(P.midColor.rgb) * wm - castOf(P.hiColor.rgb) * wh;
+    o += (vec3<f32>(P.shR, P.shG, P.shB) * ws + vec3<f32>(P.midR, P.midG, P.midB) * wm
+          + vec3<f32>(P.hiR, P.hiG, P.hiB) * wh) * 0.005;
+    let bp = clamp(P.blackPt / 100.0, 0.0, 0.499);
+    let wp = clamp(P.whitePt / 100.0, 0.501, 1.0);
+    o = (o - vec3<f32>(bp)) / (wp - bp);
+    o = mix(o, c, clamp(P.blend / 100.0, 0.0, 1.0));
     return out8(o, s.a);
 }

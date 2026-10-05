@@ -3,10 +3,10 @@
 // Invert swaps them; Blend w. Original mixes with the source. Alpha untouched; premultiplied.
 struct Params {
     size: vec2<f32>,
-    threshold: f32,       // AE 1 Threshold (0..255)
+    threshold: f32,       // AE 1 Threshold (raw 0..1)
     channel: f32,         // AE 2 Channel (menu)
     invert: f32,          // AE 3 Invert
-    blend: f32,           // AE 4 Blend w. Original (%)
+    blend: f32,           // AE 4 Blend w. Original (raw 0..1)
     passIndex: f32,
     pad0: f32,
 };
@@ -65,9 +65,9 @@ fn fs_main(in: VSOut) -> @location(0) vec4<f32> {
     } else if (ch == 5) {
         v = s.a;
     }
-    var o = select(0.0, 1.0, round(v * 255.0) >= P.threshold);
+    var o = select(0.0, 1.0, round(v * 255.0) >= P.threshold * 255.0);
     if (P.invert > 0.5) {
         o = 1.0 - o;
     }
-    return out8(mix(vec3<f32>(o), c, clamp(P.blend / 100.0, 0.0, 1.0)), s.a);
+    return out8(mix(vec3<f32>(o), c, clamp(P.blend, 0.0, 1.0)), s.a);
 }

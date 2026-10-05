@@ -1,13 +1,13 @@
 // After Effects "CC Line Sweep" (CC Line Sweep) — UNVERIFIED: written from the effect's definition, not yet measured against After Effects renders (fxref/spec.py, fxlib check <slug> --holdout).
 // Stripes of Thickness px perpendicular to Direction (AE angle); each stripe is wiped along Direction with a delay
-// that grows with its index (Slant: the wipe front is tilted by Slant degrees), so the layer disappears line by line
+// that grows with its index (Slant %, AE range 0..99: the wipe front is tilted by Slant / (100 - Slant), a guess), so the layer disappears line by line
 // as Completion goes from 0 to 100 %. Flip Direction reverses the wipe. The exact staggering is a guess.
 struct Params {
     size: vec2<f32>,
     completion: f32,      // AE 1 Completion (%)
     direction: f32,       // AE 2 Direction (degrees)
     thickness: f32,       // AE 3 Thickness (px)
-    slant: f32,           // AE 4 Slant (degrees)
+    slant: f32,           // AE 4 Slant (%, 0..99)
     flip: f32,            // AE 5 Flip Direction
     passIndex: f32,
     layerRect: vec4<f32>, // reserved, filled by the host: the layer's rect in the canvas (x0, y0, x1, y1)
@@ -100,8 +100,10 @@ fn fs_main(in: VSOut) -> @location(0) vec4<f32> {
     }
     let k = floor(dot(v, tng) / max(P.thickness, 1.0));
     let alt = select(along, 1.0 - along, (i32(k) & 1) == 1);
-    let front = clamp(P.completion / 100.0, 0.0, 1.0) * (1.0 + abs(tan(radians(clamp(P.slant, -80.0, 80.0))))) ;
-    let tilt = (dot(v, tng) / D + 0.5) * abs(tan(radians(clamp(P.slant, -80.0, 80.0))));
+    let sl = clamp(P.slant, 0.0, 99.0);
+    let slope = sl / (100.0 - sl);                       // Slant % (0..99) -> tilt of the front (50 % = 45 deg)
+    let front = clamp(P.completion / 100.0, 0.0, 1.0) * (1.0 + slope);
+    let tilt = (dot(v, tng) / D + 0.5) * slope;
     let gone = alt + tilt < front;
     return select(s, vec4<f32>(0.0), gone);
 }

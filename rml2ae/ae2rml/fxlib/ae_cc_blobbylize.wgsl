@@ -6,10 +6,9 @@
 struct Params {
     size: vec2<f32>,
     lightColor: vec4<f32>,// AE 10 Light Color
-    property: f32,        // AE 3 Property (menu)
+    property: f32,        // AE 3 Property (menu, AE default 6 = treated as alpha)
     softness: f32,        // AE 4 Softness (px)
-    height: f32,          // AE 9 Height (%)
-    intensity: f32,       // AE 8 Light Intensity (%)
+    intensity: f32,       // AE 9 Light Intensity (%)
     lightHeight: f32,     // AE 12 Light Height
     lightDir: f32,        // AE 14 Light Direction (degrees)
     ambient: f32,         // AE 16 Ambient
@@ -17,7 +16,7 @@ struct Params {
     specular: f32,        // AE 18 Specular
     roughness: f32,       // AE 19 Roughness
     metal: f32,           // AE 20 Metal (%)
-    cutAway: f32,         // AE 5 Cut Away (0..1)
+    cutAway: f32,         // AE 5 Cut Away (%, 0..100)
     passIndex: f32,
     layerRect: vec4<f32>, // reserved, filled by the host: the layer's rect in the canvas (x0, y0, x1, y1)
 };
@@ -136,10 +135,11 @@ fn fs_main(in: VSOut) -> @location(0) vec4<f32> {
     let q = layerPos(in.uv);
     let t = tapL(q);
     let hv = hs(q);
-    let a = smoothstep(P.cutAway - 0.05, P.cutAway + 0.05, hv);
+    let ca = clamp(P.cutAway / 100.0, 0.0, 1.0);
+    let a = smoothstep(ca - 0.05, ca + 0.05, hv);
     let e = 1.0 + max(P.softness, 0.0) * 0.25;
     let g = vec2<f32>(hs(q + vec2<f32>(e, 0.0)) - hs(q - vec2<f32>(e, 0.0)), hs(q + vec2<f32>(0.0, e)) - hs(q - vec2<f32>(0.0, e))) / (2.0 * e);
-    let nrm = normalize(vec3<f32>(-g * P.height / 100.0 * 20.0, 1.0));
+    let nrm = normalize(vec3<f32>(-g * 10.0, 1.0));
     let l = light(nrm);
     let li = P.intensity / 100.0;
     let base = straight8(t);

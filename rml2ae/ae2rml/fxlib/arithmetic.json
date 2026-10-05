@@ -9,7 +9,7 @@
    "ae": 1,
    "field": "op",
    "kind": "enum",
-   "default": 1
+   "default": 3
   },
   {
    "ae": 2,
@@ -38,5 +38,5 @@
  ],
  "status": "unverified",
  "auto": false,
- "notes": "Not yet measured against After Effects.  Parameter indices follow the After Effects parameter order as documented by Adobe; `render_refs.py --params` records the real list."
+ "notes": "Not yet measured against After Effects. Param indices checked against AE 26 parameter list (_ae_params.json): Operator default is 3 in AE (was 1); values 0..255 and Clip 0/1 confirmed."
 }

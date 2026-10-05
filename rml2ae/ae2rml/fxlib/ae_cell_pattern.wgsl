@@ -12,8 +12,8 @@ struct Params {
     contrast: f32,        // AE 3 Contrast (%)
     disperse: f32,        // AE 5 Disperse
     cellSize: f32,        // AE 6 Size (px)
-    evolution: f32,       // AE 12 Evolution (degrees)
-    seed: f32,            // AE 16 Random Seed
+    evolution: f32,       // AE 13 Evolution (degrees)
+    seed: f32,            // AE 17 Random Seed
     passIndex: f32,
     layerRect: vec4<f32>, // reserved, filled by the host: the layer's rect in the canvas (x0, y0, x1, y1)
 };
@@ -155,7 +155,7 @@ fn feat(c: vec2<f32>) -> vec2<f32> {
     let j = vec2<f32>(unit(pcg(bitcast<u32>(ix) ^ pcg(bitcast<u32>(iy) ^ pcg(s)))), unit(pcg(bitcast<u32>(iy) * 7919u ^ pcg(bitcast<u32>(ix) ^ s))));
     let a = 6.28318531 * (P.evolution / 360.0) * (0.5 + j.x);
     let wob = 0.15 * vec2<f32>(cos(a + j.y * 6.0), sin(a + j.x * 6.0));
-    return c + vec2<f32>(0.5) + (j - vec2<f32>(0.5)) * clamp(P.disperse, 0.0, 1.0) + wob * clamp(P.disperse, 0.0, 1.0);
+    return c + vec2<f32>(0.5) + (j - vec2<f32>(0.5)) * clamp(P.disperse, 0.0, 1.5) + wob * clamp(P.disperse, 0.0, 1.5);
 }
 
 @fragment

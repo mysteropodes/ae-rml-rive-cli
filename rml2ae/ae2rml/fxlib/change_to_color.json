@@ -11,8 +11,8 @@
    "kind": "color",
    "default": [
     1,
-    0,
-    0,
+    1,
+    1,
     1
    ]
   },
@@ -21,9 +21,9 @@
    "field": "toC",
    "kind": "color",
    "default": [
-    0,
     1,
-    0,
+    1,
+    1,
     1
    ]
   },
@@ -43,28 +43,28 @@
    "ae": 6,
    "field": "tolH",
    "kind": "number",
-   "default": 5
+   "default": 0.10000610351562
   },
   {
    "ae": 7,
    "field": "tolL",
    "kind": "number",
-   "default": 50
+   "default": 1
   },
   {
    "ae": 8,
    "field": "tolS",
    "kind": "number",
-   "default": 50
-  },
-  {
-   "ae": 9,
-   "field": "softness",
-   "kind": "number",
-   "default": 50
+   "default": 1
   },
   {
    "ae": 10,
+   "field": "softness",
+   "kind": "number",
+   "default": 0.5
+  },
+  {
+   "ae": 11,
    "field": "matte",
    "kind": "bool",
    "default": 0
@@ -72,5 +72,5 @@
  ],
  "status": "unverified",
  "auto": false,
- "notes": "Not yet measured against After Effects.  Parameter indices follow the After Effects parameter order as documented by Adobe; `render_refs.py --params` records the real list."
+ "notes": "Not yet measured against After Effects. Param indices checked against AE 26 parameter list (_ae_params.json): Tolerances Hue/Lightness/Saturation are raw 0..2 (UI % = raw x 50; defaults 0.1/1/1), Softness is param 10 (raw 0..1, default 0.5; 9 is a group end), View Correction Matte is 11. The shader now reads them raw. From/To default white in AE."
 }

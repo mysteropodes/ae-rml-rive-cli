@@ -42,139 +42,164 @@
    "default": 1
   },
   {
-   "ae": 10,
+   "ae": 11,
    "field": "redInBlack",
    "kind": "number",
    "default": 0
   },
   {
-   "ae": 11,
+   "ae": 12,
    "field": "redInWhite",
    "kind": "number",
    "default": 1
   },
   {
-   "ae": 12,
+   "ae": 13,
    "field": "redGamma",
    "kind": "number",
    "default": 1
   },
   {
-   "ae": 13,
+   "ae": 14,
    "field": "redOutBlack",
    "kind": "number",
    "default": 0
   },
   {
-   "ae": 14,
+   "ae": 15,
    "field": "redOutWhite",
    "kind": "number",
    "default": 1
   },
   {
-   "ae": 16,
+   "ae": 18,
    "field": "greenInBlack",
    "kind": "number",
    "default": 0
   },
   {
-   "ae": 17,
+   "ae": 19,
    "field": "greenInWhite",
    "kind": "number",
    "default": 1
   },
   {
-   "ae": 18,
+   "ae": 20,
    "field": "greenGamma",
    "kind": "number",
    "default": 1
   },
   {
-   "ae": 19,
+   "ae": 21,
    "field": "greenOutBlack",
    "kind": "number",
    "default": 0
   },
   {
-   "ae": 20,
+   "ae": 22,
    "field": "greenOutWhite",
    "kind": "number",
    "default": 1
   },
   {
-   "ae": 22,
+   "ae": 25,
    "field": "blueInBlack",
    "kind": "number",
    "default": 0
   },
   {
-   "ae": 23,
+   "ae": 26,
    "field": "blueInWhite",
    "kind": "number",
    "default": 1
   },
   {
-   "ae": 24,
+   "ae": 27,
    "field": "blueGamma",
    "kind": "number",
    "default": 1
   },
   {
-   "ae": 25,
+   "ae": 28,
    "field": "blueOutBlack",
    "kind": "number",
    "default": 0
   },
   {
-   "ae": 26,
+   "ae": 29,
    "field": "blueOutWhite",
    "kind": "number",
    "default": 1
   },
   {
-   "ae": 28,
+   "ae": 32,
    "field": "alphaInBlack",
    "kind": "number",
    "default": 0
   },
   {
-   "ae": 29,
+   "ae": 33,
    "field": "alphaInWhite",
    "kind": "number",
    "default": 1
   },
   {
-   "ae": 30,
+   "ae": 34,
    "field": "alphaGamma",
    "kind": "number",
    "default": 1
   },
   {
-   "ae": 31,
+   "ae": 35,
    "field": "alphaOutBlack",
    "kind": "number",
    "default": 0
   },
   {
-   "ae": 32,
+   "ae": 36,
    "field": "alphaOutWhite",
    "kind": "number",
    "default": 1
   },
   {
-   "ae": 33,
+   "ae": 38,
    "field": "clipBlack",
    "kind": "enum",
    "default": 3
   },
   {
-   "ae": 34,
+   "ae": 39,
    "field": "clipWhite",
    "kind": "enum",
    "default": 3
   }
  ],
- "status": "unverified",
- "auto": false,
- "notes": "Not yet measured against After Effects.  Parameter indices follow the After Effects parameter order as documented by Adobe; `render_refs.py --params` records the real list."
+ "status": "exact",
+ "notes": "Not yet measured against After Effects.  Parameter indices follow the After Effects parameter order as documented by Adobe; `render_refs.py --params` records the real list. Param indices/kinds/defaults checked against AE 26 parameter list (_ae_params.json): each channel group has an opening and a closing header: RGB 4-8, Red 11-15, Green 18-22, Blue 25-29, Alpha 32-36, Clip To Output Black/White 38/39 (2 is the Histogram).",
+ "verified": {
+  "by": "fxlib regress 2026-10-05 (offline wgpu, AE 2026 8 bpc refs)",
+  "settings": {
+   "levels_individual_0": {
+    "offline": {
+     "mean": 0.001,
+     "pct_px_gt8": 0.0,
+     "max": 1
+    }
+   },
+   "levels_individual_1": {
+    "offline": {
+     "mean": 0.0,
+     "pct_px_gt8": 0.0,
+     "max": 0
+    }
+   },
+   "levels_individual_2": {
+    "offline": {
+     "mean": 0.002,
+     "pct_px_gt8": 0.0,
+     "max": 1
+    }
+   }
+  }
+ }
 }

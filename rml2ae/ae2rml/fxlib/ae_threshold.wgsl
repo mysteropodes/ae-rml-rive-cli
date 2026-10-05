@@ -1,9 +1,10 @@
 // After Effects "Threshold" (ADBE Threshold2) — UNVERIFIED: written from the effect's definition, not yet measured against After Effects renders (fxref/spec.py, fxlib check <slug> --holdout).
-// Each pixel becomes white when its Rec.601 luma (straight 8-bit colour, 0..255) is >= Level, black otherwise.
+// Each pixel becomes white when its Rec.601 luma (straight 8-bit colour, 0..255) is >= Level * 255 (AE stores Level raw,
+// 0.5 = the UI's 128), black otherwise.
 // Alpha untouched; premultiplied output.
 struct Params {
     size: vec2<f32>,
-    level: f32,           // AE 1 Level (0..255, default 128)
+    level: f32,           // AE 1 Level (raw 0..1: 0.5 = UI 128)
     passIndex: f32,
 };
 @group(0) @binding(0) var srcTex: texture_2d<f32>;
@@ -50,5 +51,5 @@ fn out8(c: vec3<f32>, a: f32) -> vec4<f32> {
 fn fs_main(in: VSOut) -> @location(0) vec4<f32> {
     let s = textureLoad(srcTex, pixelOf(in.uv), 0);
     let l = round(dot(straight8(s), vec3<f32>(0.299, 0.587, 0.114)) * 255.0);
-    return out8(vec3<f32>(select(0.0, 1.0, l >= P.level)), s.a);
+    return out8(vec3<f32>(select(0.0, 1.0, l >= P.level * 255.0)), s.a);
 }

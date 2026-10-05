@@ -6,55 +6,55 @@
  "textures": {},
  "params": [
   {
-   "ae": 5,
+   "ae": 2,
    "field": "fuzz",
    "kind": "number",
-   "default": 0
+   "default": 20
   },
   {
-   "ae": 6,
+   "ae": 3,
    "field": "space",
    "kind": "enum",
    "default": 1
   },
   {
-   "ae": 7,
+   "ae": 4,
    "field": "min0",
    "kind": "number",
-   "default": 0
+   "default": 127
+  },
+  {
+   "ae": 5,
+   "field": "max0",
+   "kind": "number",
+   "default": 127
+  },
+  {
+   "ae": 6,
+   "field": "min1",
+   "kind": "number",
+   "default": 127
+  },
+  {
+   "ae": 7,
+   "field": "max1",
+   "kind": "number",
+   "default": 127
   },
   {
    "ae": 8,
-   "field": "max0",
+   "field": "min2",
    "kind": "number",
-   "default": 0
+   "default": 127
   },
   {
    "ae": 9,
-   "field": "min1",
-   "kind": "number",
-   "default": 0
-  },
-  {
-   "ae": 10,
-   "field": "max1",
-   "kind": "number",
-   "default": 0
-  },
-  {
-   "ae": 11,
-   "field": "min2",
-   "kind": "number",
-   "default": 0
-  },
-  {
-   "ae": 12,
    "field": "max2",
    "kind": "number",
-   "default": 0
+   "default": 127
   }
  ],
  "status": "unverified",
  "auto": false,
- "notes": "Not yet measured against After Effects.  Parameter indices follow the After Effects parameter order as documented by Adobe; `render_refs.py --params` records the real list."
+ "notes": "Not yet measured against After Effects. Param indices checked against AE 26 parameter list (_ae_params.json): Every index was 3 too high (1 = Preview group header, Fuzziness = 2, Color Space = 3, Min/Max = 4..9); defaults from AE (fuzz 20, min/max 127)."
 }

@@ -1,7 +1,7 @@
 // After Effects "Linear Color Key" (ADBE Linear Color Key2) — UNVERIFIED: written from the effect's definition, not yet measured against After Effects renders (fxref/spec.py, fxlib check <slug> --holdout).
 // Distance to Key Color (Match colors 1 Using RGB, 2 Using Hue, 3 Using Chroma), a matte 0 below Matching Tolerance
 // ramping to 1 over Matching Softness; Key Operation 1 Key Colors removes the matched pixels, 2 Keep Colors keeps
-// only them. View 2 shows the matte. Parameter positions are guesses (the effect has a preview at the top).
+// only them. View 2 shows the matte. Indices checked against AE 26 (1 = the preview group).
 struct Params {
     size: vec2<f32>,
     view: f32,            // AE 2 View (menu)

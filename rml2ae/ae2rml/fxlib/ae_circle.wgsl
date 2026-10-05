@@ -6,10 +6,10 @@ struct Params {
     size: vec2<f32>,
     center: vec2<f32>,    // AE 1 Center (layer px)
     radius: f32,          // AE 2 Radius (px)
-    invert: f32,          // AE 8 Invert Circle
-    color: vec4<f32>,     // AE 9 Color
-    opacity: f32,         // AE 10 Opacity (%)
-    blendMode: f32,       // AE 11 Blending Mode (1 None)
+    invert: f32,          // AE 9 Invert Circle
+    color: vec4<f32>,     // AE 10 Color
+    opacity: f32,         // AE 11 Opacity (%)
+    blendMode: f32,       // AE 12 Blending Mode (1 None)
     passIndex: f32,
     pad0: f32,
     layerRect: vec4<f32>, // reserved, filled by the host: the layer's rect in the canvas (x0, y0, x1, y1)

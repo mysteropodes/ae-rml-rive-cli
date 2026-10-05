@@ -2,21 +2,21 @@
 // The layer's own Property (1 Alpha, 2 Red, 3 Green, 4 Blue, 5 Luminance; assumed menu) is a height field, smoothed
 // over Softness px, raised by Height %: the content is refracted along the surface slope by Displacement % and lit
 // (Light Intensity %, Light Color, Light Height, Light Direction) with Ambient / Diffuse / Specular / Roughness.
-// A separate Bump Map layer, AE lights, Light Type and Metal are not modelled. Positions assumed (groups counted).
+// A separate Bump Map layer, AE lights, Light Type and Metal are not modelled. Indices checked against AE 26.
 struct Params {
     size: vec2<f32>,
-    lightColor: vec4<f32>,// AE 10 Light Color
+    lightColor: vec4<f32>,// AE 11 Light Color
     property: f32,        // AE 3 Property (menu)
     softness: f32,        // AE 4 Softness (px)
     height: f32,          // AE 5 Height (%)
     displacement: f32,    // AE 6 Displacement (%)
-    intensity: f32,       // AE 9 Light Intensity (%)
-    lightHeight: f32,     // AE 12 Light Height
-    lightDir: f32,        // AE 14 Light Direction (degrees)
-    ambient: f32,         // AE 16 Ambient
-    diffuse: f32,         // AE 17 Diffuse
-    specular: f32,        // AE 18 Specular
-    roughness: f32,       // AE 19 Roughness
+    intensity: f32,       // AE 10 Light Intensity (%)
+    lightHeight: f32,     // AE 13 Light Height
+    lightDir: f32,        // AE 15 Light Direction (degrees)
+    ambient: f32,         // AE 18 Ambient
+    diffuse: f32,         // AE 19 Diffuse
+    specular: f32,        // AE 20 Specular
+    roughness: f32,       // AE 21 Roughness
     passIndex: f32,
     layerRect: vec4<f32>, // reserved, filled by the host: the layer's rect in the canvas (x0, y0, x1, y1)
 };

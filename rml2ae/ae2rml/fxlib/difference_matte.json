@@ -17,13 +17,13 @@
    "ae": 3,
    "field": "sizes",
    "kind": "enum",
-   "default": 2
+   "default": 1
   },
   {
    "ae": 4,
    "field": "tolerance",
    "kind": "number",
-   "default": 10
+   "default": 15
   },
   {
    "ae": 5,
@@ -40,8 +40,8 @@
  ],
  "status": "unverified",
  "auto": false,
- "notes": "Not yet measured against After Effects. The second layer comes from the Rive node's map input (ae2rml binds the referenced layer, PR 7). Parameter indices follow the After Effects parameter order as documented by Adobe; `render_refs.py --params` records the real list.",
+ "notes": "Not yet measured against After Effects. The second layer comes from the Rive node's map input (ae2rml binds the referenced layer, PR 7). Parameter indices follow the After Effects parameter order as documented by Adobe; `render_refs.py --params` records the real list. Param indices/kinds/defaults checked against AE 26 parameter list (_ae_params.json): defaults set to AE's (If Layer Sizes Differ 1, Tolerance 15); the Difference Layer is AE 2, so textureParams.mapTex is now 2 (was 1, the View menu).",
  "textureParams": {
-  "mapTex": 1
+  "mapTex": 2
  }
 }

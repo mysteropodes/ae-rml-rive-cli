@@ -9,7 +9,7 @@
    "ae": 1,
    "field": "scale",
    "kind": "number",
-   "default": 25
+   "default": 1
   },
   {
    "ae": 2,
@@ -29,5 +29,5 @@
  ],
  "status": "unverified",
  "auto": false,
- "notes": "Not yet measured against After Effects.  Parameter indices follow the After Effects parameter order as documented by Adobe; `render_refs.py --params` records the real list."
+ "notes": "Not yet measured against After Effects. Param indices checked against AE 26 parameter list (_ae_params.json): Scale and Blend w. Original are raw 0..1 in AE (Scale default 1 = 100 %); the shader now reads them raw (was /100). Spec setting 0 now sets Scale 0.25 explicitly (the AE default 1 tiles nothing)."
 }
