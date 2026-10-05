@@ -8,19 +8,21 @@ It refuses to run if another project with content is open. Renders in batches of
 Effects' UI freezes beyond about 10 per script) and skips references already rendered unless --all.
 --params adds each effect once to a scratch comp and records, per parameter, its position i (the manifests' "ae"),
 match name, name (in the After Effects UI language), value type, default value and range; effects already in
-_ae_params.json are kept unless named. Set AE_APP to your After Effects application name if it is not "Adobe After Effects 2026" (macOS, AppleScript).
+_ae_params.json are kept unless named. The project is forced to 8 bpc without colour management (the references are
+display values; a colour-managed project's saveFrameToPng writes its linear working buffer), and the run stops if After
+Effects keeps another state. The newest installed After Effects is used (macOS: AppleScript, set AE_APP to override the
+application name; Windows: AfterFX.exe -r).
 """
 import json
 import os
-import subprocess
 import sys
 import time
 
 D = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, D)
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.dirname(D))))     # the repository root
 from spec import renders, NEEDS_MAP  # noqa: E402
-
-AE_APP = os.environ.get("AE_APP", "Adobe After Effects 2026")
+from rml2ae import aeapp  # noqa: E402
 PROJECT = os.path.join(D, "fxref.aep")
 
 
@@ -39,6 +41,13 @@ JSX_JSON = (
     ' return "null"; }')
 
 
+# the references are display values of an 8 bpc project without colour management: force that state, and stop if
+# After Effects keeps another (a colour-managed project's saveFrameToPng writes its linear working buffer, scaled)
+COLOR_GUARD = [aeapp.COLOR_SET_JSX, aeapp.COLOR_CHECK_JSX,
+               'var cp = colorProblem(); if (cp) throw new Error("the reference project must be 8 bpc without colour '
+               'management, After Effects keeps: " + cp);']
+
+
 def open_project_jsx():
     return ['try {',
             f'var proj = new File({js(PROJECT)});',
@@ -48,6 +57,7 @@ def open_project_jsx():
             '  if (proj.exists) app.open(proj);',
             f'  else {{ app.newProject(); app.project.importFile(new ImportOptions(new File({js(os.path.join(D, "src", "src.png"))}))); app.project.save(proj); }}',
             '}',
+            *COLOR_GUARD,
             'function item(n) { for (var i = 1; i <= app.project.numItems; i++) if (app.project.item(i).name == n) return app.project.item(i); return null; }']
 
 
@@ -106,8 +116,7 @@ def record_params(slugs):
 
 
 def run_jsx(jsx, log, timeout=600):
-    subprocess.Popen(["osascript", "-e", f'tell application "{AE_APP}" to DoScriptFile "{jsx}"'],
-                     stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+    aeapp.run_script(jsx)
     t0 = time.time()
     while time.time() - t0 < timeout and not os.path.exists(log):
         time.sleep(1)
@@ -122,6 +131,7 @@ def batch_jsx(rs, log):
          '  if (proj.exists) app.open(proj);',
          f'  else {{ app.newProject(); app.project.importFile(new ImportOptions(new File({js(os.path.join(D, "src", "src.png"))}))); app.project.save(proj); }}',
          '}',
+         *COLOR_GUARD,
          'function item(n) { for (var i = 1; i <= app.project.numItems; i++) if (app.project.item(i).name == n) return app.project.item(i); return null; }',
          'var foot = item("src.png"); var mapf = item("map.png");',
          f'if (!mapf) mapf = app.project.importFile(new ImportOptions(new File({js(os.path.join(D, "src", "map.png"))})));',
@@ -168,8 +178,7 @@ def main():
         open(jsx, "w", encoding="utf-8").write(batch_jsx(chunk, log))
         if os.path.exists(log):
             os.remove(log)
-        subprocess.Popen(["osascript", "-e", f'tell application "{AE_APP}" to DoScriptFile "{jsx}"'],
-                         stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        aeapp.run_script(jsx)
         t0 = time.time()
         while time.time() - t0 < 600 and not os.path.exists(log):
             time.sleep(1)
@@ -178,14 +187,7 @@ def main():
             print("stopped:", txt[:300])
             return 1
         pngs = [os.path.join(D, r["png"]) for r in chunk]
-        t1 = time.time()                      # saveFrameToPng is asynchronous: wait for every PNG to stop growing
-        while time.time() - t1 < 300:
-            sizes = [os.path.getsize(p) if os.path.exists(p) else -1 for p in pngs]
-            if all(s > 0 for s in sizes):
-                time.sleep(1.5)
-                if sizes == [os.path.getsize(p) for p in pngs]:
-                    break
-            time.sleep(1)
+        aeapp.wait_settled(pngs)              # saveFrameToPng is asynchronous: wait for every PNG to stop growing
         fails = [ln for ln in txt.split("\n") if not ln.startswith("ok")]
         print(f"batch {b // 8}: {len(chunk)} renders, {time.time() - t0:.0f}s", "; ".join(fails)[:600], flush=True)
 

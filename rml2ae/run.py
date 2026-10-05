@@ -34,7 +34,9 @@ def shots(project_dir, out_dir, comp_name, artboard, times, fps=25):
     shot_dir = os.path.join(out_dir, "shots")
     os.makedirs(shot_dir, exist_ok=True)
     lines = ['var out = [];', 'var comp = null; for (var i = 1; i <= app.project.numItems; i++) { var it = app.project.item(i); if (it instanceof CompItem && it.name == ' + js(comp_name) + ') comp = it; }',
-             'if (!comp) out.push("no comp " + ' + js(comp_name) + ');']
+             'if (!comp) out.push("no comp " + ' + js(comp_name) + ');',
+             # the user's project is not changed: a colour-managed or > 8 bpc one only gets a warning
+             aeapp.COLOR_CHECK_JSX, 'var cp = colorProblem(); if (cp) out.push("warn colour: " + cp);']
     ae_paths = {}
     for t in times:
         p = os.path.join(shot_dir, f"ae_{t:06.2f}.png")
@@ -58,10 +60,12 @@ def shots(project_dir, out_dir, comp_name, artboard, times, fps=25):
         # state machine) — measured: walk-test at T + 1/60 = AE at T to the pixel, a 300 px/s move at 0.25 s sits at 70 px
         subprocess.run(["rive", project_dir, f"--screenshot={p}", f"--artboard={artboard}", f"--advance={t + RIVE_SHOT_LAG:.4f}s", "--quiet"],
                        capture_output=True, text=True, env=env)
-    t0 = time.time()
-    while time.time() - t0 < 900 and not all(os.path.exists(p) for p in ae_paths.values()):
-        time.sleep(3)
-    time.sleep(2)
+    aeapp.wait_settled(list(ae_paths.values()), timeout=900)    # saveFrameToPng writes asynchronously
+    if os.path.exists(done):
+        for ln in open(done, encoding="utf-8", errors="replace").read().split("\n"):
+            if ln.startswith("warn colour"):
+                print(f"warning: the AE frames are not display values ({ln[13:]}): this comparison is not reliable; "
+                      "set the project to 8 bpc without colour management (File > Project Settings)")
     from PIL import Image, ImageDraw
     tiles = []
     for t in times:

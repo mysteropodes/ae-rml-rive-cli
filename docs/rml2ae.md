@@ -30,7 +30,7 @@ With After Effects open and the install done:
 ```bash
 ae doctor my_project            # every line should read [ok]
 ae build my_project             # new AE project + my_project/build/rml2ae/my_project.aep
-ae diff my_project --times 1 2.5 4     # AE frames next to `rive --screenshot`
+ae diff my_project --times 1 2.5 4     # AE frames next to `rive --screenshot` (warns if the AE project is colour-managed or > 8 bpc)
 ```
 
 Without the `ae` command on your PATH, the converter alone runs from the repository root:
