@@ -20,11 +20,16 @@ def run(jsx, log, timeout=900):
         os.remove(log)
     osa(jsx)
     t0 = time.time()
+    watch = aeapp.DialogWatch()
     while time.time() - t0 < timeout:
         if os.path.exists(log):
             txt = open(log, errors="replace", encoding="utf-8").read()
             if "DONE" in txt or "TOP FAILED" in txt:
                 return txt
+        dialog = watch.check()
+        if dialog:              # After Effects waits for a click: the log will not come
+            return f"TOP FAILED After Effects shows a dialog: {dialog}\n" + \
+                (open(log, errors="replace", encoding="utf-8").read() if os.path.exists(log) else "")
         time.sleep(2)
     return "timeout\n" + (open(log, errors="replace", encoding="utf-8").read() if os.path.exists(log) else "")
 
@@ -60,7 +65,10 @@ def shots(project_dir, out_dir, comp_name, artboard, times, fps=25):
         # state machine) — measured: walk-test at T + 1/60 = AE at T to the pixel, a 300 px/s move at 0.25 s sits at 70 px
         subprocess.run(["rive", project_dir, f"--screenshot={p}", f"--artboard={artboard}", f"--advance={t + RIVE_SHOT_LAG:.4f}s", "--quiet"],
                        capture_output=True, text=True, env=env)
-    aeapp.wait_settled(list(ae_paths.values()), timeout=900)    # saveFrameToPng writes asynchronously
+    try:                                                            # saveFrameToPng writes asynchronously
+        aeapp.wait_settled(list(ae_paths.values()), timeout=900, watch=aeapp.DialogWatch())
+    except RuntimeError as e:
+        raise SystemExit(f"ae diff: {e}")
     if os.path.exists(done):
         for ln in open(done, encoding="utf-8", errors="replace").read().split("\n"):
             if ln.startswith("warn colour"):

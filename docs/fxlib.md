@@ -168,6 +168,8 @@ Everything needed to measure an effect is in the repository:
    management** and the run stops if After Effects keeps another state: in a colour-managed project
    `saveFrameToPng` writes the linear working buffer (scaled), not display values, so every reference would be off
    without any error. Frames are read once their file has stopped growing (`saveFrameToPng` writes asynchronously).
+   If After Effects stops on a modal dialog, the run stops and prints its text (macOS: the terminal needs the
+   Accessibility permission for this, see `ae doctor`).
 3. Write `fxlib/ae_<slug>.wgsl` and `fxlib/<slug>.json` looking only at the visible renders, iterate with
    `fxlib check <slug> --rive`.
 4. Have someone else (or a later session) run `fxlib check <slug> --rive --holdout` and record the result in the

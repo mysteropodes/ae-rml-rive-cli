@@ -141,7 +141,7 @@ ae help
 
 | Command | What it does |
 |---|---|
-| `doctor [<project>]` | Checks After Effects, `aerender`, the Rive CLI, ffmpeg, Python dependencies and the Rive Shader plugin. With a project: that `scene.rml` exists, how many fonts and whether their files are present, and the artboards. Exit code 1 if anything is `[!!]`. |
+| `doctor [<project>]` | Checks After Effects (and, while it runs, that no dialog blocks it), `aerender`, the Rive CLI, ffmpeg, Python dependencies and the Rive Shader plugin. With a project: that `scene.rml` exists, how many fonts and whether their files are present, and the artboards. Exit code 1 if anything is `[!!]`. |
 | `templates` | Lists the render-settings and output-module templates of the running AE (their names are localised). |
 | `build <project>` | Converts and runs the script in the open AE: new project, `.aep` saved under `build/rml2ae/`. |
 | `build --replace` | Updates the **open** AE project incrementally: only comps whose RML changed are rebuilt, your edits elsewhere stay. `--full` replaces everything. |
@@ -157,6 +157,7 @@ Notes:
 - `build`, `watch`, `pull` and `diff` need After Effects running (ExtendScript has no headless mode on macOS). `render` and `screenshot` use `aerender` and need a saved project.
 - In `--replace` and `watch` modes, rendering reads the **open** project, which must be saved (the build prints `unsaved` otherwise).
 - Save the AE project before `--replace` or `watch`, and do not leave a dialog open in AE during a build: scripts would be blocked.
+- When After Effects stops on a modal dialog (a script error, a missing file, a question), `build`, `watch`, `pull` and `diff` stop after about 20 seconds and print the dialog's text, instead of waiting for their timeout. On macOS this reads AE's windows through System Events, which needs the terminal allowed in **System Settings › Privacy & Security › Accessibility**; without it the commands only stop at the timeout. On Windows it needs nothing. `ae doctor` says whether detection works and whether AE is blocked now.
 - Logs go to `build/rml2ae/<name>.ae.log`; the report is `build/rml2ae/<name>.ae-report.md`.
 - `render` has a start-up cost (about 13 seconds) plus roughly 1.5 seconds per frame in the reference measurements. There is no real-time AE viewer outside AE: `render` and `screenshot` are renders.
 
