@@ -19,7 +19,7 @@ import os
 import re
 import subprocess
 
-from .jsx import js
+from .jsx import js, TIDY_JSX, TIDY_PULL_JSX
 from .model import Project
 
 PROPS = {"x": 13, "y": 14, "rotation": 15, "scaleX": 16, "scaleY": 17, "opacity": 18}
@@ -64,22 +64,29 @@ function dumpGroups(container, path, out) {
   }
 }
 var OUT = new File(__OUT__);
+var T0 = (new Date()).getTime();
+var TIDY = {};
+for (var ti = 1; ti <= app.project.numItems; ti++) { var tit = app.project.item(ti); if (tit instanceof FolderItem && tit.name == "rml2ae tidy") { var tr0 = tidyLoad(tit); for (var tk in tr0) TIDY[tk] = tr0[tk]; } }
 try {
-  var comps = [];
-  for (var i = 1; i <= app.project.numItems; i++) {
-    var it = app.project.item(i);
+  var comps = [], ITEMS = [];
+  // a snapshot: the temporary nulls of tidyWrap add solids to the project, which shifts the item indices
+  for (var i0 = 1; i0 <= app.project.numItems; i0++) ITEMS.push(app.project.item(i0));
+  for (var i = 0; i < ITEMS.length; i++) {
+    var it = ITEMS[i];
     if (!(it instanceof CompItem) || !it.comment || it.comment.indexOf("rive:") != 0) continue;
     var parts = it.comment.split("|");
     if (parts.length < 2 || parts[1] == "seq" || parts[1] == "looped" || parts[1] == "stepped") continue;
-    var layers = [];
-    for (var j = 1; j <= it.numLayers; j++) {
-      var L = it.layer(j);
+    var layers = [], LL = [];
+    for (var j0 = 1; j0 <= it.numLayers; j0++) LL.push(it.layer(j0));   // tidyWrap adds layers: iterate a snapshot
+    for (var j = 0; j < LL.length; j++) {
+      var L = LL[j], TW = null;
       var c = L.comment || "";
       if (c.indexOf("rive:") != 0) continue;
       var isRun = c.indexOf("+run") > 0;
       if (c.indexOf("+") >= 0 && !isRun) continue;
       if (L.name.indexOf("[skinned]") >= 0) continue;
       try { if (L.source && L.source instanceof CompItem && L.source.comment && L.source.comment.indexOf("|clip") > 0) continue; } catch (e0) {}
+      TW = tidyWrap(it, L, TIDY);                     // a null dissolved by the build's tidy pass, back for the read
       var sepd = false; try { sepd = prop(L, "ADBE Position").dimensionsSeparated; } catch (e1) {}
       var tm = false; try { tm = L.isTrackMatte; } catch (e2) {}                   // a matte layer is switched off by AE itself
       var rec = "{\"id\":" + q(c.substr(5)) + ",\"name\":" + q(L.name) + ",\"enabled\":" + ((L.enabled || tm) ? "true" : "false") + ",\"sep\":" + (sepd ? "true" : "false");
@@ -87,10 +94,14 @@ try {
       else rec += ",\"p\":" + dumpProp(prop(L, "ADBE Position"));
       rec += ",\"r\":" + dumpProp(prop(L, "ADBE Rotate Z")) + ",\"s\":" + dumpProp(prop(L, "ADBE Scale")) + ",\"o\":" + dumpProp(prop(L, "ADBE Opacity"));
       rec += ",\"tag\":" + q(c) + ",\"run\":" + (isRun ? "true" : "false");
+      var tch = TIDY[it.id + ":" + L.id];
+      if (tch && tch.length && !TW && !tidyRotated(tch)) { var tp = []; for (var ti2 = 0; ti2 < tch.length; ti2++) tp.push("[" + tch[ti2].join(",") + "]"); rec += ",\"untidy\":[" + tp.join(",") + "]"; }
       var gs = []; try { if (L.property("ADBE Root Vectors Group")) dumpGroups(L.property("ADBE Root Vectors Group"), [], gs); } catch (eg) {}
       rec += ",\"groups\":[" + gs.join(",") + "]}";
+      tidyUnwrap(TW);
       layers.push(rec);
     }
+    log("read " + it.name + ": " + layers.length + " layer(s), " + ((new Date()).getTime() - T0) + " ms");
     comps.push("{\"tag\":" + q(it.comment) + ",\"name\":" + q(it.name) + ",\"fps\":" + num(it.frameRate) + ",\"layers\":[" + layers.join(",") + "]}");
   }
   OUT.open("w"); OUT.write("[" + comps.join(",") + "]"); OUT.close();
@@ -276,12 +287,43 @@ class RmlText:
             open(self.path, "w", encoding="utf-8").write(self.text)
 
 
+def untidy(L):
+    """a layer whose static parent nulls the build's tidy pass dissolved (no rotation in the chain): its dumped values
+    back in the space of its Rive parent. Each dissolved null maps a point q to (q - anchor) * scale + position, the
+    outermost first; the child's scale was multiplied by theirs."""
+    chain = L.pop("untidy")
+
+    def pt(x, y):
+        for ax, ay, px, py, _r, sx, sy in chain:                  # outermost first: undo it first
+            x = (x - px) * 100.0 / (sx or 1e-9) + ax
+            y = (y - py) * 100.0 / (sy or 1e-9) + ay
+        return x, y
+    fx = fy = 1.0
+    for _ax, _ay, _px, _py, _r, sx, sy in chain:
+        fx *= sx / 100.0
+        fy *= sy / 100.0
+
+    def each(rec, fn):
+        if rec is None:
+            return
+        rec["v"] = fn(rec["v"])
+        for k in rec.get("k") or []:
+            k["v"] = fn(k["v"])
+    if L.get("sep"):
+        # x and y are independent without rotation: x' = f(x) only
+        each(L.get("px"), lambda v: pt(v, 0.0)[0])
+        each(L.get("py"), lambda v: pt(0.0, v)[1])
+    else:
+        each(L.get("p"), lambda v: list(pt(v[0], v[1])))
+    each(L.get("s"), lambda v: [v[0] / (fx or 1e-9), v[1] / (fy or 1e-9)])
+
+
 def prepare(out_dir):
     """Write the dump script; returns (jsx path, json path, log path)."""
     dump_jsx = os.path.join(out_dir, "_pull.jsx")
     dump_json = os.path.join(out_dir, "_pull.json")
     log = os.path.join(out_dir, "_pull.log")
-    open(dump_jsx, "w", encoding="utf-8").write(DUMP_JSX.replace("__LOG__", js(log)).replace("__OUT__", js(dump_json)))
+    open(dump_jsx, "w", encoding="utf-8").write((TIDY_JSX + TIDY_PULL_JSX + DUMP_JSX).replace("__LOG__", js(log)).replace("__OUT__", js(dump_json)))
     return dump_jsx, dump_json, log
 
 
@@ -383,6 +425,8 @@ def apply(project_dir, out_dir, dry=False, only_comp=None):
             static_ok = anim_id == first_anim
             records = []
             for L in comp["layers"]:
+                if L.get("untidy"):
+                    untidy(L)
                 if not L.get("run"):
                     records.append(L)
                 gids = group_ids.get(L.get("tag") or ("rive:" + L["id"]), {})

@@ -132,6 +132,13 @@ function addFx(L, match, params) {
   for (var k in params) { try { fx.property(k).setValue(params[k]); } catch (e) { log("effect " + match + " param " + k + ": " + e.toString()); } }
   return fx;
 }
+// a layer only exists while its element can be seen (its opacity and its ancestors' are not 0): the cut is in its in/out
+// points, as an editor would make it (the opacity keys stay: they also draw any gap inside the window)
+function trimTo(L, a, b) {
+  if (!L || L.inPoint === undefined) return;
+  var i = Math.max(L.inPoint, a), o = Math.min(L.outPoint, b);
+  if (o - i > 1e-6) { if (i > L.inPoint) L.inPoint = i; if (o < L.outPoint) L.outPoint = o; }
+}
 function resetProp(p, v) { while (p.numKeys > 0) p.removeKey(1); p.expression = ""; p.setValue(v); }
 // a clip source copy turned into the stencil of its clipped precomp: geometry only (Rive clips by the path, not by its
 // paint): fills opaque and unkeyed, strokes removed, layer opacity 100, Stencil Alpha, on top of the precomp's stack
@@ -438,5 +445,178 @@ function selfTest(comp) {
   for (var j = 0; j < pr2.length; j++) s2 += " " + q.valueAtTime(T(pr2[j]), false).toFixed(2);
   log(s2);
   n.remove();
+}
+"""
+
+# ---- tidy: nulls that do nothing are dissolved once the build is done (measured on a 72 s film: 1 456 nulls for
+# 1 443 shape layers, 275 of them with no child). A null goes when it is static (no keys, no expression but the
+# opacity propagation, opacity 100 %, no effect, 2D) and its children can take its transform: AE re-expresses each
+# child in the grandparent's space when its parent changes, keys included (measured 2026-10-07: identical world
+# positions at 5 times). What a dissolved null was is kept in the comment of a folder item ("rml2ae tidy"), keyed by
+# comp id + child layer id, so that `ae pull` puts the null back for the time it reads the child (rml2ae/pull.py).
+TIDY_JSX = r"""
+var PROPAGATE = "value * thisLayer.parent.transform.opacity / 100";
+function tidyR(v) { return Math.round(v * 1e6) / 1e6; }
+function tidyTf(L) {
+  var t = L.property("ADBE Transform Group"), p = t.property("ADBE Position"), a = t.property("ADBE Anchor Point").value, s = t.property("ADBE Scale").value;
+  var pv = p.dimensionsSeparated ? [t.property("ADBE Position_0").value, t.property("ADBE Position_1").value] : p.value;
+  return [tidyR(a[0]), tidyR(a[1]), tidyR(pv[0]), tidyR(pv[1]), tidyR(t.property("ADBE Rotate Z").value), tidyR(s[0]), tidyR(s[1])];
+}
+function tidySer(o) {
+  var out = [];
+  for (var k in o) { var ch = o[k], parts = []; for (var i = 0; i < ch.length; i++) parts.push("[" + ch[i].join(",") + "]"); out.push('"' + k + '":[' + parts.join(",") + "]"); }
+  return "{" + out.join(",") + "}";
+}
+// the store: a folder "rml2ae tidy" whose sub-folders "1", "2"… carry the text in their comments (AE caps an item
+// comment at 15 999 bytes)
+function tidyStore(root) {
+  for (var i = 1; i <= app.project.numItems; i++) { var it = app.project.item(i); if (it instanceof FolderItem && it.name == "rml2ae tidy" && (!root || it.parentFolder.id == root.id)) return it; }
+  if (!root) return null;
+  var f = app.project.items.addFolder("rml2ae tidy"); f.parentFolder = root; return f;
+}
+function tidyChunks(store) {
+  var out = [];
+  for (var i = 1; i <= app.project.numItems; i++) { var it = app.project.item(i); if (it instanceof FolderItem && it.parentFolder.id == store.id && /^\d+$/.test(it.name)) out.push(it); }
+  out.sort(function (a, b) { return parseInt(a.name, 10) - parseInt(b.name, 10); });
+  return out;
+}
+function tidyLoad(store) {
+  if (!store) return {};
+  var ch = tidyChunks(store), txt = "";
+  for (var i = 0; i < ch.length; i++) txt += ch[i].comment || "";
+  if (!txt) return {};
+  try { return eval("(" + txt + ")"); } catch (e) { return {}; }
+}
+function tidySave(store, txt) {
+  var ch = tidyChunks(store), n = 0;
+  for (var i = 0; i < txt.length || n == 0; i += 15000) {
+    var it = n < ch.length ? ch[n] : app.project.items.addFolder(String(n + 1));
+    it.parentFolder = store; it.comment = txt.substr(i, 15000); n++;
+  }
+  for (var k = ch.length - 1; k >= n; k--) ch[k].remove();
+}
+// AE re-expresses a child in its new parent's space at the comp's current time: with an ancestor scaled to 0 at that
+// time the result is garbage (measured: a cigar's glow under a "pop-in" group keyed from scale 0 vanished). The
+// dissolved null is static, so any time where the whole new chain is invertible gives the same, exact result.
+function tidyChainOk(L, t) {
+  for (var X = L; X; X = X.parent) {
+    var s = X.property("ADBE Transform Group").property("ADBE Scale").valueAtTime(t, false);
+    if (Math.abs(s[0] * s[1]) < 1e-6) return false;
+  }
+  return true;
+}
+function tidyTime(comp, P) {
+  if (!P) return comp.time;
+  var cand = [comp.time, 0, comp.duration / 2, comp.duration - comp.frameDuration];
+  for (var X = P; X; X = X.parent) {
+    var sp = X.property("ADBE Transform Group").property("ADBE Scale");
+    for (var k = 1; k <= sp.numKeys; k++) { cand.push(sp.keyTime(k)); if (k < sp.numKeys) cand.push((sp.keyTime(k) + sp.keyTime(k + 1)) / 2); }
+  }
+  for (var i = 0; i < cand.length; i++) if (cand[i] >= 0 && cand[i] <= comp.duration && tidyChainOk(P, cand[i])) return cand[i];
+  return null;
+}
+"""
+
+TIDY_BUILD_JSX = r"""
+function tidyStatic(L, allowPropagate, ignoreOpacity) {
+  var g = L.property("ADBE Transform Group");
+  for (var i = 1; i <= g.numProperties; i++) {
+    var p = g.property(i);
+    if (ignoreOpacity && p.matchName == "ADBE Opacity") continue;
+    try { if (p.numKeys > 0) return false; } catch (e) {}
+    try { if (p.expressionEnabled && p.expression) { if (!(allowPropagate && p.matchName == "ADBE Opacity" && p.expression == PROPAGATE)) return false; } } catch (e2) {}
+  }
+  return true;
+}
+function tidyMovable(C, sx, sy) {
+  if (C.threeDLayer) return false;
+  var g = C.property("ADBE Transform Group");
+  var names = ["ADBE Anchor Point", "ADBE Position", "ADBE Position_0", "ADBE Position_1", "ADBE Rotate Z", "ADBE Scale"];
+  for (var i = 0; i < names.length; i++) { try { var p = g.property(names[i]); if (p && p.expressionEnabled && p.expression) return false; } catch (e) {} }
+  if (Math.abs(sx - sy) > 1e-6) { var r = g.property("ADBE Rotate Z"); if (r.numKeys > 0 || Math.abs(r.value) > 1e-9) return false; }   // skew
+  return true;
+}
+// dissolve the static nulls of the comps under `root`; returns the number removed
+function tidyProject(root) {
+  var store = tidyStore(root), rec = tidyLoad(store), removed = 0, live = {};
+  var comps = [];
+  for (var i = 1; i <= app.project.numItems; i++) {
+    var it = app.project.item(i);
+    if (!(it instanceof CompItem)) continue;
+    var f = it.parentFolder; while (f && f !== app.project.rootFolder && f.id != root.id) f = f.parentFolder;
+    if (f && f.id == root.id) comps.push(it);
+  }
+  for (var c = 0; c < comps.length; c++) {
+    var comp = comps[c], again = true, tKeep = comp.time;
+    while (again) {
+      again = false;
+      for (var j = comp.numLayers; j >= 1; j--) {
+        var N = comp.layer(j);
+        if (!N.nullLayer || N.threeDLayer || N.name == "ViewModel" || N.isTrackMatte || N.hasTrackMatte) continue;
+        if (N.property("ADBE Effect Parade").numProperties > 0) continue;
+        var g = N.property("ADBE Transform Group");
+        var s = g.property("ADBE Scale").value, kids = [], ok = true, reads = false;
+        for (var k = 1; k <= comp.numLayers; k++) {
+          var C = comp.layer(k);
+          if (!(C.parent && C.parent.index == N.index)) continue;
+          kids.push(C); if (!tidyMovable(C, s[0], s[1])) ok = false;
+          try { var ce = C.property("ADBE Transform Group").property("ADBE Opacity").expression; if (ce && ce.indexOf("thisLayer.parent.transform.opacity") >= 0) reads = true; } catch (e4) {}
+        }
+        // a null with no child goes whatever it carries; else it must be static, and its opacity only matters when a
+        // child reads it (Rive's opacity multiplied down)
+        if (kids.length && (!ok || !tidyStatic(N, true, !reads))) continue;
+        if (reads && Math.abs(g.property("ADBE Opacity").value - 100) > 1e-6) continue;
+        var P = N.parent, tf = tidyTf(N), mine = rec[comp.id + ":" + N.id] || [];
+        if (kids.length) {
+          var sN = g.property("ADBE Scale").value; if (Math.abs(sN[0] * sN[1]) < 1e-6) continue;   // a null at scale 0 hides its children
+          var t0 = tidyTime(comp, P); if (t0 === null) continue;
+          if (Math.abs(comp.time - t0) > 1e-9) comp.time = t0;
+        }
+        for (var q = 0; q < kids.length; q++) {
+          var C2 = kids[q], key = comp.id + ":" + C2.id;
+          rec[key] = mine.concat([tf]).concat(rec[key] || []);
+          C2.parent = P;                                   // AE keeps the world transform (keys re-expressed)
+          if (!P) { var op = C2.property("ADBE Transform Group").property("ADBE Opacity"); try { if (op.expression == PROPAGATE) op.expression = ""; else if (op.expression.indexOf(" * thisLayer.parent.transform.opacity / 100") > 0) op.expression = op.expression.replace(/^\((.*)\) \* thisLayer\.parent\.transform\.opacity \/ 100$/, "$1"); } catch (e3) {} }
+        }
+        delete rec[comp.id + ":" + N.id];
+        var nsrc = N.source; N.remove(); removed++; again = true;
+        try { if (nsrc && nsrc.usedIn.length == 0) nsrc.remove(); } catch (e5) {}     // its solid, else left orphan
+        break;
+      }
+    }
+    if (Math.abs(comp.time - tKeep) > 1e-9) comp.time = tKeep;
+    for (var m = 1; m <= comp.numLayers; m++) live[comp.id + ":" + comp.layer(m).id] = true;
+  }
+  var kept = {};
+  for (var key2 in rec) { var cid = parseInt(key2.split(":")[0], 10), keep = live[key2]; if (!keep) { var inTree = false; for (var z = 0; z < comps.length; z++) if (comps[z].id == cid) inTree = true; keep = !inTree && !!app.project.itemByID(cid); } if (keep) kept[key2] = rec[key2]; }
+  tidySave(store, tidySer(kept));
+  return removed;
+}
+"""
+
+# pull: the dissolved nulls are rebuilt around a child while it is read, then removed (AE re-expresses it both ways)
+TIDY_PULL_JSX = r"""
+function tidyRotated(ch) { for (var i = 0; i < ch.length; i++) if (Math.abs(ch[i][4]) > 1e-9) return true; return false; }
+// without rotation the inverse is done in Python on the dumped values (rml2ae/pull.py untidy): no layer created here
+function tidyWrap(comp, L, rec) {
+  var ch = rec[comp.id + ":" + L.id]; if (!ch || !ch.length || !tidyRotated(ch)) return null;
+  var orig = L.parent, cur = orig, tmp = [], tKeep = comp.time;
+  var t0 = tidyTime(comp, orig); if (t0 === null) return null;
+  if (Math.abs(comp.time - t0) > 1e-9) comp.time = t0;
+  for (var i = 0; i < ch.length; i++) {
+    var n = comp.layers.addNull(), t = n.property("ADBE Transform Group"), v = ch[i];
+    n.parent = cur;
+    t.property("ADBE Anchor Point").setValue([v[0], v[1]]); t.property("ADBE Position").setValue([v[2], v[3]]);
+    t.property("ADBE Rotate Z").setValue(v[4]); t.property("ADBE Scale").setValue([v[5], v[6]]);
+    tmp.push(n); cur = n;
+  }
+  L.parent = cur;
+  return { L: L, orig: orig, tmp: tmp, comp: comp, t: tKeep };
+}
+function tidyUnwrap(w) {
+  if (!w) return;
+  w.L.parent = w.orig;
+  for (var i = w.tmp.length - 1; i >= 0; i--) { var src = w.tmp[i].source; w.tmp[i].remove(); try { if (src && src.usedIn.length == 0) src.remove(); } catch (e) {} }
+  w.comp.time = w.t;
 }
 """
