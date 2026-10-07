@@ -9,7 +9,7 @@ import os
 import re
 
 from .model import Project, Animation, El, argb, blend_name, is_a, prop_name
-from .jsx import Writer, js, PRELUDE
+from .jsx import Writer, js, PRELUDE, TIDY_JSX, TIDY_BUILD_JSX
 from .report import Report
 from . import replay as RP
 from . import riveshader as RS
@@ -528,6 +528,7 @@ class Converter:
     def convert(self):
         J = self.W
         J(PRELUDE.replace("__LOG__", js(self.log)).replace("__FPS__", js(float(self.fps))))
+        J(TIDY_JSX + TIDY_BUILD_JSX)
         J(f"var KEEP = {js(self.keep)};")
         J("try {")
         J("if (!KEEP) {")
@@ -570,6 +571,9 @@ class Converter:
             names = ", ".join(sorted({e.name or e.tag for e in uniq}))
             self.rep.add(abn, "info", None, f"{len(uniq)} element(s) invisible for the whole '{an}' animation (opacity 0 / "
                          f"transparent paint): not built in its comp — {names[:300]}")
+        if self.layout == "industry":
+            # nulls that do nothing are dissolved (their children keep their world transform; ae pull rebuilds them)
+            J('try { var __td = tidyProject(ROOTF); log("tidy: " + __td + " static null(s) dissolved"); } catch (eT) { log("tidy FAILED: " + eT.toString() + " line " + eT.line); }')
         J("app.endUndoGroup();")
         J(f'if (!KEEP) {{ app.project.save(new File({js(self.aep)})); log("saved " + app.project.file.fsName); }}')
         J('else if (app.project.file) { app.project.save(); log("saved " + app.project.file.fsName); }')
@@ -845,6 +849,66 @@ class Converter:
             cur = cur.parent
         return False
 
+    @staticmethod
+    def _visible_spans(keys, dur):
+        """frames where an opacity key list is above 0, as merged [a, b) spans over [0, dur]: a hold segment is
+        invisible when its key is 0, any other segment when both of its ends are 0 (Rive interpolates the value)"""
+        spans = []
+        pts = [(f, abs(float(v)) > 1e-6, i) for f, v, i, _e in keys]
+        if pts[0][0] > 0:
+            if pts[0][1]:
+                spans.append([0, pts[0][0]])
+        for k, (f, vis, interp) in enumerate(pts):
+            nxt = pts[k + 1] if k + 1 < len(pts) else None
+            end = nxt[0] if nxt else dur
+            if end <= f:
+                continue
+            if vis or (nxt is not None and interp != "hold" and nxt[1]):
+                spans.append([f, end])
+        out = []
+        for a, b in spans:
+            if out and a <= out[-1][1] + 1e-9:
+                out[-1][1] = max(out[-1][1], b)
+            else:
+                out.append([a, b])
+        return out
+
+    def visible_window(self, els, ctx):
+        """(t0, t1) in comp seconds: the hull of the frames where any of `els` can be seen (their opacity and their
+        ancestors' above 0), or None when it is the whole animation / unknown (a binding drives an opacity)"""
+        if not ctx.anim:
+            return None
+        dur = float(ctx.anim.duration)
+        lo, hi = None, None
+        for el in els:
+            spans = [[0.0, dur]]
+            cur = el
+            while cur is not None and cur.tag != "Artboard":
+                if any(c.tag == "DataBindContext" and prop_name(c.get("propertyKey", -1)) in ("opacity", "isVisible")
+                       for c in cur.children):
+                    return None
+                ks = ctx.keys(cur.id, "opacity") if cur.id else None
+                if ks:
+                    own = self._visible_spans(ks, dur)
+                    spans = [[max(a, c), min(b, d)] for a, b in spans for c, d in own if min(b, d) > max(a, c)]
+                    if not spans:
+                        return None            # never visible: _dead's business, not a cut
+                cur = cur.parent
+            a, b = spans[0][0], spans[-1][1]
+            lo = a if lo is None else min(lo, a)
+            hi = b if hi is None else max(hi, b)
+        if lo is None or (lo <= 1e-9 and hi >= dur - 1e-9):
+            return None
+        return (lo * ctx.fscale / self.fps, hi * ctx.fscale / self.fps)
+
+    def trim(self, var, els, ctx):
+        """cut the layer to the window where its element(s) can be seen"""
+        if not isinstance(var, str) or self.layout != "industry":
+            return
+        w = self.visible_window(els, ctx)
+        if w is not None:
+            self.W(f"trimTo({var}, {js(w[0])}, {js(w[1])});")
+
     # ---- elements that draw nothing in a comp are not built (audit F2: 58 % of film-test's layers were slots hidden for
     # the whole board, rims at opacity 0, clip sources drawn with a transparent fill)
     def _rig_targets(self, ab):
@@ -947,6 +1011,19 @@ class Converter:
                 return False              # clip, bind, nested node…
         return any(c.tag in ("Fill", "Stroke") for c in el.children)
 
+    def _matte_groupable(self, el):
+        """a clip source Node: only nodes and shapes made of paths (paints do not matter, Rive clips by geometry)"""
+        if el.tag == "Node":
+            if el.find("ClippingShape") is not None or self.needs_replay(el):
+                return False
+            kids = [c for c in el.children if self.is_element(c)]
+            return bool(kids) and all(self._matte_groupable(c) for c in kids)
+        if is_a(el.tag, "Shape"):
+            if RIG.has_skin(el) or self.needs_replay(el):
+                return False
+            return any(is_a(c.tag, "Path") for c in el.children)
+        return False
+
     def _node_groupable(self, el, root=False):
         """a plain Node whose whole subtree can be one shape layer (the root may carry bindings: they go on the layer)"""
         if el.tag != "Node" or el.ae or self.needs_replay(el) or el.find("ClippingShape") is not None:
@@ -960,6 +1037,15 @@ class Converter:
                            if c.tag not in ("DataBindContext",) and self.is_element(c)):
             return False
         return all(self._shape_groupable(c) if is_a(c.tag, "Shape") else self._node_groupable(c) for c in kids)
+
+    def _moves(self, el):
+        """x or y keyed in some animation: on its own layer, position is separated in X / Y (exact eases both ways);
+        a vector group's position is one 2-D property whose eases ae pull cannot split back (measured: 79 false edits)"""
+        for a in self.p.animations.values():
+            for (o, pk) in a.keys:
+                if o == el.id and prop_name(pk) in ("x", "y"):
+                    return True
+        return False
 
     def _identity_node(self, el):
         """a Node that changes nothing (no transform, no keys, no clip, no binding): no null for it in AE"""
@@ -990,7 +1076,8 @@ class Converter:
         if len(kids) != 1:
             return None
         c = kids[0]
-        if not (is_a(c.tag, "Shape") or is_a(c.tag, "Text") or is_a(c.tag, "Image")) or c.ae or self.needs_replay(c):
+        # a nested artboard too (a film's shot: its holder node carried the cut, now the precomp layer does)
+        if not (is_a(c.tag, "Shape") or is_a(c.tag, "Text") or is_a(c.tag, "Image") or c.tag == "NestedArtboard") or c.ae or self.needs_replay(c):
             return None
         if is_a(c.tag, "Shape") and (RIG.has_skin(c) or any(self.gradient_of(x) is not None for x in c.children if x.tag in ("Fill", "Stroke"))):
             return None
@@ -1053,7 +1140,9 @@ class Converter:
         (its children take its place, parented to its parent)"""
         items, run = [], []
         for c in drawables:                      # Rive order: first = on top
-            if self._shape_groupable(c):         # loose sibling shapes share a layer; a group keeps its own (named) one
+            # loose sibling shapes share a layer, and so do sibling groups made only of shapes (a vector group each,
+            # with its own transform and keys): a 72 s film had 705 such one-group layers stacked side by side
+            if self._shape_groupable(c) or (self._node_groupable(c) and not self._moves(c)):
                 run.append(c)
                 continue
             if run:
@@ -1070,6 +1159,7 @@ class Converter:
                     tag = self.tag_of(it[0]) + "+run"
                     self.W(f"//<el {tag} {ctx.comp} {parent or '-'}>")
                     v = self.emit_shape_run(container, it, parent, ctx, tag)
+                    self.trim(v, it, ctx)
                     self.W(f"//</el {tag} {v}>")
                 continue
             if self._identity_node(it) and not self._node_groupable(it, root=True):
@@ -1099,6 +1189,7 @@ class Converter:
             v = self.emit_element(leaf, parent, ctx)
             if leaf.ae:
                 self.emit_effects(leaf, v, ctx)
+            self.trim(v, [leaf], ctx)
             self.W(f"//</el {tag} {v if isinstance(v, str) else '__none'}>")
             self.rep.add(ctx.artboard.name, "converted", it, f"node holding one {leaf.tag}: no null, the layer carries its animation")
             return
@@ -1110,6 +1201,7 @@ class Converter:
         v = self.emit_element(c, parent, ctx)
         if c.ae:
             self.emit_effects(c, v, ctx)
+        self.trim(v, [c], ctx)
         self.W(f"//</el {tag} {v if isinstance(v, str) else '__none'}>")
 
     def emit_merged(self, el, parent, ctx):
@@ -1127,6 +1219,86 @@ class Converter:
         self.rep.add(ctx.artboard.name, "converted", el, f"node of {n} shapes → one shape layer (vector groups)")
         return var
 
+    def emit_merged_matte(self, src, parent, ctx):
+        """a clip source that is a Node of shapes -> ONE shape layer (vector groups), every path filled opaque: Rive clips
+        by the geometry of all the node's shapes, whatever their paint"""
+        J = self.W
+        var = J.var("shp")
+        J(f'var {var} = {ctx.comp}.layers.addShape(); {var}.name = {js(src.name + " (matte)")};')
+        if parent:
+            J(f"{var}.parent = {parent};")
+        J(f'var gr = {var}.property("ADBE Root Vectors Group");')
+        self._emit_groups([c for c in src.children if self.is_element(c)], "gr", ctx, "rive:" + (src.id or "") + "+mattegroups",
+                          matte=True)
+        J(f'tr({var}, "ADBE Anchor Point").setValue([0, 0]);')
+        self.base_transform(var, src, ctx)
+        return var
+
+    @staticmethod
+    def _local_matrix(e):
+        x, y, r = e.num("x"), e.num("y"), e.num("rotation")
+        sx, sy = e.num("scaleX", 1), e.num("scaleY", 1)
+        c, s_ = math.cos(r), math.sin(r)
+        return [[c * sx, -s_ * sy, x], [s_ * sx, c * sy, y], [0.0, 0.0, 1.0]]
+
+    def matte_space(self, src, target, host, ctx, ab):
+        """the AE parent for a clip source's matte: `host` (the layer standing for `target`) when the source's parent IS
+        target; else nulls under host that rebuild the source's own space: the static inverse of target's branch up to
+        the common ancestor, then one null per node of the source's branch (with its keys: a card's burn zone shrinks)"""
+        J = self.W
+        sp = src.parent
+        if sp is None or sp is target or target is None:
+            return host
+
+        def chain(e):
+            out = []
+            while e is not None and e.tag != "Artboard":
+                out.append(e)
+                e = e.parent
+            return out
+        up_s, up_t = chain(sp), chain(target)
+        ca = next((e for e in up_s if any(e is t for t in up_t)), None)
+        below = lambda lst: [e for e in lst[:next((k for k, e in enumerate(lst) if e is ca), len(lst))]]
+        br_s, br_t = below(up_s), below(up_t)            # bottom-up, the common ancestor excluded
+        keyed = getattr(self, "_keyed_ids", None)
+        if keyed is None:
+            keyed = self._keyed_ids = {o for a in self.p.animations.values() for (o, _pk) in a.keys}
+        if any(e.id in keyed for e in br_t):
+            self.rep.add(ab.name, "approx", src, "clip source in another branch, the clipped node's own branch is animated: "
+                                                 "its inverse is static")
+        mt = [[1.0, 0.0, 0.0], [0.0, 1.0, 0.0], [0.0, 0.0, 1.0]]
+        for e in br_t:                                    # target space -> common ancestor space
+            lm = self._local_matrix(e)
+            mt = [[sum(lm[i][k] * mt[k][j] for k in range(3)) for j in range(3)] for i in range(3)]
+        cur = host
+        det = mt[0][0] * mt[1][1] - mt[0][1] * mt[1][0]
+        ident = abs(mt[0][0] - 1) + abs(mt[1][1] - 1) + abs(mt[0][1]) + abs(mt[1][0]) + abs(mt[0][2]) + abs(mt[1][2]) < 1e-9
+        if not ident and abs(det) > 1e-12:
+            inv = [[mt[1][1] / det, -mt[0][1] / det, 0.0], [-mt[1][0] / det, mt[0][0] / det, 0.0], [0.0, 0.0, 1.0]]
+            inv[0][2] = -(inv[0][0] * mt[0][2] + inv[0][1] * mt[1][2])
+            inv[1][2] = -(inv[1][0] * mt[0][2] + inv[1][1] * mt[1][2])
+            rot = math.degrees(math.atan2(inv[1][0], inv[0][0]))
+            sx = math.hypot(inv[0][0], inv[1][0])
+            sy = (inv[0][0] * inv[1][1] - inv[0][1] * inv[1][0]) / (sx or 1)
+            off = J.var("nul")
+            J(f'var {off} = {ctx.comp}.layers.addNull(); {off}.name = {js(src.name + " (matte space)")}; {off}.label = 3; {off}.enabled = false;')
+            if cur:
+                J(f"{off}.parent = {cur};")
+            J(f'tr({off}, "ADBE Anchor Point").setValue([0, 0]); tr({off}, "ADBE Position").setValue([{js(inv[0][2])}, {js(inv[1][2])}]); '
+              f'tr({off}, "ADBE Rotate Z").setValue({js(rot)}); tr({off}, "ADBE Scale").setValue([{js(sx * 100)}, {js(sy * 100)}]);')
+            cur = off
+        for e in reversed(br_s):                          # common ancestor -> the source's parent, keys included
+            if e.id not in keyed and self._identity_node(e):
+                continue
+            nv = J.var("nul")
+            J(f'var {nv} = {ctx.comp}.layers.addNull(); {nv}.name = {js(e.name + " (matte space)")}; {nv}.label = 3; {nv}.enabled = false;')
+            if cur:
+                J(f"{nv}.parent = {cur};")
+            J(f'tr({nv}, "ADBE Anchor Point").setValue([0, 0]);')
+            self.base_transform(nv, e, ctx)
+            cur = nv
+        return cur
+
     def emit_shape_run(self, container, run, parent, ctx, tag):
         """consecutive groupable siblings -> one shape layer at identity, a vector group each"""
         J = self.W
@@ -1142,7 +1314,7 @@ class Converter:
         self.rep.add(ctx.artboard.name, "converted", run[0], f"{len(run)} sibling shapes/groups ({n} shapes) → one shape layer")
         return var
 
-    def _emit_groups(self, els, cvar, ctx, layer_tag, path=()):
+    def _emit_groups(self, els, cvar, ctx, layer_tag, path=(), matte=False):
         """els in Rive order (first on top) -> vector groups added in that order (AE: first in the list on top).
         Each group's index path inside its layer is recorded (group_map): `ae pull` reads the groups back by it."""
         J = self.W
@@ -1159,15 +1331,18 @@ class Converter:
                 for p in c.children:
                     if is_a(p.tag, "Path"):
                         self.emit_path(p, ctx, c)
-                for p in reversed(c.children):
-                    if p.tag == "Fill":
-                        self.emit_fill(p, ctx, c, False)
-                    elif p.tag == "Stroke":
-                        self.emit_stroke(p, ctx, c)
+                if matte:           # a clip: the geometry, filled opaque
+                    J('var fl = gc.addProperty("ADBE Vector Graphic - Fill"); fl.property("ADBE Vector Fill Color").setValue([1,1,1]); fl.property("ADBE Vector Fill Opacity").setValue(100);')
+                else:
+                    for p in reversed(c.children):
+                        if p.tag == "Fill":
+                            self.emit_fill(p, ctx, c, False)
+                        elif p.tag == "Stroke":
+                            self.emit_stroke(p, ctx, c)
                 n += 1
             else:
                 n += self._emit_groups([x for x in c.children if self.is_element(x)], f'{gv}.property("ADBE Vectors Group")', ctx,
-                                       layer_tag, gpath)
+                                       layer_tag, gpath, matte)
         return n
 
     def _group_transform(self, gv, el, ctx):
@@ -1769,6 +1944,12 @@ class Converter:
                 # the clip source is one of the node's own children: the precomp carries a Stencil Alpha copy of it,
                 # and the parent comp sees one precomp layer (no outer null nor matte; audit F6)
                 return self.emit_clipped(el, None, parent, ctx, clip, stencil=True)
+        if clip is not None and self.layout == "industry" and el.id not in self._rig_targets(ctx.artboard):
+            src = self.p.by_id.get(clip.get("sourceId"))
+            if src is not None and not any(e is src for e in el.iter()):
+                # the clip source lives elsewhere: the null would only hold the node's transform, which the precomp's
+                # root null already carries — no outer null (it was left with no child)
+                return self.emit_clipped(el, None, parent, ctx, clip)
         var = J.var("nul")
         label = ("[script] " if placeholder else "") + el.name
         J(f'var {var} = {ctx.comp}.layers.addNull(); {var}.name = {js(label)}; {var}.label = {4 if placeholder else 3};')
@@ -1849,23 +2030,30 @@ class Converter:
         if bm and bm != "srcOver":
             J(f'{lv}.blendingMode = BLEND[{js(bm)}];')
         if clip is None:
-            J(f"{nul}.moveToBeginning();")
+            if nul:
+                J(f"{nul}.moveToBeginning();")
             return lv
         if stencil:
             self.rep.add(ab.name, "converted", el, f"clipped by '{src.name}' → precomp holding a Stencil Alpha copy of the "
                                                    f"clip (one layer here, no outer null nor matte)")
             J(f"{lv}.moveToBeginning();")
             return lv
-        if src is not None and is_a(src.tag, "Shape"):
-            # the matte follows the node when the clip source lives inside it, else it stays in the node's parent space
+        node_src = src is not None and src.tag == "Node" and self._matte_groupable(src)
+        if src is not None and (is_a(src.tag, "Shape") or node_src):
+            # the matte follows the node when the clip source lives inside it, else it stays in the node's parent space;
+            # a source elsewhere in the tree (ae2rml's track mattes: « X · matte source » next to the clipped node's
+            # parent) gets its own space through an offset null
             inside = any(e is src for e in el.iter())
-            mv = self.emit_shape(src, nul if inside else parent, ctx, as_matte=True)
+            host = nul if inside else parent
+            host = self.matte_space(src, el if inside else el.parent, host, ctx, ab)
+            mv = self.emit_merged_matte(src, host, ctx) if node_src else self.emit_shape(src, host, ctx, as_matte=True)
             J(f'{mv}.comment = {js("rive:" + (el.id or "") + "+matte")};')      # belongs to this element, not to the source
             J(f"{lv}.setTrackMatte({mv}, TrackMatteType.ALPHA);")
-            self.rep.add(ab.name, "converted", el, f"clipped by '{src.name}' → precomp + alpha matte")
+            self.rep.add(ab.name, "converted", el, f"clipped by {'the shapes of node ' if node_src else ''}'{src.name}' → precomp + alpha matte")
         else:
             self.rep.add(ab.name, "unsupported", el, "ClippingShape source not found / not a shape")
-        J(f"{nul}.moveToBeginning();")
+        if nul:
+            J(f"{nul}.moveToBeginning();")
         return lv
 
     def emit_audio(self, ab, ctx):
@@ -1984,6 +2172,9 @@ class Converter:
                 t0 = ctx.carry.get((remap.id, "time"), remap.num("time"))      # unkeyed here: the value the previous state left
                 t0 = min(t0 * dur_s, max(0.0, dur_s - 1.0 / (anim.fps or self.fps)))
                 J(f"remapSet(trp, [[0, {js(t0)}], [{ctx.comp}.duration, {js(t0)}]]);")
+                # held on one frame for the whole parent: the layer must last as long (the trailer's Letterbox, a
+                # 26-frame comp with an unkeyed remap, vanished after 0.43 s)
+                J(f'{var}.outPoint = {ctx.comp}.duration;')
             self.rep.add(ctx.artboard.name, "converted", el, f"scrubs '{ab.name} · {anim.name}' → time remap")
         elif simple is not None:
             sp = simple.num("speed", 1)
@@ -2391,6 +2582,12 @@ fn fs_main(in: VSOut) -> @location(0) vec4<f32> {{
                 self.emit_fill(c, ctx, el, as_matte)
             elif c.tag == "Stroke":
                 self.emit_stroke(c, ctx, el)
+        fst = [c for c in el.children if c.tag == "Stroke" and c.find("Feather") is not None]
+        if fst and not as_matte and not any(c.tag == "Fill" for c in el.children):
+            # a feathered stroke alone on its shape (a glowing outline): the layer is blurred instead
+            fs = max(f.find("Feather").num("strength", 0) for f in fst)
+            J(f'var gbl = {var}.property("ADBE Effect Parade").addProperty("ADBE Gaussian Blur 2"); gbl.property("ADBE Gaussian Blur 2-0001").setValue({js(round(fs, 2))});')
+            self.rep.add(ab, "approx", el, f"feathered stroke (strength {fs:g}) → Gaussian Blur {fs:g} on the layer")
         if as_matte and not any(c.tag in ("Fill", "Stroke") for c in el.children):
             # a paint-less clip source (Rive clips by geometry, draws nothing): the matte needs an opaque fill
             J('var fl = gc.addProperty("ADBE Vector Graphic - Fill"); fl.property("ADBE Vector Fill Color").setValue([1,1,1]); fl.property("ADBE Vector Fill Opacity").setValue(100);')
@@ -2698,7 +2895,7 @@ fn fs_main(in: VSOut) -> @location(0) vec4<f32> {{
             if tp.get("modeValue") == "synchronized":
                 J('trm.property("ADBE Vector Trim Type").setValue(2);')
             self.emit_binds(tp, {"start": ('trm.property("ADBE Vector Trim Start")', "%s * 100"), "end": ('trm.property("ADBE Vector Trim End")', "%s * 100"), "offset": ('trm.property("ADBE Vector Trim Offset")', "%s * 360")}, ctx)
-        if c.find("Feather") is not None:
+        if c.find("Feather") is not None and any(x.tag == "Fill" for x in el.children):
             self.warn(ab, "approx", el, "Feather on a stroke: not reproduced (add a Gaussian blur on the layer if wanted)")
         if c.get("isVisible") == "false":
             J('st.property("ADBE Vector Stroke Opacity").setValue(0);')

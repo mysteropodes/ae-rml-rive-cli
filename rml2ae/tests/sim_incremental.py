@@ -69,7 +69,8 @@ def main():
                                      '<Node x="950" y="150" opacity="0.5" name="Group" id="0:116">', 1))
     conv, text = build(sim, True)
     if LAYOUT == "industry":
-        # loose sibling shapes share one layer: the new shape joins (or makes) the run it sits in
+        # loose sibling shapes share one layer: the new shape joins (or makes) the run it sits in; a group whose
+        # position is keyed keeps its own layer (its X / Y stay separated)
         assert any(t.startswith("rive:0:999") for t in rebuilt_tags(text)) and "rive:0:116" not in rebuilt_tags(text), rebuilt_tags(text)
     else:
         assert sorted(set(rebuilt_tags(text))) == ["rive:0:999"], rebuilt_tags(text)

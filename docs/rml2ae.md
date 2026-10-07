@@ -75,10 +75,15 @@ Outputs are `<name>.jsx`, `<name>.ae-report.md` (what was converted, approximate
 
 With `industry`:
 
-- **One shape layer per group.** A `Node` whose subtree contains only simple shapes becomes a single shape layer. The node's transform and keys live on the layer. Each sub-node and shape inside is a **vector group** with its own keyed transform, and group opacity is native (no opacity expression). Neighbouring isolated shapes share one layer named `Parent · A…B`.
+- **One shape layer per group.** A `Node` whose subtree contains only simple shapes becomes a single shape layer. The node's transform and keys live on the layer. Each sub-node and shape inside is a **vector group** with its own keyed transform, and group opacity is native (no opacity expression). Neighbouring isolated shapes, and neighbouring groups made only of shapes, share one layer named `Parent · A…B`. A group whose position is keyed keeps its own layer: there X and Y stay separated, so `ae pull` reads its eases back exactly.
 - Kept as separate layers: gradients (Gradient Ramp at layer level), feathered shapes, blend modes, clips, internal data bindings, skins and bones.
 - **No useless nulls.** An identity node (no transform, no keys, no clip, no binding) creates no null. A node that carries a single static leaf (shape, text or image without its own rotation or scale) is folded: the leaf takes the node's animation and bindings, and the node's offset moves into the anchor point (exact).
 - `ae pull` reads groups too, through `<project>.groups.json` (group path inside its layer to Rive id), and divides the opacity of a folded node by that of its leaf. Keys rewritten identically (2D position of a group, constant x, per-frame baking) are no longer detected as edits: values are compared, not keys.
+
+- **Cuts.** A layer only exists while its element can be seen: its in and out points are set to the frames where its opacity and its ancestors' are above 0. A film's shots, switched by opacity keys in Rive, show as an edit in the timeline. The opacity keys stay (they still draw any gap inside the window).
+- **Tidy pass.** Once the build is done, every null that does nothing is dissolved: no child, or static (no key, no expression but the opacity propagation, no effect, 2D) with children that can take its transform. AE re-expresses each child in the grandparent's space, keys included; the pass picks a time where the whole new parent chain is invertible (a parent keyed from scale 0 would otherwise break it). What each dissolved null was is stored in the folder `rml2ae tidy` (comments of its numbered sub-folders), and `ae pull` uses it to read the child back in its Rive parent's space: in Python for chains without rotation, by rebuilding the nulls for the time of the read otherwise.
+
+Measured on a 72 s film (19 shots, 362 comps): nulls 1 456 → 267, shape layers 1 443 → 1 102, project items 3 848 → 901; 17 of 19 frames identical to the previous build within 2/255, the two others differ on 0.004 % and 0.007 % of pixels (anti-aliasing). A dry `ae pull` on the untouched project lists 16 changes, all of them already listed with the previous build (it listed 204).
 
 Remaining nulls are animated controllers (cameras, three-copy RGB split and similar).
 
