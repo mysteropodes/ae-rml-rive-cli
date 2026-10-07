@@ -1,4 +1,5 @@
-"""RML (Rive CLI scene) -> a small object model, typed by the Rive schema (schema.json, from `rive schema --json`).
+"""RML (Rive CLI scene) -> a small object model, typed by the Rive schema (schema.json, from the rive-runtime
+headers: tools/make_schema.py).
 
 Nothing here knows about After Effects. `Project.load(dir)` reads rive.yaml + scene.rml (+ any *.rml next to it),
 keeps every element (tag, attributes, children, id), and indexes: objects by id, artboards, assets, animations

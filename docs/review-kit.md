@@ -25,7 +25,7 @@ A review artboard wrapped around the film:
 
 ## Requirements
 
-- Rive CLI (`rive`), tested on 1.2.0
+- Rive CLI (`rive`), tested on 1.2.0 to 1.4.0
 - Python 3.9+ (standard library only)
 - A `.ttf` / `.otf` font in the project, or any font file you can point to: the panel needs one
 

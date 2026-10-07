@@ -166,6 +166,12 @@
 "key": 23
 },
 {
+"name": "additiveAmount",
+"owner": "Drawable",
+"type": "uint8_t",
+"key": 450
+},
+{
 "name": "drawableFlags",
 "owner": "Drawable",
 "type": "uint",
@@ -305,6 +311,12 @@
 "owner": "Drawable",
 "type": "uint8_t",
 "key": 23
+},
+{
+"name": "additiveAmount",
+"owner": "Drawable",
+"type": "uint8_t",
+"key": 450
 },
 {
 "name": "drawableFlags",
@@ -1935,6 +1947,12 @@
 "parent": "Component",
 "properties": [
 {
+"name": "nameId",
+"owner": "CustomProperty",
+"type": "uint",
+"key": 449
+},
+{
 "name": "name",
 "owner": "Component",
 "type": "String",
@@ -1964,6 +1982,12 @@
 "key": 245
 },
 {
+"name": "nameId",
+"owner": "CustomProperty",
+"type": "uint",
+"key": 449
+},
+{
 "name": "name",
 "owner": "Component",
 "type": "String",
@@ -1991,6 +2015,12 @@
 "owner": "CustomPropertyColor",
 "type": "int",
 "key": 836
+},
+{
+"name": "nameId",
+"owner": "CustomProperty",
+"type": "uint",
+"key": 449
 },
 {
 "name": "name",
@@ -2026,6 +2056,12 @@
 "owner": "CustomPropertyEnum",
 "type": "Id",
 "key": 873
+},
+{
+"name": "nameId",
+"owner": "CustomProperty",
+"type": "uint",
+"key": 449
 },
 {
 "name": "name",
@@ -2080,6 +2116,12 @@
 "key": 243
 },
 {
+"name": "nameId",
+"owner": "CustomProperty",
+"type": "uint",
+"key": 449
+},
+{
 "name": "name",
 "owner": "Component",
 "type": "String",
@@ -2107,6 +2149,12 @@
 "owner": "CustomPropertyString",
 "type": "String",
 "key": 246
+},
+{
+"name": "nameId",
+"owner": "CustomProperty",
+"type": "uint",
+"key": 449
 },
 {
 "name": "name",
@@ -2142,6 +2190,12 @@
 "owner": "CustomPropertyTrigger",
 "type": "uint",
 "key": 870
+},
+{
+"name": "nameId",
+"owner": "CustomProperty",
+"type": "uint",
+"key": 449
 },
 {
 "name": "name",
@@ -3089,6 +3143,12 @@
 "key": 23
 },
 {
+"name": "additiveAmount",
+"owner": "Drawable",
+"type": "uint8_t",
+"key": 450
+},
+{
 "name": "drawableFlags",
 "owner": "Drawable",
 "type": "uint",
@@ -3676,8 +3736,14 @@
 {
 "name": "blendModeValue",
 "owner": "ShapePaint",
-"type": "uint",
+"type": "uint8_t",
 "key": 747
+},
+{
+"name": "additiveAmount",
+"owner": "ShapePaint",
+"type": "uint8_t",
+"key": 452
 },
 {
 "name": "name",
@@ -3944,6 +4010,12 @@
 "owner": "Drawable",
 "type": "uint8_t",
 "key": 23
+},
+{
+"name": "additiveAmount",
+"owner": "Drawable",
+"type": "uint8_t",
+"key": 450
 },
 {
 "name": "drawableFlags",
@@ -4541,6 +4613,12 @@
 "key": 23
 },
 {
+"name": "additiveAmount",
+"owner": "Drawable",
+"type": "uint8_t",
+"key": 450
+},
+{
 "name": "drawableFlags",
 "owner": "Drawable",
 "type": "uint",
@@ -5116,6 +5194,94 @@
 }
 ]
 },
+"LayerMask": {
+"type": "LayerMask",
+"typeKey": 154,
+"extends": [
+"Component"
+],
+"parent": "Component",
+"properties": [
+{
+"name": "sourceId",
+"owner": "LayerMask",
+"type": "Id",
+"key": 459
+},
+{
+"name": "maskFlags",
+"owner": "LayerMask",
+"type": "uint",
+"key": 460
+},
+{
+"name": "maskModeValue",
+"owner": "LayerMask",
+"type": "uint8_t",
+"key": 455
+},
+{
+"name": "isVisible",
+"owner": "LayerMask",
+"type": "bool",
+"key": 456
+},
+{
+"name": "sourceDraws",
+"owner": "LayerMask",
+"type": "bool",
+"key": 457
+},
+{
+"name": "useCustomBounds",
+"owner": "LayerMask",
+"type": "bool",
+"key": 461
+},
+{
+"name": "resolution",
+"owner": "LayerMask",
+"type": "double",
+"key": 458
+},
+{
+"name": "boundsX",
+"owner": "LayerMask",
+"type": "double",
+"key": 462
+},
+{
+"name": "boundsY",
+"owner": "LayerMask",
+"type": "double",
+"key": 463
+},
+{
+"name": "boundsWidth",
+"owner": "LayerMask",
+"type": "double",
+"key": 464
+},
+{
+"name": "boundsHeight",
+"owner": "LayerMask",
+"type": "double",
+"key": 465
+},
+{
+"name": "name",
+"owner": "Component",
+"type": "String",
+"key": 4
+},
+{
+"name": "parentId",
+"owner": "Component",
+"type": "Id",
+"key": 5
+}
+]
+},
 "LayerState": {
 "type": "LayerState",
 "typeKey": 60,
@@ -5186,6 +5352,12 @@
 "owner": "Drawable",
 "type": "uint8_t",
 "key": 23
+},
+{
+"name": "additiveAmount",
+"owner": "Drawable",
+"type": "uint8_t",
+"key": 450
 },
 {
 "name": "drawableFlags",
@@ -5715,6 +5887,12 @@
 "key": 656
 },
 {
+"name": "hugUnbounded",
+"owner": "LayoutSizingStyle",
+"type": "bool",
+"key": 451
+},
+{
 "name": "widthUnitsValue",
 "owner": "LayoutSizingStyle",
 "type": "uint8_t",
@@ -5844,6 +6022,12 @@
 "owner": "LayoutSizingStyle",
 "type": "uint8_t",
 "key": 656
+},
+{
+"name": "hugUnbounded",
+"owner": "LayoutSizingStyle",
+"type": "bool",
+"key": 451
 },
 {
 "name": "widthUnitsValue",
@@ -5978,6 +6162,12 @@
 "key": 656
 },
 {
+"name": "hugUnbounded",
+"owner": "LayoutSizingStyle",
+"type": "bool",
+"key": 451
+},
+{
 "name": "widthUnitsValue",
 "owner": "LayoutSizingStyle",
 "type": "uint8_t",
@@ -6082,6 +6272,12 @@
 "owner": "LayoutSizingStyle",
 "type": "uint8_t",
 "key": 656
+},
+{
+"name": "hugUnbounded",
+"owner": "LayoutSizingStyle",
+"type": "bool",
+"key": 451
 },
 {
 "name": "widthUnitsValue",
@@ -6661,6 +6857,28 @@
 }
 ]
 },
+"ListenerInputTypePointerButton": {
+"type": "ListenerInputTypePointerButton",
+"typeKey": 155,
+"extends": [
+"ListenerInputType"
+],
+"parent": "ListenerInputType",
+"properties": [
+{
+"name": "pointerButtonValue",
+"owner": "ListenerInputTypePointerButton",
+"type": "uint8_t",
+"key": 468
+},
+{
+"name": "listenerTypeValue",
+"owner": "ListenerInputType",
+"type": "uint",
+"key": 965
+}
+]
+},
 "ListenerInputTypeSemantic": {
 "type": "ListenerInputTypeSemantic",
 "typeKey": 669,
@@ -6787,6 +7005,18 @@
 ],
 "parent": "ListenerAction",
 "properties": [
+{
+"name": "inputValue",
+"owner": "ListenerViewModelChange",
+"type": "uint8_t",
+"key": 453
+},
+{
+"name": "inputValueIndex",
+"owner": "ListenerViewModelChange",
+"type": "uint8_t",
+"key": 454
+},
 {
 "name": "flags",
 "owner": "ListenerAction",
@@ -7195,6 +7425,12 @@
 "key": 23
 },
 {
+"name": "additiveAmount",
+"owner": "Drawable",
+"type": "uint8_t",
+"key": 450
+},
+{
 "name": "drawableFlags",
 "owner": "Drawable",
 "type": "uint",
@@ -7403,6 +7639,12 @@
 "key": 23
 },
 {
+"name": "additiveAmount",
+"owner": "Drawable",
+"type": "uint8_t",
+"key": 450
+},
+{
 "name": "drawableFlags",
 "owner": "Drawable",
 "type": "uint",
@@ -7597,6 +7839,12 @@
 "owner": "Drawable",
 "type": "uint8_t",
 "key": 23
+},
+{
+"name": "additiveAmount",
+"owner": "Drawable",
+"type": "uint8_t",
+"key": 450
 },
 {
 "name": "drawableFlags",
@@ -9657,6 +9905,12 @@
 "key": 876
 },
 {
+"name": "nameId",
+"owner": "CustomProperty",
+"type": "uint",
+"key": 449
+},
+{
 "name": "name",
 "owner": "Component",
 "type": "String",
@@ -9685,6 +9939,12 @@
 "owner": "CustomPropertyBoolean",
 "type": "bool",
 "key": 245
+},
+{
+"name": "nameId",
+"owner": "CustomProperty",
+"type": "uint",
+"key": 449
 },
 {
 "name": "name",
@@ -9717,6 +9977,12 @@
 "key": 836
 },
 {
+"name": "nameId",
+"owner": "CustomProperty",
+"type": "uint",
+"key": 449
+},
+{
 "name": "name",
 "owner": "Component",
 "type": "String",
@@ -9747,6 +10013,12 @@
 "key": 243
 },
 {
+"name": "nameId",
+"owner": "CustomProperty",
+"type": "uint",
+"key": 449
+},
+{
 "name": "name",
 "owner": "Component",
 "type": "String",
@@ -9775,6 +10047,12 @@
 "owner": "CustomPropertyString",
 "type": "String",
 "key": 246
+},
+{
+"name": "nameId",
+"owner": "CustomProperty",
+"type": "uint",
+"key": 449
 },
 {
 "name": "name",
@@ -9813,6 +10091,12 @@
 "key": 870
 },
 {
+"name": "nameId",
+"owner": "CustomProperty",
+"type": "uint",
+"key": 449
+},
+{
 "name": "name",
 "owner": "Component",
 "type": "String",
@@ -9840,6 +10124,12 @@
 "owner": "ScriptInputViewModelProperty",
 "type": "Bytes",
 "key": 866
+},
+{
+"name": "nameId",
+"owner": "CustomProperty",
+"type": "uint",
+"key": 449
 },
 {
 "name": "name",
@@ -9942,6 +10232,12 @@
 "owner": "Drawable",
 "type": "uint8_t",
 "key": 23
+},
+{
+"name": "additiveAmount",
+"owner": "Drawable",
+"type": "uint8_t",
+"key": 450
 },
 {
 "name": "drawableFlags",
@@ -10100,6 +10396,12 @@
 "owner": "Drawable",
 "type": "uint8_t",
 "key": 23
+},
+{
+"name": "additiveAmount",
+"owner": "Drawable",
+"type": "uint8_t",
+"key": 450
 },
 {
 "name": "drawableFlags",
@@ -10305,6 +10607,12 @@
 "owner": "Drawable",
 "type": "uint8_t",
 "key": 23
+},
+{
+"name": "additiveAmount",
+"owner": "Drawable",
+"type": "uint8_t",
+"key": 450
 },
 {
 "name": "drawableFlags",
@@ -10609,6 +10917,18 @@
 "owner": "ScrollConstraint",
 "type": "double",
 "key": 1070
+},
+{
+"name": "scrollFlags",
+"owner": "ScrollConstraint",
+"type": "uint8_t",
+"key": 466
+},
+{
+"name": "wheelInteractive",
+"owner": "ScrollConstraint",
+"type": "bool",
+"key": 467
 },
 {
 "name": "directionValue",
@@ -10952,6 +11272,12 @@
 "key": 23
 },
 {
+"name": "additiveAmount",
+"owner": "Drawable",
+"type": "uint8_t",
+"key": 450
+},
+{
 "name": "drawableFlags",
 "owner": "Drawable",
 "type": "uint",
@@ -11085,8 +11411,14 @@
 {
 "name": "blendModeValue",
 "owner": "ShapePaint",
-"type": "uint",
+"type": "uint8_t",
 "key": 747
+},
+{
+"name": "additiveAmount",
+"owner": "ShapePaint",
+"type": "uint8_t",
+"key": 452
 },
 {
 "name": "name",
@@ -11928,6 +12260,12 @@
 "key": 50
 },
 {
+"name": "position",
+"owner": "Stroke",
+"type": "uint8_t",
+"key": 470
+},
+{
 "name": "isVisible",
 "owner": "ShapePaint",
 "type": "bool",
@@ -11936,8 +12274,14 @@
 {
 "name": "blendModeValue",
 "owner": "ShapePaint",
-"type": "uint",
+"type": "uint8_t",
 "key": 747
+},
+{
+"name": "additiveAmount",
+"owner": "ShapePaint",
+"type": "uint8_t",
+"key": 452
 },
 {
 "name": "name",
@@ -12249,6 +12593,12 @@
 "key": 23
 },
 {
+"name": "additiveAmount",
+"owner": "Drawable",
+"type": "uint8_t",
+"key": 450
+},
+{
 "name": "drawableFlags",
 "owner": "Drawable",
 "type": "uint",
@@ -12492,6 +12842,12 @@
 "key": 23
 },
 {
+"name": "additiveAmount",
+"owner": "Drawable",
+"type": "uint8_t",
+"key": 450
+},
+{
 "name": "drawableFlags",
 "owner": "Drawable",
 "type": "uint",
@@ -12628,6 +12984,12 @@
 "key": 23
 },
 {
+"name": "additiveAmount",
+"owner": "Drawable",
+"type": "uint8_t",
+"key": 450
+},
+{
 "name": "drawableFlags",
 "owner": "Drawable",
 "type": "uint",
@@ -12761,6 +13123,12 @@
 "owner": "Drawable",
 "type": "uint8_t",
 "key": 23
+},
+{
+"name": "additiveAmount",
+"owner": "Drawable",
+"type": "uint8_t",
+"key": 450
 },
 {
 "name": "drawableFlags",
@@ -12899,6 +13267,12 @@
 "key": 23
 },
 {
+"name": "additiveAmount",
+"owner": "Drawable",
+"type": "uint8_t",
+"key": 450
+},
+{
 "name": "drawableFlags",
 "owner": "Drawable",
 "type": "uint",
@@ -13035,6 +13409,12 @@
 "key": 23
 },
 {
+"name": "additiveAmount",
+"owner": "Drawable",
+"type": "uint8_t",
+"key": 450
+},
+{
 "name": "drawableFlags",
 "owner": "Drawable",
 "type": "uint",
@@ -13169,6 +13549,12 @@
 "owner": "Drawable",
 "type": "uint8_t",
 "key": 23
+},
+{
+"name": "additiveAmount",
+"owner": "Drawable",
+"type": "uint8_t",
+"key": 450
 },
 {
 "name": "drawableFlags",
@@ -16568,6 +16954,11 @@
 "outIndices",
 "uint"
 ],
+"449": [
+"CustomProperty",
+"nameId",
+"uint"
+],
 "245": [
 "CustomPropertyBoolean",
 "propertyValue",
@@ -16846,6 +17237,11 @@
 "23": [
 "Drawable",
 "blendModeValue",
+"uint8_t"
+],
+"450": [
+"Drawable",
+"additiveAmount",
 "uint8_t"
 ],
 "129": [
@@ -17293,6 +17689,61 @@
 "value",
 "uint"
 ],
+"459": [
+"LayerMask",
+"sourceId",
+"Id"
+],
+"460": [
+"LayerMask",
+"maskFlags",
+"uint"
+],
+"455": [
+"LayerMask",
+"maskModeValue",
+"uint8_t"
+],
+"456": [
+"LayerMask",
+"isVisible",
+"bool"
+],
+"457": [
+"LayerMask",
+"sourceDraws",
+"bool"
+],
+"461": [
+"LayerMask",
+"useCustomBounds",
+"bool"
+],
+"458": [
+"LayerMask",
+"resolution",
+"double"
+],
+"462": [
+"LayerMask",
+"boundsX",
+"double"
+],
+"463": [
+"LayerMask",
+"boundsY",
+"double"
+],
+"464": [
+"LayerMask",
+"boundsWidth",
+"double"
+],
+"465": [
+"LayerMask",
+"boundsHeight",
+"double"
+],
 "536": [
 "LayerState",
 "flags",
@@ -17683,6 +18134,11 @@
 "layoutHeightScaleType",
 "uint8_t"
 ],
+"451": [
+"LayoutSizingStyle",
+"hugUnbounded",
+"bool"
+],
 "607": [
 "LayoutSizingStyle",
 "widthUnitsValue",
@@ -17828,6 +18284,11 @@
 "eventId",
 "Id"
 ],
+"468": [
+"ListenerInputTypePointerButton",
+"pointerButtonValue",
+"uint8_t"
+],
 "963": [
 "ListenerInputTypeViewModel",
 "viewModelPathIds",
@@ -17837,6 +18298,16 @@
 "ListenerNumberChange",
 "value",
 "double"
+],
+"453": [
+"ListenerViewModelChange",
+"inputValue",
+"uint8_t"
+],
+"454": [
+"ListenerViewModelChange",
+"inputValueIndex",
+"uint8_t"
 ],
 "223": [
 "Mesh",
@@ -18383,6 +18854,16 @@
 "computedContentHeight",
 "double"
 ],
+"466": [
+"ScrollConstraint",
+"scrollFlags",
+"uint8_t"
+],
+"467": [
+"ScrollConstraint",
+"wheelInteractive",
+"bool"
+],
 "731": [
 "ScrollPhysics",
 "constraintId",
@@ -18551,7 +19032,12 @@
 "747": [
 "ShapePaint",
 "blendModeValue",
-"uint"
+"uint8_t"
+],
+"452": [
+"ShapePaint",
+"additiveAmount",
+"uint8_t"
 ],
 "104": [
 "Skin",
@@ -18707,6 +19193,11 @@
 "Stroke",
 "transformAffectsStroke",
 "bool"
+],
+"470": [
+"Stroke",
+"position",
+"uint8_t"
 ],
 "922": [
 "TargetEffect",

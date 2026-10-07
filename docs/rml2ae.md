@@ -67,7 +67,7 @@ Outputs are `<name>.jsx`, `<name>.ae-report.md` (what was converted, approximate
 - ffmpeg, only for `ae render --out file.mp4`.
 - The fonts used by the project installed in macOS. AE looks fonts up by PostScript name; `ae doctor <project>` lists the font files.
 - In After Effects, the preference **Scripts & Expressions › Allow Scripts to Write Files and Access Network** must be on.
-- `rml2ae/schema.json` caches `rive schema --json` (the property keys and names of all types). Regenerate it if the CLI's schema changes.
+- `rml2ae/schema.json` holds the property keys and names of all Rive types, generated from the rive-runtime headers by `rml2ae/tools/make_schema.py`. Regenerate it when a CLI release adds types or properties (last regenerated when CLI 1.4.0 was current); `rive schema <Type>` shows what the installed CLI knows.
 
 ## Comp organisation
 
