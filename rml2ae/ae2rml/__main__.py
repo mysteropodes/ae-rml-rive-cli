@@ -6,6 +6,7 @@
 --media-fps N     at most N distinct images per second of footage (default: one per comp frame)
 --no-audio        no sound (audio layers and the sound of videos are left out)
 --no-video        video files (.mov, .mp4…) are left out: their layers draw nothing (image sequences and stills stay)
+--work-area       the main comp's animation ends with its work area (what AE renders by default)
 --ae-lang fr|en|any  the After Effects UI language to emulate: AE resolves names in expressions (effect("C")("Color"))
                   in its own language only, a French AE disables English ones (default: AE2RML_LANG, else the system's)"""
 import os
@@ -48,7 +49,7 @@ def main(argv):
                      media_scale=float(flags.get("media-scale") or 1.0),
                      media_fps=float(flags["media-fps"]) if flags.get("media-fps") else None,
                      ae_lang=flags.get("ae-lang"), audio=not flags.get("no-audio"),
-                     video=not flags.get("no-video"))
+                     video=not flags.get("no-video"), work_area=bool(flags.get("work-area")))
     scene = conv.convert()
     c = conv.report.counts()
     print(f"{scene}  ({time.time() - t0:.1f}s)")

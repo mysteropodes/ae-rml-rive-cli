@@ -68,6 +68,13 @@ BLEND_NEAREST = {"VIVID_LIGHT": "hardLight", "LINEAR_LIGHT": "hardLight", "PIN_L
                  "HARD_MIX": "hardLight", "LINEAR_BURN": "multiply", "SUBTRACT": "difference", "DIVIDE": "colorDodge"}
 
 
+def frame_window(L, fps):
+    """(first frame shown, first frame hidden) of a layer: AE draws frame k when in ≤ k / fps < out — an in point
+    between two frames (a cut at 3.1 s in a 24 fps comp: frame 74.4) shows from the NEXT frame. Rounding put such cuts
+    one frame early (the next shot over the last frame of the previous one)."""
+    return (int(math.ceil(float(L.in_point) * fps - 1e-6)), int(math.ceil(float(L.out_point) * fps - 1e-6)))
+
+
 def blend_of(L):
     """(Rive blend mode, AE name when it is only the nearest one or not converted)"""
     try:
@@ -146,7 +153,7 @@ def _patch_py_aep():
 
 class Converter:
     def __init__(self, aep, out_dir, comp=None, fps=None, loop="loop", bg=True, log=print, media_scale=1.0,
-                 media_fps=None, ae_lang=None, audio=True, video=True):
+                 media_fps=None, ae_lang=None, audio=True, video=True, work_area=False):
         import py_aep
         from .rml import PRUNED
         _patch_py_aep()
@@ -187,6 +194,7 @@ class Converter:
         self.media_scale = media_scale
         self.with_audio = audio         # False: no sound at all (--no-audio)
         self.with_video = video         # False: video files left out (--no-video)
+        self.work_area = work_area      # True: the main comp's animation ends with its work area (--work-area)
         self.media_fps = media_fps
         self.frames = {}              # (footage id, tag) -> {source frame index: (asset id, w, h)}
         self.media_bytes = 0
@@ -986,7 +994,7 @@ class CompBuild:
         self.kid = comp.id if not variant else f"{comp.id}~{variant}"      # id namespace
         name = clean(comp.name) + (f" · instance {variant}" if variant else "")
         fps = conv.fps_override or max(1, int(round(float(comp.frame_rate or 25))))
-        self.tl = Timeline(conv, comp, fps)
+        self.tl = Timeline(conv, comp, fps, main=main)
         ids = conv.ids
         self.ab = E("Artboard", id=ids.key("comp", self.kid), name=name, width=float(comp.width),
                     height=float(comp.height))
@@ -1078,6 +1086,61 @@ class CompBuild:
             ms = getattr(src, "main_source", None)
             f = (getattr(ms, "file", "") or "").lower()
             if f.endswith(AUDIO_EXT) and not getattr(src, "width", 0):
+                return False
+        return True
+
+    def black_below(self, L, f0, f1):
+        """everything drawn below L between frames f0..f1 is opaque black: a full-frame black solid, or — main comp —
+        its black background with nothing drawn above it"""
+        fps = self.tl.fps
+        for M in self.layers[L.index + 1:]:
+            if not self.drawn(M):
+                continue
+            shown, hidden = frame_window(M, fps)
+            if shown > f1 or hidden <= f0:
+                continue
+            return self.black_solid(M, (f0, (f0 + f1) / 2.0, f1))
+        if not (self.main and self.conv.bg):
+            return False
+        return max(tonum(x) for x in list(getattr(self.comp, "bg_color", [0, 0, 0]))[:3]) < 0.5 / 255
+
+    def black_solid(self, M, frames):
+        """M is an opaque black solid covering the whole frame at these frames (normal blend; no matte, mask, effect)"""
+        src = getattr(M, "source", None)
+        color = getattr(getattr(src, "main_source", None), "color", None)
+        if type(M).__name__ != "AVLayer" or color is None or three.is3d(M):
+            return False
+        if max(tonum(c) for c in list(color)[:3]) > 0.5 / 255 or blend_of(M)[0] != "srcOver":
+            return False
+        if self.matte_of(M) is not None:
+            return False
+        try:
+            if M.masks is not None and len(list(M.masks.properties)):
+                return False
+        except Exception:
+            pass
+        try:
+            if M.effects is not None and any(getattr(fx, "enabled", True) for fx in M.effects.properties):
+                return False
+        except Exception:
+            pass
+        tr = M.transform
+        op = AProp(self.tl, tr.property("ADBE Opacity") if tr is not None else None, M)
+        if op.animated or abs(tonum(op.static(None, 100)) - 100) > 1e-6:
+            return False
+        w, h = float(getattr(src, "width", 0) or 0), float(getattr(src, "height", 0) or 0)
+        W, H = float(self.comp.width), float(self.comp.height)
+        for f in frames:
+            m = self.conv.engine.layer_matrix(M, self.comp, None, f / self.tl.fps)
+            quad = [geom.apply(m, p) for p in ((0.0, 0.0), (w, 0.0), (w, h), (0.0, h))]
+            # each corner of the frame on the inner side of every edge (either winding)
+            sides = []
+            for i in range(4):
+                (ax, ay), (bx, by) = quad[i], quad[(i + 1) % 4]
+                sides.append([(bx - ax) * (cy - ay) - (by - ay) * (cx - ax)
+                              for cx, cy in ((0.0, 0.0), (W, 0.0), (W, H), (0.0, H))])
+            flat = [v for s in sides for v in s]
+            if not (all(v >= -1e-6 for v in flat) or all(v <= 1e-6 for v in flat)):
                 return False
         return True
 
@@ -1639,10 +1702,11 @@ class LayerBuild:
             mnode = E("Node", id=self.id("matte"), name=self.name + " · matte")
             holder.add(mnode)
             clip_id = self.matte_clip(m)
+            holder = mnode
             if clip_id:
                 mnode.add(E("ClippingShape", id=self.id("mclip"), name="Track matte", sourceId=clip_id[0],
                             fillRule=clip_id[1]))
-            holder = mnode
+                holder = self.matte_alpha(mnode, m)
         for fx in reversed(plan["wrappers"]):
             node, inner = self.transform_effect(fx)
             holder.add(node)
@@ -1658,13 +1722,32 @@ class LayerBuild:
             self.make_matte_source(own)
             return
         op = self.prop(self.tprop("ADBE Opacity"), "opacity")
-        in_f = int(round(float(L.in_point) * self.tl.fps))
-        out_f = int(round(float(L.out_point) * self.tl.fps))
+        in_f, out_f = frame_window(L, self.tl.fps)
         need_in, need_out = in_f > 0, out_f < self.tl.nframes
         masks = self.mask_items()
         draw_into = holder
         content_node = None
-        if op.animated or abs(tonum(op.static(None, 100)) - 100) > 1e-6 or need_in or need_out or masks or visible_matte:
+        if self.black_veil(op, in_f, out_f, m, masks, plan, visible_matte):
+            # fade through black: the layer at full opacity under a black veil of opacity 1 − α (exact over black)
+            content_node = E("Node", id=self.id("content"), name=self.name + " · content")
+            holder.add(content_node)
+            draw_into = content_node
+            if need_in or need_out:
+                keys = [(0, 0.0 if need_in else 1.0, "hold", None)]
+                if need_in:
+                    keys.append((in_f, 1.0, "hold", None))
+                if need_out:
+                    keys.append((max(out_f, 0), 0.0, "hold", None))
+                content_node.set("opacity", keys[0][1])
+                self.anim.put(content_node.id, "Node", "opacity", keys)
+            veil = content_node.add(E("Shape", id=self.id("veil"), name=self.name + " · fade (black veil)"))
+            veil.add(E("Rectangle", id=self.id("veil", "r"), name="Everything", width=BIG, height=BIG))
+            f = veil.add(E("Fill", id=self.id("veil", "f"), name="Fill"))
+            f.add(E("SolidColor", id=self.id("veil", "c"), name="Black", colorValue="FF000000"))
+            self.put(veil, "opacity", op, None, -0.01, 1.0, default=1.0)
+            self.note("converted", self.name, "fade over black → a black veil above the layer (AE fades the layer as "
+                                              "one picture; Rive's opacity would reach each of its shapes)")
+        elif op.animated or abs(tonum(op.static(None, 100)) - 100) > 1e-6 or need_in or need_out or masks or visible_matte:
             if (not has_children and not masks and not plan["wrappers"] and m is None and not visible_matte
                     and self._frame_owns(space)):
                 target = space                    # the layer's own node: `ae pull` reads its opacity there
@@ -3270,6 +3353,63 @@ class LayerBuild:
         self.note("converted", self.name, f"track matte '{clean(M.name)}'{' (inverted)' if inverted else ''} → clipping")
         return (ids[1], "evenOdd") if inverted else (ids[0], None)
 
+    def black_veil(self, op, in_f, out_f, m, masks, plan, visible_matte):
+        """a precomp layer faded where only black lies below: AE fades it as one picture, Rive's opacity reaches each
+        shape (a faded character shows its overlapping parts) — drawn at full opacity under a black veil instead"""
+        L, cb = self.L, self.cb
+        src = getattr(L, "source", None)
+        if type(L).__name__ != "AVLayer" or src is None or not hasattr(src, "layers") or three.is3d(L):
+            return False
+        if m is not None or masks or visible_matte or self.blend not in (None, "srcOver"):
+            return False
+        if any(plan.get(k) for k in ("wrappers", "colors", "ramps", "blurs", "shadows", "glows", "wgsl", "setmattes",
+                                     "cornerpin", "copyfrom")):
+            return False
+        N, fps = self.tl.nframes, self.tl.fps
+        f0, f1 = max(0, in_f), min(N, out_f)
+        if op.animated:
+            fading = [f for f in range(f0, f1 + 1) if tonum(unwrap(op.at(f / fps))) < 100 - 1e-6]
+        else:
+            fading = list(range(f0, f1 + 1)) if tonum(op.static(None, 100)) < 100 - 1e-6 else []
+        if not fading:
+            return False
+        return cb.black_below(L, min(fading), max(fading))
+
+    def matte_alpha(self, mnode, M):
+        """AE multiplies by the matte's ALPHA, which carries the matte layer's opacity (rml2ae's nulls pass a node's
+        fade down by expression: a glow faded out through its matte stayed lit) and its in/out window (outside it the
+        matte is empty): the clipped node takes both — exact for an opaque matte, Rive clips by geometry alone. An
+        inverted matte (1 − alpha) can't be split that way: only noted. Returns the node to draw into."""
+        t = int(self.L.track_matte_type)
+        tr = getattr(M, "transform", None)
+        p = tr.property("ADBE Opacity") if tr is not None else None
+        st = float(getattr(M, "stretch", 100.0) or 100.0) / 100.0
+        op = AProp(self.tl, p, M, what=f"{self.name} · matte opacity", stretch=st) if p is not None else None
+        N = self.tl.nframes
+        in_f, out_f = frame_window(M, self.tl.fps)
+        need_in, need_out = in_f > 0, out_f < N
+        faded = op is not None and (op.animated or abs(tonum(op.static(None, 100)) - 100) > 1e-6)
+        if t in (5014, 5016):
+            if faded or need_in or need_out:
+                self.note("approx", self.name, "inverted track matte: the matte's opacity / in-out window is not "
+                                               "converted")
+            return mnode
+        if faded:
+            self.put(mnode, "opacity", op, None, 0.01, default=1.0)
+            self.note("converted", self.name, "track matte's opacity → the clipped node's opacity")
+        if not (need_in or need_out):
+            return mnode
+        vis = E("Node", id=self.id("matteinout"), name=self.name + " · matte in/out")
+        mnode.add(vis)
+        keys = [(0, 0.0 if need_in else 1.0, "hold", None)]
+        if need_in:
+            keys.append((in_f, 1.0, "hold", None))
+        if need_out:
+            keys.append((max(out_f, 0), 0.0, "hold", None))
+        vis.set("opacity", keys[0][1])
+        self.anim.put(vis.id, "Node", "opacity", keys)
+        return vis
+
     def make_matte_source(self, node, ids=None, want_inverted=None):
         """the matte layer's own drawing, stripped of its paints: the clip geometry. + an inverted copy when needed.
         `ids` / `want_inverted`: a Set Matte's own source (not the layer's track-matte ids)"""
@@ -3773,8 +3913,7 @@ class LayerBuild:
         """Transform effects of an adjustment layer -> nested nodes under `parent`, identity outside the layer's
         in/out (sampled per frame). -> the innermost node"""
         L, tl = self.L, self.tl
-        in_f = int(round(float(L.in_point) * tl.fps))
-        out_f = int(round(float(L.out_point) * tl.fps))
+        in_f, out_f = frame_window(L, tl.fps)
         holder = parent
         for k, fx in enumerate(geo):
             P = {int(getattr(p, "match_name", "0-0").split("-")[-1]): p for p in self.fx_params(fx)
@@ -3827,8 +3966,7 @@ class LayerBuild:
         from .fxlib import MIX_BLEND
         L = self.L
         n, fps = self.tl.nframes, float(self.tl.fps)
-        in_f = int(round(float(L.in_point) * fps))
-        out_f = int(round(float(L.out_point) * fps))
+        in_f, out_f = frame_window(L, fps)
         op = self.prop(self.tprop("ADBE Opacity"), "opacity")
         amount = []
         for f in range(n + 1):
