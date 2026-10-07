@@ -2,7 +2,8 @@
 
   python3 tools/make_schema.py ~/.cache/rive-runtime-generated   # folder of *_base.hpp (curl from github rive-app/rive-runtime)
 
-Types: class name without the `Base` suffix; `extends` = the ancestor list of `isTypeOf`; properties = `<name>PropertyKey = N`
+Types: class name without the `Base` suffix; `extends` = the ancestors (`isTypeOf` in older headers, else the
+`public Parent` chain); properties = `<name>PropertyKey = N`
 with the getter's C++ type mapped to the RML type names (double / uint / bool / String / Color / Id / Bytes).
 """
 import json
@@ -21,7 +22,7 @@ def parse(path):
         return None
     name, parent = m.group(1), m.group(2)
     tk = re.search(r"static const uint16_t typeKey = (\d+);", s)
-    anc = [a for a in re.findall(r"case (\w+)Base::typeKey:", s) if a != name]
+    anc = [a for a in re.findall(r"case (\w+)Base::typeKey:", s) if a != name]   # older headers; else from `parent`
     props = []
     for pname, key in re.findall(r"static const uint16_t (\w+)PropertyKey = (\d+);", s):
         g = re.search(r"(?:inline|virtual)\s+([\w:<>\s]+?)\s+" + re.escape(pname) + r"\(\)\s*const", s)
@@ -49,6 +50,14 @@ def main(folder):
             d = parse(os.path.join(folder, f))
             if d:
                 types[d["type"]] = d
+    # ancestry: newer headers no longer list it in isTypeOf (core_registry.hpp does): follow the `public Parent` chain
+    for t, d in types.items():
+        if not d["extends"]:
+            chain, p = [], d["parent"]
+            while p in types and p not in chain:
+                chain.append(p)
+                p = types[p]["parent"]
+            d["extends"] = chain
     # inherited properties (the CLI schema lists them on every type): flatten by walking `extends`
     keys = {}
     for t, d in types.items():
