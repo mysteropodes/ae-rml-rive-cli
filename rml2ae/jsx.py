@@ -464,7 +464,8 @@ function tidyTf(L) {
 }
 function tidySer(o) {
   var out = [];
-  for (var k in o) { var ch = o[k], parts = []; for (var i = 0; i < ch.length; i++) parts.push("[" + ch[i].join(",") + "]"); out.push('"' + k + '":[' + parts.join(",") + "]"); }
+  function v(x) { return typeof x == "string" ? '"' + x.replace(/\\/g, "\\\\").replace(/"/g, '\\"') + '"' : String(x); }
+  for (var k in o) { var ch = o[k], parts = []; for (var i = 0; i < ch.length; i++) { var row = []; for (var j = 0; j < ch[i].length; j++) row.push(v(ch[i][j])); parts.push("[" + row.join(",") + "]"); } out.push('"' + k + '":[' + parts.join(",") + "]"); }
   return "{" + out.join(",") + "}";
 }
 // the store: a folder "rml2ae tidy" whose sub-folders "1", "2"… carry the text in their comments (AE caps an item
@@ -536,6 +537,85 @@ function tidyMovable(C, sx, sy) {
   if (Math.abs(sx - sy) > 1e-6) { var r = g.property("ADBE Rotate Z"); if (r.numKeys > 0 || Math.abs(r.value) > 1e-9) return false; }   // skew
   return true;
 }
+var TIDY_LIFTED = 0;
+// a time remap that maps every time to itself (rml2ae's clip and stepped comps): the layer plays its comp as is
+function tidyIdentityRemap(L) {
+  var p = L.property("ADBE Time Remapping");
+  if (p.expressionEnabled && p.expression) return false;
+  // 1 ms: a nested animation's remap starts at Rive's own `time` (0.17 ms on a film), a 1/250 of a frame
+  for (var k = 1; k <= p.numKeys; k++) { if (Math.abs(p.keyValue(k) - p.keyTime(k)) > 1e-3) return false; if (p.keyOutInterpolationType(k) == KeyframeInterpolationType.HOLD && k < p.numKeys) return false; }
+  return p.numKeys >= 2 || (p.numKeys == 0);
+}
+// value, keys (times, values, interpolation types, eases) and expression of p copied onto q (same dimension)
+function tidyCopyProp(p, q) {
+  while (q.numKeys > 0) q.removeKey(1);
+  if (p.numKeys == 0) q.setValue(p.value);
+  for (var k = 1; k <= p.numKeys; k++) q.setValueAtTime(p.keyTime(k), p.keyValue(k));
+  for (var k2 = 1; k2 <= p.numKeys; k2++) {
+    q.setTemporalEaseAtKey(k2, p.keyInTemporalEase(k2), p.keyOutTemporalEase(k2));
+    q.setInterpolationTypeAtKey(k2, p.keyInInterpolationType(k2), p.keyOutInterpolationType(k2));
+  }
+  q.expression = (p.expressionEnabled && p.expression) ? p.expression : "";
+}
+function tidyNoKeys(p) { try { return p.numKeys == 0 && !(p.expressionEnabled && p.expression); } catch (e) { return true; } }
+// a precomp holding ONE layer, used by ONE plain layer U (no time remap, no effect, no mask, opacity 100 or the
+// propagation expression): that layer goes up into U's comp, where U was, with U's track matte — AE keeps its world
+// transform (it is parented to U without compensation, then to U's parent with it). Measured on a 72 s film: 206 of
+// the 362 comps were such wrappers (a clip whose content had become one layer once its root null was dissolved).
+function tidyLift(comps, rec) {
+  var lifted = 0, again = true, dead = {};
+  while (again) {
+    again = false;
+    for (var c = 0; c < comps.length; c++) {
+      var P = comps[c];
+      if (dead[c]) continue;
+      try { if (P.numLayers != 1) continue; } catch (eD) { dead[c] = true; continue; }
+      var X = P.layer(1), users = P.usedIn;
+      if (users.length != 1) continue;
+      var C = users[0], U = null, nU = 0;
+      for (var j = 1; j <= C.numLayers; j++) { var L = C.layer(j); try { if (L.source === P) { U = L; nU++; } } catch (e) {} }
+      if (nU != 1) continue;
+      // only a clip precomp of the same animation as its user ("rive:<node>|<anim>|clip" inside "rive:<…>|<anim>…"): a
+      // nested artboard's comp holds another animation's keys (ae pull, incremental builds) — measured: 8 false edits
+      var pt = (P.comment || "").split("|"), ct = (C.comment || "").split("|");
+      if (pt.length != 3 || pt[2] != "clip" || ct.length < 2 || pt[1] != ct[1]) continue;
+      if (X.threeDLayer || X.hasTrackMatte || X.isTrackMatte || X.parent || X.guideLayer) continue;
+      if ((U.timeRemapEnabled && !tidyIdentityRemap(U)) || Math.abs(U.startTime) > 1e-9 || Math.abs(U.stretch - 100) > 1e-9 || U.collapseTransformation || U.threeDLayer || U.isTrackMatte || !U.enabled) continue;
+      if (U.property("ADBE Effect Parade").numProperties > 0 || U.property("ADBE Mask Parade").numProperties > 0) continue;
+      // U's opacity (the clipped node's: value, keys, propagation expression) moves onto the lifted layer when that
+      // layer's own opacity is a plain 100 %; ae pull then reads it as the node's (tidy store key "op:…")
+      var uo = U.property("ADBE Transform Group").property("ADBE Opacity");
+      var uOwn = uo.numKeys > 0 || Math.abs(uo.value - 100) > 1e-6 || (uo.expressionEnabled && uo.expression);
+      var xo = X.property("ADBE Transform Group").property("ADBE Opacity");
+      if (uOwn && (!tidyNoKeys(xo) || Math.abs(xo.value - 100) > 1e-6)) continue;
+      if (U.blendingMode != BlendingMode.NORMAL && X.blendingMode != BlendingMode.NORMAL) continue;
+      var t0 = tidyTime(C, U); if (t0 === null) continue;
+      var tKeep = C.time; if (Math.abs(C.time - t0) > 1e-9) C.time = t0;
+      var M = U.hasTrackMatte ? U.trackMatteLayer : null, mt = U.trackMatteType;
+      var before = {}; for (var b = 1; b <= C.numLayers; b++) before[C.layer(b).id] = true;
+      X.copyToComp(C);
+      var Y = null; for (var b2 = 1; b2 <= C.numLayers; b2++) if (!before[C.layer(b2).id]) { Y = C.layer(b2); break; }
+      if (!Y || Y === U) { if (Math.abs(C.time - tKeep) > 1e-9) C.time = tKeep; continue; }
+      try {
+        Y.setParentWithJump(U);                         // X's values are in P's space, which U maps into C
+        Y.parent = U.parent;                            // AE re-expresses Y in U's parent's space (keys included)
+        Y.moveBefore(U);
+        if (M) Y.setTrackMatte(M, mt);
+        Y.inPoint = Math.max(X.inPoint, U.inPoint); Y.outPoint = Math.min(X.outPoint, U.outPoint);
+        if (U.blendingMode != BlendingMode.NORMAL) Y.blendingMode = U.blendingMode;
+        if (uOwn) { tidyCopyProp(uo, Y.property("ADBE Transform Group").property("ADBE Opacity")); rec["op:" + C.id + ":" + Y.id] = [[U.comment || ""]]; }
+        if (!Y.comment) Y.comment = X.comment;
+        var kU = C.id + ":" + U.id, kX = P.id + ":" + X.id;
+        rec[C.id + ":" + Y.id] = [tidyTf(U)].concat(rec[kX] || []);   // U's current values carry its dissolved parents
+        delete rec[kU]; delete rec[kX];
+        if (Math.abs(C.time - tKeep) > 1e-9) C.time = tKeep;
+      } catch (eL) { try { delete rec[C.id + ":" + Y.id]; Y.remove(); } catch (eY) {} dead[c] = true; if (Math.abs(C.time - tKeep) > 1e-9) C.time = tKeep; continue; }
+      U.remove(); dead[c] = true; P.remove(); lifted++; again = true;
+      break;
+    }
+  }
+  return lifted;
+}
 // dissolve the static nulls of the comps under `root`; returns the number removed
 function tidyProject(root) {
   var store = tidyStore(root), rec = tidyLoad(store), removed = 0, live = {};
@@ -566,7 +646,7 @@ function tidyProject(root) {
         // child reads it (Rive's opacity multiplied down)
         if (kids.length && (!ok || !tidyStatic(N, true, !reads))) continue;
         if (reads && Math.abs(g.property("ADBE Opacity").value - 100) > 1e-6) continue;
-        var P = N.parent, tf = tidyTf(N), mine = rec[comp.id + ":" + N.id] || [];
+        var P = N.parent, tf = tidyTf(N);
         if (kids.length) {
           var sN = g.property("ADBE Scale").value; if (Math.abs(sN[0] * sN[1]) < 1e-6) continue;   // a null at scale 0 hides its children
           var t0 = tidyTime(comp, P); if (t0 === null) continue;
@@ -574,7 +654,7 @@ function tidyProject(root) {
         }
         for (var q = 0; q < kids.length; q++) {
           var C2 = kids[q], key = comp.id + ":" + C2.id;
-          rec[key] = mine.concat([tf]).concat(rec[key] || []);
+          rec[key] = [tf].concat(rec[key] || []);         // tf: N's CURRENT values, which already carry its own dissolved parents
           C2.parent = P;                                   // AE keeps the world transform (keys re-expressed)
           if (!P) { var op = C2.property("ADBE Transform Group").property("ADBE Opacity"); try { if (op.expression == PROPAGATE) op.expression = ""; else if (op.expression.indexOf(" * thisLayer.parent.transform.opacity / 100") > 0) op.expression = op.expression.replace(/^\((.*)\) \* thisLayer\.parent\.transform\.opacity \/ 100$/, "$1"); } catch (e3) {} }
         }
@@ -585,10 +665,18 @@ function tidyProject(root) {
       }
     }
     if (Math.abs(comp.time - tKeep) > 1e-9) comp.time = tKeep;
-    for (var m = 1; m <= comp.numLayers; m++) live[comp.id + ":" + comp.layer(m).id] = true;
   }
+  var lifted = 0; try { lifted = tidyLift(comps, rec); } catch (eLift) {}
+  var alive = [];
+  for (var c2 = 0; c2 < comps.length; c2++) {
+    var cc = comps[c2]; try { if (!cc.numLayers && cc.numLayers !== 0) continue; } catch (eR) { continue; }   // removed
+    alive.push(cc);
+    for (var m = 1; m <= cc.numLayers; m++) live[cc.id + ":" + cc.layer(m).id] = true;
+  }
+  comps = alive;
+  TIDY_LIFTED = lifted;
   var kept = {};
-  for (var key2 in rec) { var cid = parseInt(key2.split(":")[0], 10), keep = live[key2]; if (!keep) { var inTree = false; for (var z = 0; z < comps.length; z++) if (comps[z].id == cid) inTree = true; keep = !inTree && !!app.project.itemByID(cid); } if (keep) kept[key2] = rec[key2]; }
+  for (var key2 in rec) { var bare = key2.indexOf("op:") == 0 ? key2.substr(3) : key2, cid = parseInt(bare.split(":")[0], 10), keep = live[bare]; if (!keep) { var inTree = false; for (var z = 0; z < comps.length; z++) if (comps[z].id == cid) inTree = true; keep = !inTree && !!app.project.itemByID(cid); } if (keep) kept[key2] = rec[key2]; }
   tidySave(store, tidySer(kept));
   return removed;
 }

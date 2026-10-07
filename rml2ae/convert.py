@@ -573,7 +573,7 @@ class Converter:
                          f"transparent paint): not built in its comp — {names[:300]}")
         if self.layout == "industry":
             # nulls that do nothing are dissolved (their children keep their world transform; ae pull rebuilds them)
-            J('try { var __td = tidyProject(ROOTF); log("tidy: " + __td + " static null(s) dissolved"); } catch (eT) { log("tidy FAILED: " + eT.toString() + " line " + eT.line); }')
+            J('try { var __td = tidyProject(ROOTF); log("tidy: " + __td + " static null(s) dissolved, " + TIDY_LIFTED + " one-layer precomp(s) lifted"); } catch (eT) { log("tidy FAILED: " + eT.toString() + " line " + eT.line); }')
         J("app.endUndoGroup();")
         J(f'if (!KEEP) {{ app.project.save(new File({js(self.aep)})); log("saved " + app.project.file.fsName); }}')
         J('else if (app.project.file) { app.project.save(); log("saved " + app.project.file.fsName); }')

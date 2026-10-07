@@ -95,6 +95,8 @@ try {
       rec += ",\"r\":" + dumpProp(prop(L, "ADBE Rotate Z")) + ",\"s\":" + dumpProp(prop(L, "ADBE Scale")) + ",\"o\":" + dumpProp(prop(L, "ADBE Opacity"));
       rec += ",\"tag\":" + q(c) + ",\"run\":" + (isRun ? "true" : "false");
       var tch = TIDY[it.id + ":" + L.id];
+      var top = TIDY["op:" + it.id + ":" + L.id];       // the opacity of a lifted precomp's node, carried by this layer
+      if (top && top.length && top[0][0].indexOf("rive:") == 0) rec += ",\"opid\":" + q(top[0][0].substr(5).split("+")[0]);
       if (tch && tch.length && !TW && !tidyRotated(tch)) { var tp = []; for (var ti2 = 0; ti2 < tch.length; ti2++) tp.push("[" + tch[ti2].join(",") + "]"); rec += ",\"untidy\":[" + tp.join(",") + "]"; }
       var gs = []; try { if (L.property("ADBE Root Vectors Group")) dumpGroups(L.property("ADBE Root Vectors Group"), [], gs); } catch (eg) {}
       rec += ",\"groups\":[" + gs.join(",") + "]}";
@@ -427,6 +429,12 @@ def apply(project_dir, out_dir, dry=False, only_comp=None):
             for L in comp["layers"]:
                 if L.get("untidy"):
                     untidy(L)
+                if L.get("opid"):
+                    # its opacity is the clipped node's (the precomp it came out of carried it): read for that node,
+                    # the layer's own opacity is a plain 100 %
+                    records.append({"id": L["opid"], "sep": False, "only": "opacity", "o": L["o"], "name": L.get("name", ""),
+                                    "enabled": True})
+                    L["o"] = {"v": 100}
                 if not L.get("run"):
                     records.append(L)
                 gids = group_ids.get(L.get("tag") or ("rive:" + L["id"]), {})
@@ -447,12 +455,17 @@ def apply(project_dir, out_dir, dry=False, only_comp=None):
                     continue                           # mesh rows: identity layers, the shape lives in their Corner Pins
                 is_bone = el.tag == "Bone"
                 # AE property -> (Rive prop, unit scale, dump record, component)
-                if L["sep"]:
+                if L.get("only") == "opacity":
+                    plan = []
+                elif L["sep"]:
                     plan = [("x", 1.0, L["px"], None), ("y", 1.0, L["py"], None)]
                 else:
                     plan = [("x", 1.0, L["p"], 0), ("y", 1.0, L["p"], 1)]
-                plan += [("rotation", math.pi / 180, L["r"], None), ("scaleX", 0.01, L["s"], 0), ("scaleY", 0.01, L["s"], 1),
-                         ("opacity", 0.01, L["o"], None)]
+                if L.get("only") == "opacity":
+                    plan = [("opacity", 0.01, L["o"], None)]
+                else:
+                    plan += [("rotation", math.pi / 180, L["r"], None), ("scaleX", 0.01, L["s"], 0), ("scaleY", 0.01, L["s"], 1),
+                             ("opacity", 0.01, L["o"], None)]
                 for prop, unit, rec, dim in plan:
                     if is_bone and prop in ("x", "y"):
                         continue                       # a Bone sits at its parent's tip: not its own attribute
