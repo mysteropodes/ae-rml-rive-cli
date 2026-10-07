@@ -23,12 +23,12 @@
    "ae": 5,
    "field": "amount",
    "kind": "number",
-   "default": 10
+   "default": 25
   }
  ],
  "status": "unverified",
  "auto": false,
- "notes": "Not yet measured against After Effects. The revealed layer comes from the Rive node's map input (ae2rml binds the referenced layer, PR 7). Parameter indices follow the After Effects parameter order as documented by Adobe; `render_refs.py --params` records the real list.",
+ "notes": "Not yet measured against After Effects. The revealed layer comes from the Rive node's map input (ae2rml binds the referenced layer, PR 7). Param indices checked against AE 26 parameter list (_ae_params.json): Displacement Amount default is 25 in AE (was 10); Completion 0..100, Softness 5..100 confirmed. Gradient Layer (3) not modelled (the layer itself is used).",
  "textureParams": {
   "mapTex": 2
  }

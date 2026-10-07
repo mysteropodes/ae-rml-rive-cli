@@ -1,6 +1,6 @@
 // After Effects "Ellipse" (ADBE Ellipse) — UNVERIFIED: written from the effect's definition, not yet measured against After Effects renders (fxref/spec.py, fxlib check <slug> --holdout).
-// A ring of Thickness px on the ellipse Width x Height around Center, Softness % of the thickness feathering both
-// edges; colour from Inside Color (inner edge) to Outside Color (outer edge) across the ring. Composite On Original
+// A ring of Thickness px on the ellipse Width x Height around Center, Softness (raw 0..1) of the thickness feathering
+// both edges; colour (and its alpha) from Inside Color (inner edge) to Outside Color (outer edge) across the ring. Composite On Original
 // draws it over the layer, otherwise alone.
 struct Params {
     size: vec2<f32>,
@@ -8,7 +8,7 @@ struct Params {
     width: f32,           // AE 2 Width (px)
     height: f32,          // AE 3 Height (px)
     thickness: f32,       // AE 4 Thickness (px)
-    softness: f32,        // AE 5 Softness (%)
+    softness: f32,        // AE 5 Softness (raw 0..1)
     inside: vec4<f32>,    // AE 6 Inside Color
     outside: vec4<f32>,   // AE 7 Outside Color
     composite: f32,       // AE 8 Composite On Original
@@ -99,13 +99,14 @@ fn fs_main(in: VSOut) -> @location(0) vec4<f32> {
     let e = length(v / rad);                                       // 1 on the ellipse
     let dpx = (e - 1.0) * min(rad.x, rad.y);                       // approx. signed distance (px)
     let half = max(P.thickness * 0.5, 0.5);
-    let soft = max(P.softness / 100.0 * half, 0.5);
+    let soft = max(P.softness * half, 0.5);
     let cov = clamp((half - abs(dpx)) / soft + 0.5, 0.0, 1.0);
     let t = clamp(dpx / (2.0 * half) + 0.5, 0.0, 1.0);
     let col = mix(P.inside.rgb, P.outside.rgb, t);
-    let ep = vec4<f32>(col * cov, cov);
+    let k = cov * clamp(mix(P.inside.a, P.outside.a, t), 0.0, 1.0);   // AE's default colours carry an alpha
+    let ep = vec4<f32>(col * k, k);
     if (P.composite > 0.5) {
-        return round((ep + s * (1.0 - cov)) * 255.0) / 255.0;
+        return round((ep + s * (1.0 - k)) * 255.0) / 255.0;
     }
     return round(ep * 255.0) / 255.0;
 }

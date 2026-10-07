@@ -8,19 +8,19 @@
  },
  "params": [
   {
-   "ae": 1,
+   "ae": 2,
    "field": "amount",
    "kind": "number",
-   "default": 50
+   "default": 0
   },
   {
-   "ae": 2,
+   "ae": 3,
    "field": "radius",
    "kind": "number",
    "default": 1
   },
   {
-   "ae": 3,
+   "ae": 4,
    "field": "threshold",
    "kind": "number",
    "default": 0
@@ -28,5 +28,5 @@
  ],
  "status": "unverified",
  "auto": false,
- "notes": "Not yet measured against After Effects.  Parameter indices follow the After Effects parameter order as documented by Adobe; `render_refs.py --params` records the real list."
+ "notes": "Not yet measured against After Effects.  Parameter indices follow the After Effects parameter order as documented by Adobe; `render_refs.py --params` records the real list. Param indices/kinds/defaults checked against AE 26 parameter list (_ae_params.json): AE 1 is a Color Mode checkbox (not modelled), so Amount/Radius/Threshold are 2/3/4; Amount default 0 (raw, -500..500 %); Threshold is raw 0..1 (shader now compares |diff| with it directly instead of 0..255)."
 }

@@ -7,7 +7,7 @@ struct Params {
     size: vec2<f32>,
     light: vec2<f32>,     // AE 3 Light Source (layer px)
     color: vec4<f32>,     // AE 1 Shadow Color
-    opacity: f32,         // AE 2 Opacity (%)
+    opacity: f32,         // AE 2 Opacity (raw 0..1)
     distance: f32,        // AE 4 Projection Distance
     softness: f32,        // AE 5 Softness (not modelled)
     shadowOnly: f32,      // AE 8 Shadow Only
@@ -96,7 +96,7 @@ fn fs_main(in: VSOut) -> @location(0) vec4<f32> {
     let s = textureLoad(srcTex, pixelOf(in.uv), 0);
     let L = layerPt(P.light);
     let q = L + (layerPos(in.uv) - L) / (1.0 + max(P.distance, 0.0) / 100.0);
-    let sa = tapL(q).a * clamp(P.opacity / 100.0, 0.0, 1.0);
+    let sa = tapL(q).a * clamp(P.opacity, 0.0, 1.0);
     let sh = vec4<f32>(P.color.rgb * sa, sa);
     if (P.shadowOnly > 0.5) {
         return round(sh * 255.0) / 255.0;

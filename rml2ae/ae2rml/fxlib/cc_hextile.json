@@ -1,6 +1,6 @@
 {
  "slug": "cc_hextile",
- "aeMatchName": "CC HexTile",
+ "aeMatchName": "CS HexTile",
  "wgsl": "ae_cc_hextile.wgsl",
  "passes": 1,
  "textures": {},
@@ -27,13 +27,13 @@
    ]
   },
   {
-   "ae": 4,
+   "ae": 5,
    "field": "rotate",
    "kind": "angle",
    "default": 0
   },
   {
-   "ae": 5,
+   "ae": 6,
    "field": "smearing",
    "kind": "number",
    "default": 0
@@ -41,5 +41,5 @@
  ],
  "status": "unverified",
  "auto": false,
- "notes": "Not yet measured against After Effects.  Parameter indices follow the After Effects parameter order as documented by Adobe; `render_refs.py --params` records the real list."
+ "notes": "Not yet measured against After Effects.  Parameter indices follow the After Effects parameter order as documented by Adobe; `render_refs.py --params` records the real list. Param indices and units checked against the AE 26 parameter list (2026-10-05)."
 }

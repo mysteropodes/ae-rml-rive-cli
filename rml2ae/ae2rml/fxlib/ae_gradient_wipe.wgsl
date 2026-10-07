@@ -5,8 +5,8 @@
 // is ignored (same size).
 struct Params {
     size: vec2<f32>,
-    completion: f32,      // AE 1 Transition Completion (%)
-    softness: f32,        // AE 2 Transition Softness (%)
+    completion: f32,      // AE 1 Transition Completion (raw 0..1)
+    softness: f32,        // AE 2 Transition Softness (raw 0..1)
     placement: f32,       // AE 4 Gradient Placement (not modelled)
     invert: f32,          // AE 5 Invert Gradient
     passIndex: f32,
@@ -60,8 +60,8 @@ fn fs_main(in: VSOut) -> @location(0) vec4<f32> {
     if (P.invert > 0.5) {
         L = 1.0 - L;
     }
-    let comp = clamp(P.completion / 100.0, 0.0, 1.0);
-    let soft = clamp(P.softness / 100.0, 0.0, 1.0);
+    let comp = clamp(P.completion, 0.0, 1.0);
+    let soft = clamp(P.softness, 0.0, 1.0);
     var m: f32;
     if (soft <= 0.0) {
         m = select(0.0, 1.0, L >= comp);

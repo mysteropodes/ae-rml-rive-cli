@@ -7,8 +7,8 @@ struct Params {
     center: vec2<f32>,    // AE 3 Center (layer px)
     render: f32,          // AE 1 Render
     radius: f32,          // AE 2 Radius (px)
-    rotate: f32,          // AE 4 Rotate (degrees)
-    smearing: f32,        // AE 5 Smearing (%)
+    rotate: f32,          // AE 5 Rotate (degrees)
+    smearing: f32,        // AE 6 Smearing (%)
     passIndex: f32,
     layerRect: vec4<f32>, // reserved, filled by the host: the layer's rect in the canvas (x0, y0, x1, y1)
 };

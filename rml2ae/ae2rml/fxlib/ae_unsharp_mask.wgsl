@@ -1,12 +1,12 @@
 // After Effects "Unsharp Mask" (ADBE Unsharp Mask2) — UNVERIFIED: written from the effect's definition, not yet measured against After Effects renders (fxref/spec.py, fxlib check <slug> --holdout).
-// c' = c + Amount/100 * (c - blur(c)) where |c - blur(c)| * 255 > Threshold; blur = Gaussian of sigma = Radius px
+// c' = c + Amount/100 * (c - blur(c)) where |c - blur(c)| > Threshold (raw 0..1); blur = Gaussian of sigma = Radius px
 // (two separable passes on the premultiplied layer, transparent outside). Pass 0: horizontal blur; pass 1: vertical
 // blur + sharpen against origTex. Alpha untouched; 8-bit rounding, premultiplied.
 struct Params {
     size: vec2<f32>,
-    amount: f32,          // AE 1 Amount (%)
-    radius: f32,          // AE 2 Radius (px)
-    threshold: f32,       // AE 3 Threshold (0..255)
+    amount: f32,          // AE 2 Amount (%)
+    radius: f32,          // AE 3 Radius (px)
+    threshold: f32,       // AE 4 Threshold (raw 0..1)
     passIndex: f32,
 };
 @group(0) @binding(0) var srcTex: texture_2d<f32>;
@@ -86,6 +86,6 @@ fn fs_main(in: VSOut) -> @location(0) vec4<f32> {
         b = clamp(bl.rgb / bl.a, vec3<f32>(0.0), vec3<f32>(1.0));
     }
     let diff = c - b;
-    let on = select(vec3<f32>(0.0), vec3<f32>(1.0), abs(diff) * 255.0 > vec3<f32>(P.threshold));
+    let on = select(vec3<f32>(0.0), vec3<f32>(1.0), abs(diff) > vec3<f32>(P.threshold));
     return out8(c + (P.amount / 100.0) * diff * on, o.a);
 }

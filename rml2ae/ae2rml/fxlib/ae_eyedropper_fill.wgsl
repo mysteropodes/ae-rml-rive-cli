@@ -8,7 +8,7 @@ struct Params {
     radius: f32,          // AE 2 Sample Radius (px)
     average: f32,         // AE 3 Average Pixel Colors (menu)
     keepAlpha: f32,       // AE 4 Maintain Original Alpha
-    original: f32,        // AE 5 Blend With Original (%)
+    original: f32,        // AE 5 Blend With Original (raw 0..1)
     passIndex: f32,
     layerRect: vec4<f32>, // reserved, filled by the host: the layer's rect in the canvas (x0, y0, x1, y1)
 };
@@ -123,6 +123,6 @@ fn fs_main(in: VSOut) -> @location(0) vec4<f32> {
     if (P.keepAlpha > 0.5) {
         a = s.a;
     }
-    let k = clamp(P.original / 100.0, 0.0, 1.0);
+    let k = clamp(P.original, 0.0, 1.0);
     return out8(mix(col, straight8(s), k), mix(a, s.a, k));
 }

@@ -1,6 +1,6 @@
 {
  "slug": "cc_composite",
- "aeMatchName": "CC Composite",
+ "aeMatchName": "CS Composite",
  "wgsl": "ae_cc_composite.wgsl",
  "passes": 1,
  "textures": {
@@ -8,19 +8,19 @@
  },
  "params": [
   {
-   "ae": 1,
+   "ae": 2,
    "field": "opacity",
    "kind": "number",
    "default": 100
   },
   {
-   "ae": 2,
+   "ae": 3,
    "field": "mode",
    "kind": "enum",
    "default": 3
   },
   {
-   "ae": 3,
+   "ae": 4,
    "field": "rgbOnly",
    "kind": "bool",
    "default": 1
@@ -28,5 +28,5 @@
  ],
  "status": "unverified",
  "auto": false,
- "notes": "Not yet measured against After Effects. layerTex is the layer before any of its effects (texture role 'layer'); offline (one effect) it equals the source. Parameter indices follow the After Effects parameter order as documented by Adobe; `render_refs.py --params` records the real list."
+ "notes": "Not yet measured against After Effects. layerTex is the layer before any of its effects (texture role 'layer'); offline (one effect) it equals the source. Parameter indices follow the After Effects parameter order as documented by Adobe; `render_refs.py --params` records the real list. Param indices/kinds/defaults checked against AE 26 parameter list (_ae_params.json): AE 1 is the Top Layer (layer param, not modelled: layerTex = the layer itself, AE default None); Opacity/Transfer Mode/RGB Only moved to 2/3/4. Transfer Mode has 41 entries in AE: the shader's menu numbering is a guess (doubtful)."
 }

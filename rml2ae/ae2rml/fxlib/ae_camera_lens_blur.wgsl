@@ -10,8 +10,8 @@ struct Params {
     roundness: f32,       // AE 4 Iris Roundness (%)
     aspect: f32,          // AE 5 Iris Aspect Ratio
     rotation: f32,        // AE 6 Iris Rotation (degrees)
-    gain: f32,            // AE 14 Highlight Gain
-    threshold: f32,       // AE 15 Highlight Threshold (0..255)
+    gain: f32,            // AE 17 Highlight Gain
+    threshold: f32,       // AE 18 Highlight Threshold (raw 0..1)
     passIndex: f32,
     layerRect: vec4<f32>, // reserved, filled by the host: the layer's rect in the canvas (x0, y0, x1, y1)
 };
@@ -108,7 +108,7 @@ fn fs_main(in: VSOut) -> @location(0) vec4<f32> {
     let k = clamp(P.roundness / 100.0, 0.0, 1.0);
     let rot = radians(P.rotation);
     let asp = max(P.aspect, 0.01);
-    let thr = P.threshold / 255.0;
+    let thr = clamp(P.threshold, 0.0, 1.0);
     var acc = vec4<f32>(0.0);
     let N = 96;
     for (var i = 0; i < N; i++) {

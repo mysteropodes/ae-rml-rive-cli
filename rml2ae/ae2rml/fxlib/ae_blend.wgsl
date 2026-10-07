@@ -5,7 +5,7 @@
 struct Params {
     size: vec2<f32>,
     mode: f32,            // AE 2 Mode (menu)
-    original: f32,        // AE 3 Blend With Original (%)
+    original: f32,        // AE 3 Blend With Original (raw 0..1)
     sizes: f32,           // AE 4 If Layer Sizes Differ (1 Center, 2 Stretch to Fit)
     passIndex: f32,
     layerRect: vec4<f32>, // reserved, filled by the host: the layer's rect in the canvas (x0, y0, x1, y1)
@@ -156,7 +156,7 @@ fn fs_main(in: VSOut) -> @location(0) vec4<f32> {
     let c = straight8(s);
     let oc = straight8(o);
     let mode = i32(round(P.mode));
-    let k = 1.0 - clamp(P.original / 100.0, 0.0, 1.0);
+    let k = 1.0 - clamp(P.original, 0.0, 1.0);
     if (mode == 1) {
         let r = mix(s, o, k);
         return round(r * 255.0) / 255.0;

@@ -4,14 +4,14 @@
 // linearly. The eyedroppers (Key Color, Plus, Minus) only set Min / Max in AE and are not read.
 struct Params {
     size: vec2<f32>,
-    fuzz: f32,            // AE 5 Fuzziness
-    space: f32,           // AE 6 Color Space (menu)
-    min0: f32,            // AE 7 Min (L, Y, R)
-    max0: f32,            // AE 8 Max (L, Y, R)
-    min1: f32,            // AE 9 Min (a, U, G)
-    max1: f32,            // AE 10 Max (a, U, G)
-    min2: f32,            // AE 11 Min (b, V, B)
-    max2: f32,            // AE 12 Max (b, V, B)
+    fuzz: f32,            // AE 2 Fuzziness
+    space: f32,           // AE 3 Color Space (menu: 1 Lab, 2 YUV, 3 RGB)
+    min0: f32,            // AE 4 Min (L, Y, R)
+    max0: f32,            // AE 5 Max (L, Y, R)
+    min1: f32,            // AE 6 Min (a, U, G)
+    max1: f32,            // AE 7 Max (a, U, G)
+    min2: f32,            // AE 8 Min (b, V, B)
+    max2: f32,            // AE 9 Max (b, V, B)
     passIndex: f32,
     pad0: f32,
 };

@@ -1,5 +1,5 @@
 // After Effects "CC Threshold RGB" (CC Threshold RGB) — UNVERIFIED: written from the effect's definition, not yet measured against After Effects renders (fxref/spec.py, fxlib check <slug> --holdout).
-// Each channel against its own threshold (0..255) gives 0 or 1; Invert Red/Green/Blue swap per channel; Blend w.
+// Each channel against its own threshold (raw 0..1 in AE, compared on 0..255 levels) gives 0 or 1; Invert Red/Green/Blue swap per channel; Blend w.
 // Original mixes with the source. Alpha untouched; premultiplied.
 struct Params {
     size: vec2<f32>,
@@ -9,7 +9,7 @@ struct Params {
     rI: f32,              // AE 4 Invert Red
     gI: f32,              // AE 5 Invert Green
     bI: f32,              // AE 6 Invert Blue
-    blend: f32,           // AE 7 Blend w. Original (%)
+    blend: f32,           // AE 7 Blend w. Original (raw 0..1)
     passIndex: f32,
 };
 @group(0) @binding(0) var srcTex: texture_2d<f32>;
@@ -57,8 +57,8 @@ fn fs_main(in: VSOut) -> @location(0) vec4<f32> {
     let s = textureLoad(srcTex, pixelOf(in.uv), 0);
     let c = straight8(s);
     let v = round(c * 255.0);
-    var o = select(vec3<f32>(0.0), vec3<f32>(1.0), v >= vec3<f32>(P.rT, P.gT, P.bT));
+    var o = select(vec3<f32>(0.0), vec3<f32>(1.0), v >= round(vec3<f32>(P.rT, P.gT, P.bT) * 255.0));
     let inv = vec3<f32>(P.rI, P.gI, P.bI) > vec3<f32>(0.5);
     o = select(o, vec3<f32>(1.0) - o, inv);
-    return out8(mix(o, c, clamp(P.blend / 100.0, 0.0, 1.0)), s.a);
+    return out8(mix(o, c, clamp(P.blend, 0.0, 1.0)), s.a);
 }

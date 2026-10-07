@@ -1,24 +1,24 @@
 // After Effects "CC Plastic" (CC Plastic) — UNVERIFIED: written from the effect's definition, not yet measured against After Effects renders (fxref/spec.py, fxlib check <slug> --holdout).
 // The layer's Property (1 Alpha, 2 Red, 3 Green, 4 Blue, 5 Luminance; assumed menu) smoothed over Softness px is a
 // relief of Height %, lit like a plastic surface: Ambient + Diffuse (Lambert) + Specular (Blinn, Roughness), Metal %
-// tinting the highlight with the surface colour; Cut Min / Cut Max limit the relief. A separate Bump Layer, AE lights
-// and Light Type are not modelled. Positions assumed (groups counted).
+// tinting the highlight with the surface colour; Cut Min / Cut Max (%) are mapped but not applied yet. A separate Bump Layer, AE lights,
+// Light Type, Ambient Light Color and Dust are not modelled. Indices checked against AE 26.
 struct Params {
     size: vec2<f32>,
-    lightColor: vec4<f32>,// AE 11 Light Color
+    lightColor: vec4<f32>,// AE 12 Light Color
     property: f32,        // AE 3 Property (menu)
     softness: f32,        // AE 4 Softness (px)
     height: f32,          // AE 5 Height (%)
-    intensity: f32,       // AE 10 Light Intensity (%)
-    lightHeight: f32,     // AE 13 Light Height
-    lightDir: f32,        // AE 15 Light Direction (degrees)
-    ambient: f32,         // AE 17 Ambient
-    diffuse: f32,         // AE 18 Diffuse
-    specular: f32,        // AE 19 Specular
-    roughness: f32,       // AE 20 Roughness
-    metal: f32,           // AE 21 Metal (%)
-    cutMin: f32,          // AE 6 Cut Min (0..1)
-    cutMax: f32,          // AE 7 Cut Max (0..1)
+    intensity: f32,       // AE 11 Light Intensity (%)
+    lightHeight: f32,     // AE 14 Light Height
+    lightDir: f32,        // AE 16 Light Direction (degrees)
+    ambient: f32,         // AE 20 Ambient
+    diffuse: f32,         // AE 21 Diffuse
+    specular: f32,        // AE 23 Specular
+    roughness: f32,       // AE 24 Roughness
+    metal: f32,           // AE 25 Metal (%)
+    cutMin: f32,          // AE 6 Cut Min (%, not used yet)
+    cutMax: f32,          // AE 7 Cut Max (%, not used yet)
     passIndex: f32,
     layerRect: vec4<f32>, // reserved, filled by the host: the layer's rect in the canvas (x0, y0, x1, y1)
 };

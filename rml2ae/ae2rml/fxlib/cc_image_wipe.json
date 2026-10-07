@@ -17,7 +17,7 @@
    "ae": 2,
    "field": "softness",
    "kind": "number",
-   "default": 0
+   "default": 0.09999084472656
   },
   {
    "ae": 3,
@@ -29,7 +29,7 @@
    "ae": 6,
    "field": "property",
    "kind": "enum",
-   "default": 1
+   "default": 5
   },
   {
    "ae": 7,
@@ -46,7 +46,7 @@
  ],
  "status": "unverified",
  "auto": false,
- "notes": "Not yet measured against After Effects. The second layer comes from the Rive node's map input (ae2rml binds the referenced layer, PR 7). Parameter indices follow the After Effects parameter order as documented by Adobe; `render_refs.py --params` records the real list.",
+ "notes": "Not yet measured against After Effects. The second layer comes from the Rive node's map input (ae2rml binds the referenced layer, PR 7). Parameter indices follow the After Effects parameter order as documented by Adobe; `render_refs.py --params` records the real list. Param indices/kinds/defaults checked against AE 26 parameter list (_ae_params.json): Completion and Border Softness are raw 0..1 (shader no longer divides by 100); Property default 5 of 8: shader menu reordered to R,G,B,Alpha,Luminance,Lightness,Hue,Saturation (order guessed from the default = Luminance, doubtful).",
  "textureParams": {
   "mapTex": 5
  }

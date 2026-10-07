@@ -1,6 +1,6 @@
 {
  "slug": "cc_color_neutralizer",
- "aeMatchName": "CC Color Neutralizer",
+ "aeMatchName": "CS Color Neutralizer",
  "wgsl": "ae_cc_color_neutralizer.wgsl",
  "passes": 1,
  "textures": {},
@@ -17,30 +17,54 @@
    ]
   },
   {
-   "ae": 2,
-   "field": "shadows",
+   "ae": 3,
+   "field": "shR",
    "kind": "number",
-   "default": 100
+   "default": 0
   },
   {
-   "ae": 3,
+   "ae": 4,
+   "field": "shG",
+   "kind": "number",
+   "default": 0
+  },
+  {
+   "ae": 5,
+   "field": "shB",
+   "kind": "number",
+   "default": 0
+  },
+  {
+   "ae": 7,
    "field": "midColor",
    "kind": "color",
    "default": [
-    0.5,
-    0.5,
-    0.5,
+    0.49803921568627,
+    0.49803921568627,
+    0.49803921568627,
     1
    ]
   },
   {
-   "ae": 4,
-   "field": "midtones",
+   "ae": 9,
+   "field": "midR",
    "kind": "number",
-   "default": 100
+   "default": 0
   },
   {
-   "ae": 5,
+   "ae": 10,
+   "field": "midG",
+   "kind": "number",
+   "default": 0
+  },
+  {
+   "ae": 11,
+   "field": "midB",
+   "kind": "number",
+   "default": 0
+  },
+  {
+   "ae": 13,
    "field": "hiColor",
    "kind": "color",
    "default": [
@@ -51,25 +75,55 @@
    ]
   },
   {
-   "ae": 6,
-   "field": "highlights",
-   "kind": "number",
-   "default": 100
-  },
-  {
-   "ae": 7,
-   "field": "pivot",
-   "kind": "number",
-   "default": 0.5
-  },
-  {
-   "ae": 8,
-   "field": "contrast",
+   "ae": 15,
+   "field": "hiR",
    "kind": "number",
    "default": 0
+  },
+  {
+   "ae": 16,
+   "field": "hiG",
+   "kind": "number",
+   "default": 0
+  },
+  {
+   "ae": 17,
+   "field": "hiB",
+   "kind": "number",
+   "default": 0
+  },
+  {
+   "ae": 19,
+   "field": "pinning",
+   "kind": "number",
+   "default": 0
+  },
+  {
+   "ae": 20,
+   "field": "blend",
+   "kind": "number",
+   "default": 0
+  },
+  {
+   "ae": 22,
+   "field": "view",
+   "kind": "enum",
+   "default": 1
+  },
+  {
+   "ae": 23,
+   "field": "blackPt",
+   "kind": "number",
+   "default": 0
+  },
+  {
+   "ae": 24,
+   "field": "whitePt",
+   "kind": "number",
+   "default": 100
   }
  ],
  "status": "unverified",
  "auto": false,
- "notes": "Not yet measured against After Effects.  Parameter indices follow the After Effects parameter order as documented by Adobe; `render_refs.py --params` records the real list."
+ "notes": "Not yet measured against After Effects. Param indices checked against AE 26 parameter list (_ae_params.json): the old model (Shadows/Midtones/Highlights amounts, Pivot, Contrast) did not exist: AE has per band an Unbalance colour (1, 7, 13) + Red/Green/Blue sliders, then Pinning, Blend w. Original, View, Black/White Point. Shader re-modelled on that list (strengths guessed)."
 }

@@ -21,7 +21,7 @@
    "ae": 4,
    "field": "placement",
    "kind": "enum",
-   "default": 1
+   "default": 3
   },
   {
    "ae": 5,
@@ -32,5 +32,5 @@
  ],
  "status": "unverified",
  "auto": false,
- "notes": "Not yet measured against After Effects.  Parameter indices follow the After Effects parameter order as documented by Adobe; `render_refs.py --params` records the real list."
+ "notes": "Not yet measured against After Effects. Param indices checked against AE 26 parameter list (_ae_params.json): Transition Completion and Softness are raw 0..1 (the shader now reads them raw, was /100); Gradient Placement default 3 (still not modelled). Gradient Layer (3) not modelled (the layer itself is used)."
 }

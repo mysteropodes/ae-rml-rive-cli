@@ -16,8 +16,8 @@
    "field": "center",
    "kind": "point",
    "default": [
-    320,
-    180
+    32,
+    32
    ]
   },
   {
@@ -30,7 +30,7 @@
    "ae": 4,
    "field": "shape",
    "kind": "enum",
-   "default": 1
+   "default": 2
   },
   {
    "ae": 5,
@@ -64,5 +64,5 @@
  ],
  "status": "unverified",
  "auto": false,
- "notes": "Not yet measured against After Effects.  Parameter indices follow the After Effects parameter order as documented by Adobe; `render_refs.py --params` records the real list."
+ "notes": "Not yet measured against After Effects.  Parameter indices follow the After Effects parameter order as documented by Adobe; `render_refs.py --params` records the real list. Param indices/kinds/defaults checked against AE 26 parameter list (_ae_params.json): Shape default 2 (Round); menu 1 Doors / 2 Round / 3 Square as in the shader."
 }

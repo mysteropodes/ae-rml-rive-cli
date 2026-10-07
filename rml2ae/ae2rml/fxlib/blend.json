@@ -17,18 +17,18 @@
    "ae": 3,
    "field": "original",
    "kind": "number",
-   "default": 0
+   "default": 1
   },
   {
    "ae": 4,
    "field": "sizes",
    "kind": "enum",
-   "default": 2
+   "default": 1
   }
  ],
  "status": "unverified",
  "auto": false,
- "notes": "Not yet measured against After Effects. The second layer comes from the Rive node's map input (ae2rml binds the referenced layer, PR 7). Parameter indices follow the After Effects parameter order as documented by Adobe; `render_refs.py --params` records the real list.",
+ "notes": "Not yet measured against After Effects. The second layer comes from the Rive node's map input (ae2rml binds the referenced layer, PR 7). Param indices checked against AE 26 parameter list (_ae_params.json): Blend With Original is raw 0..1 (AE default 1 = 100 %), the shader now uses it raw (was /100); If Layer Sizes Differ default 1 (Center). Param 1 = the layer (mapTex).",
  "textureParams": {
   "mapTex": 1
  }

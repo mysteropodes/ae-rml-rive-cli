@@ -1579,7 +1579,7 @@
  },
  {
   "slug": "channel_mixer",
-  "mn": "ADBE Channel Mixer",
+  "mn": "ADBE CHANNEL MIXER",
   "k": 0,
   "vals": {
    "1": 50,
@@ -1592,7 +1592,7 @@
  },
  {
   "slug": "channel_mixer",
-  "mn": "ADBE Channel Mixer",
+  "mn": "ADBE CHANNEL MIXER",
   "k": 1,
   "vals": {
    "13": 1,
@@ -1605,7 +1605,7 @@
  },
  {
   "slug": "channel_mixer",
-  "mn": "ADBE Channel Mixer",
+  "mn": "ADBE CHANNEL MIXER",
   "k": 2,
   "vals": {
    "5": -50,
@@ -1674,7 +1674,7 @@
     100.5,
     40.25
    ],
-   "2": 30
+   "2": 0.3
   },
   "held": false,
   "png": "ae/offset_1.png"
@@ -1829,7 +1829,7 @@
   "mn": "ADBE Threshold2",
   "k": 0,
   "vals": {
-   "1": 128
+   "1": 0.5
   },
   "held": false,
   "png": "ae/threshold_0.png"
@@ -1839,7 +1839,7 @@
   "mn": "ADBE Threshold2",
   "k": 1,
   "vals": {
-   "1": 60
+   "1": 0.235
   },
   "held": false,
   "png": "ae/threshold_1.png"
@@ -1849,14 +1849,14 @@
   "mn": "ADBE Threshold2",
   "k": 2,
   "vals": {
-   "1": 200
+   "1": 0.784
   },
   "held": false,
   "png": "ae/threshold_2.png"
  },
  {
   "slug": "gamma_pedestal_gain",
-  "mn": "ADBE Gamma/Pedestal/Gain",
+  "mn": "ADBE Gamma/Pedestal/Gain2",
   "k": 0,
   "vals": {
    "2": 0.6,
@@ -1868,7 +1868,7 @@
  },
  {
   "slug": "gamma_pedestal_gain",
-  "mn": "ADBE Gamma/Pedestal/Gain",
+  "mn": "ADBE Gamma/Pedestal/Gain2",
   "k": 1,
   "vals": {
    "3": 0.1,
@@ -1880,7 +1880,7 @@
  },
  {
   "slug": "gamma_pedestal_gain",
-  "mn": "ADBE Gamma/Pedestal/Gain",
+  "mn": "ADBE Gamma/Pedestal/Gain2",
   "k": 2,
   "vals": {
    "1": 2.0
@@ -1985,7 +1985,7 @@
   "mn": "ADBE Find Edges",
   "k": 2,
   "vals": {
-   "2": 50
+   "2": 0.5
   },
   "held": false,
   "png": "ae/find_edges_2.png"
@@ -1995,8 +1995,8 @@
   "mn": "ADBE Unsharp Mask2",
   "k": 0,
   "vals": {
-   "1": 100,
-   "2": 3
+   "2": 100,
+   "3": 3
   },
   "held": false,
   "png": "ae/unsharp_mask_0.png"
@@ -2006,9 +2006,9 @@
   "mn": "ADBE Unsharp Mask2",
   "k": 1,
   "vals": {
-   "1": 200,
-   "2": 8,
-   "3": 10
+   "2": 200,
+   "3": 8,
+   "4": 0.04
   },
   "held": false,
   "png": "ae/unsharp_mask_1.png"
@@ -2059,7 +2059,8 @@
   "mn": "ADBE Polar Coordinates",
   "k": 0,
   "vals": {
-   "1": 100
+   "1": 1,
+   "2": 1
   },
   "held": false,
   "png": "ae/polar_coordinates_0.png"
@@ -2069,7 +2070,7 @@
   "mn": "ADBE Polar Coordinates",
   "k": 1,
   "vals": {
-   "1": 100,
+   "1": 1,
    "2": 2
   },
   "held": false,
@@ -2080,7 +2081,8 @@
   "mn": "ADBE Polar Coordinates",
   "k": 2,
   "vals": {
-   "1": 50
+   "1": 0.5,
+   "2": 1
   },
   "held": false,
   "png": "ae/polar_coordinates_2.png"
@@ -2189,7 +2191,7 @@
   "mn": "ADBE Radial Blur",
   "k": 0,
   "vals": {
-   "1": 20
+   "2": 20
   },
   "held": false,
   "png": "ae/radial_blur_0.png"
@@ -2199,8 +2201,8 @@
   "mn": "ADBE Radial Blur",
   "k": 1,
   "vals": {
-   "1": 30,
-   "3": 2
+   "2": 30,
+   "4": 2
   },
   "held": false,
   "png": "ae/radial_blur_1.png"
@@ -2210,8 +2212,8 @@
   "mn": "ADBE Radial Blur",
   "k": 2,
   "vals": {
-   "1": 15,
-   "2": [
+   "2": 15,
+   "3": [
     200,
     120
    ]
@@ -2221,7 +2223,7 @@
  },
  {
   "slug": "cc_vignette",
-  "mn": "CC Vignette",
+  "mn": "CS Vignette",
   "k": 0,
   "vals": {
    "1": 80
@@ -2231,7 +2233,7 @@
  },
  {
   "slug": "cc_vignette",
-  "mn": "CC Vignette",
+  "mn": "CS Vignette",
   "k": 1,
   "vals": {
    "1": 100,
@@ -2242,7 +2244,7 @@
  },
  {
   "slug": "cc_vignette",
-  "mn": "CC Vignette",
+  "mn": "CS Vignette",
   "k": 2,
   "vals": {
    "1": 60,
@@ -2256,7 +2258,7 @@
  },
  {
   "slug": "iris_wipe",
-  "mn": "ADBE Iris Wipe",
+  "mn": "ADBE IRIS_WIPE",
   "k": 0,
   "vals": {
    "3": 120
@@ -2266,7 +2268,7 @@
  },
  {
   "slug": "iris_wipe",
-  "mn": "ADBE Iris Wipe",
+  "mn": "ADBE IRIS_WIPE",
   "k": 1,
   "vals": {
    "2": 10,
@@ -2280,7 +2282,7 @@
  },
  {
   "slug": "iris_wipe",
-  "mn": "ADBE Iris Wipe",
+  "mn": "ADBE IRIS_WIPE",
   "k": 2,
   "vals": {
    "1": [
@@ -2409,7 +2411,7 @@
   "k": 2,
   "vals": {
    "1": 3,
-   "7": 30
+   "7": 0.3
   },
   "held": false,
   "png": "ae/cc_toner_2.png"
@@ -2590,7 +2592,14 @@
   "slug": "spill_suppressor",
   "mn": "ADBE Spill Suppressor",
   "k": 0,
-  "vals": {},
+  "vals": {
+   "1": [
+    0,
+    1,
+    0,
+    1
+   ]
+  },
   "held": false,
   "png": "ae/spill_suppressor_0.png"
  },
@@ -2605,7 +2614,7 @@
     1,
     1
    ],
-   "3": 60
+   "2": 60
   },
   "held": false,
   "png": "ae/spill_suppressor_1.png"
@@ -2623,7 +2632,7 @@
   "mn": "CC Threshold",
   "k": 1,
   "vals": {
-   "1": 80,
+   "1": 0.31,
    "2": 2,
    "3": 1
   },
@@ -2635,8 +2644,8 @@
   "mn": "CC Threshold",
   "k": 2,
   "vals": {
-   "1": 160,
-   "4": 40
+   "1": 0.63,
+   "4": 0.4
   },
   "held": false,
   "png": "ae/cc_threshold_2.png"
@@ -2654,9 +2663,9 @@
   "mn": "CC Threshold RGB",
   "k": 1,
   "vals": {
-   "1": 60,
-   "2": 200,
-   "3": 100,
+   "1": 0.25,
+   "2": 0.8,
+   "3": 0.4,
    "5": 1
   },
   "held": false,
@@ -2757,7 +2766,9 @@
   "slug": "cc_tiler",
   "mn": "CC Tiler",
   "k": 0,
-  "vals": {},
+  "vals": {
+   "1": 0.25
+  },
   "held": false,
   "png": "ae/cc_tiler_0.png"
  },
@@ -2766,7 +2777,7 @@
   "mn": "CC Tiler",
   "k": 1,
   "vals": {
-   "1": 50,
+   "1": 0.5,
    "2": [
     200,
     120
@@ -2780,8 +2791,8 @@
   "mn": "CC Tiler",
   "k": 2,
   "vals": {
-   "1": 33,
-   "3": 40
+   "1": 0.33,
+   "3": 0.4
   },
   "held": false,
   "png": "ae/cc_tiler_2.png"
@@ -2803,20 +2814,20 @@
    "4": 60,
    "5": 30,
    "6": 4,
-   "9": [
+   "12": [
     1,
     0,
     0,
     1
    ],
-   "11": 2
+   "14": 2
   },
   "held": false,
   "png": "ae/grid_1.png"
  },
  {
   "slug": "ellipse",
-  "mn": "ADBE Ellipse",
+  "mn": "ADBE ELLIPSE",
   "k": 0,
   "vals": {},
   "held": false,
@@ -2824,13 +2835,13 @@
  },
  {
   "slug": "ellipse",
-  "mn": "ADBE Ellipse",
+  "mn": "ADBE ELLIPSE",
   "k": 1,
   "vals": {
    "2": 400,
    "3": 200,
    "4": 40,
-   "5": 50,
+   "5": 0.5,
    "6": [
     1,
     0.8,
@@ -2893,7 +2904,7 @@
     0.6,
     1
    ],
-   "2": 80,
+   "2": 0.8,
    "3": [
     500,
     300
@@ -2940,7 +2951,7 @@
  },
  {
   "slug": "cc_cross_blur",
-  "mn": "CC Cross Blur",
+  "mn": "CS CrossBlur",
   "k": 0,
   "vals": {
    "1": 20,
@@ -2951,7 +2962,7 @@
  },
  {
   "slug": "cc_cross_blur",
-  "mn": "CC Cross Blur",
+  "mn": "CS CrossBlur",
   "k": 1,
   "vals": {
    "1": 40,
@@ -2963,7 +2974,7 @@
  },
  {
   "slug": "bilateral_blur",
-  "mn": "ADBE Bilateral Blur",
+  "mn": "ADBE Bilateral",
   "k": 0,
   "vals": {},
   "held": false,
@@ -2971,7 +2982,7 @@
  },
  {
   "slug": "bilateral_blur",
-  "mn": "ADBE Bilateral Blur",
+  "mn": "ADBE Bilateral",
   "k": 1,
   "vals": {
    "1": 12,
@@ -2985,7 +2996,7 @@
   "mn": "ADBE Gradient Wipe",
   "k": 0,
   "vals": {
-   "1": 40
+   "1": 0.4
   },
   "held": false,
   "png": "ae/gradient_wipe_0.png"
@@ -2995,8 +3006,8 @@
   "mn": "ADBE Gradient Wipe",
   "k": 1,
   "vals": {
-   "1": 50,
-   "2": 30
+   "1": 0.5,
+   "2": 0.3
   },
   "held": false,
   "png": "ae/gradient_wipe_1.png"
@@ -3006,7 +3017,7 @@
   "mn": "ADBE Gradient Wipe",
   "k": 2,
   "vals": {
-   "1": 30,
+   "1": 0.3,
    "5": 1
   },
   "held": false,
@@ -3054,13 +3065,13 @@
     120
    ],
    "2": 100,
-   "9": [
+   "10": [
     1,
     0.5,
     0,
     1
    ],
-   "11": 2
+   "12": 2
   },
   "held": false,
   "png": "ae/circle_1.png"
@@ -3133,7 +3144,7 @@
     220
    ],
    "4": 40,
-   "5": 50,
+   "5": 0.5,
    "6": [
     1,
     0.8,
@@ -3203,7 +3214,7 @@
   "k": 1,
   "vals": {
    "2": 2,
-   "3": 85
+   "3": 100
   },
   "held": false,
   "png": "ae/broadcast_colors_1.png"
@@ -3275,7 +3286,7 @@
   "mn": "CC Radial ScaleWipe",
   "k": 0,
   "vals": {
-   "1": 30
+   "1": 0.3
   },
   "held": false,
   "png": "ae/cc_radial_scalewipe_0.png"
@@ -3285,7 +3296,7 @@
   "mn": "CC Radial ScaleWipe",
   "k": 1,
   "vals": {
-   "1": 50,
+   "1": 0.5,
    "2": [
     200,
     120
@@ -3299,7 +3310,7 @@
   "mn": "CC Radial ScaleWipe",
   "k": 2,
   "vals": {
-   "1": 40,
+   "1": 0.4,
    "3": 1
   },
   "held": false,
@@ -3322,7 +3333,10 @@
   "vals": {
    "1": -20,
    "3": 60,
-   "4": 300,
+   "4": [
+    320,
+    300
+   ],
    "5": 1,
    "6": [
     0.2,
@@ -3458,7 +3472,7 @@
   "k": 0,
   "vals": {
    "1": 3,
-   "2": 20
+   "2": 0.0784313725490196
   },
   "held": false,
   "png": "ae/dust_scratches_0.png"
@@ -3469,7 +3483,7 @@
   "k": 1,
   "vals": {
    "1": 6,
-   "2": 5
+   "2": 0.0196078431372549
   },
   "held": false,
   "png": "ae/dust_scratches_1.png"
@@ -3568,7 +3582,7 @@
   "mn": "ADBE Laser",
   "k": 0,
   "vals": {
-   "4": 70
+   "4": 0.7
   },
   "held": false,
   "png": "ae/beam_0.png"
@@ -3586,9 +3600,9 @@
     550,
     60
    ],
-   "3": 60,
-   "4": 90,
-   "7": 30,
+   "3": 0.6,
+   "4": 0.9,
+   "7": 0.3,
    "9": [
     1,
     0,
@@ -3605,7 +3619,7 @@
   "mn": "CC Jaws",
   "k": 0,
   "vals": {
-   "1": 20
+   "1": 0.2
   },
   "held": false,
   "png": "ae/cc_jaws_0.png"
@@ -3615,17 +3629,17 @@
   "mn": "CC Jaws",
   "k": 1,
   "vals": {
-   "1": 35,
+   "1": 0.35,
    "3": 90,
-   "4": 100,
-   "5": 30
+   "4": 0.5,
+   "5": 20
   },
   "held": false,
   "png": "ae/cc_jaws_1.png"
  },
  {
   "slug": "cc_line_sweep",
-  "mn": "CC Line Sweep",
+  "mn": "CS LineSweep",
   "k": 0,
   "vals": {
    "1": 40
@@ -3635,7 +3649,7 @@
  },
  {
   "slug": "cc_line_sweep",
-  "mn": "CC Line Sweep",
+  "mn": "CS LineSweep",
   "k": 1,
   "vals": {
    "1": 60,
@@ -3662,7 +3676,7 @@
   "k": 1,
   "vals": {
    "1": 30,
-   "4": 2,
+   "4": 3,
    "2": [
     200,
     120
@@ -3767,7 +3781,7 @@
   "vals": {
    "1": 4,
    "2": 20,
-   "4": 2
+   "3": 2
   },
   "held": false,
   "png": "ae/smart_blur_1.png"
@@ -3779,7 +3793,7 @@
   "vals": {
    "1": 8,
    "2": 60,
-   "4": 3
+   "3": 3
   },
   "held": false,
   "png": "ae/smart_blur_2.png"
@@ -3847,9 +3861,9 @@
   "mn": "ADBE Pro Levels2",
   "k": 0,
   "vals": {
-   "10": 0.2,
-   "22": 0.1,
-   "24": 0.7
+   "11": 0.2,
+   "25": 0.1,
+   "27": 0.7
   },
   "held": false,
   "png": "ae/levels_individual_0.png"
@@ -3861,7 +3875,7 @@
   "vals": {
    "4": 0.1,
    "5": 0.9,
-   "18": 1.6
+   "20": 1.6
   },
   "held": false,
   "png": "ae/levels_individual_1.png"
@@ -3871,9 +3885,9 @@
   "mn": "ADBE Pro Levels2",
   "k": 2,
   "vals": {
-   "13": 0.2,
-   "26": 0.8,
-   "31": 0.6
+   "14": 0.2,
+   "29": 0.8,
+   "35": 0.6
   },
   "held": false,
   "png": "ae/levels_individual_2.png"
@@ -3895,7 +3909,7 @@
     1,
     1
    ],
-   "6": 15
+   "6": 0.3
   },
   "held": false,
   "png": "ae/change_to_color_0.png"
@@ -3918,8 +3932,8 @@
     1
    ],
    "3": 4,
-   "6": 20,
-   "9": 30
+   "6": 0.4,
+   "10": 0.3
   },
   "held": false,
   "png": "ae/change_to_color_1.png"
@@ -3942,7 +3956,7 @@
     1
    ],
    "4": 2,
-   "6": 25
+   "6": 0.5
   },
   "held": false,
   "png": "ae/change_to_color_2.png"
@@ -3952,7 +3966,7 @@
   "mn": "ADBE Channel Combiner",
   "k": 0,
   "vals": {
-   "3": 1
+   "5": 1
   },
   "held": false,
   "png": "ae/channel_combiner_0.png"
@@ -3962,8 +3976,8 @@
   "mn": "ADBE Channel Combiner",
   "k": 1,
   "vals": {
-   "3": 5,
-   "4": 3
+   "5": 5,
+   "6": 3
   },
   "held": false,
   "png": "ae/channel_combiner_1.png"
@@ -3973,9 +3987,9 @@
   "mn": "ADBE Channel Combiner",
   "k": 2,
   "vals": {
-   "3": 6,
-   "4": 4,
-   "5": 1
+   "5": 6,
+   "6": 4,
+   "7": 1
   },
   "held": false,
   "png": "ae/channel_combiner_2.png"
@@ -3985,8 +3999,8 @@
   "mn": "ADBE Channel Combiner",
   "k": 3,
   "vals": {
-   "3": 3,
-   "6": 1
+   "5": 3,
+   "8": 1
   },
   "held": false,
   "png": "ae/channel_combiner_3.png"
@@ -3996,13 +4010,13 @@
   "mn": "ADBE Color Range",
   "k": 0,
   "vals": {
-   "6": 3,
-   "7": 150,
-   "8": 255,
-   "9": 0,
-   "10": 120,
-   "11": 0,
-   "12": 120
+   "3": 3,
+   "4": 150,
+   "5": 255,
+   "6": 0,
+   "7": 120,
+   "8": 0,
+   "9": 120
   },
   "held": false,
   "png": "ae/color_range_0.png"
@@ -4012,14 +4026,14 @@
   "mn": "ADBE Color Range",
   "k": 1,
   "vals": {
-   "6": 1,
-   "7": 0,
-   "8": 255,
-   "9": 140,
-   "10": 255,
-   "11": 0,
-   "12": 255,
-   "5": 20
+   "3": 1,
+   "4": 0,
+   "5": 255,
+   "6": 140,
+   "7": 255,
+   "8": 0,
+   "9": 255,
+   "2": 20
   },
   "held": false,
   "png": "ae/color_range_1.png"
@@ -4029,14 +4043,14 @@
   "mn": "ADBE Color Range",
   "k": 2,
   "vals": {
-   "6": 2,
-   "7": 100,
-   "8": 255,
-   "9": 0,
-   "10": 255,
-   "11": 0,
-   "12": 128,
-   "5": 40
+   "3": 2,
+   "4": 100,
+   "5": 255,
+   "6": 0,
+   "7": 255,
+   "8": 0,
+   "9": 128,
+   "2": 40
   },
   "held": false,
   "png": "ae/color_range_2.png"
@@ -4056,7 +4070,7 @@
   "vals": {
    "1": 8,
    "2": -40,
-   "3": 30
+   "3": 0.3
   },
   "held": false,
   "png": "ae/matte_choker_1.png"
@@ -4070,56 +4084,57 @@
    "2": 20,
    "4": 6,
    "5": 30,
-   "6": 20
+   "6": 0.2
   },
   "held": false,
   "png": "ae/matte_choker_2.png"
  },
  {
   "slug": "cc_kernel",
-  "mn": "CC Kernel",
+  "mn": "CS Kernel",
   "k": 0,
   "vals": {
-   "1": 1,
    "2": 1,
    "3": 1,
    "4": 1,
-   "6": 1,
    "7": 1,
-   "8": 1,
-   "9": 1
+   "9": 1,
+   "12": 1,
+   "13": 1,
+   "14": 1,
+   "16": 9
   },
   "held": false,
   "png": "ae/cc_kernel_0.png"
  },
  {
   "slug": "cc_kernel",
-  "mn": "CC Kernel",
+  "mn": "CS Kernel",
   "k": 1,
   "vals": {
-   "2": -1,
-   "4": -1,
-   "5": 5,
-   "6": -1,
-   "8": -1
+   "3": -1,
+   "7": -1,
+   "8": 5,
+   "9": -1,
+   "13": -1
   },
   "held": false,
   "png": "ae/cc_kernel_1.png"
  },
  {
   "slug": "cc_kernel",
-  "mn": "CC Kernel",
+  "mn": "CS Kernel",
   "k": 2,
   "vals": {
-   "1": -1,
-   "3": 1,
-   "4": -2,
-   "5": 0,
-   "6": 2,
-   "7": -1,
-   "9": 1,
-   "10": 1,
-   "11": 1
+   "2": -1,
+   "4": 1,
+   "7": -2,
+   "8": 0,
+   "9": 2,
+   "12": -1,
+   "14": 1,
+   "16": 1,
+   "17": 1
   },
   "held": false,
   "png": "ae/cc_kernel_2.png"
@@ -4206,7 +4221,8 @@
   "vals": {
    "1": 150,
    "2": 150,
-   "3": 15
+   "3": 15,
+   "5": 0
   },
   "held": false,
   "png": "ae/cc_griddler_0.png"
@@ -4217,7 +4233,8 @@
   "k": 1,
   "vals": {
    "3": 20,
-   "4": 30
+   "4": 30,
+   "5": 0
   },
   "held": false,
   "png": "ae/cc_griddler_1.png"
@@ -4260,7 +4277,7 @@
    ],
    "3": 3,
    "4": 16,
-   "5": 50
+   "5": 0.5
   },
   "held": false,
   "png": "ae/cc_simple_wire_removal_1.png"
@@ -4272,7 +4289,7 @@
   "vals": {
    "3": 4,
    "4": 24,
-   "6": 50
+   "6": 0.5
   },
   "held": false,
   "png": "ae/cc_simple_wire_removal_2.png"
@@ -4320,7 +4337,7 @@
   "mn": "CC Grid Wipe",
   "k": 0,
   "vals": {
-   "1": 40
+   "1": 0.4
   },
   "held": false,
   "png": "ae/cc_grid_wipe_0.png"
@@ -4330,7 +4347,7 @@
   "mn": "CC Grid Wipe",
   "k": 1,
   "vals": {
-   "1": 50,
+   "1": 0.5,
    "3": 30,
    "6": 2,
    "5": 8
@@ -4343,9 +4360,9 @@
   "mn": "CC Grid Wipe",
   "k": 2,
   "vals": {
-   "1": 60,
+   "1": 0.6,
    "6": 3,
-   "4": 4,
+   "4": 120,
    "2": [
     100,
     80
@@ -4357,7 +4374,7 @@
  },
  {
   "slug": "cc_block_load",
-  "mn": "CC Block Load",
+  "mn": "CS BlockLoad",
   "k": 0,
   "vals": {
    "1": 30
@@ -4367,7 +4384,7 @@
  },
  {
   "slug": "cc_block_load",
-  "mn": "CC Block Load",
+  "mn": "CS BlockLoad",
   "k": 1,
   "vals": {
    "1": 65,
@@ -4378,7 +4395,7 @@
  },
  {
   "slug": "cc_block_load",
-  "mn": "CC Block Load",
+  "mn": "CS BlockLoad",
   "k": 2,
   "vals": {
    "1": 10,
@@ -4391,7 +4408,9 @@
   "slug": "blend",
   "mn": "ADBE Blend",
   "k": 0,
-  "vals": {},
+  "vals": {
+   "3": 0
+  },
   "held": false,
   "png": "ae/blend_0.png"
  },
@@ -4400,7 +4419,8 @@
   "mn": "ADBE Blend",
   "k": 1,
   "vals": {
-   "2": 2
+   "2": 2,
+   "3": 0
   },
   "held": false,
   "png": "ae/blend_1.png"
@@ -4411,7 +4431,7 @@
   "k": 2,
   "vals": {
    "2": 4,
-   "3": 30
+   "3": 0.3
   },
   "held": false,
   "png": "ae/blend_2.png"
@@ -4421,7 +4441,8 @@
   "mn": "ADBE Blend",
   "k": 3,
   "vals": {
-   "2": 5
+   "2": 5,
+   "3": 0
   },
   "held": false,
   "png": "ae/blend_3.png"
@@ -4431,7 +4452,7 @@
   "mn": "ADBE Calculations",
   "k": 0,
   "vals": {
-   "5": 50
+   "8": 0.5
   },
   "held": false,
   "png": "ae/calculations_0.png"
@@ -4441,7 +4462,8 @@
   "mn": "ADBE Calculations",
   "k": 1,
   "vals": {
-   "8": 4
+   "8": 1,
+   "12": 4
   },
   "held": false,
   "png": "ae/calculations_1.png"
@@ -4451,9 +4473,9 @@
   "mn": "ADBE Calculations",
   "k": 2,
   "vals": {
-   "1": 2,
-   "8": 8,
-   "5": 80
+   "2": 2,
+   "12": 8,
+   "8": 0.8
   },
   "held": false,
   "png": "ae/calculations_2.png"
@@ -4463,8 +4485,9 @@
   "mn": "ADBE Calculations",
   "k": 3,
   "vals": {
-   "4": 3,
-   "8": 18
+   "7": 3,
+   "8": 1,
+   "12": 18
   },
   "held": false,
   "png": "ae/calculations_3.png"
@@ -4586,7 +4609,7 @@
   "mn": "CC Image Wipe",
   "k": 0,
   "vals": {
-   "1": 40
+   "1": 0.4
   },
   "held": false,
   "png": "ae/cc_image_wipe_0.png"
@@ -4596,8 +4619,8 @@
   "mn": "CC Image Wipe",
   "k": 1,
   "vals": {
-   "1": 60,
-   "2": 20,
+   "1": 0.6,
+   "2": 0.2,
    "8": 1
   },
   "held": false,
@@ -4608,7 +4631,8 @@
   "mn": "ADBE 3D Glasses2",
   "k": 0,
   "vals": {
-   "3": 12
+   "3": 12,
+   "7": 3
   },
   "held": false,
   "png": "ae/three_d_glasses_0.png"
@@ -4773,8 +4797,9 @@
   "mn": "CC Flo Motion",
   "k": 0,
   "vals": {
-   "2": 60,
-   "4": -40
+   "3": 60,
+   "5": -40,
+   "6": 0
   },
   "held": false,
   "png": "ae/cc_flo_motion_0.png"
@@ -4784,10 +4809,10 @@
   "mn": "CC Flo Motion",
   "k": 1,
   "vals": {
-   "2": -80,
-   "4": 80,
-   "5": 1,
-   "7": 3
+   "3": -80,
+   "5": 80,
+   "6": 1,
+   "8": 3
   },
   "held": false,
   "png": "ae/cc_flo_motion_1.png"
@@ -4797,7 +4822,7 @@
   "mn": "CC Twister",
   "k": 0,
   "vals": {
-   "1": 50
+   "1": 0.5
   },
   "held": false,
   "png": "ae/cc_twister_0.png"
@@ -4807,7 +4832,7 @@
   "mn": "CC Twister",
   "k": 1,
   "vals": {
-   "1": 80,
+   "1": 0.8,
    "5": 90,
    "3": 0
   },
@@ -4861,9 +4886,9 @@
   "mn": "CC Sphere",
   "k": 1,
   "vals": {
-   "2": 60,
-   "1": 20,
-   "4": 150
+   "3": 60,
+   "2": 20,
+   "7": 150
   },
   "held": false,
   "png": "ae/cc_sphere_1.png"
@@ -4873,8 +4898,8 @@
   "mn": "CC Sphere",
   "k": 2,
   "vals": {
-   "6": 3,
-   "3": 30
+   "9": 3,
+   "4": 30
   },
   "held": false,
   "png": "ae/cc_sphere_2.png"
@@ -4893,7 +4918,7 @@
   "k": 1,
   "vals": {
    "1": 60,
-   "4": 90
+   "9": 90
   },
   "held": false,
   "png": "ae/cc_cylinder_1.png"
@@ -4903,8 +4928,8 @@
   "mn": "CC Cylinder",
   "k": 2,
   "vals": {
-   "6": 3,
-   "4": 45
+   "13": 3,
+   "9": 45
   },
   "held": false,
   "png": "ae/cc_cylinder_2.png"
@@ -5056,7 +5081,7 @@
  },
  {
   "slug": "selective_color",
-  "mn": "ADBE Selective Color",
+  "mn": "ADBE SelectiveColor",
   "k": 0,
   "vals": {
    "9": -50,
@@ -5067,31 +5092,31 @@
  },
  {
   "slug": "selective_color",
-  "mn": "ADBE Selective Color",
+  "mn": "ADBE SelectiveColor",
   "k": 1,
   "vals": {
    "1": 2,
-   "19": 40,
-   "20": -30,
-   "44": 20
+   "21": 40,
+   "22": -30,
+   "51": 20
   },
   "held": false,
   "png": "ae/selective_color_1.png"
  },
  {
   "slug": "selective_color",
-  "mn": "ADBE Selective Color",
+  "mn": "ADBE SelectiveColor",
   "k": 2,
   "vals": {
-   "39": -40,
-   "40": 20
+   "45": -40,
+   "46": 20
   },
   "held": false,
   "png": "ae/selective_color_2.png"
  },
  {
   "slug": "shadow_highlight",
-  "mn": "ADBE Shadow/Highlight",
+  "mn": "ADBE ShadowHighlight",
   "k": 0,
   "vals": {},
   "held": false,
@@ -5099,7 +5124,7 @@
  },
  {
   "slug": "shadow_highlight",
-  "mn": "ADBE Shadow/Highlight",
+  "mn": "ADBE ShadowHighlight",
   "k": 1,
   "vals": {
    "1": 0,
@@ -5111,7 +5136,7 @@
  },
  {
   "slug": "shadow_highlight",
-  "mn": "ADBE Shadow/Highlight",
+  "mn": "ADBE ShadowHighlight",
   "k": 2,
   "vals": {
    "1": 0,
@@ -5124,10 +5149,10 @@
  },
  {
   "slug": "cc_color_neutralizer",
-  "mn": "CC Color Neutralizer",
+  "mn": "CS Color Neutralizer",
   "k": 0,
   "vals": {
-   "3": [
+   "7": [
     0.6,
     0.45,
     0.4,
@@ -5139,7 +5164,7 @@
  },
  {
   "slug": "cc_color_neutralizer",
-  "mn": "CC Color Neutralizer",
+  "mn": "CS Color Neutralizer",
   "k": 1,
   "vals": {
    "1": [
@@ -5148,13 +5173,15 @@
     0.15,
     1
    ],
-   "5": [
+   "13": [
     1,
     0.95,
     0.8,
     1
    ],
-   "8": 20
+   "9": 20,
+   "17": -30,
+   "20": 25
   },
   "held": false,
   "png": "ae/cc_color_neutralizer_1.png"
@@ -5164,14 +5191,14 @@
   "mn": "ADBE Color Difference Key",
   "k": 0,
   "vals": {
-   "2": [
+   "3": [
     0,
     0.3,
     1,
     1
    ],
-   "4": 60,
-   "5": 140
+   "5": 60,
+   "6": 140
   },
   "held": false,
   "png": "ae/color_difference_key_0.png"
@@ -5181,22 +5208,22 @@
   "mn": "ADBE Color Difference Key",
   "k": 1,
   "vals": {
-   "2": [
+   "3": [
     1,
     0,
     0,
     1
    ],
-   "1": 3,
-   "14": 40,
-   "15": 200
+   "2": 7,
+   "15": 40,
+   "16": 200
   },
   "held": false,
   "png": "ae/color_difference_key_1.png"
  },
  {
   "slug": "eyedropper_fill",
-  "mn": "ADBE Sample Fill",
+  "mn": "ADBE Eyedropper Fill",
   "k": 0,
   "vals": {
    "1": [
@@ -5210,7 +5237,7 @@
  },
  {
   "slug": "eyedropper_fill",
-  "mn": "ADBE Sample Fill",
+  "mn": "ADBE Eyedropper Fill",
   "k": 1,
   "vals": {
    "1": [
@@ -5219,7 +5246,7 @@
    ],
    "2": 40,
    "4": 1,
-   "5": 30
+   "5": 0.3
   },
   "held": false,
   "png": "ae/eyedropper_fill_1.png"
@@ -5239,7 +5266,7 @@
   "vals": {
    "1": 1,
    "5": 4,
-   "6": 0
+   "6": 0.01
   },
   "held": false,
   "png": "ae/cartoon_1.png"
@@ -5250,7 +5277,7 @@
   "k": 2,
   "vals": {
    "1": 2,
-   "8": 0.8
+   "9": 1.2
   },
   "held": false,
   "png": "ae/cartoon_2.png"
@@ -5280,7 +5307,7 @@
  },
  {
   "slug": "cc_hextile",
-  "mn": "CC HexTile",
+  "mn": "CS HexTile",
   "k": 0,
   "vals": {},
   "held": false,
@@ -5288,12 +5315,12 @@
  },
  {
   "slug": "cc_hextile",
-  "mn": "CC HexTile",
+  "mn": "CS HexTile",
   "k": 1,
   "vals": {
    "2": 30,
-   "4": 30,
-   "5": 50
+   "5": 30,
+   "6": 50
   },
   "held": false,
   "png": "ae/cc_hextile_1.png"
@@ -5366,8 +5393,8 @@
    "1": 16,
    "3": 1,
    "6": 20,
-   "14": 30,
-   "15": 200
+   "17": 30,
+   "18": 0.78
   },
   "held": false,
   "png": "ae/camera_lens_blur_1.png"
@@ -5431,7 +5458,7 @@
  },
  {
   "slug": "turbulent_noise",
-  "mn": "ADBE Turbulent Noise",
+  "mn": "ADBE AIF Perlin Noise 3D",
   "k": 0,
   "vals": {},
   "held": false,
@@ -5439,7 +5466,7 @@
  },
  {
   "slug": "turbulent_noise",
-  "mn": "ADBE Turbulent Noise",
+  "mn": "ADBE AIF Perlin Noise 3D",
   "k": 1,
   "vals": {
    "1": 2,
@@ -5451,25 +5478,25 @@
  },
  {
   "slug": "turbulent_noise",
-  "mn": "ADBE Turbulent Noise",
+  "mn": "ADBE AIF Perlin Noise 3D",
   "k": 2,
   "vals": {
    "2": 1,
    "16": 3,
-   "31": 4
+   "27": 4
   },
   "held": false,
   "png": "ae/turbulent_noise_2.png"
  },
  {
   "slug": "turbulent_noise",
-  "mn": "ADBE Turbulent Noise",
+  "mn": "ADBE AIF Perlin Noise 3D",
   "k": 3,
   "vals": {
    "1": 3,
-   "24": 90,
-   "31": 5,
-   "30": 60
+   "21": 90,
+   "27": 5,
+   "26": 60
   },
   "held": false,
   "png": "ae/turbulent_noise_3.png"
@@ -5500,7 +5527,7 @@
   "vals": {
    "1": 5,
    "3": 150,
-   "16": 3
+   "17": 3
   },
   "held": false,
   "png": "ae/cell_pattern_2.png"
@@ -5574,7 +5601,7 @@
   "mn": "ADBE Fractal",
   "k": 2,
   "vals": {
-   "1": 3,
+   "1": 5,
    "4": -0.8,
    "5": 0.156
   },
@@ -5599,8 +5626,8 @@
    "3": 5,
    "4": 20,
    "5": 100,
-   "19": 80,
-   "21": 0
+   "23": 80,
+   "25": 0
   },
   "held": false,
   "png": "ae/cc_plastic_1.png"
@@ -5621,7 +5648,7 @@
   "k": 1,
   "vals": {
    "4": 20,
-   "5": 0.3,
+   "5": 30,
    "3": 5
   },
   "held": false,
@@ -5651,7 +5678,7 @@
  },
  {
   "slug": "cc_threads",
-  "mn": "CC Threads",
+  "mn": "CS Threads",
   "k": 0,
   "vals": {},
   "held": false,
@@ -5659,7 +5686,7 @@
  },
  {
   "slug": "cc_threads",
-  "mn": "CC Threads",
+  "mn": "CS Threads",
   "k": 1,
   "vals": {
    "1": 24,
@@ -5673,7 +5700,7 @@
  },
  {
   "slug": "cc_threads",
-  "mn": "CC Threads",
+  "mn": "CS Threads",
   "k": 2,
   "vals": {
    "3": 2,
@@ -5697,8 +5724,8 @@
   "vals": {
    "4": 25,
    "6": 3,
-   "10": 50,
-   "14": 2.5
+   "11": 50,
+   "16": 2.5
   },
   "held": false,
   "png": "ae/advanced_lightning_1.png"
@@ -5708,7 +5735,7 @@
   "mn": "ADBE Brush Strokes",
   "k": 0,
   "vals": {
-   "2": 6,
+   "2": 4,
    "3": 20
   },
   "held": false,
@@ -5720,7 +5747,7 @@
   "k": 1,
   "vals": {
    "1": 45,
-   "2": 10,
+   "2": 5,
    "3": 40,
    "4": 2,
    "6": 3
@@ -5733,9 +5760,9 @@
   "mn": "ADBE Noise HLS Auto",
   "k": 0,
   "vals": {
-   "2": 20,
-   "3": 20,
-   "4": 20
+   "2": 0.2,
+   "3": 0.2,
+   "4": 0.2
   },
   "held": false,
   "png": "ae/noise_hls_auto_0.png"
@@ -5746,7 +5773,7 @@
   "k": 1,
   "vals": {
    "1": 3,
-   "3": 40,
+   "3": 0.4,
    "5": 4
   },
   "held": false,
@@ -5754,31 +5781,31 @@
  },
  {
   "slug": "cc_composite",
-  "mn": "CC Composite",
+  "mn": "CS Composite",
   "k": 0,
   "vals": {
-   "1": 50
+   "2": 50
   },
   "held": false,
   "png": "ae/cc_composite_0.png"
  },
  {
   "slug": "cc_composite",
-  "mn": "CC Composite",
+  "mn": "CS Composite",
   "k": 1,
   "vals": {
-   "2": 6
+   "3": 6
   },
   "held": false,
   "png": "ae/cc_composite_1.png"
  },
  {
   "slug": "cc_composite",
-  "mn": "CC Composite",
+  "mn": "CS Composite",
   "k": 2,
   "vals": {
-   "2": 1,
-   "3": 0
+   "3": 1,
+   "4": 0
   },
   "held": false,
   "png": "ae/cc_composite_2.png"
@@ -5808,7 +5835,7 @@
    ],
    "2": 2,
    "3": 40,
-   "10": [
+   "8": [
     0,
     0.4,
     1,
@@ -5876,9 +5903,9 @@
   "k": 1,
   "vals": {
    "1": 60,
-   "6": 60,
-   "7": 3,
-   "8": 40
+   "5": 60,
+   "6": 3,
+   "7": 40
   },
   "held": false,
   "png": "ae/cc_warpomatic_1.png"
@@ -5923,7 +5950,7 @@
   "k": 1,
   "vals": {
    "1": 2,
-   "3": 300,
+   "3": 50,
    "4": 60
   },
   "held": false,

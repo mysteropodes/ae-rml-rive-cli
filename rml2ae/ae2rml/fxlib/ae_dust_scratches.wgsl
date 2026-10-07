@@ -82,7 +82,7 @@ fn fs_main(in: VSOut) -> @location(0) vec4<f32> {
         lo = select(mid, lo, up);
     }
     let med = min(0.5 * (lo + hi), vec3<f32>(s.a));
-    let far = abs(s.rgb - med) * 255.0 > vec3<f32>(P.threshold);
+    let far = abs(s.rgb - med) * 255.0 > vec3<f32>(P.threshold * 255.0);
     let o = select(s.rgb, med, far);
     return round(vec4<f32>(o, s.a) * 255.0) / 255.0;
 }

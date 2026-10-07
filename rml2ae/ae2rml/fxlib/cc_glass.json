@@ -9,19 +9,19 @@
    "ae": 3,
    "field": "property",
    "kind": "enum",
-   "default": 1
+   "default": 6
   },
   {
    "ae": 4,
    "field": "softness",
    "kind": "number",
-   "default": 10
+   "default": 20
   },
   {
    "ae": 5,
    "field": "height",
    "kind": "number",
-   "default": 50
+   "default": 25
   },
   {
    "ae": 6,
@@ -30,13 +30,13 @@
    "default": 100
   },
   {
-   "ae": 9,
+   "ae": 10,
    "field": "intensity",
    "kind": "number",
    "default": 100
   },
   {
-   "ae": 10,
+   "ae": 11,
    "field": "lightColor",
    "kind": "color",
    "default": [
@@ -47,43 +47,43 @@
    ]
   },
   {
-   "ae": 12,
+   "ae": 13,
    "field": "lightHeight",
    "kind": "number",
-   "default": 50
+   "default": 65
   },
   {
-   "ae": 14,
+   "ae": 15,
    "field": "lightDir",
    "kind": "angle",
    "default": -45
   },
   {
-   "ae": 16,
+   "ae": 18,
    "field": "ambient",
    "kind": "number",
-   "default": 75
-  },
-  {
-   "ae": 17,
-   "field": "diffuse",
-   "kind": "number",
-   "default": 25
-  },
-  {
-   "ae": 18,
-   "field": "specular",
-   "kind": "number",
-   "default": 25
+   "default": 50
   },
   {
    "ae": 19,
+   "field": "diffuse",
+   "kind": "number",
+   "default": 50
+  },
+  {
+   "ae": 20,
+   "field": "specular",
+   "kind": "number",
+   "default": 50
+  },
+  {
+   "ae": 21,
    "field": "roughness",
    "kind": "number",
-   "default": 0.05
+   "default": 0.02499389648438
   }
  ],
  "status": "unverified",
  "auto": false,
- "notes": "Not yet measured against After Effects.  Parameter indices follow the After Effects parameter order as documented by Adobe; `render_refs.py --params` records the real list."
+ "notes": "Not yet measured against After Effects. Param indices checked against AE 26 parameter list (_ae_params.json): Light Intensity/Color/Height/Direction are 10/11/13/15 and Ambient/Diffuse/Specular/Roughness 18-21 (7, 8, 16, 17 are group headers; 9 Using, 12 Light Type, 14 Light Position, 22 Metal not modelled); defaults set to AE's. The Property menu order (AE default 6) is still assumed by the shader."
 }

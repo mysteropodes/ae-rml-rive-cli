@@ -9,11 +9,11 @@ struct Params {
     toC: vec4<f32>,       // AE 2 To
     change: f32,          // AE 3 Change (menu)
     changeBy: f32,        // AE 4 Change By (menu)
-    tolH: f32,            // AE 6 Tolerance: Hue (%)
-    tolL: f32,            // AE 7 Tolerance: Lightness (%)
-    tolS: f32,            // AE 8 Tolerance: Saturation (%)
-    softness: f32,        // AE 9 Softness (%)
-    matte: f32,           // AE 10 View Correction Matte
+    tolH: f32,            // AE 6 Tolerance: Hue (raw 0..2, UI % = raw * 50)
+    tolL: f32,            // AE 7 Tolerance: Lightness (raw 0..2)
+    tolS: f32,            // AE 8 Tolerance: Saturation (raw 0..2)
+    softness: f32,        // AE 10 Softness (raw 0..1)
+    matte: f32,           // AE 11 View Correction Matte
     passIndex: f32,
 };
 @group(0) @binding(0) var srcTex: texture_2d<f32>;
@@ -121,9 +121,9 @@ fn fs_main(in: VSOut) -> @location(0) vec4<f32> {
     let t = rgb2hls(P.toC.rgb);
     let dh0 = abs(x.x - f.x);
     let dh = min(dh0, 1.0 - dh0) * 2.0;
-    let soft = P.softness / 100.0 * 0.5;
-    let w = within(dh, P.tolH / 100.0, soft) * within(abs(x.y - f.y), P.tolL / 100.0, soft)
-          * within(abs(x.z - f.z), P.tolS / 100.0, soft);
+    let soft = P.softness * 0.5;
+    let w = within(dh, P.tolH * 0.5, soft) * within(abs(x.y - f.y), P.tolL * 0.5, soft)
+          * within(abs(x.z - f.z), P.tolS * 0.5, soft);
     if (P.matte > 0.5) {
         return out8(vec3<f32>(w), s.a);
     }

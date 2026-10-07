@@ -27,7 +27,7 @@
    "ae": 4,
    "field": "overflow",
    "kind": "enum",
-   "default": 1
+   "default": 2
   },
   {
    "ae": 5,
@@ -38,5 +38,5 @@
  ],
  "status": "unverified",
  "auto": false,
- "notes": "Not yet measured against After Effects.  Parameter indices follow the After Effects parameter order as documented by Adobe; `render_refs.py --params` records the real list."
+ "notes": "Not yet measured against After Effects.  Parameter indices follow the After Effects parameter order as documented by Adobe; `render_refs.py --params` records the real list. Param indices/kinds/defaults checked against AE 26 parameter list (_ae_params.json): Overflow default 2; Cycle Noise / Cycle (7, 8) not modelled."
 }

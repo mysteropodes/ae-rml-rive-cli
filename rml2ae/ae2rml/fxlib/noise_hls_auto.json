@@ -39,10 +39,10 @@
    "ae": 6,
    "field": "speed",
    "kind": "number",
-   "default": 0
+   "default": 24
   }
  ],
  "status": "unverified",
  "auto": false,
- "notes": "Noise HLS with Noise Animation Speed instead of Noise Phase (not modelled). Not yet measured against After Effects.  Parameter indices follow the After Effects parameter order as documented by Adobe; `render_refs.py --params` records the real list."
+ "notes": "Noise HLS with Noise Animation Speed instead of Noise Phase (not modelled). Not yet measured against After Effects. Param indices checked against AE 26 parameter list (_ae_params.json): 1-6 were right; Noise Animation Speed defaults to 24. Hue/Lightness/Saturation have AE range 0..10 here (Noise HLS2: 0..1000), read as raw fractions (0.2 = 20 %): shader no longer divides by 100 (to confirm with a render)."
 }

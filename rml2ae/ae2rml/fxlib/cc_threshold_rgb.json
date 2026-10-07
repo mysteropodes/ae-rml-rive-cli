@@ -9,19 +9,19 @@
    "ae": 1,
    "field": "rT",
    "kind": "number",
-   "default": 127
+   "default": 0.5
   },
   {
    "ae": 2,
    "field": "gT",
    "kind": "number",
-   "default": 127
+   "default": 0.5
   },
   {
    "ae": 3,
    "field": "bT",
    "kind": "number",
-   "default": 127
+   "default": 0.5
   },
   {
    "ae": 4,
@@ -50,5 +50,5 @@
  ],
  "status": "unverified",
  "auto": false,
- "notes": "Not yet measured against After Effects.  Parameter indices follow the After Effects parameter order as documented by Adobe; `render_refs.py --params` records the real list."
+ "notes": "Not yet measured against After Effects. Param indices checked against AE 26 parameter list (_ae_params.json): indices 1-7 were right; thresholds and Blend w. Original are raw 0..1 in AE (shader fixed: thresholds were 0..255, blend was /100)."
 }

@@ -1,7 +1,7 @@
-// After Effects "Key Cleaner" (match name assumed ADBE KeyCleaner) — UNVERIFIED: written from the effect's definition, not yet measured against After Effects renders (fxref/spec.py, fxlib check <slug> --holdout).
+// After Effects "Key Cleaner" (ADBE KeyCleaner) — UNVERIFIED: written from the effect's definition, not yet measured against After Effects renders (fxref/spec.py, fxlib check <slug> --holdout).
 // Cleans a keyed matte: the alpha is averaged over Additional Edge Radius px (restoring detail lost at the edge),
 // then its contrast is raised by Alpha Contrast % around 0.5; Strength % mixes the cleaned alpha with the original.
-// Reduce Chatter needs neighbouring frames and is not modelled. Positions assumed.
+// Reduce Chatter (checkbox 0/1) needs neighbouring frames and is not modelled. Indices checked against AE 26.
 struct Params {
     size: vec2<f32>,
     radius: f32,          // AE 1 Additional Edge Radius (px)

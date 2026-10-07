@@ -7,11 +7,10 @@ struct Params {
     size: vec2<f32>,
     a: vec2<f32>,         // AE 4 Sample A (layer px)
     b: vec2<f32>,         // AE 5 Sample B (layer px)
-    property: f32,        // AE 2 Property (menu)
-    smoothness: f32,      // AE 3 Smoothness
+    property: f32,        // AE 2 Property (menu, AE default 5; order guessed: 1 R, 2 G, 3 B, 4 A, 5 luminance, 6 lightness)
+    smoothness: f32,      // AE 3 Smoothness (0..511)
     phase: f32,           // AE 6 Phase (degrees)
     loops: f32,           // AE 7 Color Loop
-    original: f32,        // AE 8 Blend w. Original (%)
     passIndex: f32,
     layerRect: vec4<f32>, // reserved, filled by the host: the layer's rect in the canvas (x0, y0, x1, y1)
 };
@@ -97,17 +96,18 @@ fn fs_main(in: VSOut) -> @location(0) vec4<f32> {
     let c = straight8(s);
     var v = luma(c);
     switch i32(round(P.property)) {
-        case 2: { v = c.r; }
-        case 3: { v = c.g; }
-        case 4: { v = c.b; }
-        case 5: { v = s.a; }
+        case 1: { v = c.r; }
+        case 2: { v = c.g; }
+        case 3: { v = c.b; }
+        case 4: { v = s.a; }
+        case 6: { v = 0.5 * (max(c.r, max(c.g, c.b)) + min(c.r, min(c.g, c.b))); }
         default: {}
     }
     let x = fract(v * max(P.loops, 1.0) * 0.5 + P.phase / 360.0) * 2.0;
     let t = select(x, 2.0 - x, x > 1.0);                    // back and forth along A -> B
     let a = layerPt(P.a);
     let b = layerPt(P.b);
-    let sm = clamp(P.smoothness, 0.0, 1.0) * 0.1;
+    let sm = clamp(P.smoothness / 100.0, 0.0, 1.0) * 0.1;
     var acc = vec4<f32>(0.0);
     for (var i = 0; i < 5; i++) {
         let u = clamp(t + (f32(i) - 2.0) * sm, 0.0, 1.0);
@@ -115,5 +115,5 @@ fn fs_main(in: VSOut) -> @location(0) vec4<f32> {
     }
     let pc = acc / 5.0;
     let col = straight8(pc);
-    return out8(mix(col, c, clamp(P.original / 100.0, 0.0, 1.0)), s.a);
+    return out8(col, s.a);
 }

@@ -85,5 +85,5 @@ fn fs_main(in: VSOut) -> @location(0) vec4<f32> {
             o = mix(P.midtones.rgb, P.highlights.rgb, y * 2.0 - 1.0);
         }
     }
-    return out8(mix(o, c, clamp(P.blend / 100.0, 0.0, 1.0)), s.a);
+    return out8(mix(o, c, clamp(P.blend, 0.0, 1.0)), s.a);
 }

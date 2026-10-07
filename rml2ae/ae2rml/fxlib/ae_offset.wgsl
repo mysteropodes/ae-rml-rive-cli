@@ -72,6 +72,6 @@ fn fs_main(in: VSOut) -> @location(0) vec4<f32> {
     let f = q - floor(q);
     let a = mix(wrapTexel(q0, org, wh), wrapTexel(q0 + vec2<i32>(1, 0), org, wh), f.x);
     let b = mix(wrapTexel(q0 + vec2<i32>(0, 1), org, wh), wrapTexel(q0 + vec2<i32>(1, 1), org, wh), f.x);
-    let o = mix(mix(a, b, f.y), orig, clamp(P.blend / 100.0, 0.0, 1.0));
+    let o = mix(mix(a, b, f.y), orig, clamp(P.blend, 0.0, 1.0));
     return round(o * 255.0) / 255.0;
 }

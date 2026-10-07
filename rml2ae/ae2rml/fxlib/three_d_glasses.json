@@ -29,18 +29,18 @@
    "ae": 7,
    "field": "view",
    "kind": "enum",
-   "default": 3
+   "default": 1
   },
   {
    "ae": 8,
    "field": "balance",
    "kind": "number",
-   "default": 0
+   "default": 8
   }
  ],
  "status": "unverified",
  "auto": false,
- "notes": "Not yet measured against After Effects. The second layer comes from the Rive node's map input (ae2rml binds the referenced layer, PR 7). Parameter indices follow the After Effects parameter order as documented by Adobe; `render_refs.py --params` records the real list.",
+ "notes": "Not yet measured against After Effects. The second layer comes from the Rive node's map input (ae2rml binds the referenced layer, PR 7). Parameter indices follow the After Effects parameter order as documented by Adobe; `render_refs.py --params` records the real list. Param indices/kinds/defaults checked against AE 26 parameter list (_ae_params.json): 3D View default 1 (12 entries in AE; the shader models 6 of them in a guessed order, doubtful), Balance default 8 (range 0..50); Left View layer (1) = this layer, Units (5) not modelled (pixels assumed).",
  "textureParams": {
   "mapTex": 2
  }

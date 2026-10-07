@@ -6,6 +6,30 @@
  "textures": {},
  "params": [
   {
+   "ae": 3,
+   "field": "property",
+   "kind": "enum",
+   "default": 6
+  },
+  {
+   "ae": 4,
+   "field": "softness",
+   "kind": "number",
+   "default": 20
+  },
+  {
+   "ae": 5,
+   "field": "cutAway",
+   "kind": "number",
+   "default": 25
+  },
+  {
+   "ae": 9,
+   "field": "intensity",
+   "kind": "number",
+   "default": 100
+  },
+  {
    "ae": 10,
    "field": "lightColor",
    "kind": "color",
@@ -17,34 +41,10 @@
    ]
   },
   {
-   "ae": 3,
-   "field": "property",
-   "kind": "enum",
-   "default": 1
-  },
-  {
-   "ae": 4,
-   "field": "softness",
-   "kind": "number",
-   "default": 10
-  },
-  {
-   "ae": 9,
-   "field": "height",
-   "kind": "number",
-   "default": 50
-  },
-  {
-   "ae": 8,
-   "field": "intensity",
-   "kind": "number",
-   "default": 100
-  },
-  {
    "ae": 12,
    "field": "lightHeight",
    "kind": "number",
-   "default": 50
+   "default": 65
   },
   {
    "ae": 14,
@@ -53,43 +53,37 @@
    "default": -45
   },
   {
-   "ae": 16,
+   "ae": 17,
    "field": "ambient",
    "kind": "number",
-   "default": 20
-  },
-  {
-   "ae": 17,
-   "field": "diffuse",
-   "kind": "number",
-   "default": 70
+   "default": 75
   },
   {
    "ae": 18,
-   "field": "specular",
+   "field": "diffuse",
    "kind": "number",
-   "default": 30
+   "default": 25
   },
   {
    "ae": 19,
-   "field": "roughness",
+   "field": "specular",
    "kind": "number",
-   "default": 0.05
+   "default": 100
   },
   {
    "ae": 20,
-   "field": "metal",
+   "field": "roughness",
    "kind": "number",
-   "default": 50
+   "default": 0.02499389648438
   },
   {
-   "ae": 5,
-   "field": "cutAway",
+   "ae": 21,
+   "field": "metal",
    "kind": "number",
-   "default": 0.5
+   "default": 100
   }
  ],
  "status": "unverified",
  "auto": false,
- "notes": "Not yet measured against After Effects.  Parameter indices follow the After Effects parameter order as documented by Adobe; `render_refs.py --params` records the real list."
+ "notes": "Not yet measured against After Effects. Param indices checked against AE 26 parameter list (_ae_params.json): Every index shifted (8 = Using, 9 = Light Intensity, 16 = Shading group header); defaults set to AE; Cut Away is 0..100 in AE (shader now divides by 100). AE has no blob Height parameter: the bump scale is now a shader constant. The Property menu order (AE default 6) is not known: 6 and 1 read alpha, 2-5 R/G/B/luma are guesses. Blob Layer (2), Using (8), Light Type (11), Light Position (13) not modelled."
 }

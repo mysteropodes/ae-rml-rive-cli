@@ -1,13 +1,14 @@
 // After Effects "Noise HLS Auto" (ADBE Noise HLS Auto) — UNVERIFIED: written from the effect's definition, not yet measured against After Effects renders (fxref/spec.py, fxlib check <slug> --holdout).
-// Random noise added in HLS: Hue, Lightness and Saturation amounts in % (hue as a fraction of the circle); Noise 1
+// Random noise added in HLS: Hue, Lightness and Saturation amounts stored as raw fractions (AE
+// range 0..10, unlike Noise HLS2's 0..1000 %; hue as a fraction of the circle); Noise 1
 // Uniform, 2 Squared, 3 Grain (blocks of Grain Size px). The random draw differs from After Effects; the draw
 // does not change over time here (Noise Animation Speed is not modelled: the node has no frame index). Alpha untouched; 8-bit rounding, premultiplied.
 struct Params {
     size: vec2<f32>,
     kind: f32,            // AE 1 Noise (menu)
-    hue: f32,             // AE 2 Hue (%)
-    light: f32,           // AE 3 Lightness (%)
-    sat: f32,             // AE 4 Saturation (%)
+    hue: f32,             // AE 2 Hue (raw fraction: 0.2 = 20 %, AE range 0..10)
+    light: f32,           // AE 3 Lightness (raw fraction)
+    sat: f32,             // AE 4 Saturation (raw fraction)
     grain: f32,           // AE 5 Grain Size
     speed: f32,           // AE 6 Noise Animation Speed
     passIndex: f32,
@@ -160,8 +161,8 @@ fn fs_main(in: VSOut) -> @location(0) vec4<f32> {
     if (mode == 2) {
         n = sign(n) * n * n * 2.0;
     }
-    let h = fract(hueOf(c) + n.x * P.hue / 100.0 + 1.0);
-    let l = clamp(lumHsl(c) + n.y * P.light / 100.0, 0.0, 1.0);
-    let sa = clamp(satOf(c) + n.z * P.sat / 100.0, 0.0, 1.0);
+    let h = fract(hueOf(c) + n.x * P.hue + 1.0);
+    let l = clamp(lumHsl(c) + n.y * P.light, 0.0, 1.0);
+    let sa = clamp(satOf(c) + n.z * P.sat, 0.0, 1.0);
     return out8(hslToRgb(h, sa, l), s.a);
 }

@@ -14,39 +14,39 @@
    "default": 0
   },
   {
-   "ae": 4,
+   "ae": 3,
    "field": "driver",
    "kind": "enum",
    "default": 1
   },
   {
-   "ae": 5,
+   "ae": 4,
    "field": "smoothness",
    "kind": "number",
-   "default": 0
+   "default": 50
+  },
+  {
+   "ae": 5,
+   "field": "amount",
+   "kind": "number",
+   "default": 25
   },
   {
    "ae": 6,
-   "field": "amount",
-   "kind": "number",
-   "default": 30
-  },
-  {
-   "ae": 7,
    "field": "direction",
    "kind": "enum",
    "default": 1
   },
   {
-   "ae": 8,
+   "ae": 7,
    "field": "span",
    "kind": "number",
-   "default": 20
+   "default": 75
   }
  ],
  "status": "unverified",
  "auto": false,
- "notes": "Not yet measured against After Effects. Layer to Reveal comes from the Rive node's map input (ae2rml binds the referenced layer, PR 7). Parameter indices follow the After Effects parameter order as documented by Adobe; `render_refs.py --params` records the real list.",
+ "notes": "Not yet measured against After Effects. Layer to Reveal comes from the Rive node's map input (ae2rml binds the referenced layer, PR 7). Parameter indices follow the After Effects parameter order as documented by Adobe; `render_refs.py --params` records the real list. Param indices/kinds/defaults checked against AE 26 parameter list (_ae_params.json): AE 2 is Layer to Reveal (mapTex), so Reactor/Smoothness/Warp Amount/Warp Direction/Blend Span are 3-7 (were 4-8); defaults set to AE's.",
  "textureParams": {
   "mapTex": 2
  }

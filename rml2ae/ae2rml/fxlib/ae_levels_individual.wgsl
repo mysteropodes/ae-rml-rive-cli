@@ -6,33 +6,33 @@
 struct Params {
     size: vec2<f32>,
     channel: f32,         // AE 1 Channel (display only)
-    rgbInBlack: f32,    // AE 4 RGB Input Black
-    rgbInWhite: f32,    // AE 5 RGB Input White
-    rgbGamma: f32,      // AE 6 RGB Gamma
-    rgbOutBlack: f32,   // AE 7 RGB Output Black
-    rgbOutWhite: f32,   // AE 8 RGB Output White
-    redInBlack: f32,    // AE 10 Red Input Black
-    redInWhite: f32,    // AE 11 Red Input White
-    redGamma: f32,      // AE 12 Red Gamma
-    redOutBlack: f32,   // AE 13 Red Output Black
-    redOutWhite: f32,   // AE 14 Red Output White
-    greenInBlack: f32,  // AE 16 Green Input Black
-    greenInWhite: f32,  // AE 17 Green Input White
-    greenGamma: f32,    // AE 18 Green Gamma
-    greenOutBlack: f32, // AE 19 Green Output Black
-    greenOutWhite: f32, // AE 20 Green Output White
-    blueInBlack: f32,   // AE 22 Blue Input Black
-    blueInWhite: f32,   // AE 23 Blue Input White
-    blueGamma: f32,     // AE 24 Blue Gamma
-    blueOutBlack: f32,  // AE 25 Blue Output Black
-    blueOutWhite: f32,  // AE 26 Blue Output White
-    alphaInBlack: f32,  // AE 28 Alpha Input Black
-    alphaInWhite: f32,  // AE 29 Alpha Input White
-    alphaGamma: f32,    // AE 30 Alpha Gamma
-    alphaOutBlack: f32, // AE 31 Alpha Output Black
-    alphaOutWhite: f32, // AE 32 Alpha Output White
-    clipBlack: f32,       // AE 33 Clip To Output Black (1 Off, 2 On, 3 Off for 32 bpc = on here)
-    clipWhite: f32,       // AE 34 Clip To Output White
+    rgbInBlack: f32,      // AE 4 RGB Input Black
+    rgbInWhite: f32,      // AE 5 RGB Input White
+    rgbGamma: f32,        // AE 6 RGB Gamma
+    rgbOutBlack: f32,     // AE 7 RGB Output Black
+    rgbOutWhite: f32,     // AE 8 RGB Output White
+    redInBlack: f32,      // AE 11 Red Input Black
+    redInWhite: f32,      // AE 12 Red Input White
+    redGamma: f32,        // AE 13 Red Gamma
+    redOutBlack: f32,     // AE 14 Red Output Black
+    redOutWhite: f32,     // AE 15 Red Output White
+    greenInBlack: f32,    // AE 18 Green Input Black
+    greenInWhite: f32,    // AE 19 Green Input White
+    greenGamma: f32,      // AE 20 Green Gamma
+    greenOutBlack: f32,   // AE 21 Green Output Black
+    greenOutWhite: f32,   // AE 22 Green Output White
+    blueInBlack: f32,     // AE 25 Blue Input Black
+    blueInWhite: f32,     // AE 26 Blue Input White
+    blueGamma: f32,       // AE 27 Blue Gamma
+    blueOutBlack: f32,    // AE 28 Blue Output Black
+    blueOutWhite: f32,    // AE 29 Blue Output White
+    alphaInBlack: f32,    // AE 32 Alpha Input Black
+    alphaInWhite: f32,    // AE 33 Alpha Input White
+    alphaGamma: f32,      // AE 34 Alpha Gamma
+    alphaOutBlack: f32,   // AE 35 Alpha Output Black
+    alphaOutWhite: f32,   // AE 36 Alpha Output White
+    clipBlack: f32,       // AE 38 Clip To Output Black (1 Off, 2 On, 3 Off for 32 bpc = on here)
+    clipWhite: f32,       // AE 39 Clip To Output White
     passIndex: f32,
 };
 @group(0) @binding(0) var srcTex: texture_2d<f32>;

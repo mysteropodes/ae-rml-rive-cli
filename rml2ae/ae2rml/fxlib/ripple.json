@@ -9,7 +9,7 @@
    "ae": 1,
    "field": "radius",
    "kind": "number",
-   "default": 50
+   "default": 0
   },
   {
    "ae": 2,
@@ -53,5 +53,5 @@
  ],
  "status": "unverified",
  "auto": false,
- "notes": "Not yet measured against After Effects.  Parameter indices follow the After Effects parameter order as documented by Adobe; `render_refs.py --params` records the real list."
+ "notes": "Not yet measured against After Effects. Param indices checked against AE 26 parameter list (_ae_params.json): 1-7 were right (5 = Wave Width/Period, 6 = Wave Height/Amplitude); Radius defaults to 0."
 }

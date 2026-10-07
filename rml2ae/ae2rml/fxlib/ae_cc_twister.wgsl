@@ -5,7 +5,7 @@
 struct Params {
     size: vec2<f32>,
     center: vec2<f32>,    // AE 4 Center (layer px)
-    completion: f32,      // AE 1 Completion (%)
+    completion: f32,      // AE 1 Completion (raw 0..1)
     shading: f32,         // AE 3 Shading
     axis: f32,            // AE 5 Axis (degrees)
     passIndex: f32,
@@ -94,7 +94,7 @@ fn fs_main(in: VSOut) -> @location(0) vec4<f32> {
     let half = 0.5 * length(layerSize());
     let s = dot(q - c, ax);
     let u = dot(q - c, n);
-    let turn = 3.14159265 * clamp(P.completion / 100.0, 0.0, 1.0) * clamp((s + half) / (2.0 * half), 0.0, 1.0);
+    let turn = 3.14159265 * clamp(P.completion, 0.0, 1.0) * clamp((s + half) / (2.0 * half), 0.0, 1.0);
     let k = cos(turn);
     if (abs(k) < 1e-3) {
         return vec4<f32>(0.0);

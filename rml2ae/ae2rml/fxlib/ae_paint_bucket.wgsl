@@ -8,12 +8,12 @@
 struct Params {
     size: vec2<f32>,
     point: vec2<f32>,     // AE 1 Fill Point (layer px)
-    color: vec4<f32>,     // AE 10 Color
+    color: vec4<f32>,     // AE 8 Color
     selector: f32,        // AE 2 Fill Selector (menu)
     tolerance: f32,       // AE 3 Tolerance (0..255)
     viewThr: f32,         // AE 4 View Threshold
-    invert: f32,          // AE 9 Invert Fill
-    opacity: f32,         // AE 11 Opacity (%)
+    invert: f32,          // AE 7 Invert Fill
+    opacity: f32,         // AE 9 Opacity (%)
     passIndex: f32,
     pad0: f32,
     pad1: f32,

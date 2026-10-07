@@ -8,57 +8,57 @@
  },
  "params": [
   {
-   "ae": 1,
+   "ae": 2,
    "field": "inChan",
    "kind": "enum",
    "default": 1
   },
   {
-   "ae": 2,
+   "ae": 3,
    "field": "inInvert",
    "kind": "bool",
    "default": 0
   },
   {
-   "ae": 4,
+   "ae": 7,
    "field": "secChan",
    "kind": "enum",
    "default": 1
   },
   {
-   "ae": 5,
+   "ae": 8,
    "field": "secOpacity",
    "kind": "number",
-   "default": 100
+   "default": 0
   },
   {
-   "ae": 6,
+   "ae": 9,
    "field": "secInvert",
    "kind": "bool",
    "default": 0
   },
   {
-   "ae": 7,
+   "ae": 10,
    "field": "stretch",
    "kind": "bool",
    "default": 1
   },
   {
-   "ae": 8,
+   "ae": 12,
    "field": "mode",
    "kind": "enum",
    "default": 1
   },
   {
-   "ae": 9,
+   "ae": 13,
    "field": "preserve",
    "kind": "bool",
-   "default": 0
+   "default": 1
   }
  ],
  "status": "unverified",
  "auto": false,
- "notes": "Not yet measured against After Effects. The second layer comes from the Rive node's map input (ae2rml binds the referenced layer, PR 7). Parameter indices follow the After Effects parameter order as documented by Adobe; `render_refs.py --params` records the real list.",
+ "notes": "Not yet measured against After Effects. The second layer comes from the Rive node's map input (ae2rml binds the referenced layer, PR 7). Param indices checked against AE 26 parameter list (_ae_params.json): 1, 4, 5, 11 are group headers; the second layer is param 6 (spec NEEDS_MAP fixed to {6: 2}); Second Layer Opacity is raw 0..1 (default 0), the shader now uses it directly; Preserve Transparency defaults to 1. The Blending Mode menu (1..37 in AE) order is still assumed (separable modes 1-19 of the shader's list).",
  "textureParams": {
   "mapTex": 1
  }

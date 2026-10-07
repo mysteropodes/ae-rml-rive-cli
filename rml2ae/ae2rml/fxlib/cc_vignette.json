@@ -1,6 +1,6 @@
 {
  "slug": "cc_vignette",
- "aeMatchName": "CC Vignette",
+ "aeMatchName": "CS Vignette",
  "wgsl": "ae_cc_vignette.wgsl",
  "passes": 1,
  "textures": {},
@@ -9,13 +9,13 @@
    "ae": 1,
    "field": "amount",
    "kind": "number",
-   "default": 50
+   "default": 100
   },
   {
    "ae": 2,
    "field": "angle",
    "kind": "angle",
-   "default": 90
+   "default": 45
   },
   {
    "ae": 3,
@@ -29,5 +29,5 @@
  ],
  "status": "unverified",
  "auto": false,
- "notes": "Not yet measured against After Effects.  Parameter indices follow the After Effects parameter order as documented by Adobe; `render_refs.py --params` records the real list."
+ "notes": "Not yet measured against After Effects. Param indices checked against AE 26 parameter list (_ae_params.json): Defaults set to AE: Amount 100, Angle of View 45 (indices were right). Pin Highlights (4) not modelled."
 }

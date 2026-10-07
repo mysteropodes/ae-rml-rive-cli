@@ -1,6 +1,6 @@
 {
  "slug": "cc_threads",
- "aeMatchName": "CC Threads",
+ "aeMatchName": "CS Threads",
  "wgsl": "ae_cc_threads.wgsl",
  "passes": 1,
  "textures": {},
@@ -21,7 +21,7 @@
    "ae": 3,
    "field": "overlaps",
    "kind": "number",
-   "default": 1
+   "default": 3
   },
   {
    "ae": 4,
@@ -42,22 +42,22 @@
    "ae": 6,
    "field": "coverage",
    "kind": "number",
-   "default": 90
+   "default": 75
   },
   {
    "ae": 7,
    "field": "shadowing",
    "kind": "number",
-   "default": 70
+   "default": 50
   },
   {
    "ae": 8,
    "field": "texture",
    "kind": "number",
-   "default": 0
+   "default": 15
   }
  ],
  "status": "unverified",
  "auto": false,
- "notes": "Not yet measured against After Effects.  Parameter indices follow the After Effects parameter order as documented by Adobe; `render_refs.py --params` records the real list."
+ "notes": "Not yet measured against After Effects. Param indices checked against AE 26 parameter list (_ae_params.json): Defaults set to AE: Overlaps 3, Coverage 75, Shadowing 50, Texture 15 (indices were right)."
 }

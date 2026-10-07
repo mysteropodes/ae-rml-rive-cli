@@ -15,7 +15,7 @@
    "ae": 2,
    "field": "relief",
    "kind": "number",
-   "default": 1.5
+   "default": 1
   },
   {
    "ae": 3,
@@ -30,7 +30,25 @@
    "default": 0
   }
  ],
- "status": "unverified",
- "auto": false,
- "notes": "Not yet measured against After Effects.  Parameter indices follow the After Effects parameter order as documented by Adobe; `render_refs.py --params` records the real list."
+ "status": "close",
+ "notes": "Not yet measured against After Effects. Param indices checked against AE 26 parameter list (_ae_params.json): indices 1-4 were right (Blend With Original really is 0..100 here); Relief defaults to 1.",
+ "verified": {
+  "by": "fxlib regress 2026-10-05 (offline wgpu, AE 2026 8 bpc refs)",
+  "settings": {
+   "color_emboss_0": {
+    "offline": {
+     "mean": 0.0,
+     "pct_px_gt8": 0.0,
+     "max": 1
+    }
+   },
+   "color_emboss_1": {
+    "offline": {
+     "mean": 0.001,
+     "pct_px_gt8": 0.0,
+     "max": 4
+    }
+   }
+  }
+ }
 }

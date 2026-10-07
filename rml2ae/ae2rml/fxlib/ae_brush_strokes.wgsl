@@ -11,7 +11,7 @@ struct Params {
     density: f32,         // AE 4 Stroke Density
     randomness: f32,      // AE 5 Stroke Randomness
     surface: f32,         // AE 6 Paint Surface (menu)
-    original: f32,        // AE 7 Blend With Original (%)
+    original: f32,        // AE 7 Blend With Original (raw 0..1)
     passIndex: f32,
     layerRect: vec4<f32>, // reserved, filled by the host: the layer's rect in the canvas (x0, y0, x1, y1)
 };
@@ -132,6 +132,6 @@ fn fs_main(in: VSOut) -> @location(0) vec4<f32> {
     if (best >= 0.0) {
         o = col + base * (1.0 - col.a);
     }
-    o = mix(o, s, clamp(P.original / 100.0, 0.0, 1.0));
+    o = mix(o, s, clamp(P.original, 0.0, 1.0));
     return round(o * 255.0) / 255.0;
 }

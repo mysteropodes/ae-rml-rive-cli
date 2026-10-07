@@ -23,5 +23,5 @@
  ],
  "status": "unverified",
  "auto": false,
- "notes": "Not yet measured against After Effects: written from the effect's definition. Status stays 'unverified' and auto false until fxref renders are measured (fxlib check <slug> --rive --holdout). Parameter indices come from the After Effects parameter order as documented by Adobe; `render_refs.py --params` records the real list."
+ "notes": "Not yet measured against After Effects: written from the effect's definition. Status stays 'unverified' and auto false until fxref renders are measured (fxlib check <slug> --rive --holdout). Parameter indices come from the After Effects parameter order as documented by Adobe; `render_refs.py --params` records the real list. Param indices and units checked against the AE 26 parameter list (2026-10-05)."
 }

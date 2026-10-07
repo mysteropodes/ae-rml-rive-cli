@@ -33,10 +33,10 @@
    "ae": 5,
    "field": "cut",
    "kind": "bool",
-   "default": 0
+   "default": 1
   }
  ],
  "status": "unverified",
  "auto": false,
- "notes": "Not yet measured against After Effects.  Parameter indices follow the After Effects parameter order as documented by Adobe; `render_refs.py --params` records the real list."
+ "notes": "Not yet measured against After Effects. Param indices checked against AE 26 parameter list (_ae_params.json): Cut Tiles default is 1 (on) in AE (was 0); spec settings 0/1 now set it to 0 explicitly to keep their intent."
 }

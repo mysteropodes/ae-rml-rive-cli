@@ -36,19 +36,19 @@
    "default": 0
   },
   {
-   "ae": 14,
+   "ae": 17,
    "field": "gain",
    "kind": "number",
    "default": 0
   },
   {
-   "ae": 15,
+   "ae": 18,
    "field": "threshold",
    "kind": "number",
-   "default": 255
+   "default": 0.80000001192093
   }
  ],
  "status": "unverified",
  "auto": false,
- "notes": "Not yet measured against After Effects.  Parameter indices follow the After Effects parameter order as documented by Adobe; `render_refs.py --params` records the real list."
+ "notes": "Not yet measured against After Effects. Param indices checked against AE 26 parameter list (_ae_params.json): Highlight Gain is param 17 and Highlight Threshold param 18 (raw 0..1, default 0.8; was 14/15 = group headers, 0..255); the shader now reads the threshold raw. Diffraction Fringe (7), Blur Map (10-14), Highlight Saturation (19), Repeat Edge Pixels (21), Linear working space (22) not modelled."
 }

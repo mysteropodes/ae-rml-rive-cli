@@ -97,7 +97,10 @@ COLOR_CHECK_JSX = (
 # ExtendScript: put the open project in the state the fxlib references assume (8 bpc, no colour management)
 COLOR_SET_JSX = (
     'try { app.project.colorManagementSystem = 0; } catch (e) {}'
-    ' try { app.project.workingSpace = "None"; } catch (e) {}'
+    # only when a working space is set: assigning "None" when there is none makes AE 26 show a warning dialog
+    # ("profile None is missing", 83::0) instead of throwing
+    ' try { var ws0 = String(app.project.workingSpace); if (ws0 != "" && ws0 != "None") {'
+    ' app.beginSuppressDialogs(); try { app.project.workingSpace = ""; } catch (e2) {} app.endSuppressDialogs(false); } } catch (e) {}'
     ' try { app.project.linearBlending = false; } catch (e) {}'
     ' try { app.project.linearizeWorkingSpace = false; } catch (e) {}'
     ' try { app.project.bitsPerChannel = 8; } catch (e) {}')

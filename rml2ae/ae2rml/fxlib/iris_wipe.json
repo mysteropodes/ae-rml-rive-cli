@@ -1,6 +1,6 @@
 {
  "slug": "iris_wipe",
- "aeMatchName": "ADBE Iris Wipe",
+ "aeMatchName": "ADBE IRIS_WIPE",
  "wgsl": "ae_iris_wipe.wgsl",
  "passes": 1,
  "textures": {},

@@ -1,6 +1,6 @@
 {
  "slug": "eyedropper_fill",
- "aeMatchName": "ADBE Sample Fill",
+ "aeMatchName": "ADBE Eyedropper Fill",
  "wgsl": "ae_eyedropper_fill.wgsl",
  "passes": 1,
  "textures": {},
@@ -18,7 +18,7 @@
    "ae": 2,
    "field": "radius",
    "kind": "number",
-   "default": 0
+   "default": 10
   },
   {
    "ae": 3,
@@ -39,7 +39,25 @@
    "default": 0
   }
  ],
- "status": "unverified",
- "auto": false,
- "notes": "Not yet measured against After Effects.  Parameter indices follow the After Effects parameter order as documented by Adobe; `render_refs.py --params` records the real list."
+ "status": "exact",
+ "notes": "Not yet measured against After Effects. Param indices checked against AE 26 parameter list (_ae_params.json): Sample Radius default 10 (was 0); Blend With Original is raw 0..1 (the shader now reads it raw, was /100).",
+ "verified": {
+  "by": "fxlib regress 2026-10-05 (offline wgpu, AE 2026 8 bpc refs)",
+  "settings": {
+   "eyedropper_fill_0": {
+    "offline": {
+     "mean": 0.098,
+     "pct_px_gt8": 0.0,
+     "max": 1
+    }
+   },
+   "eyedropper_fill_1": {
+    "offline": {
+     "mean": 0.247,
+     "pct_px_gt8": 0.0,
+     "max": 2
+    }
+   }
+  }
+ }
 }

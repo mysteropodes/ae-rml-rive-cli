@@ -6,11 +6,11 @@
 struct Params {
     size: vec2<f32>,
     completion: f32,      // AE 1 Completion (%)
-    driver: f32,          // AE 4 Driver (menu)
-    smoothness: f32,      // AE 5 Smoothness
-    amount: f32,          // AE 6 Warp Amount
-    direction: f32,       // AE 7 Warp Direction (menu)
-    span: f32,            // AE 8 Blend Span (%)
+    driver: f32,          // AE 3 Reactor (menu)
+    smoothness: f32,      // AE 4 Smoothness
+    amount: f32,          // AE 5 Warp Amount
+    direction: f32,       // AE 6 Warp Direction (menu)
+    span: f32,            // AE 7 Blend Span (%)
     passIndex: f32,
     pad0: f32,
     layerRect: vec4<f32>, // reserved, filled by the host: the layer's rect in the canvas (x0, y0, x1, y1)

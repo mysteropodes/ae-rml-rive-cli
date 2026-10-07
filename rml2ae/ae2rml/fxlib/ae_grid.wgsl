@@ -2,7 +2,7 @@
 // Lines of Border px on a grid of cells anchored at Anchor; the cell is Width x Height px (Size From 2 Width Slider:
 // square cells of Width; 3 Width & Height; 1 Corner Point: the cell spans Anchor..Corner). Invert Grid swaps lines
 // and cells. Blending Mode 1 None draws the grid alone, otherwise it is drawn over the layer at Opacity. Feather is
-// not modelled (lines anti-aliased over one pixel). Parameter positions after Border are guesses.
+// not modelled (lines anti-aliased over one pixel). Positions checked against AE 26 (Feather = 7-10).
 struct Params {
     size: vec2<f32>,
     anchor: vec2<f32>,    // AE 1 Anchor (layer px)
@@ -11,10 +11,10 @@ struct Params {
     width: f32,           // AE 4 Width (px)
     height: f32,          // AE 5 Height (px)
     border: f32,          // AE 6 Border (px)
-    color: vec4<f32>,     // AE 9 Color
-    invert: f32,          // AE 8 Invert Grid
-    opacity: f32,         // AE 10 Opacity (%)
-    blendMode: f32,       // AE 11 Blending Mode (1 None)
+    color: vec4<f32>,     // AE 12 Color
+    invert: f32,          // AE 11 Invert Grid
+    opacity: f32,         // AE 13 Opacity (%)
+    blendMode: f32,       // AE 14 Blending Mode (1 None)
     passIndex: f32,
     layerRect: vec4<f32>, // reserved, filled by the host: the layer's rect in the canvas (x0, y0, x1, y1)
 };

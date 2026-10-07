@@ -12,70 +12,73 @@
    "default": 100
   },
   {
-   "ae": 2,
-   "field": "position",
-   "kind": "point",
-   "default": [
-    320,
-    180
-   ]
+   "ae": 3,
+   "field": "posX",
+   "kind": "number",
+   "default": 0
   },
   {
-   "ae": 3,
+   "ae": 4,
+   "field": "posY",
+   "kind": "number",
+   "default": 0
+  },
+  {
+   "ae": 8,
    "field": "rx",
    "kind": "angle",
    "default": 0
   },
   {
-   "ae": 4,
+   "ae": 9,
    "field": "ry",
    "kind": "angle",
    "default": 0
   },
   {
-   "ae": 5,
+   "ae": 10,
    "field": "rz",
    "kind": "angle",
    "default": 0
   },
   {
-   "ae": 6,
+   "ae": 13,
    "field": "render",
    "kind": "enum",
    "default": 1
   },
   {
-   "ae": 8,
+   "ae": 15,
    "field": "lightIntensity",
    "kind": "number",
    "default": 100
   },
   {
-   "ae": 10,
+   "ae": 17,
    "field": "lightHeight",
    "kind": "number",
-   "default": 50
+   "default": 25
   },
   {
-   "ae": 11,
+   "ae": 18,
    "field": "lightDir",
    "kind": "angle",
    "default": -45
   },
   {
-   "ae": 13,
+   "ae": 21,
    "field": "ambient",
    "kind": "number",
-   "default": 8
+   "default": 50
   },
   {
-   "ae": 14,
+   "ae": 22,
    "field": "diffuse",
    "kind": "number",
-   "default": 65
+   "default": 50
   }
  ],
  "status": "unverified",
  "auto": false,
- "notes": "Not yet measured against After Effects.  Parameter indices follow the After Effects parameter order as documented by Adobe; `render_refs.py --params` records the real list."
+ "notes": "Not yet measured against After Effects. Param indices checked against AE 26 parameter list (_ae_params.json): AE Position is three 1D sliders X/Y/Z (offsets from the layer centre, default 0), not a 2D point (2 is a group header): the shader now takes posX/posY. Rotation X/Y/Z = 8/9/10, Render 13, Light Intensity 15, Light Height 17, Light Direction 18, Ambient 21, Diffuse 22 (defaults from AE). Position Z, Rotation Order (11), Light Color (16), Specular/Roughness/Metal (23-25) and Rotation X/Z (read but unused) not modelled."
 }

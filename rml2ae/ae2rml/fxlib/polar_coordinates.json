@@ -15,10 +15,10 @@
    "ae": 2,
    "field": "kind",
    "kind": "enum",
-   "default": 1
+   "default": 2
   }
  ],
  "status": "unverified",
  "auto": false,
- "notes": "Not yet measured against After Effects.  Parameter indices follow the After Effects parameter order as documented by Adobe; `render_refs.py --params` records the real list."
+ "notes": "Not yet measured against After Effects.  Parameter indices follow the After Effects parameter order as documented by Adobe; `render_refs.py --params` records the real list. Param indices/kinds/defaults checked against AE 26 parameter list (_ae_params.json): Interpolation is raw 0..1 (shader no longer divides by 100); Type of Conversion defaults to 2 (Polar to Rect)."
 }

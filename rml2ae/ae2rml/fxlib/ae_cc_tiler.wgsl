@@ -4,8 +4,8 @@
 struct Params {
     size: vec2<f32>,
     center: vec2<f32>,    // AE 2 Center (layer px)
-    scale: f32,           // AE 1 Scale (%)
-    blend: f32,           // AE 3 Blend w. Original (%)
+    scale: f32,           // AE 1 Scale (raw 0..1)
+    blend: f32,           // AE 3 Blend w. Original (raw 0..1)
     passIndex: f32,
     pad0: f32,
     layerRect: vec4<f32>, // reserved, filled by the host: the layer's rect in the canvas (x0, y0, x1, y1)
@@ -88,9 +88,9 @@ fn aeDir(deg: f32) -> vec2<f32> {
 fn fs_main(in: VSOut) -> @location(0) vec4<f32> {
     let p = layerPos(in.uv);
     let wh = layerSize();
-    let s = max(P.scale / 100.0, 1e-3);
+    let s = max(P.scale, 1e-3);
     let u = (p - layerPt(P.center)) / s + 0.5 * wh;
     let q = u - wh * floor(u / wh);
-    let o = mix(tapL(q), tapL(p), clamp(P.blend / 100.0, 0.0, 1.0));
+    let o = mix(tapL(q), tapL(p), clamp(P.blend, 0.0, 1.0));
     return round(o * 255.0) / 255.0;
 }

@@ -10,10 +10,10 @@ struct Params {
     threshold: f32,       // AE 3 Detail Threshold
     steps: f32,           // AE 5 Shading Steps
     smoothness: f32,      // AE 6 Shading Smoothness (%)
-    edgeThr: f32,         // AE 8 Edge Threshold
-    edgeWidth: f32,       // AE 9 Edge Width
-    edgeSoft: f32,        // AE 10 Edge Softness (%)
-    edgeOpacity: f32,     // AE 11 Edge Opacity (%)
+    edgeThr: f32,         // AE 9 Edge Threshold
+    edgeWidth: f32,       // AE 10 Edge Width
+    edgeSoft: f32,        // AE 11 Edge Softness (%)
+    edgeOpacity: f32,     // AE 12 Edge Opacity (%)
     passIndex: f32,
 };
 @group(0) @binding(0) var srcTex: texture_2d<f32>;

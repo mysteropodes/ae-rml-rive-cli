@@ -27,9 +27,9 @@
    "field": "brights",
    "kind": "color",
    "default": [
-    1,
-    0.9,
-    0.7,
+    0.75294117647059,
+    0.66666666666667,
+    0.47058823529412,
     1
    ]
   },
@@ -38,9 +38,9 @@
    "field": "midtones",
    "kind": "color",
    "default": [
-    0.6,
-    0.45,
-    0.3,
+    0.50196078431373,
+    0.3921568627451,
+    0.27450980392157,
     1
    ]
   },
@@ -49,9 +49,9 @@
    "field": "darktones",
    "kind": "color",
    "default": [
-    0.3,
-    0.2,
-    0.1,
+    0.25098039215686,
+    0.19607843137255,
+    0.03921568627451,
     1
    ]
   },
@@ -73,7 +73,32 @@
    "default": 0
   }
  ],
- "status": "unverified",
- "auto": false,
- "notes": "Not yet measured against After Effects.  Parameter indices follow the After Effects parameter order as documented by Adobe; `render_refs.py --params` records the real list."
+ "status": "exact",
+ "notes": "Not yet measured against After Effects.  Parameter indices follow the After Effects parameter order as documented by Adobe; `render_refs.py --params` records the real list. Param indices and units checked against the AE 26 parameter list (2026-10-05).",
+ "verified": {
+  "by": "fxlib regress 2026-10-05 (offline wgpu, AE 2026 8 bpc refs)",
+  "settings": {
+   "cc_toner_0": {
+    "offline": {
+     "mean": 0.082,
+     "pct_px_gt8": 0.0,
+     "max": 1
+    }
+   },
+   "cc_toner_1": {
+    "offline": {
+     "mean": 0.042,
+     "pct_px_gt8": 0.0,
+     "max": 1
+    }
+   },
+   "cc_toner_2": {
+    "offline": {
+     "mean": 0.131,
+     "pct_px_gt8": 0.0,
+     "max": 2
+    }
+   }
+  }
+ }
 }

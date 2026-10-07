@@ -1,78 +1,103 @@
 {
  "slug": "cc_kernel",
- "aeMatchName": "CC Kernel",
+ "aeMatchName": "CS Kernel",
  "wgsl": "ae_cc_kernel.wgsl",
  "passes": 1,
  "textures": {},
  "params": [
   {
-   "ae": 1,
+   "ae": 2,
    "field": "k1",
    "kind": "number",
    "default": 0
   },
   {
-   "ae": 2,
+   "ae": 3,
    "field": "k2",
    "kind": "number",
    "default": 0
   },
   {
-   "ae": 3,
+   "ae": 4,
    "field": "k3",
    "kind": "number",
    "default": 0
   },
   {
-   "ae": 4,
+   "ae": 7,
    "field": "k4",
    "kind": "number",
    "default": 0
   },
   {
-   "ae": 5,
+   "ae": 8,
    "field": "k5",
    "kind": "number",
    "default": 1
   },
   {
-   "ae": 6,
+   "ae": 9,
    "field": "k6",
    "kind": "number",
    "default": 0
   },
   {
-   "ae": 7,
+   "ae": 12,
    "field": "k7",
    "kind": "number",
    "default": 0
   },
   {
-   "ae": 8,
+   "ae": 13,
    "field": "k8",
    "kind": "number",
    "default": 0
   },
   {
-   "ae": 9,
+   "ae": 14,
    "field": "k9",
    "kind": "number",
    "default": 0
   },
   {
-   "ae": 10,
+   "ae": 16,
    "field": "divider",
    "kind": "number",
-   "default": 0
+   "default": 1
   },
   {
-   "ae": 11,
+   "ae": 17,
    "field": "absolute",
    "kind": "bool",
    "default": 0
   }
  ],
- "status": "unverified",
- "auto": false,
- "notes": "Not yet measured against After Effects.  Parameter indices follow the After Effects parameter order as documented by Adobe; `render_refs.py --params` records the real list."
+ "status": "close",
+ "notes": "Not yet measured against After Effects.  Parameter indices follow the After Effects parameter order as documented by Adobe; `render_refs.py --params` records the real list. Param indices/kinds/defaults checked against AE 26 parameter list (_ae_params.json): the 3x3 weights are 2-4 (Line 1), 7-9 (Line 2), 12-14 (Line 3) (1, 5, 6, 10, 11, 15 are group headers); Divider 16 (AE range 0.01..10000, default 1: the shader's 0 = auto-sum fallback is never reached from AE), Absolute Values 17; Blend w. Original (18, 0..100) not modelled.",
+ "verified": {
+  "by": "fxlib regress 2026-10-05 (offline wgpu, AE 2026 8 bpc refs)",
+  "settings": {
+   "cc_kernel_0": {
+    "offline": {
+     "mean": 0.083,
+     "pct_px_gt8": 0.0,
+     "max": 1
+    }
+   },
+   "cc_kernel_1": {
+    "offline": {
+     "mean": 0.0,
+     "pct_px_gt8": 0.0,
+     "max": 1
+    }
+   },
+   "cc_kernel_2": {
+    "offline": {
+     "mean": 0.0,
+     "pct_px_gt8": 0.0,
+     "max": 4
+    }
+   }
+  }
+ }
 }

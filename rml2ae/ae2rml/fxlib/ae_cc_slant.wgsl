@@ -4,15 +4,14 @@
 // (alpha kept). Bilinear, transparent outside the layer.
 struct Params {
     size: vec2<f32>,
-    slant: f32,           // AE 1 Slant (degrees)
+    floor: vec2<f32>,     // AE 4 Floor (point, layer px; only y is used)
+    slant: f32,           // AE 1 Slant (treated as degrees; AE range -1000..1000)
     stretching: f32,      // AE 2 Stretching
-    height: f32,          // AE 3 Height (%)
-    floor: f32,           // AE 4 Floor (layer px, y)
     color: vec4<f32>,     // AE 6 Color
+    height: f32,          // AE 3 Height (%)
     setColor: f32,        // AE 5 Set Color
     passIndex: f32,
     pad0: f32,
-    pad1: f32,
     layerRect: vec4<f32>, // reserved, filled by the host: the layer's rect in the canvas (x0, y0, x1, y1)
 };
 @group(0) @binding(0) var srcTex: texture_2d<f32>;
@@ -92,7 +91,7 @@ fn aeDir(deg: f32) -> vec2<f32> {
 @fragment
 fn fs_main(in: VSOut) -> @location(0) vec4<f32> {
     let p = layerPos(in.uv);
-    let fl = P.floor;                               // a number (not a point): layer px, the host adds no pad
+    let fl = layerPt(P.floor).y;                    // Floor is a point: its y is the floor line
     let h = max(P.height / 100.0, 1e-3);
     let ys = fl - (fl - p.y) / h;
     let xs = p.x - (fl - p.y) * tan(radians(clamp(P.slant, -89.0, 89.0)));

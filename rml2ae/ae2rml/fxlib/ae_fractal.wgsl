@@ -1,5 +1,5 @@
 // After Effects "Fractal" (ADBE Fractal) — UNVERIFIED: written from the effect's definition, not yet measured against After Effects renders (fxref/spec.py, fxlib check <slug> --holdout).
-// The Mandelbrot / Julia set: Set Type (assumed menu) 1 Mandelbrot, 2 Mandelbrot Inverse, 3 Julia, 4 Julia Inverse,
+// The Mandelbrot / Julia set: Set Type 1 Mandelbrot, 2 Mandelbrot Inverse, 3/4 Mandelbrot (Inverse) over Julia (drawn as 1/2), 5 Julia, 6 Julia Inverse,
 // z <- z^2 + c (Equation 1 only). The view centre is Mandelbrot X / Y (Julia: Julia X / Y with the Mandelbrot point as
 // c), its width 4 / 2^Magnification over the layer width; Escape Limit iterations. Colour: smooth iteration count
 // through a hue cycle of Cycle Steps, shifted by Hue and Cycle Offset; the inside is black. Overlay, Transparency,
@@ -11,12 +11,13 @@ struct Params {
     my: f32,              // AE 5 Mandelbrot Y (Imaginary)
     mag: f32,             // AE 6 Mandelbrot Magnification
     escape: f32,          // AE 7 Mandelbrot Escape Limit
-    jx: f32,              // AE 9 Julia X (Real)
-    jy: f32,              // AE 10 Julia Y (Imaginary)
-    jmag: f32,            // AE 11 Julia Magnification
-    hue: f32,             // AE 20 Hue (degrees)
-    steps: f32,           // AE 21 Cycle Steps
-    cycleOffset: f32,     // AE 22 Cycle Offset (degrees)
+    jx: f32,              // AE 10 Julia X (Real)
+    jy: f32,              // AE 11 Julia Y (Imaginary)
+    jmag: f32,            // AE 12 Julia Magnification
+    jescape: f32,         // AE 13 Julia Escape Limit
+    hue: f32,             // AE 23 Hue (degrees)
+    steps: f32,           // AE 24 Cycle Steps
+    cycleOffset: f32,     // AE 25 Cycle Offset (degrees)
     passIndex: f32,
     layerRect: vec4<f32>, // reserved, filled by the host: the layer's rect in the canvas (x0, y0, x1, y1)
 };
@@ -151,18 +152,18 @@ fn fs_main(in: VSOut) -> @location(0) vec4<f32> {
     let q = layerPos(in.uv);
     let sz = layerSize();
     let st = i32(round(P.setType));
-    let julia = st >= 3;
+    let julia = st >= 5;                                  // 5 Julia, 6 Julia Inverse (3/4 '... over Julia' drawn as 1/2)
     let magv = select(P.mag, P.jmag, julia);
     let w = 4.0 / exp2(magv);
     let ctr = select(vec2<f32>(P.mx, P.my), vec2<f32>(P.jx, P.jy), julia);
     var p = ctr + (q - 0.5 * sz) / sz.x * w;
     p.y = -p.y;
-    if (st == 2 || st == 4) {
+    if (st == 2 || st == 4 || st == 6) {
         p = p / max(dot(p, p), 1e-9);                        // inverse sets: z -> 1 / z
     }
     var z = select(vec2<f32>(0.0), p, julia);
     let c = select(p, vec2<f32>(P.mx, P.my), julia);
-    let lim = i32(clamp(P.escape, 1.0, 1000.0));
+    let lim = i32(clamp(select(P.escape, P.jescape, julia), 1.0, 1000.0));
     var n = 0;
     for (var i = 0; i < 1000; i++) {
         if (i >= lim || dot(z, z) > 256.0) { break; }

@@ -15,7 +15,7 @@
    "ae": 2,
    "field": "stretching",
    "kind": "bool",
-   "default": 0
+   "default": 1
   },
   {
    "ae": 3,
@@ -26,8 +26,11 @@
   {
    "ae": 4,
    "field": "floor",
-   "kind": "number",
-   "default": 360
+   "kind": "point",
+   "default": [
+    320,
+    360
+   ]
   },
   {
    "ae": 5,
@@ -49,5 +52,5 @@
  ],
  "status": "unverified",
  "auto": false,
- "notes": "Not yet measured against After Effects.  Parameter indices follow the After Effects parameter order as documented by Adobe; `render_refs.py --params` records the real list."
+ "notes": "Not yet measured against After Effects. Param indices checked against AE 26 parameter list (_ae_params.json): Floor (4) is a point, not a number: Params field is now vec2 (y used as the floor line); Stretching defaults to 1. Slant's unit (AE range -1000..1000) is still treated as degrees, Stretching not modelled."
 }

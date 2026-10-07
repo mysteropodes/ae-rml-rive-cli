@@ -6,7 +6,7 @@
  "textures": {},
  "params": [
   {
-   "ae": 11,
+   "ae": 12,
    "field": "lightColor",
    "kind": "color",
    "default": [
@@ -20,67 +20,19 @@
    "ae": 3,
    "field": "property",
    "kind": "enum",
-   "default": 1
+   "default": 5
   },
   {
    "ae": 4,
    "field": "softness",
    "kind": "number",
-   "default": 10
+   "default": 20
   },
   {
    "ae": 5,
    "field": "height",
    "kind": "number",
-   "default": 50
-  },
-  {
-   "ae": 10,
-   "field": "intensity",
-   "kind": "number",
-   "default": 100
-  },
-  {
-   "ae": 13,
-   "field": "lightHeight",
-   "kind": "number",
-   "default": 50
-  },
-  {
-   "ae": 15,
-   "field": "lightDir",
-   "kind": "angle",
-   "default": -45
-  },
-  {
-   "ae": 17,
-   "field": "ambient",
-   "kind": "number",
-   "default": 20
-  },
-  {
-   "ae": 18,
-   "field": "diffuse",
-   "kind": "number",
-   "default": 70
-  },
-  {
-   "ae": 19,
-   "field": "specular",
-   "kind": "number",
-   "default": 30
-  },
-  {
-   "ae": 20,
-   "field": "roughness",
-   "kind": "number",
-   "default": 0.05
-  },
-  {
-   "ae": 21,
-   "field": "metal",
-   "kind": "number",
-   "default": 50
+   "default": 25
   },
   {
    "ae": 6,
@@ -92,10 +44,58 @@
    "ae": 7,
    "field": "cutMax",
    "kind": "number",
-   "default": 1
+   "default": 100
+  },
+  {
+   "ae": 11,
+   "field": "intensity",
+   "kind": "number",
+   "default": 100
+  },
+  {
+   "ae": 14,
+   "field": "lightHeight",
+   "kind": "number",
+   "default": 65
+  },
+  {
+   "ae": 16,
+   "field": "lightDir",
+   "kind": "angle",
+   "default": -45
+  },
+  {
+   "ae": 20,
+   "field": "ambient",
+   "kind": "number",
+   "default": 75
+  },
+  {
+   "ae": 21,
+   "field": "diffuse",
+   "kind": "number",
+   "default": 25
+  },
+  {
+   "ae": 23,
+   "field": "specular",
+   "kind": "number",
+   "default": 100
+  },
+  {
+   "ae": 24,
+   "field": "roughness",
+   "kind": "number",
+   "default": 0.02499389648438
+  },
+  {
+   "ae": 25,
+   "field": "metal",
+   "kind": "number",
+   "default": 100
   }
  ],
  "status": "unverified",
  "auto": false,
- "notes": "Not yet measured against After Effects.  Parameter indices follow the After Effects parameter order as documented by Adobe; `render_refs.py --params` records the real list."
+ "notes": "Not yet measured against After Effects. Param indices checked against AE 26 parameter list (_ae_params.json): light params are 11 Intensity, 12 Color, 14 Height, 16 Direction; shading 20 Ambient, 21 Diffuse, 23 Specular, 24 Roughness, 25 Metal (8, 9, 18, 19 are group headers; 10 Using, 13 Light Type, 15 Light Position, 17 Ambient Light Color, 22 Dust not modelled); Cut Min/Max are 0..100 % (defaults 0/100); all defaults set to AE's. Property menu order (AE default 5) still assumed."
 }

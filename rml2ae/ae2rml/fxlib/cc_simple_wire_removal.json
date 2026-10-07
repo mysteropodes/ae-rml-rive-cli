@@ -10,8 +10,8 @@
    "field": "a",
    "kind": "point",
    "default": [
-    160,
-    0
+    32,
+    48
    ]
   },
   {
@@ -19,42 +19,42 @@
    "field": "b",
    "kind": "point",
    "default": [
-    480,
-    360
+    32,
+    16
    ]
   },
   {
    "ae": 3,
    "field": "style",
    "kind": "enum",
-   "default": 1
+   "default": 3
   },
   {
    "ae": 4,
    "field": "thickness",
    "kind": "number",
-   "default": 10
+   "default": 2
   },
   {
    "ae": 5,
    "field": "slope",
    "kind": "number",
-   "default": 0
+   "default": 0.5
   },
   {
    "ae": 6,
    "field": "mirror",
    "kind": "number",
-   "default": 0
+   "default": 0.25
   },
   {
    "ae": 7,
    "field": "frameOffset",
    "kind": "number",
-   "default": 0
+   "default": 5
   }
  ],
  "status": "unverified",
  "auto": false,
- "notes": "Not yet measured against After Effects.  Parameter indices follow the After Effects parameter order as documented by Adobe; `render_refs.py --params` records the real list."
+ "notes": "Not yet measured against After Effects.  Parameter indices follow the After Effects parameter order as documented by Adobe; `render_refs.py --params` records the real list. Param indices/kinds/defaults checked against AE 26 parameter list (_ae_params.json): Slope and Mirror Blend are raw 0..1 (shader no longer divides by 100); defaults set to AE's; Frame Offset style (2) needs other frames, not modelled."
 }

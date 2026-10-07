@@ -38,10 +38,42 @@
    "default": 0
   }
  ],
- "status": "unverified",
- "auto": false,
+ "status": "close",
  "notes": "Not yet measured against After Effects. The second layer comes from the Rive node's map input (ae2rml binds the referenced layer, PR 7). Parameter indices follow the After Effects parameter order as documented by Adobe; `render_refs.py --params` records the real list.",
  "textureParams": {
   "mapTex": 1
+ },
+ "verified": {
+  "by": "fxlib regress 2026-10-05 (offline wgpu, AE 2026 8 bpc refs)",
+  "settings": {
+   "compound_arithmetic_0": {
+    "offline": {
+     "mean": 0.0,
+     "pct_px_gt8": 0.0,
+     "max": 1
+    }
+   },
+   "compound_arithmetic_1": {
+    "offline": {
+     "mean": 0.001,
+     "pct_px_gt8": 0.0,
+     "max": 1
+    }
+   },
+   "compound_arithmetic_2": {
+    "offline": {
+     "mean": 0.174,
+     "pct_px_gt8": 0.0,
+     "max": 1
+    }
+   },
+   "compound_arithmetic_3": {
+    "offline": {
+     "mean": 0.088,
+     "pct_px_gt8": 0.0,
+     "max": 6
+    }
+   }
+  }
  }
 }

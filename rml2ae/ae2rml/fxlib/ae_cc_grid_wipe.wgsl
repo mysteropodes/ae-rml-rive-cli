@@ -1,11 +1,11 @@
 // After Effects "CC Grid Wipe" (CC Grid Wipe) — UNVERIFIED: written from the effect's definition, not yet measured against After Effects renders (fxref/spec.py, fxlib check <slug> --holdout).
 // A grid of Tiles cells across the layer width, turned by Rotation around Center, hides the layer as Completion
 // grows: each cell shrinks to nothing (Shape 1 Doors: from its sides inward on x, 2 Radial: a disc, 3 Rectangular:
-// a square), the cells near Center first. Border feathers the cell edges (px). Reverse Transition inverts it.
+// a square), the cells near Center first. Border feathers the cell edges (px; AE's range is 30..200, default 75, so its unit is still a guess). Reverse Transition inverts it.
 struct Params {
     size: vec2<f32>,
     center: vec2<f32>,    // AE 2 Center (layer px)
-    completion: f32,      // AE 1 Completion (%)
+    completion: f32,      // AE 1 Completion (raw 0..1)
     rotation: f32,        // AE 3 Rotation (degrees)
     border: f32,          // AE 4 Border (px)
     tiles: f32,           // AE 5 Tiles
@@ -106,7 +106,7 @@ fn fs_main(in: VSOut) -> @location(0) vec4<f32> {
     let cc = (ci + vec2<f32>(0.5)) * cell;
     let far = length(sz);
     let delay = clamp(length(cc) / far, 0.0, 1.0);
-    let t = clamp((P.completion / 100.0) * 2.0 - delay, 0.0, 1.0);    // this cell's own completion
+    let t = clamp(P.completion * 2.0 - delay, 0.0, 1.0);    // this cell's own completion
     let shape = i32(round(P.shape));
     var m: f32;
     if (shape == 1) {

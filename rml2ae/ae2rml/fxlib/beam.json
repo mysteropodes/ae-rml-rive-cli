@@ -10,8 +10,8 @@
    "field": "a",
    "kind": "point",
    "default": [
-    160,
-    180
+    6.4,
+    32
    ]
   },
   {
@@ -19,21 +19,21 @@
    "field": "b",
    "kind": "point",
    "default": [
-    480,
-    180
+    57.6,
+    32
    ]
   },
   {
    "ae": 3,
    "field": "len",
    "kind": "number",
-   "default": 30
+   "default": 0.25
   },
   {
    "ae": 4,
    "field": "time",
    "kind": "number",
-   "default": 100
+   "default": 0.5
   },
   {
    "ae": 5,
@@ -45,13 +45,13 @@
    "ae": 6,
    "field": "t1",
    "kind": "number",
-   "default": 20
+   "default": 8
   },
   {
    "ae": 7,
    "field": "softness",
    "kind": "number",
-   "default": 60
+   "default": 0.5
   },
   {
    "ae": 8,
@@ -59,9 +59,9 @@
    "kind": "color",
    "default": [
     1,
-    1,
-    1,
-    1
+    0.74509803921569,
+    0.98039215686275,
+    0.72549019607843
    ]
   },
   {
@@ -69,10 +69,10 @@
    "field": "outside",
    "kind": "color",
    "default": [
-    0,
-    0,
     1,
-    1
+    0.09803921568627,
+    0.09803921568627,
+    0.58823529411765
    ]
   },
   {
@@ -84,5 +84,5 @@
  ],
  "status": "unverified",
  "auto": false,
- "notes": "Not yet measured against After Effects.  Parameter indices follow the After Effects parameter order as documented by Adobe; `render_refs.py --params` records the real list."
+ "notes": "Not yet measured against After Effects.  Parameter indices follow the After Effects parameter order as documented by Adobe; `render_refs.py --params` records the real list. Param indices/kinds/defaults checked against AE 26 parameter list (_ae_params.json): Length/Time/Softness are raw 0..1 in AE (shader no longer divides by 100); defaults set to AE's (point defaults are AE's for its probe layer); 3D Perspective (10) not modelled."
 }

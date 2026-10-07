@@ -93,7 +93,7 @@ fn fs_main(in: VSOut) -> @location(0) vec4<f32> {
     let v = p - c;
     let r = length(v);
     let R = 0.5 * length(layerSize());
-    let w = clamp(P.completion / 100.0, 0.0, 1.0) * R;
+    let w = clamp(P.completion, 0.0, 1.0) * R;
     if (w <= 0.0) {
         return round(tapL(p) * 255.0) / 255.0;
     }

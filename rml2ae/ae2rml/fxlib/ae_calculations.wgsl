@@ -1,17 +1,17 @@
 // After Effects "Calculations" (ADBE Calculations) — UNVERIFIED: written from the effect's definition, not yet measured against After Effects renders (fxref/spec.py, fxlib check <slug> --holdout).
 // Input Channel and Second Layer Channel: 1 RGBA, 2 Gray, 3 Red, 4 Green, 5 Blue, 6 Alpha (a single channel shows as
-// grey); each can be inverted. The second layer, at Second Layer Opacity %, is blended over the input with Blending
+// grey); each can be inverted. The second layer (AE 6), at Second Layer Opacity (raw 0..1), is blended over the input with Blending
 // Mode (separable modes, menu order assumed); Preserve Transparency keeps the input's alpha.
 struct Params {
     size: vec2<f32>,
-    inChan: f32,          // AE 1 Input Channel (menu)
-    inInvert: f32,        // AE 2 Invert Input
-    secChan: f32,         // AE 4 Second Layer Channel (menu)
-    secOpacity: f32,      // AE 5 Second Layer Opacity (%)
-    secInvert: f32,       // AE 6 Invert Second Layer
-    stretch: f32,         // AE 7 Stretch Second Layer to Fit
-    mode: f32,            // AE 8 Blending Mode (menu)
-    preserve: f32,        // AE 9 Preserve Transparency
+    inChan: f32,          // AE 2 Input Channel (menu)
+    inInvert: f32,        // AE 3 Invert Input
+    secChan: f32,         // AE 7 Second Layer Channel (menu)
+    secOpacity: f32,      // AE 8 Second Layer Opacity (raw 0..1)
+    secInvert: f32,       // AE 9 Invert Second Layer
+    stretch: f32,         // AE 10 Stretch Second Layer to Fit
+    mode: f32,            // AE 12 Blending Mode (menu)
+    preserve: f32,        // AE 13 Preserve Transparency
     passIndex: f32,
     pad0: f32,
     layerRect: vec4<f32>, // reserved, filled by the host: the layer's rect in the canvas (x0, y0, x1, y1)
@@ -181,7 +181,7 @@ fn fs_main(in: VSOut) -> @location(0) vec4<f32> {
     let o = mapAt(layerPos(in.uv));
     let b = chan(s, i32(round(P.inChan)), P.inInvert > 0.5);
     let t = chan(o, i32(round(P.secChan)), P.secInvert > 0.5);
-    let k = clamp(P.secOpacity / 100.0, 0.0, 1.0) * t.a;
+    let k = clamp(P.secOpacity, 0.0, 1.0) * t.a;
     let r = mix(b.rgb, blendRGB(b.rgb, t.rgb, i32(round(P.mode))), k);
     var a = b.a;
     if (P.preserve < 0.5) {

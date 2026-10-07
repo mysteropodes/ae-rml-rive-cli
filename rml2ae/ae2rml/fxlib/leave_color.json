@@ -19,14 +19,14 @@
     1,
     0,
     0,
-    1
+    0
    ]
   },
   {
    "ae": 3,
    "field": "tolerance",
    "kind": "number",
-   "default": 0
+   "default": 15
   },
   {
    "ae": 4,
@@ -43,5 +43,5 @@
  ],
  "status": "unverified",
  "auto": false,
- "notes": "Not yet measured against After Effects.  Parameter indices follow the After Effects parameter order as documented by Adobe; `render_refs.py --params` records the real list."
+ "notes": "Not yet measured against After Effects. Param indices checked against AE 26 parameter list (_ae_params.json): Tolerance default 15 (was 0); colour default is AE red (alpha 0 as stored by AE, the shader ignores colour alpha). Amount/Tolerance/Softness are 0..100 in AE (shader unchanged)."
 }

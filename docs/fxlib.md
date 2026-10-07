@@ -228,9 +228,12 @@ against After Effects renders: `"status": "unverified"`, `"auto": false` (ae2rml
 visible settings are in `fxref/spec.py`; render them on a Mac (`render_refs.py --params <slug>` first, to record the
 real parameter list, then `render_refs.py <slug>`), add held-out settings, and measure.
 
+
+**2026-10-05.** The parameter list of every effect was recorded in After Effects 2026 (`_ae_params.json`) and every manifest and `spec.py` setting was checked against it: 18 match names were wrong (9 did not exist, 9 CC effects are registered as `CS …`), 85 effects had parameter indices on group headers or shifted, and percentages were written in UI units (After Effects scripting uses 0..1). All visible settings are now rendered (except Calculations setting 2, which makes After Effects fail silently) and in the regression baseline. Ten effects reached `exact` or `close` and left this table: CC RepeTile, Channel Mixer, Solid Composite, CC Toner, Eyedropper Fill, Levels (Individual Controls), Threshold (exact); Compound Arithmetic, CC Kernel, Color Emboss (close). The others still differ from After Effects and need fitting.
+
 | Effect | Match name | Slug | Open questions to measure |
 |---|---|---|---|
-| Channel Mixer | `ADBE Channel Mixer` | `channel_mixer` | Parameter order; rounding of the constants |
+| Channel Mixer | `ADBE CHANNEL MIXER` | `channel_mixer` | Parameter order; rounding of the constants |
 | Set Channels | `ADBE Set Channels` | `set_channels` | Only the layer itself as source; Luminance weights, HLS of greys |
 | Offset | `ADBE Offset` | `offset` | Sub-pixel filtering of fractional shifts |
 | Radial Wipe | `ADBE Radial Wipe` | `radial_wipe` | Feather law (distance to the edge ray here) |
@@ -238,7 +241,7 @@ real parameter list, then `render_refs.py <slug>`), add held-out settings, and m
 | Photo Filter | `ADBE Photo Filter` | `photo_filter` | Menu index of Custom; preset colours; luminosity law |
 | Vibrance | `ADBE Vibrance` | `vibrance` | Approximation: Adobe's vibrance law is undocumented |
 | Threshold | `ADBE Threshold2` | `threshold` | Luma weights, >= vs > |
-| Gamma/Pedestal/Gain | `ADBE Gamma/Pedestal/Gain` | `gamma_pedestal_gain` | Black Stretch law; order of gamma and pedestal/gain |
+| Gamma/Pedestal/Gain | `ADBE Gamma/Pedestal/Gain2` | `gamma_pedestal_gain` | Black Stretch law; order of gamma and pedestal/gain |
 | Leave Color | `ADBE Leave Color` | `leave_color` | Distance in RGB and in hue; softness ramp |
 | Sharpen | `ADBE Sharpen` | `sharpen` | Kernel and strength per Amount |
 | Find Edges | `ADBE Find Edges` | `find_edges` | Operator and scale |
@@ -249,8 +252,8 @@ real parameter list, then `render_refs.py <slug>`), add held-out settings, and m
 | Bulge | `ADBE Bulge` | `bulge` | Height law, taper, pinning |
 | Spherize | `ADBE Spherize` | `spherize` | Sphere law |
 | Radial Blur | `ADBE Radial Blur` | `radial_blur` | Amount units per type; sampling |
-| CC Vignette | `CC Vignette` | `cc_vignette` | Falloff law and Angle of View |
-| Iris Wipe | `ADBE Iris Wipe` | `iris_wipe` | Polygon when Use Inner Radius is off; feather law |
+| CC Vignette | `CS Vignette` | `cc_vignette` | Falloff law and Angle of View |
+| Iris Wipe | `ADBE IRIS_WIPE` | `iris_wipe` | Polygon when Use Inner Radius is off; feather law |
 | Color Balance | `ADBE Color Balance 2` | `color_balance` | Tonal weights; Preserve Luminosity law |
 | Change Color | `ADBE Change Color` | `change_color` | Distance per Match Colors mode; transforms in HSL |
 | CC Toner | `CC Toner` | `cc_toner` | Gradient stops per Tones mode |
@@ -268,12 +271,12 @@ real parameter list, then `render_refs.py <slug>`), add held-out settings, and m
 | Ripple | `ADBE Ripple` | `ripple` | Radius reference, falloff, Type |
 | CC Tiler | `CC Tiler` | `cc_tiler` | Tile origin |
 | Grid | `ADBE Grid` | `grid` | Parameter positions after Border; Feather |
-| Ellipse | `ADBE Ellipse` | `ellipse` | Ring geometry and softness |
+| Ellipse | `ADBE ELLIPSE` | `ellipse` | Ring geometry and softness |
 | Bevel Alpha | `ADBE Bevel Alpha` | `bevel_alpha` | Height field and shading law |
 | Radial Shadow | `ADBE Radial Shadow` | `radial_shadow` | Projection law; Softness |
 | Channel Blur | `ADBE Channel Blur` | `channel_blur` | Assumed legacy blur law (Gaussian of equal variance) |
-| CC Cross Blur | `CC Cross Blur` | `cc_cross_blur` | Kernel shape; Transfer Mode |
-| Bilateral Blur | `ADBE Bilateral Blur` | `bilateral_blur` | Spatial and range weights; Colorize |
+| CC Cross Blur | `CS CrossBlur` | `cc_cross_blur` | Kernel shape; Transfer Mode |
+| Bilateral Blur | `ADBE Bilateral` | `bilateral_blur` | Spatial and range weights; Colorize |
 | Gradient Wipe | `ADBE Gradient Wipe` | `gradient_wipe` | The layer itself as gradient only; softness law |
 | Block Dissolve | `ADBE Block Dissolve` | `block_dissolve` | Random pattern cannot match AE; feather |
 | Circle | `ADBE Circle` | `circle` | Parameter positions after Radius; Edge and Feather |
@@ -296,7 +299,7 @@ real parameter list, then `render_refs.py <slug>`), add held-out settings, and m
 | CC Light Sweep | `CC Light Sweep` | `cc_light_sweep` | Band profiles; Edge Intensity |
 | Beam | `ADBE Laser` | `beam` | Length/Time window; 3D Perspective |
 | CC Jaws | `CC Jaws` | `cc_jaws` | Tooth shapes; travel distance |
-| CC Line Sweep | `CC Line Sweep` | `cc_line_sweep` | Staggering of the lines |
+| CC Line Sweep | `CS LineSweep` | `cc_line_sweep` | Staggering of the lines |
 | CC Light Wipe | `CC Light Wipe` | `cc_light_wipe` | Glow profile; shapes |
 | Bevel Edges | `ADBE Bevel Edges` | `bevel_edges` | Thickness reference; shading |
 | Linear Color Key | `ADBE Linear Color Key2` | `linear_color_key` | Parameter positions; distance |
@@ -308,14 +311,14 @@ real parameter list, then `render_refs.py <slug>`), add held-out settings, and m
 | Channel Combiner | `ADBE Channel Combiner` | `channel_combiner` | From / To menu order; YUV constants; the layer itself as source only |
 | Color Range | `ADBE Color Range` | `color_range` | Lab scaling; Fuzziness law; parameter positions |
 | Matte Choker | `ADBE Matte Choker` | `matte_choker` | Softness to sigma; choke threshold law; Iterations |
-| CC Kernel | `CC Kernel` | `cc_kernel` | Parameter list (Divider, Absolute Value); edge handling |
+| CC Kernel | `CS Kernel` | `cc_kernel` | Parameter list (Divider, Absolute Value); edge handling |
 | CC Vector Blur | `CC Vector Blur` | `cc_vector_blur` | Direction per Type; length law; the layer itself as vector map only |
 | CC Bend It | `CC Bend It` | `cc_bend_it` | Bend units; what happens past End; Distort modes |
 | CC Griddler | `CC Griddler` | `cc_griddler` | Tile size reference; overlaps without Cut Tiles |
 | CC Simple Wire Removal | `CC Simple Wire Removal` | `cc_simple_wire_removal` | Removal styles; Slope law; Frame Offset (time) not modelled |
 | Lens Flare | `ADBE Lens Flare` | `lens_flare` | A stylised flare: AE's elements are not reproduced |
 | CC Grid Wipe | `CC Grid Wipe` | `cc_grid_wipe` | Order of the cells; shapes; Border |
-| CC Block Load | `CC Block Load` | `cc_block_load` | Block levels and fill order; Scanlines |
+| CC Block Load | `CS BlockLoad` | `cc_block_load` | Block levels and fill order; Scanlines |
 | Blend | `ADBE Blend` | `blend` | Color Only / Tint Only laws; Blend With Original direction |
 | Calculations | `ADBE Calculations` | `calculations` | Blending Mode menu order; alpha when not preserving transparency |
 | Compound Arithmetic | `ADBE Compound Arithmetic` | `compound_arithmetic` | Operator menu; Scale overflow ranges |
@@ -336,30 +339,30 @@ real parameter list, then `render_refs.py <slug>`), add held-out settings, and m
 | Warp | `ADBE WRPMESH` | `warp` | Match name; the 15 styles' envelopes; distortion law |
 | Bezier Warp | `ADBE BEZMESH` | `bezier_warp` | Match name; patch form (Coons here) |
 | Colorama | `APC Colorama` | `colorama` | Get Phase From menu; output presets (only the Hue Cycle here; the custom wheel is not read) |
-| Selective Color | `ADBE Selective Color` | `selective_color` | Parameter positions of the 9 colour groups; class weights; relative law |
-| Shadow/Highlight | `ADBE Shadow/Highlight` | `shadow_highlight` | Local luminance and tonal-width law; Auto Amounts |
-| CC Color Neutralizer | `CC Color Neutralizer` | `cc_color_neutralizer` | Band weights around Pivot; Contrast |
+| Selective Color | `ADBE SelectiveColor` | `selective_color` | Parameter positions of the 9 colour groups; class weights; relative law |
+| Shadow/Highlight | `ADBE ShadowHighlight` | `shadow_highlight` | Local luminance and tonal-width law; Auto Amounts |
+| CC Color Neutralizer | `CS Color Neutralizer` | `cc_color_neutralizer` | Band weights around Pivot; Contrast |
 | Color Difference Key | `ADBE Color Difference Key` | `color_difference_key` | Partial mattes A / B; parameter positions |
-| Eyedropper Fill | `ADBE Sample Fill` | `eyedropper_fill` | Match name; Average Pixel Colors menu |
+| Eyedropper Fill | `ADBE Eyedropper Fill` | `eyedropper_fill` | Match name; Average Pixel Colors menu |
 | Cartoon | `ADBE Cartoonify` | `cartoon` | Match name; smoothing, shading steps and edge laws |
 | CC Glass | `CC Glass` | `cc_glass` | Parameter positions; refraction and shading laws; the layer itself as bump map |
-| CC HexTile | `CC HexTile` | `cc_hextile` | What a tile shows; Smearing; Render |
+| CC HexTile | `CS HexTile` | `cc_hextile` | What a tile shows; Smearing; Render |
 | CC RepeTile | `CC RepeTile` | `cc_repetile` | Tiling menu; Blend Borders (the node grows by the largest expansion) |
 | CC Burn Film | `CC Burn Film` | `cc_burn_film` | Random pattern cannot match AE; rim colours |
 | Camera Lens Blur | `ADBE Camera Lens Blur` | `camera_lens_blur` | Iris shape menu; highlight law; parameter positions |
 | Fractal Noise | `ADBE Fractal Noise` | `fractal_noise` | Proprietary noise: same parameters, different pattern; Fractal Type variants |
-| Turbulent Noise | `ADBE Turbulent Noise` | `turbulent_noise` | Parameter layout taken from Fractal Noise; proprietary noise |
+| Turbulent Noise | `ADBE AIF Perlin Noise 3D` | `turbulent_noise` | Parameter layout taken from Fractal Noise; proprietary noise |
 | Cell Pattern | `ADBE Cell Pattern` | `cell_pattern` | Pattern menu and shapes; random draw differs |
 | Roughen Edges | `ADBE Roughen Edges` | `roughen_edges` | Edge distance and noise laws (measured parameter list); proprietary noise |
 | Fractal | `ADBE Fractal` | `fractal` | Parameter positions; magnification units; palettes |
 | CC Plastic | `CC Plastic` | `cc_plastic` | Parameter positions; shading law |
 | CC Blobbylize | `CC Blobbylize` | `cc_blobbylize` | Parameter positions; cut-away and shading laws |
 | CC Glass Wipe | `CC Glass Wipe` | `cc_glass_wipe` | The gradient is this layer (a third layer is not bound); displacement law |
-| CC Threads | `CC Threads` | `cc_threads` | Weave, Overlaps and Texture laws |
+| CC Threads | `CS Threads` | `cc_threads` | Weave, Overlaps and Texture laws |
 | Noise HLS Auto | `ADBE Noise HLS Auto` | `noise_hls_auto` | Animation over time not modelled (frame 0's draw); random draw differs |
 | Advanced Lightning | `ADBE Lightning 2` | `advanced_lightning` | One bolt only (no forks / decay / types); random; positions |
 | Brush Strokes | `ADBE Brush Strokes` | `brush_strokes` | Stroke placement is random: differs from AE |
-| CC Composite | `CC Composite` | `cc_composite` | Composite Original menu (41 entries); uses the new texture role "layer" |
+| CC Composite | `CS Composite` | `cc_composite` | Composite Original menu (41 entries); uses the new texture role "layer" |
 | Paint Bucket | `ADBE Paint Bucket` | `paint_bucket` | Multi-pass flood fill (very winding regions may stay partly unfilled); stroke options; positions |
 | CC Mr. Smoothie | `CC Mr. Smoothie` | `cc_mr_smoothie` | Palette sampling and loop law; Flow Layer not bound |
 | CC WarpoMatic | `CC WarpoMatic` | `cc_warpomatic` | Drivers other than brightness; Reactor layer; positions |

@@ -5,7 +5,7 @@
 struct Params {
     size: vec2<f32>,
     completion: f32,      // AE 1 Completion (%)
-    scanlines: f32,       // AE 2 Scanlines (Interlaced)
+    scanlines: f32,       // AE 2 Scans (1..16, not modelled)
     cleared: f32,         // AE 3 Start Cleared
     bilinear: f32,        // AE 4 Bilinear
     passIndex: f32,

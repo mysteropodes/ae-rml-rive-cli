@@ -24,13 +24,13 @@
    "ae": 3,
    "field": "rotation",
    "kind": "angle",
-   "default": 0
+   "default": 45
   },
   {
    "ae": 4,
    "field": "border",
    "kind": "number",
-   "default": 0
+   "default": 75
   },
   {
    "ae": 5,
@@ -42,7 +42,7 @@
    "ae": 6,
    "field": "shape",
    "kind": "enum",
-   "default": 1
+   "default": 2
   },
   {
    "ae": 7,
@@ -53,5 +53,5 @@
  ],
  "status": "unverified",
  "auto": false,
- "notes": "Not yet measured against After Effects.  Parameter indices follow the After Effects parameter order as documented by Adobe; `render_refs.py --params` records the real list."
+ "notes": "Not yet measured against After Effects. Param indices checked against AE 26 parameter list (_ae_params.json): indices 1-7 were right; Completion is raw 0..1 (shader fixed, was /100); defaults set to AE's (Rotation 45, Border 75, Shape 2). Border's unit (AE range 30..200) is unknown: the shader still treats it as a feather in px."
 }

@@ -1,13 +1,13 @@
 // After Effects "CC Jaws" (CC Jaws) — UNVERIFIED: written from the effect's definition, not yet measured against After Effects renders (fxref/spec.py, fxlib check <slug> --holdout).
 // The layer splits along the line through Center perpendicular to Direction (AE angle) with a toothed edge (Shape
-// 1 Spikes: triangular teeth Width px apart, Height % of Width tall), and the two halves slide apart along Direction
-// by Completion % of the layer diagonal. Shapes RoboJaw, Block, Waves are not modelled (Spikes used).
+// 1 Spikes: triangular teeth Width px apart, Height (0..1) of Width tall), and the two halves slide apart along Direction
+// by Completion (0..1) of the layer diagonal. Shapes RoboJaw, Block, Waves are not modelled (Spikes used).
 struct Params {
     size: vec2<f32>,
     center: vec2<f32>,    // AE 2 Center (layer px)
-    completion: f32,      // AE 1 Completion (%)
+    completion: f32,      // AE 1 Completion (raw 0..1)
     direction: f32,       // AE 3 Direction (degrees)
-    height: f32,          // AE 4 Height (%)
+    height: f32,          // AE 4 Height (raw 0..1, fraction of Width)
     width: f32,           // AE 5 Width (px)
     shape: f32,           // AE 6 Shape (menu)
     passIndex: f32,
@@ -93,9 +93,9 @@ fn fs_main(in: VSOut) -> @location(0) vec4<f32> {
     let c = layerPt(P.center);
     let dir = aeDir(P.direction);
     let tng = vec2<f32>(-dir.y, dir.x);
-    let shift = clamp(P.completion / 100.0, 0.0, 1.0) * length(layerSize());
+    let shift = clamp(P.completion, 0.0, 1.0) * length(layerSize());
     let w = max(P.width, 2.0);
-    let amp = P.height / 100.0 * w * 0.5;
+    let amp = P.height * w * 0.5;
     // which half does p belong to after the move? test both: half A moves +dir, half B moves -dir
     let qa = p - dir * shift * 0.5;
     let qb = p + dir * shift * 0.5;

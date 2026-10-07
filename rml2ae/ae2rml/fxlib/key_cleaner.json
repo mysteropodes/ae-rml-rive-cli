@@ -9,12 +9,12 @@
    "ae": 1,
    "field": "radius",
    "kind": "number",
-   "default": 4
+   "default": 10
   },
   {
    "ae": 2,
    "field": "chatter",
-   "kind": "number",
+   "kind": "bool",
    "default": 0
   },
   {
@@ -32,5 +32,5 @@
  ],
  "status": "unverified",
  "auto": false,
- "notes": "Not yet measured against After Effects.  Parameter indices follow the After Effects parameter order as documented by Adobe; `render_refs.py --params` records the real list."
+ "notes": "Not yet measured against After Effects. Param indices checked against AE 26 parameter list (_ae_params.json): 1-4 were right; Additional Edge Radius defaults to 10; Reduce Chatter is a 0/1 checkbox; spec's Alpha Contrast 300 was out of AE's 0..100 range (now 50)."
 }

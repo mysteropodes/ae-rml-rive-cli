@@ -16,8 +16,8 @@
    "field": "origin",
    "kind": "point",
    "default": [
-    100,
-    60
+    288,
+    18
    ]
   },
   {
@@ -25,21 +25,21 @@
    "field": "toPt",
    "kind": "point",
    "default": [
-    540,
-    300
+    320,
+    342
    ]
   },
   {
    "ae": 4,
    "field": "conductivity",
    "kind": "number",
-   "default": 10
+   "default": 0
   },
   {
    "ae": 6,
    "field": "coreRadius",
    "kind": "number",
-   "default": 1.5
+   "default": 2
   },
   {
    "ae": 7,
@@ -59,30 +59,30 @@
    ]
   },
   {
-   "ae": 10,
-   "field": "glowRadius",
-   "kind": "number",
-   "default": 30
-  },
-  {
    "ae": 11,
-   "field": "glowOpacity",
+   "field": "glowRadius",
    "kind": "number",
    "default": 50
   },
   {
    "ae": 12,
+   "field": "glowOpacity",
+   "kind": "number",
+   "default": 50
+  },
+  {
+   "ae": 13,
    "field": "glowColor",
    "kind": "color",
    "default": [
-    0.17,
-    0.27,
-    0.8,
+    0.19607843137255,
+    0.19607843137255,
+    1,
     1
    ]
   },
   {
-   "ae": 14,
+   "ae": 16,
    "field": "turbulence",
    "kind": "number",
    "default": 1
@@ -90,5 +90,5 @@
  ],
  "status": "unverified",
  "auto": false,
- "notes": "Not yet measured against After Effects.  Parameter indices follow the After Effects parameter order as documented by Adobe; `render_refs.py --params` records the real list."
+ "notes": "Not yet measured against After Effects. Param indices checked against AE 26 parameter list (_ae_params.json): glow radius/opacity/colour are 11/12/13 (10 is the Glow group header), Turbulence is 16; defaults set to AE's (point defaults scaled from AE's 64x64 probe layer to 640x360)."
 }

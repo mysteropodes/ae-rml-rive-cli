@@ -4,17 +4,18 @@
 // (front), 3 Inside (the inner back). Lambert shading as CC Sphere (assumed parameter positions).
 struct Params {
     size: vec2<f32>,
-    position: vec2<f32>,  // AE 2 Position (layer px)
     radius: f32,          // AE 1 Radius (%)
-    rx: f32,              // AE 3 Rotation X
-    ry: f32,              // AE 4 Rotation Y
-    rz: f32,              // AE 5 Rotation Z
-    render: f32,          // AE 6 Render (menu)
-    lightIntensity: f32,  // AE 8 Light Intensity
-    lightHeight: f32,     // AE 10 Light Height
-    lightDir: f32,        // AE 11 Light Direction
-    ambient: f32,         // AE 13 Ambient
-    diffuse: f32,         // AE 14 Diffuse
+    posX: f32,            // AE 3 Position X (px offset from the layer centre)
+    posY: f32,            // AE 4 Position Y (px offset from the layer centre)
+    rx: f32,              // AE 8 Rotation X
+    ry: f32,              // AE 9 Rotation Y
+    rz: f32,              // AE 10 Rotation Z
+    render: f32,          // AE 13 Render (menu: 1 Full, 2 Outside, 3 Inside)
+    lightIntensity: f32,  // AE 15 Light Intensity
+    lightHeight: f32,     // AE 17 Light Height
+    lightDir: f32,        // AE 18 Light Direction
+    ambient: f32,         // AE 21 Ambient
+    diffuse: f32,         // AE 22 Diffuse
     passIndex: f32,
     layerRect: vec4<f32>, // reserved, filled by the host: the layer's rect in the canvas (x0, y0, x1, y1)
 };
@@ -110,7 +111,7 @@ fn fs_main(in: VSOut) -> @location(0) vec4<f32> {
     let q = layerPos(in.uv);
     let sz = layerSize();
     let R = max(P.radius / 100.0 * sz.x / 3.14159265, 1.0);
-    let c = layerPt(P.position);
+    let c = 0.5 * sz + vec2<f32>(P.posX, P.posY);
     let x = (q.x - c.x) / R;
     if (abs(x) >= 1.0) {
         return vec4<f32>(0.0);
