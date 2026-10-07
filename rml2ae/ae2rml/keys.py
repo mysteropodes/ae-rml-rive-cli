@@ -236,11 +236,22 @@ def douglas_peucker(pts, tol):
 class Timeline:
     """time frame of one artboard: Rive fps, frame count, the expression engine and the report"""
 
-    def __init__(self, conv, comp_item, fps):
+    def __init__(self, conv, comp_item, fps, main=False):
         self.conv = conv
         self.comp = comp_item
         self.fps = fps
         self.duration = float(comp_item.duration)
+        if main and getattr(conv, "work_area", False):
+            # --work-area: the main animation ends where the comp's work area ends (what AE renders by default — a
+            # 101 s montage comp exported as its 66.4 s work area). A work area starting later would need every key
+            # shifted: kept whole, noted.
+            ws = float(getattr(comp_item, "work_area_start", 0.0) or 0.0)
+            wd = float(getattr(comp_item, "work_area_duration", 0.0) or 0.0)
+            if wd > 0 and ws < 1e-6:
+                self.duration = min(self.duration, wd)
+            elif wd > 0:
+                conv.report.add(clean(comp_item.name), "approx", clean(comp_item.name),
+                                f"work area starts at {ws:.3f} s: the animation keeps the whole comp")
         self.nframes = max(1, int(round(self.duration * fps)))
         self.engine = conv.engine
         self.scope = clean(comp_item.name)

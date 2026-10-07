@@ -1753,17 +1753,23 @@ def shape_to_value(s):
 
 def null_opacity_fixed(p, L):
     """py-aep 0.17 reports 0 % for a null layer's static opacity although the file stores 100 (checked against AE's
-    own ExtendScript dump and the raw cdat chunk): a null's untouched opacity is 100."""
+    own ExtendScript dump and the raw cdat chunk, which holds the fraction 1.0 — or 100): the stored value, else None.
+    An expression on that opacity marks the property modified without touching the stored value: rml2ae's nulls carry
+    `value * thisLayer.parent.transform.opacity / 100`, and reading them 0 made every layer parented below one vanish
+    (measured on a 66 s film: all the vector shapes gone, only the gradient images left)."""
     try:
         if L is None or not getattr(L, "null_layer", False) or p.match_name != "ADBE Opacity":
-            return False
-        if len(p.keyframes) or p.is_modified:
-            return False
+            return None
+        if len(p.keyframes):
+            return None
         cd = getattr(p, "_cdat", None)
         vals = getattr(cd, "values", None) or []
-        return not vals or abs(float(vals[0]) - 100.0) < 1e-6 or abs(float(vals[0]) - 1.0) < 1e-6
+        if not vals:
+            return 100.0
+        v = float(vals[0])
+        return v * 100.0 if v <= 1.0 + 1e-9 else v
     except Exception:
-        return False
+        return None
 
 
 # value of an expression control's parameter the instance does not store: AE's own default. py-aep synthesizes it
@@ -1801,8 +1807,9 @@ def raw_value(p, L, t=None):
     o = OVERRIDES.get(id(p))
     if o is not None:
         return o[0](t)
-    if null_opacity_fixed(p, L):
-        return 100.0
+    fixed = null_opacity_fixed(p, L)
+    if fixed is not None:
+        return fixed
     mn = getattr(p, "match_name", "")
     if (mn in _PARAM_DEFAULTS or mn in CONTROL_DEFAULTS) and _unstored(p):
         return _PARAM_DEFAULTS.get(mn, CONTROL_DEFAULTS.get(mn))
