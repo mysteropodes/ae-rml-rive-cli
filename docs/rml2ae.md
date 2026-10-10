@@ -188,16 +188,22 @@ A dry test that needs no AE: `python3 -m rml2ae.tests.sim_incremental`.
 
 Edits you make in the open AE project return to `scene.rml`:
 
-- Scope: the transform of each layer tagged `rive:<id>`: x, y, rotation, scaleX, scaleY, opacity and the hidden (eye) flag.
+- Scope: the transform of each layer tagged `rive:<id>`: x, y, rotation, scaleX, scaleY, opacity and the hidden (eye) flag; and the contents of its shapes (below).
 - As an attribute when the property has no keys in AE; as keys of the comp's animation otherwise. AE eases are converted back to `CubicEaseInterpolator` by exact inversion of the build mapping; linear and hold are kept.
 - Static values are read from the comp of the artboard's first animation; keys are read in each animation comp.
 - A single key on a property that is not keyed in the RML is treated as a value carried over from an earlier state, and ignored.
 - Ignored: matte layers, `[skinned]` layers, clipped precomps and auxiliary `+` layers.
 - Groups (industry layout) are read through `<project>.groups.json`.
+- Shape contents, read by rank inside each shape's group as the build wrote them (one AE path per Rive path, in order; the paints in reverse order):
+  - fill and stroke **colour** (`SolidColor.colorValue`, alpha from the AE fill / stroke opacity, except on a paint hidden by `isVisible="false"`, which AE shows at 0 %). Keyed colours become `KeyFrameColor`, linear or hold. A `SolidColor` keyed for the first time gets an id;
+  - stroke **thickness**, static or keyed;
+  - **Rectangle / Ellipse**: width, height and position (the origin is taken back out of AE's centred position);
+  - **paths** (`PointsPath`): vertices and tangents. The vertex type follows the tangents (straight, mirrored, asymmetric, detached). A static path is rewritten whole, so it may gain or lose vertices if none of them is animated. Path keys become keys on each vertex property; the vertex count must stay the RML's. AE path keys carry no ease from the build: where AE says linear on a frame the RML eased, the RML's ease stays.
+  - When AE and the RML do not hold the same number of paths, fills or strokes on a shape (one added or deleted in AE), that part is not pulled and the list says so. Mattes, gradient fills and properties driven by an expression (data binding) are not read.
 
 The RML is rewritten as text (attributes and `<KeyedProperty>` blocks only), then checked with `rive --verify`. The manifest is marked up to date for the pulled elements, so the next `build --replace` does not rebuild them and their AE effects stay.
 
-Not pulled: colours, strokes, paths or text edited in AE; keys that fall between frames (rounded to the animation's frame grid); layers added in AE (they stay in AE and never reach the RML).
+Not pulled: gradients, Polygon / Star / Triangle shapes, skinned paths, cap / join / dashes / trim, text edited in AE; keys that fall between frames (rounded to the animation's frame grid); layers added in AE (they stay in AE and never reach the RML).
 
 ## The After Effects panel
 

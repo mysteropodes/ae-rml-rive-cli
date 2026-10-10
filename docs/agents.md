@@ -51,4 +51,4 @@ Put the content of the skill in the agent's instruction file: paste `skills/rml2
 - Never run `ae build`, `ae watch` or `ae pull` without the user's explicit go; they act on the open After Effects.
 - Run `ae doctor <project>` before any AE work; every line should be `[ok]`.
 - After a build, read the report and tell the user what was approximated, instead of claiming pixel parity.
-- The RML is the source of truth. AE edits survive only on layers rml2ae did not rebuild; `ae pull --dry` then `ae pull` brings transforms and keys back into the RML.
+- The RML is the source of truth. AE edits survive only on layers rml2ae did not rebuild; `ae pull --dry` then `ae pull` brings transforms, colours, strokes, paths and keys back into the RML.
