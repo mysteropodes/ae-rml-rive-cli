@@ -86,6 +86,26 @@ def argb(s, default=(0.0, 0.0, 0.0, 1.0)):
     return (r, g, b, a)
 
 
+# LayerMask.maskModeValue (rive-runtime MaskMode) and its After Effects track matte type
+MASK_MODES = {0: "alpha", 1: "invertedAlpha", 2: "luminance", 3: "invertedLuminance"}
+MASK_MODE_NAMES = {v.lower(): k for k, v in MASK_MODES.items()}
+MASK_MODE_NAMES.update({"luma": 2, "invertedluma": 3})
+
+
+def layer_mask_flags(el):
+    """LayerMask -> (mode 0-3, isVisible, sourceDraws). RML carries either the stored bit field maskFlags (mode in bits
+    0-1, isVisible 1 << 2, sourceDraws 1 << 3; default 4) or the three properties it packs, by name or number"""
+    raw = el.get("maskFlags")
+    if raw not in (None, ""):
+        f = int(float(raw))
+        return f & 3, bool(f & 4), bool(f & 8)
+    m = (el.get("maskModeValue") or "0").strip()
+    mode = int(float(m)) if m.replace(".", "", 1).isdigit() else MASK_MODE_NAMES.get(m.lower(), 0)
+    if mode not in MASK_MODES:
+        mode = 0                      # the runtime reads an unknown mode as alpha
+    return mode, el.get("isVisible", "true") != "false", el.get("sourceDraws", "false") == "true"
+
+
 def blend_name(v):
     if v is None:
         return None

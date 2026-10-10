@@ -1,5 +1,5 @@
 """python -m rml2ae.ae2rml project.aep out_dir [--comp NAME] [--fps N] [--once] [--no-bg] [--verify] [--shot T …]
-                                              [--media-scale S] [--media-fps N]
+                                              [--media-scale S] [--media-fps N] [--clip-mattes]
 
 --media-scale S   videos and image sequences are exported as image sequences (one ImageAsset per frame shown): scale
                   their frames — and still images — by S (default 1 = footage size) to keep the .riv light
@@ -7,6 +7,8 @@
 --no-audio        no sound (audio layers and the sound of videos are left out)
 --no-video        video files (.mov, .mp4…) are left out: their layers draw nothing (image sequences and stills stay)
 --work-area       the main comp's animation ends with its work area (what AE renders by default)
+--clip-mattes     track mattes clip with the matte's geometry (ClippingShape) instead of a LayerMask (its pixels):
+                  for Rive runtimes older than LayerMask; luma, text and image mattes are then approximated
 --ae-lang fr|en|any  the After Effects UI language to emulate: AE resolves names in expressions (effect("C")("Color"))
                   in its own language only, a French AE disables English ones (default: AE2RML_LANG, else the system's)"""
 import os
@@ -49,7 +51,8 @@ def main(argv):
                      media_scale=float(flags.get("media-scale") or 1.0),
                      media_fps=float(flags["media-fps"]) if flags.get("media-fps") else None,
                      ae_lang=flags.get("ae-lang"), audio=not flags.get("no-audio"),
-                     video=not flags.get("no-video"), work_area=bool(flags.get("work-area")))
+                     video=not flags.get("no-video"), work_area=bool(flags.get("work-area")),
+                     layer_masks=not flags.get("clip-mattes"))
     scene = conv.convert()
     c = conv.report.counts()
     print(f"{scene}  ({time.time() - t0:.1f}s)")

@@ -35,7 +35,7 @@ ae diff <project> --times t1 t2 ...      AE frames vs `rive --screenshot`, side 
 
 ## How the conversion maps (what to expect in AE)
 - artboard → comp per animation played by the default state machine's entry state; exit-time chains → a sequence comp;
-  loops → a "(looped)" comp. NestedArtboard → precomp + Time Remap. Clipped node → precomp + alpha matte.
+  loops → a "(looped)" comp. NestedArtboard → precomp + Time Remap. Clipped node → precomp + alpha matte; LayerMask → precomp + track matte of its mode (alpha / luma, inverted).
 - Shapes → shape layers (paths, fills, strokes, dashes, trim, gradients: 2 stops = Gradient Ramp, more = PNG matte).
   Text → text layers (box text, runs, animators). Images → footage (+ mesh strips). Bones → nulls (FK by parenting),
   skinned paths baked per frame. ViewModels → a "VM · <name>" control comp, data binds → expressions.

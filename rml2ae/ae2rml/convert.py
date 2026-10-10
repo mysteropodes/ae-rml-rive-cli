@@ -153,7 +153,7 @@ def _patch_py_aep():
 
 class Converter:
     def __init__(self, aep, out_dir, comp=None, fps=None, loop="loop", bg=True, log=print, media_scale=1.0,
-                 media_fps=None, ae_lang=None, audio=True, video=True, work_area=False):
+                 media_fps=None, ae_lang=None, audio=True, video=True, work_area=False, layer_masks=True):
         import py_aep
         from .rml import PRUNED
         _patch_py_aep()
@@ -161,6 +161,9 @@ class Converter:
         self.aep = os.path.abspath(aep)
         self.out_dir = os.path.abspath(out_dir)
         self.log = log
+        # track mattes -> Rive LayerMask (the matte's pixels: alpha / luma, text, images, gradients, feathers); False:
+        # the matte's geometry clips (ClippingShape), for runtimes older than LayerMask
+        self.layer_masks = layer_masks
         try:
             self.app = py_aep.parse(self.aep)
         except Exception as ex:
@@ -242,6 +245,27 @@ class Converter:
                             f"{', '.join(clean(c.name) for c in roots[1:6])}{' …' if len(roots) > 6 else ''} — use --comp")
         return roots[0]
 
+    def drop_sourceless_masks(self):
+        """a LayerMask whose source is not a Node of its own artboard (a matte the converter skips, or a matte layer
+        above an adjustment layer whose effect moved the matted layer into a sub-artboard) stops the whole file from
+        loading (MissingObject): dropped, the layer is drawn unmatted"""
+        for cb in self.order:                    # comps and the effects' sub-artboards
+            ab = cb.ab
+            masks = [e for e in ab.iter() if e.tag == "LayerMask"]
+            if not masks:
+                continue
+            have = {e.id for e in ab.iter() if e.tag == "Node"}
+            bad = {id(m) for m in masks if m.attrs.get("sourceId") not in have}
+            if not bad:
+                continue
+            for e in ab.iter():
+                for c in e.children:
+                    if id(c) in bad:
+                        self.report.add(getattr(cb, "scope", ab.name), "unsupported", e.name, "its track matte draws "
+                                        "nothing in this artboard Rive can mask with (LayerMask dropped): the layer is "
+                                        "drawn unmatted")
+                e.children = [c for c in e.children if id(c) not in bad]
+
     # ------------------------------------------------------------------ run
     def convert(self):
         main = self.pick_main()
@@ -249,6 +273,7 @@ class Converter:
         self.unnest_fx()
         for cb in self.order:
             cb.finish()
+        self.drop_sourceless_masks()
         roots = []
         x = 0.0
         for cb in self.order:
@@ -1678,21 +1703,29 @@ class LayerBuild:
             self.note("converted", self.name, f"blend mode {bm} → clip of every layer below "
                                               f"({'luma treated as alpha, ' if 'LUMA' in bm else ''}not drawn itself)")
             return
+        mask_source = self.conv.layer_masks and cb.is_matte(L)
+        if mask_source:
+            # LayerMask: the matte layer is drawn as it is (paints, opacity, in/out, effects, its own matte) in a node
+            # the masks read; Rive hides that node (sourceDraws false) unless the matte's eye is on (AE 2023+ draws it)
+            space = space.add(E("Node", id=self.id("masksrc"), name=self.name + " · matte source"))
+            matte_source = False
+            if not cb.drawn(L):
+                self.note("converted", self.name, "used as a track matte: drawn into the LayerMask source (hidden)")
         if not matte_source and cb.matte_empty(L):
             self.note("converted", self.name, "its track matte lets nothing through (a null layer, directly or through "
                                               "the matte's own matte): not drawn, as in AE")
-            if not cb.is_matte(L):
+            if not cb.is_matte(L) or mask_source:
                 return
             matte_source = True                   # still the geometry other layers clip with
         # AE 2023+: a matte layer whose eye is on is drawn AND clips (rig-test: a white solid, bubble shapes)
-        visible_matte = cb.is_matte(L) and not matte_source
+        visible_matte = cb.is_matte(L) and not matte_source and not mask_source
         has_children = bool(cb.children.get(L.index))
         plan = self.effects_plan() if not matte_source else {"wrappers": [], "colors": [], "comments": [], "ramps": []}
         holder = space
         if not matte_source and plan.get("copyfrom") is not None:
             self.note("approx", self.name, f"Compound Arithmetic 'Copy' from '{clean(plan['copyfrom'].name)}': it "
                                            f"repeats that layer's pixels — not drawn")
-            if not cb.is_matte(L):
+            if not cb.is_matte(L) or mask_source:
                 return
             matte_source, visible_matte = True, False
             plan = {"wrappers": [], "colors": [], "comments": [], "ramps": []}
@@ -1701,9 +1734,11 @@ class LayerBuild:
         if m is not None:
             mnode = E("Node", id=self.id("matte"), name=self.name + " · matte")
             holder.add(mnode)
-            clip_id = self.matte_clip(m)
+            clip_id = None if self.conv.layer_masks else self.matte_clip(m)
             holder = mnode
-            if clip_id:
+            if self.conv.layer_masks:
+                mnode.add(self.layer_mask(m))
+            elif clip_id:
                 mnode.add(E("ClippingShape", id=self.id("mclip"), name="Track matte", sourceId=clip_id[0],
                             fillRule=clip_id[1]))
                 holder = self.matte_alpha(mnode, m)
@@ -3331,6 +3366,22 @@ class LayerBuild:
         self.note("converted", self.name, f"{len(ms)} mask(s) → clipping")
 
     # ---------------------------------------------------------------- track mattes
+    MASK_MODES = {5013: (0, "alpha"), 5014: (1, "inverted alpha"), 5015: (2, "luma"), 5016: (3, "inverted luma")}
+
+    def layer_mask(self, M):
+        """this layer's track matte -> a Rive LayerMask on the node holding the layer: the masked subtree is flattened,
+        then multiplied by the matte's rendered alpha / luminance (maskModeValue 0-3 = AE's four matte types). The
+        source is the matte layer's own « · matte source » node; it draws only when the matte's eye is on."""
+        L, cb = self.L, self.cb
+        mode, what = self.MASK_MODES.get(int(L.track_matte_type), (0, "alpha"))
+        draws = cb.drawn(M)
+        flags = mode | 4 | (8 if draws else 0)    # maskModeValue bits 0-1, isVisible 1 << 2, sourceDraws 1 << 3
+        sid = self.conv.ids.key("comp", cb.kid, "L", M.id, "masksrc", *(f"copy{s}" for s in self.copy_suffix))
+        lm = E("LayerMask", id=self.id("lmask"), name=f"Track matte ({what})", sourceId=sid, maskFlags=flags)
+        self.note("converted", self.name, f"track matte '{clean(M.name)}' ({what}) → LayerMask"
+                                          + (" (the matte layer is drawn too)" if draws else ""))
+        return lm
+
     def matte_clip(self, M):
         """(clip source id, fill rule) for this layer's track matte (the source is built with the matte layer)"""
         L, cb = self.L, self.cb
