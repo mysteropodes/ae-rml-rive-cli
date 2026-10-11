@@ -77,7 +77,7 @@ plug-in. Some can come later through the Rive scene itself rather than as a shad
 | Color Link | ⛔ | samples another layer over time |
 | Color Stabilizer | ⛔ | tracks reference frames |
 | Colorama | 🟡 | lot 11 (Hue Cycle output only; the custom wheel is custom data) |
-| Curves | ⬜ | the curve is custom data: needs a reader for it |
+| Curves | ✅ | converted natively by ae2rml from the curves py-aep decodes (vector colours; images baked like the other colour effects) |
 | Equalize | ⛔ | histogram of the frame |
 | Exposure | ✅ | |
 | Gamma/Pedestal/Gain | 🟡 | lot 2 |
@@ -161,7 +161,8 @@ plug-in. Some can come later through the Rive scene itself rather than as a shad
 | Lens Flare | 🟡 | lot 8 (stylised: AE's flare elements are not reproduced) |
 | Paint Bucket | 🟡 | lot 13 (multi-pass flood fill) |
 | Radio Waves | ⛔ | particles over time |
-| Scribble, Stroke, Vegas, Write-on | ⛔ | mask- or path-driven |
+| Stroke | 🟡 | converted natively by ae2rml: a Rive stroke along the masks, trimmed by Start / End (not measured) |
+| Scribble, Vegas, Write-on | ⛔ | mask- or path-driven |
 
 ## Keying
 

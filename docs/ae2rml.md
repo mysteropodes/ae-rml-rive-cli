@@ -78,7 +78,8 @@ Legend: **exact** = reproduced to anti-aliasing noise; **approx** = reproduced w
 | Blend modes | Rive names; modes without an equivalent map to the closest of the same family and are reported | approx |
 | Solo | A soloed layer only hides the others when it has an image; soloed audio or guide layers leave everything visible, as in After Effects | exact |
 | Lights (Classic 3D: parallel, spot, point, ambient) | Shading baked into the colours of each 3D layer that accepts lights, keyed per frame when it changes: ambient + Lambert diffuse + Blinn-Phong highlight (Metal mixes its colour), spot cone and feather, the three falloff modes. The model matches After Effects 2026 renders within 1.5 levels per pixel; Rive gets one value per layer, taken at its anchor, so a spot or point light does not vary across the layer. No shadows; a still image takes the shading of the first frame | approx |
-| Layer styles (drop shadow...) | Not in Rive; reported | no |
+| Layer styles on vector layers (shape, text, solid): Drop Shadow, Outer Glow, Inner Shadow, Inner Glow, Color Overlay, Gradient Overlay, Stroke | Copies of the layer's shapes above or below it, in Photoshop's stacking order: feathered copies for shadows and glows (Spread as a stroke, inner ones with Rive's inner `Feather`), a recoloured copy for overlays (gradient across the layer's bounds), fills turned into a `Stroke` at the style's position (inside, centre, outside). Animated style parameters use their first value; noise, choke and Fill Opacity are not reproduced. See [Layer styles](#layer-styles) | approx |
+| Bevel and Emboss, Satin, Pattern Overlay; any style on footage or a pre-comp | Reported | no |
 
 ### Shapes
 
@@ -160,11 +161,24 @@ through `comp("...")`.
 | Gaussian Blur, Fast Blur, Box Blur on shape/text layers | `Feather` on each paint, keyed if animated (about 0.02-0.16 % of pixels differ). With "Repeat Edge Pixels" on (After Effects' default), the layer outline stays sharp, so no feather is applied and a note is written |
 | Drop Shadow on shape/text layers | Copy of the drawing below the layer with shadow-coloured, feathered paints |
 | Glow on shape/text layers | Feathered copy on top in screen blend mode (Rive has no additive mode) |
+| Curves | Applied to colours directly from the curves AE stores (py-aep decodes its 256-level maps): the master curve, then each channel's. Keyed curves hold from key to key. The alpha curve is not applied |
+| Stroke (along masks) | A Rive `Stroke` on the mask path(s) (open masks included) with a `TrimPath` for Start / End (keyed), Brush Hardness as a feather, "On Transparent" hides the layer. Spacing and "Reveal Original Image" are not reproduced. Not measured against After Effects yet |
 | Posterize Time | All keys of the layer held at its rate |
 | Any other raster effect found in the [WGSL effect library](fxlib.md) | One generated Luau node running the WGSL passes for the layer's **whole effect stack**, in After Effects' order |
 | Effects that read another layer (Displacement Map) | The other layer's source is bound to the node: a precomp (its artboard), a still image, or the layer itself; other layer kinds leave the map empty (reported) |
 | Anything else | Kept as an `<!-- ae: effect ... -->` comment (so rml2ae can put it back) and listed in `effects_todo.json` |
 | Adjustment layers | Library effects: the layers below go into a sub-artboard and the adjustment layer's opacity and in/out window drive a mix pass. Several stacked adjustment layers give one node with one group per layer, and the layer's blend mode is applied by the rule measured in After Effects. Otherwise listed in `effects_todo.json` |
+
+### Layer styles
+
+Each enabled style is a copy of the layer's drawables with its paints replaced, placed in the layer's node (top to
+bottom: Stroke, Inner Shadow, Inner Glow, Color Overlay, Gradient Overlay, the layer, Outer Glow, Drop Shadow). The
+light angle follows Photoshop (Use Global Light reads the layer's Global Light angle): 120° casts the shadow down and
+to the right. Style blend modes map to Rive's; Linear Dodge becomes `additive`.
+
+Not yet measured against After Effects: the factor from a style's Size to Rive's Feather strength
+(`STYLE_SIZE_K` = 0.66, Size taken as about 3 σ) and Rive's inner feather against Photoshop's inner shadow. Each
+converted style is listed as approximate in `report.md`.
 
 Notes on the WGSL path:
 
@@ -207,8 +221,10 @@ comment is empty or already a tag. Afterwards:
 
 ## Known limits
 
-- **Layer styles**: not converted (text/image mattes: only with `--clip-mattes`).
-- **Lights, depth of field, per-character 3D**: approximated (see the tables above): one shading and one blur per layer, no shadows, no perspective inside a single glyph.
+- **Lights, depth of field, per-character 3D**: approximated (see the tables above): one shading and one blur per
+  layer, no shadows, no perspective inside a single glyph.
+- **Layer styles**: approximate on vector layers (see [Layer styles](#layer-styles)); Bevel and Emboss, Satin, Pattern
+  Overlay and styles on footage or pre-comps are reported, not converted.
 - **Effects without a library implementation**: kept as comments; see `effects_todo.json`.
 - **Random generators** (wiggle, noise, random order, Wiggly selector, Wiggle Paths): structure is reproduced, the
   random draws differ.

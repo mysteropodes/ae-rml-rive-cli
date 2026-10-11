@@ -29,6 +29,7 @@ from .aexpr import Engine, ShapeValue, tonum, unwrap, to_js, pseudo_param_names,
 from .keys import AProp, Timeline, progress_keys, reduce_track
 from .rml import Anim, E, document, prop_key
 from .shapes import PathSource, ShapeBuilder
+from .styles import LayerStyles
 from .util import IdPool, Report, argb, clean, copy_font, find_footage, fmt, font_metrics, slug
 
 AE_BOX_BASELINE = 0.743     # measured by rml2ae (Montserrat, AE 2026): first baseline of a box text = top + 0.743*size
@@ -39,7 +40,7 @@ PC3D_PROPS = ("ADBE Text Position 3D", "ADBE Text Anchor Point 3D", "ADBE Text S
               "ADBE Text Rotation X", "ADBE Text Rotation Y")
 BLUR_FX = {"ADBE Gaussian Blur 2", "ADBE Gaussian Blur", "ADBE Box Blur2", "ADBE Box Blur"}
 COLOR_FX = {"ADBE Fill", "ADBE Tint", "ADBE Invert", "ADBE Exposure2", "ADBE Easy Levels2",
-            "ADBE Color Balance (HLS)", "ADBE Brightness & Contrast 2", "ADBE HUE SATURATION"}
+            "ADBE Color Balance (HLS)", "ADBE Brightness & Contrast 2", "ADBE HUE SATURATION", "ADBE CurvesCustom"}
 BLEND_NAMES = {"NORMAL": "srcOver", "DARKEN": "darken", "MULTIPLY": "multiply", "COLOR_BURN": "colorBurn",
                "CLASSIC_COLOR_BURN": "colorBurn", "ADD": "additive", "LINEAR_DODGE": "additive", "LIGHTEN": "lighten",
                "SCREEN": "screen", "COLOR_DODGE": "colorDodge", "CLASSIC_COLOR_DODGE": "colorDodge",
@@ -1549,7 +1550,7 @@ class CompBuild:
 
 
 # ====================================================================== one layer
-class LayerBuild:
+class LayerBuild(LayerStyles):
     def __init__(self, cb, L):
         self.cb, self.L = cb, L
         self.conv = cb.conv
@@ -1816,6 +1817,10 @@ class LayerBuild:
             self.drop_shadow(fx, draw_into)
         for fx in plan.get("glows", []):
             self.glow(fx, draw_into)
+        for fx in plan.get("strokes", []):
+            self.stroke_effect(fx, draw_into)
+        if plan.get("styles"):
+            self.layer_styles(plan["styles"], draw_into)
         if plan.get("wgsl"):
             self.wgsl_layer(plan["wgsl"], bool(masks))
         if plan["comments"]:
@@ -3612,7 +3617,7 @@ class LayerBuild:
         if m is not None or masks or visible_matte or self.blend not in (None, "srcOver"):
             return False
         if any(plan.get(k) for k in ("wrappers", "colors", "ramps", "blurs", "shadows", "glows", "wgsl", "setmattes",
-                                     "cornerpin", "copyfrom")):
+                                     "cornerpin", "copyfrom", "styles", "strokes")):
             return False
         N, fps = self.tl.nframes, self.tl.fps
         f0, f1 = max(0, in_f), min(N, out_f)
@@ -3935,25 +3940,10 @@ class LayerBuild:
         return n
 
     # ---------------------------------------------------------------- effects
-    def layer_styles(self):
-        """Layer Styles (drop shadow, glow, stroke…) are not effects: py-aep lists them under 'ADBE Layer Styles'.
-        Not in Rive; reported so a missing shadow is not a surprise (Infinity's Web Elements card)."""
-        try:
-            ls = self.L.property("ADBE Layer Styles")
-        except Exception:
-            ls = None
-        if ls is None or not getattr(ls, "enabled", False):
-            return
-        from .aexpr import _children
-        on = [clean(g.name) for g in _children(ls)
-              if getattr(g, "enabled", False) and "/" in getattr(g, "match_name", "")]
-        if on:
-            self.note("unsupported", self.name, f"layer style(s) not converted: {', '.join(on)}")
-
     def effects_plan(self):
         L = self.L
-        self.layer_styles()
-        plan = {"wrappers": [], "colors": [], "comments": [], "ramps": [], "setmattes": [], "copyfrom": None, "shadows": []}
+        plan = {"wrappers": [], "colors": [], "comments": [], "ramps": [], "setmattes": [], "copyfrom": None, "shadows": [],
+                "styles": self.style_groups()}
         try:
             fxs = list(L.effects.properties) if L.effects is not None else []
         except Exception:
@@ -3973,6 +3963,9 @@ class LayerBuild:
             if mn in BLUR_FX and type(L).__name__ in ("ShapeLayer", "TextLayer") and not plan.get("shadows") \
                     and not plan.get("glows"):
                 plan.setdefault("blurs", []).append(fx)
+                continue
+            if mn == "ADBE Stroke" and getattr(L, "masks", None) is not None and list(L.masks.properties):
+                plan.setdefault("strokes", []).append(fx)
                 continue
             if mn == "ADBE Glo2" and type(L).__name__ in ("ShapeLayer", "TextLayer"):
                 plan.setdefault("glows", []).append(fx)
@@ -4638,6 +4631,85 @@ class LayerBuild:
         self.note("approx", clean(fx.name), f"Glow → feathered copy on top, screen blend (radius {radius:g} → feather "
                                             f"{self.GLOW_RADIUS_K * radius:.3g}; AE adds, Rive screens)")
 
+    def stroke_effect(self, fx, holder):
+        """AE Stroke effect (a brush along the layer's masks: write-on lines) -> a Rive Shape with the mask path(s), a
+        Stroke paint and a TrimPath for Start / End, drawn on top of the layer. Parameters by position, as in AE's
+        Effect Controls: Path, All Masks, Stroke Sequentially, Color, Brush Size, Brush Hardness, Opacity, Start, End,
+        Spacing, Paint Style. Not measured against After Effects yet."""
+        Q = self.fx_params(fx)
+
+        def q(i):
+            return Q[i - 1] if 0 < i <= len(Q) else None
+
+        def val(i, d):
+            p = q(i)
+            if p is None:
+                return d
+            ap = self.prop(p, f"stroke {i}")
+            return unwrap(ap.at(0.0)) if ap.animated else ap.static(None, d)
+        ms = list(self.L.masks.properties)
+        if int(tonum(val(2, 0))):
+            chosen = list(enumerate(ms))
+        else:
+            k = int(tonum(val(1, 1)))
+            chosen = [(k - 1, ms[k - 1])] if 1 <= k <= len(ms) else []
+        if not chosen:
+            self.note("approx", clean(fx.name), "Stroke effect without a mask path: not converted")
+            return
+        sh = E("Shape", id=self.id("strokefx", fx.name), name=f"{self.name} · {clean(fx.name)}")
+        clipping = []
+        for i, m in chosen:
+            ap = self.prop(m.property("ADBE Mask Shape"), clean(m.name) + " path")
+            ps = PathSource.from_prop(ap, 1)
+            el = self.points_path(f"strokefx{i}", clean(m.name), ps) if ps is not None else None
+            if el is not None:
+                sh.add(el)
+                try:
+                    if int(m.mask_mode) != 6812 and getattr(m.property("ADBE Mask Shape").value, "closed", True):
+                        clipping.append(clean(m.name))
+                except Exception:
+                    pass
+        if not sh.children:
+            return
+        col = val(4, [1, 1, 1, 1])
+        col = list(col) if isinstance(col, (list, tuple)) else [1, 1, 1, 1]
+        opa = max(0.0, min(1.0, tonum(val(7, 1.0))))
+        st = sh.add(E("Stroke", id=self.id("strokefx", fx.name, "paint"), name="Stroke", thickness=1.0, cap="round",
+                      join="round"))
+        st.add(E("SolidColor", id=self.id("strokefx", fx.name, "color"), name="Color", colorValue=argb(col[:3], opa)))
+        if q(5) is not None:
+            self.put(st, "thickness", self.prop(q(5), "brush size"), None, force=True)
+        hard = tonum(val(6, 75.0))
+        if hard < 100 - 1e-6:
+            st.add(E("Feather", id=self.id("strokefx", fx.name, "soft"), name="Hardness",
+                     strength=max(0.01, tonum(val(5, 2.0)) * (1 - hard / 100.0) * 0.5)))
+        trim = E("TrimPath", id=self.id("strokefx", fx.name, "trim"), name="Start / End",
+                 modeValue="sequential" if int(tonum(val(3, 0))) else "synchronized")
+        for i, attr, d in ((8, "start", 0.0), (9, "end", 100.0)):
+            if q(i) is not None:
+                self.put(trim, attr, self.prop(q(i), attr), None, 0.01, force=True)
+            else:
+                trim.set(attr, d / 100.0)
+        if trim.attrs.get("start", 0.0) != 0.0 or trim.attrs.get("end", 1.0) != 1.0 or len(trim.attrs) > 3 or any(
+                k[0] == trim.id for k in self.anim.order):
+            st.add(trim)
+        if tonum(val(10, 15.0)) > 15 + 1e-6:
+            self.note("approx", clean(fx.name), "Stroke effect spacing (dotted brush) is not reproduced")
+        style = int(tonum(val(11, 1)))
+        holder.insert(0, sh)                                    # first child: on top of the layer
+        if style == 2:
+            for d in self.drawables:
+                d.set("hidden", True)
+        elif style == 3:
+            self.note("approx", clean(fx.name), "Stroke effect 'Reveal Original Image': the stroke is drawn instead")
+            for d in self.drawables:
+                d.set("hidden", True)
+        if clipping:
+            self.note("approx", clean(fx.name), f"stroked mask(s) {', '.join(clipping)} also cut the layer: the stroke "
+                                                f"is clipped with it")
+        self.note("approx", clean(fx.name), "Stroke effect → Rive stroke along the mask path(s) with a trim for Start / End "
+                                            "(not measured in AE)")
+
     def wipe_matte(self, own):
         """Linear Wipe(s) on a solid that only serves as a track matte (promo-test: the inverted matte of a video,
         wiped open): the matte's geometry becomes the solid's rectangle cut by the wipe's half-plane, keyed per frame.
@@ -4913,6 +4985,8 @@ class LayerBuild:
         P = {int(getattr(p, "match_name", "0-0").split("-")[-1]): p for p in self.fx_params(fx)
              if getattr(p, "match_name", "").startswith(mn + "-")}
         L, comp, eng = self.L, self.cb.comp, self.conv.engine
+        if mn == "ADBE CurvesCustom":
+            return self.curves_fn(fx)
 
         def v(i, t, default=0.0):
             p = P.get(i)
@@ -5018,6 +5092,64 @@ class LayerBuild:
             self.note("approx", clean(fx.name), "Brightness & Contrast approximated (linear contrast around 50 %)")
             return f
         return None
+
+    def curves_fn(self, fx):
+        """AE Curves -> f(rgb, t). py-aep decodes the curves AE stores (a 256-level map per channel and its points);
+        each colour goes through the master RGB curve, then its own channel's curve. Keyed curves: a key's curves hold
+        until the next key (AE's blend between linear keys cannot be read)."""
+        q = next((p for p in self.fx_params(fx) if getattr(p, "match_name", "") == "ADBE CurvesCustom-0001"), None)
+        try:
+            keys = list(getattr(q, "keyframes", None) or []) if q is not None else []
+            static = None if keys else (q.value if q is not None else None)
+        except Exception:
+            keys, static = [], None
+        if q is None or (not keys and not hasattr(static, "evaluate")):
+            self.note("approx", clean(fx.name), "Curves without readable curves: left out")
+            return None
+        if keys:
+            self._fx_animated = True
+            curves_at = self._keyed_curves(fx, q, keys)
+        else:
+            def curves_at(t):
+                return static
+        first = curves_at(0.0)
+        chans = getattr(first, "channels", {}) or {}
+
+        def edited(ch):
+            c = chans.get(ch)
+            return c is not None and not getattr(c, "is_identity", False)
+        if edited("alpha"):
+            self.note("approx", clean(fx.name), "Curves on the alpha channel is not applied (colours only)")
+        if edited("rgb") and any(edited(c) for c in ("red", "green", "blue")):
+            self.note("approx", clean(fx.name), "Curves: master curve applied before the channel curves (order not "
+                                                "measured in AE)")
+
+        def f(c, t):
+            cur = curves_at(t)
+            if cur is None:
+                return c
+            return [cur.evaluate(ch, cur.evaluate("rgb", max(0.0, min(1.0, float(x)))))
+                    for ch, x in zip(("red", "green", "blue"), c)]
+        return f
+
+    def _keyed_curves(self, fx, q, keys):
+        """keyed Curves -> curves_at(t): the key's curves at and after it (hold), the previous key's between linear keys"""
+        warned = []
+
+        def curves_at(t):
+            try:
+                c = q._keyed_curves_at(t)
+            except Exception:
+                c = None
+            if c is None:
+                prev = [k for k in keys if k.time <= t] or keys[:1]
+                c = q._keyframe_curves(prev[-1])
+                if not warned:
+                    warned.append(1)
+                    self.note("approx", clean(fx.name), "keyed Curves: each key's curves hold until the next key "
+                                                        "(AE's blend between keys is not readable)")
+            return c
+        return curves_at
 
     def apply_colors(self, fns):
         """bake colour effects into the layer's colours (static values and colour keys)"""
