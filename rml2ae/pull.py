@@ -142,7 +142,7 @@ try {
     var it = ITEMS[i];
     if (!(it instanceof CompItem) || !it.comment || it.comment.indexOf("rive:") != 0) continue;
     var parts = it.comment.split("|");
-    if (parts.length < 2 || parts[1] == "seq" || parts[1] == "looped" || parts[1] == "stepped") continue;
+    if (parts.length < 2 || parts[1] == "seq" || parts[1] == "sm" || parts[1] == "looped" || parts[1] == "stepped") continue;
     if (parts[0].indexOf("+matte") > 0) continue;                    // a LayerMask's matte: a copy of its source
     var layers = [], LL = [], stack = [], added = [], MAIN = {}, COPY = {}, BUILT = inBuild(it);
     for (var j0 = 1; j0 <= it.numLayers; j0++) LL.push(it.layer(j0));   // tidyWrap adds layers: iterate a snapshot
@@ -180,6 +180,10 @@ try {
       var top = TIDY["op:" + it.id + ":" + L.id];       // the opacity of a lifted precomp's node, carried by this layer
       if (top && top.length && top[0][0].indexOf("rive:") == 0) rec += ",\"opid\":" + q(top[0][0].substr(5).split("+")[0]);
       if (tch && tch.length && !TW && !tidyRotated(tch)) { var tp = []; for (var ti2 = 0; ti2 < tch.length; ti2++) tp.push("[" + tch[ti2].join(",") + "]"); rec += ",\"untidy\":[" + tp.join(",") + "]"; }
+      var lu = [];                                       // script inputs as rml2ae built them ("Luau: <name>" controls)
+      try { var EP = L.property("ADBE Effect Parade"); for (var e = 1; e <= EP.numProperties; e++) { var E = EP.property(e); if (E.name.indexOf("Luau: ") != 0) continue;
+        var pv = E.property(1), v = pv.value; lu.push("{\"name\":" + q(E.name.substr(6)) + ",\"k\":" + q(E.matchName) + ",\"keyed\":" + (pv.numKeys > 0 ? "true" : "false") + ",\"v\":" + (v instanceof Array ? "[" + num(v[0]) + "," + num(v[1]) + "," + num(v[2]) + "]" : num(v)) + "}"); } } catch (el0) {}
+      if (lu.length) rec += ",\"luau\":[" + lu.join(",") + "]";
       var gs = []; try { if (L.property("ADBE Root Vectors Group")) dumpGroups(L.property("ADBE Root Vectors Group"), [], gs); } catch (eg) {}
       rec += ",\"groups\":[" + gs.join(",") + "]}";
       tidyUnwrap(TW);
@@ -575,6 +579,49 @@ def split_chains(comps, chains, proj):
     return out
 
 
+def script_inputs(proj, comps, file_of, changes):
+    """the 'Luau: <name>' controls of a scripted element's layer -> its ScriptInput propertyValue (static values; a
+    keyed control is left to the RML animation). The element is not marked pulled: the next build replays it."""
+    from .convert import script_color
+    seen = set()
+    for comp in comps:
+        for L in comp["layers"]:
+            el = proj.by_id.get(L.get("id"))
+            if el is None or not L.get("luau") or el.id in seen:
+                continue
+            seen.add(el.id)
+            f = file_of(el.id)
+            if f is None:
+                continue
+            for c in L["luau"]:
+                inp = next((x for x in el.children if x.tag.startswith("ScriptInput") and x.name == c["name"]), None)
+                if inp is None or c.get("keyed"):
+                    continue
+                old = inp.get("propertyValue")
+                if inp.tag == "ScriptInputNumber":
+                    if abs(float(c["v"]) - inp.num("propertyValue", 0)) <= 1e-4:
+                        continue
+                    new = fmt(float(c["v"]))
+                elif inp.tag == "ScriptInputBoolean":
+                    new = "true" if float(c["v"]) > 0.5 else "false"
+                    if new == (old or "false"):
+                        continue
+                elif inp.tag == "ScriptInputColor":
+                    r0, g0, b0, a0 = script_color(old)
+                    r, g, b = (max(0.0, min(1.0, float(x))) for x in c["v"][:3])
+                    if max(abs(r - r0), abs(g - g0), abs(b - b0)) < 0.5 / 255:
+                        continue
+                    a8, rgb = int(round(a0 * 255)), [int(round(x * 255)) for x in (r, g, b)]
+                    if (old or "").strip().lstrip("-").isdigit():
+                        new = str((a8 << 24 | rgb[0] << 16 | rgb[1] << 8 | rgb[2]) - (1 << 32 if a8 >= 128 else 0))
+                    else:
+                        new = "%02X%02X%02X%02X" % (a8, rgb[0], rgb[1], rgb[2])
+                else:
+                    continue
+                f.set_attr_el(inp, "propertyValue", new)
+                changes.append(f"{el.name} ({el.id}) script input {c['name']}: {old} -> {new}")
+
+
 def pull(project_dir, out_dir, run, dry=False, only_comp=None):
     """Read the open AE project (through `run(jsx, log)`), write the differences into the RML. Returns the change lines."""
     dump_jsx, dump_json, log = prepare(out_dir)
@@ -769,6 +816,7 @@ def apply(project_dir, out_dir, dry=False, only_comp=None):
             # layers added in AE (pulladd.py)
             adder.comp(ab, anim, comp, first_anim, len([a for a in proj.animations.values() if a.el.parent is ab]) > 1)
     adder.flush()
+    script_inputs(proj, comps, file_of, changes)
     if dry or not changes:
         return changes
     for f in files.values():

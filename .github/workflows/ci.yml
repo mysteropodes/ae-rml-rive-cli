@@ -62,6 +62,10 @@ jobs:
         run: python -m rml2ae.tests.test_stroke_position
       - name: lights, depth of field and per-character 3D (light model vs After Effects renders)
         run: python -m rml2ae.tests.test_lights_dof_3d
+      - name: state machines with inputs play in AE from keyable inputs (expressions run in Node.js)
+        run: python -m rml2ae.tests.test_state_machine
+      - name: Luau script inputs <-> AE effect controls (build and ae pull)
+        run: python -m rml2ae.tests.test_script_inputs
       - name: gradient presets (.ffx) keep a coherent RIFX
         run: python -m rml2ae.tests.test_ffx
       - name: ae2rml binds the second layer of map effects (Displacement Map)
@@ -142,7 +146,8 @@ jobs:
       # Stroke position="inside" / "outside" as rml2ae reads it loads in the Rive CLI
       - name: Verify the Stroke position case with the Rive CLI
         run: rive rml2ae/tests/cases/stroke_position --verify
-
+      - name: Verify the state machine case with the Rive CLI
+        run: rive rml2ae/tests/cases/state_machine --verify
   fxlib:
     name: fxlib vs After Effects references
     runs-on: ubuntu-latest
