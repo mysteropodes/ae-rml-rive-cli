@@ -2104,7 +2104,9 @@ class Converter:
         root = J.var("root")
         J(f'var {root} = {sub}.layers.addNull(); {root}.name = {js(el.name)}; {root}.label = 3;')
         J(f'tr({root}, "ADBE Anchor Point").setValue([{js(-offx)}, {js(-offy)}]); tr({root}, "ADBE Opacity").setValue(100);')
-        if not inline:
+        if inline:                                # identity: the element carries its own transform (a new null sits at
+            J(f'tr({root}, "ADBE Position").setValue([0, 0]);')   # the comp centre, which offset the copy)
+        else:
             self.base_transform(root, el, subctx)
         J(f'resetProp(tr({root}, "ADBE Opacity"), 100); {root}.blendingMode = BlendingMode.NORMAL;')
         J(f'tagNew({sub}, 0, "head", null);')

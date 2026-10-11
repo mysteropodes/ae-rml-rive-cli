@@ -116,6 +116,10 @@ def check_rml2ae(tmp):
     assert ramp and f"{ramp.group(1)}.enabled = false;" in text, "hidden source not switched off"
     hole = [v for v, n in names.items() if n == "Hole"]
     assert hole and not any(f"{v}.enabled = false;" in text for v in hole)
+    # the Shape source copied whole into its matte precomp: the root null is the identity (it would sit at the comp
+    # centre and push the hole out of frame, as seen in After Effects)
+    hroot = re.search(r'var (root\d+) = sub\d+\.layers\.addNull\(\); \1\.name = "Hole";', text)
+    assert hroot and f'tr({hroot.group(1)}, "ADBE Position").setValue([0, 0]);' in text, "Hole matte root not at origin"
     bad = [e for e in conv.rep.entries if e[1] == "unsupported"]
     assert not bad, bad
     # the round trip: ae2rml's LayerMask on the demo -> an AE alpha matte again
