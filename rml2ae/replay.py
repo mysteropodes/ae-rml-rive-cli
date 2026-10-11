@@ -5,6 +5,7 @@ white — and un-matted (straight alpha: a = 1 - (W - B)/255, rgb = B / a). Only
 kept in a temporary copy of the project, so the render is the element alone, in world space (the ancestors' keyed
 transforms — cameras — are baked in).
 """
+import hashlib
 import os
 import re
 import shutil
@@ -101,12 +102,20 @@ def render_sequence(project_dir, artboard_name, element_id, out_dir, n_frames, f
     """-> list of RGBA PNG paths f0000.png... (cached when already rendered)."""
     os.makedirs(out_dir, exist_ok=True)
     paths = [os.path.join(out_dir, f"f{i:04d}.png") for i in range(n_frames)]
-    if all(os.path.exists(p) for p in paths):
+    src = open(os.path.join(project_dir, "scene.rml"), encoding="utf-8").read()
+    # the cache holds for the same isolated scene and the same scripts / assets: a script input pulled from AE (or an
+    # edited .luau) renders again
+    h = hashlib.sha1(isolate_rml(src, artboard_name, element_id, "FF000000", animation_id).encode("utf-8"))
+    for f in sorted(os.listdir(project_dir)):
+        p = os.path.join(project_dir, f)
+        if os.path.isfile(p) and f.endswith((".luau", ".wgsl")):
+            h.update(f.encode("utf-8") + open(p, "rb").read())
+    stamp, key = os.path.join(out_dir, "key.txt"), f"{h.hexdigest()} {fps:g}"
+    if all(os.path.exists(p) for p in paths) and os.path.exists(stamp) and open(stamp).read() == key:
         return paths
     from PIL import Image
     import numpy as np
     tmp = tempfile.mkdtemp(prefix="rml2ae_replay_")
-    src = open(os.path.join(project_dir, "scene.rml"), encoding="utf-8").read()
     for shade, hexv in (("black", "FF000000"), ("white", "FFFFFFFF")):
         d = os.path.join(tmp, shade)
         os.makedirs(d)
@@ -153,6 +162,8 @@ def render_sequence(project_dir, artboard_name, element_id, out_dir, n_frames, f
         rgba = np.dstack([np.clip(rgb, 0, 255), a * 255]).astype(np.uint8)
         Image.fromarray(rgba, "RGBA").save(out)
     shutil.rmtree(tmp, ignore_errors=True)
+    if all(os.path.exists(p) for p in paths):
+        open(stamp, "w").write(key)
     return paths
 
 
