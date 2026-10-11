@@ -14,6 +14,7 @@ from .report import Report
 from . import replay as RP
 from . import riveshader as RS
 from . import rig as RIG
+from . import statemachine as SMX
 
 ASCENT = 0.968          # Rive: first baseline = box top + ascent * size (Montserrat hhea, measured); per-font below
 BLOCK_H = 1.164         # measured: bounds height of a one-line text = lineHeight*(n-1) + 1.164*size (see guidelines §5)
@@ -304,7 +305,7 @@ class Converter:
     def unmark(self):
         self.W("//</comp>")
 
-    _VARRE = re.compile(r"\b(c|seq|lp|stp|vmc|sub|root|clp|nul|shp|img|txt|wrd|crd|row|nst|seqL|bone|an|gimg|sl|au|sa|fxc|pc|ft|ph|swp|line|vmc|grp|fth)\d+(F?)\b")
+    _VARRE = re.compile(r"\b(c|seq|lp|stp|vmc|sub|root|clp|nul|shp|img|txt|wrd|crd|row|nst|seqL|bone|an|gimg|sl|au|sa|fxc|pc|ft|ph|swp|line|vmc|grp|fth|smc|sml|smn|smg)\d+(F?)\b")
 
     def render(self, text, old, full=False):
         """Final pass over the generated script. The generator leaves markers:
@@ -680,6 +681,8 @@ class Converter:
     # ------------------------------------------------------------------ comps
     def artboard_comp(self, ab, top=False):
         """Comp for an artboard as its default state machine plays it (a chain of animations -> sequence comp)."""
+        if SMX.is_interactive(self.p, ab):
+            return self.sm_comp(ab, top)
         chain, loops, notes = self.p.entry_chain(ab)
         for n in notes:
             self.rep.add(ab.name, "approx", ab, n)
@@ -777,6 +780,84 @@ class Converter:
         self.rep.add(ab.name, "converted", ab, f"sequence of {len(chain)} animations: " + ", ".join(a.name for a in chain))
         return var
 
+    def sm_comp(self, ab, top=False):
+        """A state machine with inputs, Any State or blend states -> a comp whose controller null carries the inputs as
+        effect controls (keyable); an expression replays the Rive layer frame by frame from them (statemachine.py) and
+        drives the time and opacity of one precomp per (state, animation), the base pose at the bottom."""
+        if ab.id in self.seq:
+            return self.seq[ab.id]
+        data, notes = SMX.build(self.p, ab)
+        sm = SMX.default_sm(self.p, ab)
+        for n in notes:
+            self.rep.add(ab.name, "approx", ab, n)
+        J = self.W
+        var = J.var("smc")
+        self.seq[ab.id] = var
+        w, h = int(round(ab.num("width", 1920))), int(round(ab.num("height", 1080)))
+        longest = max([a["dur"] for s in data["states"] for a in s["anims"]] + [1 / self.fps])
+        total = max(self.loop_duration, longest)
+        tag = f"rive:{ab.id}|sm"
+        self.mark(tag, var, ab.name)
+        J(f'var {var} = app.project.items.addComp({js(ab.name)}, {w}, {h}, 1, {js(total)}, FPS); {var}.parentFolder = {"COMPS" if top else "SUBS"}; {var}.comment = {js(tag)};')
+        # one precomp per (state, animation): the artboard as that animation keys it
+        slots = SMX.slots(data)
+        comps = []
+        for sl in slots:
+            if sl["s"] < 0:
+                comps.append(self.anim_comp(ab, None, False, suffix=True, label="Base pose"))
+            else:
+                a = data["states"][sl["s"]]["anims"][sl["a"]]
+                comps.append(self.anim_comp(ab, self.p.animations[a["id"]], False, suffix=True))
+        cname = "State Machine \u00b7 " + sm.name
+        ctrl = f"thisComp.layer({js(cname)})"
+        head = SMX.header(data, "thisLayer")
+        lhead = SMX.header(data, ctrl)
+        names = [s["name"] for s in data["states"]]
+        for i, sl in enumerate(slots):
+            lv = J.var("sml")
+            st = data["states"][sl["s"]] if sl["s"] >= 0 else None
+            label = "Base pose" if st is None else st["name"] + ("" if len(st["anims"]) == 1 else " \u00b7 " + st["anims"][sl["a"]]["name"])
+            reads = (f'var C = {ctrl}; var P = C.effect("rive state")("ADBE Point3D Control-0001").value; '
+                     f'var Q = C.effect("rive mix")("ADBE Point Control-0001").value;\n')
+            J(f'var {lv} = {var}.layers.add({comps[i]}); {lv}.name = {js(label)};')
+            if st is not None:
+                tremap = (lhead + reads + f'var s = {sl["s"]}, tt = P[0] == s ? P[1] : (P[2] == s ? Q[0] : 0);\n'
+                          f'Math.min(rsmLocal(RSM.states[s].anims[{sl["a"]}], tt), Math.max(0, source.duration - thisComp.frameDuration / 2));')
+                J(f'{lv}.timeRemapEnabled = true; {lv}.property("ADBE Time Remapping").expression = {js(tremap)};')
+            opx = (lhead + reads + f'var W = rsmWeights([P[0], P[1], P[2]], [Q[0], Q[1]]), k = {i}, s = 0;\n'
+                   'for (var i = 0; i <= k; i++) s += W[i];\ns > 1e-6 ? 100 * W[k] / s : 0;')
+            J(f'tr({lv}, "ADBE Opacity").expression = {js(opx)}; {lv}.outPoint = {var}.duration;')
+        # the controller: inputs (keyable), then the replayed state (read only)
+        cv = J.var("smn")
+        J(f'var {cv} = {var}.layers.addNull(); {cv}.name = {js(cname)}; {cv}.label = 9; {cv}.outPoint = {var}.duration;')
+        J(f'{cv}.comment = {js("rive:" + (sm.id or "") + "+sm")};')
+        for inp in data["inputs"]:
+            nm = SMX.control_name(inp)
+            if inp["kind"] == "number":
+                J(f'slider({cv}, {js(nm)}, {js(inp["value"])});')
+            else:
+                J(f'var cb = {cv}.property("ADBE Effect Parade").addProperty("ADBE Checkbox Control"); cb.name = {js(nm)}; cb.property("ADBE Checkbox Control-0001").setValue({1 if inp["value"] else 0});')
+        J(f'var p3 = {cv}.property("ADBE Effect Parade").addProperty("ADBE Point3D Control"); p3.name = "rive state"; '
+          f'p3.property("ADBE Point3D Control-0001").expression = {js(head + "var r = rsmRun(time); [r[0], r[1], r[2]];")};')
+        J(f'var p2 = {cv}.property("ADBE Effect Parade").addProperty("ADBE Point Control"); p2.name = "rive mix"; '
+          f'p2.property("ADBE Point Control-0001").expression = {js(head + "var r = rsmRun(time); [r[3], r[4]];")};')
+        # which state plays, written in the comp (a guide layer: never rendered)
+        gv = J.var("smg")
+        gexpr = (f'var N = {js(names)}; var P = {ctrl}.effect("rive state")("ADBE Point3D Control-0001").value; '
+                 '"State: " + N[Math.round(P[0])] + (P[2] >= 0 && ' + ctrl + '.effect("rive mix")("ADBE Point Control-0001").value[1] < 1 ? "  (from " + N[Math.round(P[2])] + ")" : "");')
+        J(f'var {gv} = {var}.layers.addText("State"); {gv}.name = "State (guide)"; {gv}.guideLayer = true; {gv}.outPoint = {var}.duration; '
+          f'{gv}.property("ADBE Text Properties").property("ADBE Text Document").expression = {js(gexpr)}; '
+          f'tr({gv}, "ADBE Position").setValue([20, 40]);')
+        self.unmark()
+        kinds = {"number": "Slider", "bool": "Checkbox", "trigger": "Checkbox (key it on to fire)"}
+        self.rep.add(ab.name, "converted", ab, f"state machine '{sm.name}' → comp with a controller null '{cname}': inputs as "
+                     + (", ".join(f"{i['name']} ({kinds[i['kind']]})" for i in data["inputs"]) or "no input")
+                     + f"; {len(slots) - 1} state animation(s) switched by expression (keying an input in AE changes the states)")
+        self.rep.add(ab.name, "approx", ab, "state machine in AE: transitions and blend states mix pixels (opacity), "
+                     "Rive mixes property values; a property a state does not key shows its design value (Rive keeps "
+                     "what the previous state left)")
+        return var
+
     def duration_of(self, ab, anim, depth=0):
         """Seconds an (artboard, animation) comp must last: its animation, or the longest nested content it shows."""
         key = (ab.id, anim.id if anim else None)
@@ -808,12 +889,14 @@ class Converter:
         return self.durs[key]
 
     def chain_duration(self, ab, depth=0):
+        if SMX.is_interactive(self.p, ab):
+            return self.loop_duration
         chain, _, _ = self.p.entry_chain(ab)
         if not chain:
             return self.duration_of(ab, None, depth)
         return sum(self.duration_of(ab, a, depth) for a in chain)
 
-    def anim_comp(self, ab, anim, top=False, suffix=False, carry=None):
+    def anim_comp(self, ab, anim, top=False, suffix=False, carry=None, label=None):
         carry = carry or {}
         key = (ab.id, anim.id if anim else None, tuple(sorted(carry.items())))
         if key in self.comps:
@@ -824,6 +907,8 @@ class Converter:
         w, h = ab.num("width", 1920), ab.num("height", 1080)
         dur = self.duration_of(ab, anim)
         name = ab.name + (f" · {anim.name}" if (suffix and anim) else "")
+        if label:
+            name = ab.name + " · " + label
         self.mark("rive:" + (ab.id or "") + "|" + (anim.id if anim else ""), var, name)
         J(f"// ================================================================== {name}")
         J(f"//<head {var}>")

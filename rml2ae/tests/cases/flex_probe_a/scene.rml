@@ -1,0 +1,15 @@
+<Rive version="1" kind="fragment">
+  <Artboard styleId="0:2" width="800" height="600" name="P" id="0:1">
+    <LayoutComponentStyle name="AS" id="0:2"/>
+    <Fill name="Bg"><SolidColor colorValue="FFFFFFFF" name="C"/></Fill>
+    <LayoutComponent x="40" y="40" width="300" height="100" name="P1" id="0:10"><Fill name="F"><SolidColor colorValue="FFFF0000" name="C"/></Fill></LayoutComponent>
+    <LayoutComponent width="100" height="50" name="P2" id="0:11"><Fill name="F"><SolidColor colorValue="FF00FF00" name="C"/></Fill></LayoutComponent>
+    <LayoutComponent x="500" y="50" width="200" height="300" styleId="0:21" name="Col" id="0:20">
+      <LayoutComponentStyle flexDirectionValue="column" paddingLeft="10" paddingTop="10" paddingRight="10" paddingBottom="10" name="CS" id="0:21"/>
+      <Fill name="F"><SolidColor colorValue="FF808080" name="C"/></Fill>
+      <LayoutComponent width="100" height="50" name="C1" id="0:22"><Fill name="F"><SolidColor colorValue="FF800000" name="C"/></Fill></LayoutComponent>
+      <LayoutComponent width="60" height="10" styleId="0:24" name="C2" id="0:23"><LayoutComponentStyle layoutHeightScaleType="fill" name="C2S" id="0:24"/><Fill name="F"><SolidColor colorValue="FF008000" name="C"/></Fill></LayoutComponent>
+      <LayoutComponent width="100" height="40" name="C3" id="0:25"><Fill name="F"><SolidColor colorValue="FF000080" name="C"/></Fill></LayoutComponent>
+    </LayoutComponent>
+  </Artboard>
+</Rive>

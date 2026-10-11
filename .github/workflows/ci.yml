@@ -122,23 +122,12 @@ jobs:
       # Stroke position="inside" / "outside" as rml2ae reads it loads in the Rive CLI
       - name: Verify the Stroke position case with the Rive CLI
         run: rive rml2ae/tests/cases/stroke_position --verify
-      - name: DIAG (temporary) rive schema / docs / screenshot
+      - name: DIAG (temporary) layout screenshots
         if: always()
         run: |
-          for t in StateTransition TransitionNumberCondition TransitionBoolCondition BlendState1DInput BlendAnimation1D BlendAnimationDirect LayoutComponentStyle; do echo "=== schema $t"; rive schema $t </dev/null 2>&1 | head -120 || true; done
-          echo "=== docs list"; rive docs --list </dev/null 2>&1 | head -80 || true
-          for c in state_machine flex_layout; do echo "=== verify $c"; rive rml2ae/tests/cases/$c --verify 2>&1 | tail -20 || true; done
-          echo "=== screenshot"; rive rml2ae/tests/cases/flex_layout --screenshot=/tmp/flex.png --advance=0.1 2>&1 | tail -20 || true
-          python -c "from PIL import Image; im=Image.open('/tmp/flex.png').convert('RGB'); print(im.size); w,h=im.size; print([im.getpixel((x,140)) for x in range(0,w,20)])" || true
-      - name: DIAG (temporary) rive docs layout
-        if: always()
-        run: rive docs layout </dev/null 2>&1 | head -400 || true
-      - name: DIAG (temporary) rive docs state machines
-        if: always()
-        run: |
-          rive docs --search "BlendState" </dev/null 2>&1 | head -60 || true
-          rive docs --search "opValue" </dev/null 2>&1 | head -60 || true
-          rive docs --search "TransitionTriggerCondition" </dev/null 2>&1 | head -60 || true
+          rive rml2ae/tests/cases/flex_layout --screenshot=/tmp/flex.png 2>&1 | tail -5 || true
+          python tools/bbox_colors.py /tmp/flex.png || true
+          for d in rml2ae/tests/cases/flex_probe*; do echo "=== $d"; rive $d --screenshot=/tmp/p.png 2>&1 | tail -3; python tools/bbox_colors.py /tmp/p.png || true; done
 
   fxlib:
     name: fxlib vs After Effects references
