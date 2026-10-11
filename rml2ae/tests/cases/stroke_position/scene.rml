@@ -1,0 +1,61 @@
+<Rive version="1" kind="fragment">
+  <!-- Stroke.position cases: rml2ae draws inside / outside strokes on paths moved by Offset Paths; CI verifies them
+       with the Rive CLI -->
+  <Artboard width="800" height="300" clip="true" defaultStateMachineId="0:90" name="Strokes" id="0:1">
+    <Fill name="Background">
+      <SolidColor colorValue="FF20242C" name="Color"/>
+    </Fill>
+    <!-- 1. a filled card with an inside stroke drawn over the fill -->
+    <Shape x="150" y="150" name="Card" id="0:10">
+      <Rectangle width="200" height="200" cornerRadiusTL="20" name="Rectangle" id="0:11"/>
+      <Fill name="Fill" id="0:12">
+        <SolidColor colorValue="FFF27333" name="Color" id="0:13"/>
+      </Fill>
+      <Stroke thickness="20" position="inside" name="Inside" id="0:14">
+        <SolidColor colorValue="FFFFFFFF" name="Color" id="0:15"/>
+      </Stroke>
+    </Shape>
+    <!-- 2. an outside stroke whose width is keyed -->
+    <Shape x="400" y="150" name="Ring" id="0:20">
+      <Ellipse width="160" height="160" name="Ellipse" id="0:21"/>
+      <Fill name="Fill" id="0:22">
+        <SolidColor colorValue="FF33BF99" name="Color" id="0:23"/>
+      </Fill>
+      <Stroke thickness="10" position="outside" name="Outside" id="0:24">
+        <SolidColor colorValue="FFFFFFFF" name="Color" id="0:25"/>
+      </Stroke>
+    </Shape>
+    <!-- 3. a counter-clockwise triangle: outside is a negative Offset Paths amount in AE -->
+    <Shape x="650" y="150" name="Wedge" id="0:30">
+      <PointsPath isClosed="true" name="Path" id="0:31">
+        <StraightVertex x="0" y="-80" id="0:32"/>
+        <StraightVertex x="-80" y="80" id="0:33"/>
+        <StraightVertex x="80" y="80" id="0:34"/>
+      </PointsPath>
+      <Stroke thickness="12" position="outside" join="round" name="Outside" id="0:35">
+        <SolidColor colorValue="FFFFD24D" name="Color" id="0:36"/>
+      </Stroke>
+      <Stroke thickness="4" name="Centre" id="0:37">
+        <SolidColor colorValue="FF000000" name="Color" id="0:38"/>
+      </Stroke>
+    </Shape>
+    <LinearAnimation fps="25" duration="50" loopValue="pingPong" name="Strokes" id="0:80">
+      <KeyedObject objectId="0:24">
+        <KeyedProperty propertyKey="47">
+          <KeyFrameDouble value="10" frame="0" interpolationType="linear"/>
+          <KeyFrameDouble value="30" frame="50" interpolationType="hold"/>
+        </KeyedProperty>
+      </KeyedObject>
+    </LinearAnimation>
+    <StateMachine name="State Machine 1" id="0:90">
+      <StateMachineLayer name="Layer 1" id="0:91">
+        <AnyState x="200" y="-120"/>
+        <ExitState x="400" y="-120"/>
+        <EntryState x="0" y="0">
+          <StateTransition stateToId="0:92"/>
+        </EntryState>
+        <AnimationState x="200" y="0" animationId="0:80" id="0:92"/>
+      </StateMachineLayer>
+    </StateMachine>
+  </Artboard>
+</Rive>
