@@ -57,7 +57,7 @@ Options of `python -m rml2ae <project>`:
 | `--run` | Execute the generated script in the open After Effects. |
 | `--shots t1 t2 …` | Compare AE and Rive frames at the given times. |
 
-Outputs are `<name>.jsx`, `<name>.ae-report.md` (what was converted, approximated or left out), gradient presets (`.ffx`) and helper PNGs (mesh rows, gradient mattes).
+Outputs are `<name>.jsx`, `<name>.ae-report.md` (what was converted, approximated or left out) gradient presets (`.ffx`) and helper PNGs (mesh rows, gradient mattes).
 
 ## Requirements
 
@@ -76,7 +76,7 @@ Outputs are `<name>.jsx`, `<name>.ae-report.md` (what was converted, approximate
 With `industry`:
 
 - **One shape layer per group.** A `Node` whose subtree contains only simple shapes becomes a single shape layer. The node's transform and keys live on the layer. Each sub-node and shape inside is a **vector group** with its own keyed transform, and group opacity is native (no opacity expression). Neighbouring isolated shapes, and neighbouring groups made only of shapes, share one layer named `Parent · A…B`. A group whose position is keyed keeps its own layer: there X and Y stay separated, so `ae pull` reads its eases back exactly.
-- Kept as separate layers: gradients (native Gradient Fill / Stroke, one vector group per gradient paint), feathered shapes, blend modes, clips, internal data bindings, skins and bones.
+- Kept as separate layers: gradients (native Gradient Fill / Stroke, one vector group per paint), feathered shapes, blend modes, clips, internal data bindings, skins and bones.
 - **No useless nulls.** An identity node (no transform, no keys, no clip, no binding) creates no null. A node that carries a single static leaf (shape, text or image without its own rotation or scale) is folded: the leaf takes the node's animation and bindings, and the node's offset moves into the anchor point (exact).
 - `ae pull` reads groups too, through `<project>.groups.json` (group path inside its layer to Rive id), and divides the opacity of a folded node by that of its leaf. Keys rewritten identically (2D position of a group, constant x, per-frame baking) are no longer detected as edits: values are compared, not keys.
 
@@ -102,9 +102,11 @@ Remaining nulls are animated controllers (cameras, three-copy RGB split and simi
 | `NestedArtboard` | A precomp (collapsed if the artboard does not clip). `NestedRemapAnimation.time` (0..1) becomes a keyed Time Remap; `NestedSimpleAnimation` becomes a played precomp. |
 | `Node` (x, y, rotation in radians, scale, opacity) | A null (or folded/grouped, see above). Children are parented. Opacity is propagated by expression (`value * parent.opacity/100`) when not grouped. |
 | `Node` + `ClippingShape` | A precomp of the subtree (in the parent's space, 3x canvas for deep nodes) with a copy of the clip as alpha track matte. |
+| `Node` + `LayerMask` | The same precomp, with a copy of the mask source (its own precomp, painted as it is, in the source's space) as track matte of the mode's type: alpha, alpha inverted, luma, luma inverted. A source Rive does not draw (`sourceDraws` false) becomes a precomp switched off. Read as `maskFlags` or as `maskModeValue` / `isVisible` / `sourceDraws`. A node with both a clip and a mask keeps the clip only (AE: one track matte per layer). |
 | `Shape` + `PointsPath` (Straight, CubicDetached, Mirrored, Asymmetric), `Rectangle`, `Ellipse`, `Polygon`, `Star`, `Triangle` | Shape layer, one group per `Shape`. Keyed vertices become path keys. |
 | `Fill` / `Stroke` + `SolidColor` (keyed colour), cap/join/thickness, `fillRule`, `TrimPath`, `DashPath` | Fill, Stroke, Trim Paths, Dashes. |
-| Gradients (fill and stroke) | Native Gradient Fill / Gradient Stroke, any number of stops, alpha included; start/end points and opacity keyable. Each gradient paint gets its own vector group holding a copy of the shape's paths, so paint order is kept. A lone two-stop gradient whose colours are keyed stays a Gradient Ramp (keyable colours) when a Ramp is exact. |
+| `Stroke` `position` inside / outside | AE strokes are always centred: each paint of the Shape gets its own vector group with a copy of the paths, and the stroke's paths are moved by Offset Paths of ±width/2 (keyed and bound with the width, line join from the stroke). `ae2rml` reads that back as the same position. On an open path the offset goes sideways (approx). |
+| Gradients (fill and stroke) | Native Gradient Fill / Gradient Stroke, any number of stops, alpha included; start/end points and opacity keyable. Each paint of the shape gets its own vector group holding a copy of the paths, so paint order is kept. A lone two-stop gradient whose colours are keyed stays a Gradient Ramp (keyable colours) when a Ramp is exact. |
 | `Image` (+ regular keyed `Mesh`) | Image layer (anchor = origin). A mesh becomes one strip per row plus Corner Pin. |
 | `Text` + `TextStylePaint` + `TextValueRun` + `FontAsset` | Text layer (PostScript name read from the TTF, size, leading, tracking, justification, paragraph box). |
 | `TextModifierGroup` + `TextModifierRange` | Text animator (Position, Rotation, Opacity, Scale) with a selector (units, index or %, Start/End); `strength` maps to Amount. |
@@ -233,7 +235,7 @@ Rive has no effects (shadows, blurs). Declare them as XML comments immediately b
 Related rules measured while converting vector boards:
 
 - Shape gradient colours cannot be written by a script (measured in AE 2026: touching `ADBE Vector Grad Colors` raises a modal error that try/catch does not catch). rml2ae writes one animation preset per gradient (`<name>_gradient_<id>.ffx`, a copy of a template in `rml2ae/presets` with its gradient XML replaced) and applies it with `applyPreset`; points, type, opacity and stroke settings are then set by the script.
-- Gradient Ramp points are in comp coordinates and ignore parenting, so a Ramp is used only on a shape that is neither parented nor rotated; otherwise a gradient PNG with a matte is used (also for any gradient with alpha). This is the path for skinned shapes, the artboard background, and any gradient when the presets are missing.
+- Gradient Ramp points are in comp coordinates and ignore parenting, so a Ramp is used only on a shape that is neither parented nor rotated; otherwise a gradient PNG with a matte is used (also for any gradient with alpha). This is the path for skinned shapes, the artboard background, and any gradient when the presets are missing; a gradient that is not its shape's only paint is then drawn in its middle stop colour.
 - Rive draws the **last** paint of a shape on top; AE draws the **topmost** item of the group on top. Paints are therefore added in reverse order.
 - A clipping source without a paint (Rive clips by geometry) receives a white fill so it can serve as a matte.
 - A JPEG file named `.png` cannot be imported by AE.

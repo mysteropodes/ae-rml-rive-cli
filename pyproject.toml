@@ -13,10 +13,10 @@ dependencies = ["pillow", "numpy", "fonttools"]
 
 [project.optional-dependencies]
 # .aep reading for ae2rml (no After Effects needed)
-ae2rml = ["py-aep"]
+ae2rml = ["py-aep>=0.18.1"]   # 0.17 read 2D effect point defaults 100x too large from .aep saved by AE 2026
 # offline checks of the WGSL effect library (python -m rml2ae.ae2rml.fxlib check)
 wgpu = ["wgpu"]
-dev = ["py-aep", "ruff"]
+dev = ["py-aep>=0.18.1", "ruff"]
 
 [project.scripts]
 ae = "rml2ae.ae:cli"

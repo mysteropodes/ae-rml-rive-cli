@@ -548,13 +548,7 @@ class ShapeBuilder:
         lb, it = self.lb, pr.item
         # AE's own vertex order and start point matter to the trims and to the path effects
         need_points = bool(pr.trims) or pr.round is not None or bool(rel_groups) or bool(pr.mods)
-        direction = 1
-        d = it.sub("ADBE Vector Shape Direction")
-        if d is not None:
-            try:
-                direction = int(tonum(d.value))
-            except Exception:
-                direction = 1
+        direction = self._direction(it)
         key = f"{pr.key}@{paint_key}"            # a path drawn by two Shapes is two elements
         if it.kind == "rect" and not need_points:
             return [self.rect_el(it, key)]
@@ -579,6 +573,59 @@ class ShapeBuilder:
             return []
         el = lb.points_path(key, it.name, src, geom.IDENT, round_prop=pr.round)
         return [el] if el is not None else []
+
+    @staticmethod
+    def _direction(it):
+        """AE path direction: 1 as drawn, 3 reversed"""
+        d = it.sub("ADBE Vector Shape Direction")
+        if d is not None:
+            try:
+                return int(tonum(d.value))
+            except Exception:
+                pass
+        return 1
+
+    def _stroke_position(self, m, prs, w):
+        """'inside' / 'outside' when the last path operation before a stroke is an Offset Paths (one copy) of exactly
+        ±half the stroke width at every key, on closed paths: the stroke then draws the original paths on one side
+        (AE: a positive amount moves a clockwise path outwards; the largest path's winding decides). Else None."""
+        if m.kind != "offset":
+            return None
+        kids = {getattr(p, "match_name", "").lower(): p for p in _kids(m.prop)}
+
+        def find(word):
+            return next((p for mn, p in kids.items() if word in mn), None)
+        am_p, cp_p = find("offset amount"), find("copies")
+        if am_p is None:
+            return None
+        if cp_p is not None:
+            cp = self.prop(cp_p, m.name + " copies")
+            if cp.animated or abs(tonum(cp.static(None, 1)) - 1) > 1e-6:
+                return None
+        am = self.prop(am_p, m.name + " amount")
+        sign = 0
+        for t in sorted({0.0, *am.times(), *w.times()}):
+            a, wt = tonum(unwrap(am.at(t))), tonum(unwrap(w.at(t)))
+            if abs(abs(a) - wt / 2) > 1e-3 * max(1.0, wt) or abs(a) < 1e-6:
+                return None
+            s = 1 if a > 0 else -1
+            if sign and s != sign:
+                return None
+            sign = s
+        best = None
+        for pr, _n in prs:
+            fn, _props = self.path_fn(pr.item, self._direction(pr.item))
+            if fn is None:
+                return None
+            v, _i, _o, closed = fn(0.0)
+            if not closed or len(v) < 3:
+                return None
+            area = sum(x0 * y1 - x1 * y0 for (x0, y0), (x1, y1) in zip(v, v[1:] + v[:1])) / 2
+            if best is None or abs(area) > abs(best):
+                best = area
+        if best is None:
+            return None
+        return "outside" if (sign > 0) == (best >= 0) else "inside"
 
     def _group_props(self, groups):
         out, rotating = [], False
@@ -755,6 +802,14 @@ class ShapeBuilder:
         # Trim Paths (stacked trims chain, a trimmed fill closes on its chord as in AE), then the stroke's dashes,
         # which AE draws last as part of the stroke
         mods = prs[0][0].mods if prs else []
+        if stroke and mods and taper is None:
+            pos = self._stroke_position(mods[-1], prs, w)
+            if pos:
+                # Offset Paths by ±width/2 just before a stroke: the inside / outside stroke AE has no setting for
+                paint.set("position", pos)
+                mods = mods[:-1]
+                lb.note("converted", it.name, f"stroke on its paths offset by {'+' if pos == 'outside' else '-'}width/2 "
+                                              f"→ Stroke position {pos}")
         for i, m in enumerate(mods):
             paint.add(self.path_fx(m, key, i))
         trims = []

@@ -19,7 +19,7 @@ if want rml2ae || want ae2rml || want review-kit; then
 fi
 if want ae2rml; then
   echo; echo "== ae2rml (.aep -> Rive CLI project): reads .aep files with py-aep, no After Effects needed"
-  "$HERE/.venv/bin/pip" install -q py-aep && ok "py-aep (https://github.com/forticheprod/py-aep, MIT)"
+  "$HERE/.venv/bin/pip" install -q "py-aep>=0.18.1" && ok "py-aep (https://github.com/forticheprod/py-aep, MIT)"
   "$HERE/.venv/bin/pip" install -q wgpu >/dev/null 2>&1 && ok "wgpu (optional: offline checks of the WGSL effect library)" \
     || warn "wgpu not installed (only needed for 'python -m rml2ae.ae2rml.fxlib check')"
   echo "     try:  .venv/bin/python -m rml2ae.ae2rml examples/demo.aep out/demo --verify"

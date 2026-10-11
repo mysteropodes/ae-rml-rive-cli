@@ -1,0 +1,5 @@
+name: layer_mask
+main: Masks
+logs:
+  file: build/rive.log
+  problems: build/problems.log

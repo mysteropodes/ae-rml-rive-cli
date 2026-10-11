@@ -8,7 +8,7 @@ import math
 import os
 import re
 
-from .model import Project, Animation, El, argb, blend_name, is_a, prop_name
+from .model import Project, Animation, El, argb, blend_name, is_a, layer_mask_flags, prop_name
 from .jsx import Writer, js, PRELUDE, TIDY_JSX, TIDY_BUILD_JSX
 from .report import Report
 from . import replay as RP
@@ -19,6 +19,7 @@ from . import ffx as FFX
 ASCENT = 0.968          # Rive: first baseline = box top + ascent * size (Montserrat hhea, measured); per-font below
 BLOCK_H = 1.164         # measured: bounds height of a one-line text = lineHeight*(n-1) + 1.164*size (see guidelines §5)
 AE_BOX_BASELINE = 0.743 # measured (Montserrat, AE 2026): first baseline of a box text = box top + 0.743*size
+MASK_WORDS = {0: "alpha", 1: "inverted alpha", 2: "luma", 3: "inverted luma"}   # LayerMask modes, AE's words
 
 
 def bezier_progress(x, x1, y1, x2, y2):
@@ -101,6 +102,33 @@ def kind_of(interp, ease):
             x2 = 0.999
         return ("c", x1, y1, x2, y2)
     return ("l", 0, 0, 0, 0)
+
+
+# Rive Stroke.position (key 470): AE strokes are always centred, so an inside / outside stroke is drawn on its paths
+# moved by half its width with Offset Paths (AE: a positive amount moves a clockwise path outwards)
+STROKE_POSITIONS = {"center": 0, "inside": -1, "outside": 1}
+
+
+def path_winding(p):
+    """(|area|, clockwise on screen) of a Rive path as rml2ae draws it in AE: parametric paths (Rectangle, Ellipse,
+    Polygon, Star, Triangle) run clockwise; a PointsPath by the shoelace of its vertices (y down)"""
+    if p.tag == "PointsPath":
+        pts = [(v.num("x"), v.num("y")) for v in p.children if is_a(v.tag, "Vertex")]
+        a = sum(x0 * y1 - x1 * y0 for (x0, y0), (x1, y1) in zip(pts, pts[1:] + pts[:1])) / 2 if len(pts) > 2 else 0.0
+        return abs(a), a >= 0
+    return abs(p.num("width") * p.num("height")), True
+
+
+def stroke_shift(stroke, shape):
+    """Offset Paths amount per unit of stroke width for a Stroke drawn inside / outside its paths (0: centred).
+    The sign follows the winding of the shape's largest path (holes wound the other way move the same side)."""
+    pos = str(stroke.get("position", "center"))
+    side = STROKE_POSITIONS.get(pos, 0)
+    if not side:
+        return 0.0
+    paths = [path_winding(c) for c in shape.children if is_a(c.tag, "Path")]
+    cw = max(paths)[1] if paths else True
+    return 0.5 * side * (1 if cw else -1)
 
 
 class Ctx:
@@ -247,6 +275,8 @@ class Converter:
         self.log_fn = log
         self.vm_props = {}        # ViewModel property id -> dict(vm, name, kind, value, expr)
         self.layer_of = {}        # element id -> js layer var (per comp; refreshed as comps are built)
+        self._copying = set()     # LayerMask sources being emitted as a matte copy
+        self._hidden_done = set()  # LayerMask sources hidden by their own precomp (emit_node)
         self.all_animations = False
         self.loop_duration = 10.0 # seconds a looping main artboard is unrolled to (--duration)
         self.top_name = None      # name of the comp to render (wrapper "(looped)" / "(stepped)" when created)
@@ -1000,7 +1030,7 @@ class Converter:
     # Shape / Node a vector group with its own transform and keys), no null for a node that does nothing
     def _shape_groupable(self, el):
         """a Shape that can live as a vector group inside a shared shape layer"""
-        if not is_a(el.tag, "Shape") or el.ae or self.needs_replay(el) or RIG.has_skin(el):
+        if not is_a(el.tag, "Shape") or el.ae or self.needs_replay(el) or RIG.has_skin(el) or self._clip_or_mask(el):
             return False
         if (el.get("blendModeValue") or "srcOver") != "srcOver" or int(el.num("drawableFlags", 0)) & 1:
             return False
@@ -1011,6 +1041,84 @@ class Converter:
             elif not is_a(c.tag, "Path"):
                 return False              # clip, bind, nested node…
         return any(c.tag in ("Fill", "Stroke") for c in el.children)
+
+    # ---- LayerMask (Rive's raster mask: alpha / luminance of another subtree) -> a native track matte
+    AE_MATTES = {0: "ALPHA", 1: "ALPHA_INVERTED", 2: "LUMA", 3: "LUMA_INVERTED"}
+
+    @staticmethod
+    def _encloses(container, inner):
+        e = inner
+        while e is not None:
+            if e is container:
+                return True
+            e = e.parent
+        return False
+
+    def mask_sources(self):
+        """LayerMask source id -> True when Rive hides it (a visible mask with sourceDraws false uses it). A
+        self-referential mask (its source and the masked subtree overlap) does nothing: the runtime draws both inline"""
+        ms = self.__dict__.get("_mask_srcs")
+        if ms is None:
+            ms = self._mask_srcs = {}
+            for e in list(self.p.by_id.values()):
+                for lm in e.children:
+                    if lm.tag != "LayerMask":
+                        continue
+                    _mode, vis, draws = layer_mask_flags(lm)
+                    src = self.p.by_id.get(lm.get("sourceId"))
+                    if not vis or src is None or self._encloses(src, e) or self._encloses(e, src):
+                        continue
+                    ms[src.id] = ms.get(src.id, False) or not draws
+        return ms
+
+    def mask_hidden(self, el):
+        """el is a LayerMask source Rive does not draw (outside the matte copy being emitted)"""
+        return el.id is not None and el.id not in self._copying and self.mask_sources().get(el.id, False)
+
+    def layer_mask_of(self, el, ctx):
+        """el's LayerMask that does something (visible, a source outside el's subtree and not above it), else None"""
+        for lm in el.findall("LayerMask"):
+            _mode, vis, _draws = layer_mask_flags(lm)
+            src = self.p.by_id.get(lm.get("sourceId"))
+            if not vis:
+                self.rep.add(ctx.artboard.name, "converted", el, "LayerMask switched off (isVisible false): not matted")
+            elif src is None or not is_a(src.tag, "Node"):
+                self.rep.add(ctx.artboard.name, "unsupported", el, "LayerMask source not found / not a node")
+            elif self._encloses(src, el) or self._encloses(el, src):
+                self.rep.add(ctx.artboard.name, "converted", el, f"LayerMask source '{src.name}' overlaps the masked "
+                                                                 "subtree: the runtime ignores it, not matted")
+            else:
+                return lm
+        return None
+
+    def apply_layer_mask(self, el, lv, parent, ctx, mask):
+        """LayerMask -> AE track matte: a copy of the source (its own precomp, painted as it is: alpha and luminance
+        are the source's pixels) in the source's space, set as the track matte of el's precomp layer"""
+        J = self.W
+        ab = ctx.artboard
+        mode, _vis, _draws = layer_mask_flags(mask)
+        src = self.p.by_id.get(mask.get("sourceId"))
+        if src.id in self._copying:
+            self.rep.add(ab.name, "approx", el, f"LayerMask source '{src.name}' is masked by its own user: left out")
+            return
+        host = self.matte_space(src, el.parent, parent, ctx, ab)
+        saved = (dict(self.layer_of), dict(self.group_map))
+        self._copying.add(src.id)
+        try:
+            mv = self.emit_clipped(src, None, host, ctx, None, matte_for=el)
+        finally:
+            self._copying.discard(src.id)
+            self.layer_of.clear(); self.layer_of.update(saved[0])          # the copy must not stand for the source
+            self.group_map.clear(); self.group_map.update(saved[1])
+        J(f'{mv}.comment = {js("rive:" + (el.id or "") + "+matte")};')      # belongs to this element, not to the source
+        J(f"{lv}.setTrackMatte({mv}, TrackMatteType.{self.AE_MATTES[mode]});")
+        self.rep.add(ab.name, "converted", el, f"LayerMask ({MASK_WORDS[mode]}) of '{src.name}' → precomp + "
+                                               f"{MASK_WORDS[mode]} track matte (a copy of the source)")
+
+    def _clip_or_mask(self, el):
+        """a clip, a mask or a mask source: the element needs its own layer (never merged into a shared shape layer)"""
+        return (el.find("ClippingShape") is not None or el.find("LayerMask") is not None
+                or (el.id is not None and el.id in self.mask_sources()))
 
     def _matte_groupable(self, el):
         """a clip source Node: only nodes and shapes made of paths (paints do not matter, Rive clips by geometry)"""
@@ -1027,7 +1135,7 @@ class Converter:
 
     def _node_groupable(self, el, root=False):
         """a plain Node whose whole subtree can be one shape layer (the root may carry bindings: they go on the layer)"""
-        if el.tag != "Node" or el.ae or self.needs_replay(el) or el.find("ClippingShape") is not None:
+        if el.tag != "Node" or el.ae or self.needs_replay(el) or self._clip_or_mask(el):
             return False
         if (el.get("blendModeValue") or "srcOver") != "srcOver" or int(el.num("drawableFlags", 0)) & 1:
             return False
@@ -1050,7 +1158,7 @@ class Converter:
 
     def _identity_node(self, el):
         """a Node that changes nothing (no transform, no keys, no clip, no binding): no null for it in AE"""
-        if el.tag != "Node" or el.ae or el.find("ClippingShape") is not None:
+        if el.tag != "Node" or el.ae or self._clip_or_mask(el):
             return False
         if any(c.tag == "DataBindContext" for c in el.children) or int(el.num("drawableFlags", 0)) & 1:
             return False
@@ -1069,7 +1177,7 @@ class Converter:
         """a Node holding ONE static leaf (shape / text / image, no rotation or scale of its own): the leaf's layer takes
         the node's transform and keys, its offset going into the anchor point — no null (T(p)R S T(c) = a layer at p
         with anchor −c, exact)"""
-        if el.tag != "Node" or el.ae or el.find("ClippingShape") is not None or int(el.num("drawableFlags", 0)) & 1:
+        if el.tag != "Node" or el.ae or self._clip_or_mask(el) or int(el.num("drawableFlags", 0)) & 1:
             return None
         if (el.get("blendModeValue") or "srcOver") != "srcOver":
             return None
@@ -1082,7 +1190,7 @@ class Converter:
             return None
         if is_a(c.tag, "Shape") and (RIG.has_skin(c) or any(self.gradient_of(x) is not None for x in c.children if x.tag in ("Fill", "Stroke"))):
             return None
-        if any(x.tag == "DataBindContext" for x in c.children) or c.find("ClippingShape") is not None:
+        if any(x.tag == "DataBindContext" for x in c.children) or self._clip_or_mask(c):
             return None
         if abs(c.num("rotation")) > 1e-9 or abs(c.num("scaleX", 1) - 1) > 1e-9 or abs(c.num("scaleY", 1) - 1) > 1e-9:
             return None
@@ -1096,7 +1204,7 @@ class Converter:
         """a Node that only groups ONE child, with a static translation and/or opacity bindings (film-test's 'Set',
         'photo pass', 'text pass'): no null — the child's layer takes the translation in its position (values, keys
         and bindings) and the node's opacity bindings chained on its own opacity (exact: no rotation / scale above)."""
-        if el.tag != "Node" or el.ae or el.find("ClippingShape") is not None or int(el.num("drawableFlags", 0)) & 1:
+        if el.tag != "Node" or el.ae or self._clip_or_mask(el) or int(el.num("drawableFlags", 0)) & 1:
             return None
         if (el.get("blendModeValue") or "srcOver") != "srcOver":
             return None
@@ -1117,7 +1225,7 @@ class Converter:
         c = kids[0]
         if c.tag not in ("Node",) and not (is_a(c.tag, "Shape") or is_a(c.tag, "Text") or is_a(c.tag, "Image")):
             return None
-        if c.ae or self.needs_replay(c) or c.find("ClippingShape") is not None or (is_a(c.tag, "Shape") and RIG.has_skin(c)):
+        if c.ae or self.needs_replay(c) or self._clip_or_mask(c) or (is_a(c.tag, "Shape") and RIG.has_skin(c)):
             return None
         if is_a(c.tag, "Image") and c.find("Mesh") is not None:
             return None                           # emit_mesh places corner-pinned rows itself (no base_transform)
@@ -1329,17 +1437,13 @@ class Converter:
             self._group_transform(gv, c, ctx)
             if is_a(c.tag, "Shape"):
                 J(f'var gc = {gv}.property("ADBE Vectors Group");')
-                for p in c.children:
-                    if is_a(p.tag, "Path"):
-                        self.emit_path(p, ctx, c)
                 if matte:           # a clip: the geometry, filled opaque
+                    for p in c.children:
+                        if is_a(p.tag, "Path"):
+                            self.emit_path(p, ctx, c)
                     J('var fl = gc.addProperty("ADBE Vector Graphic - Fill"); fl.property("ADBE Vector Fill Color").setValue([1,1,1]); fl.property("ADBE Vector Fill Opacity").setValue(100);')
                 else:
-                    for p in reversed(c.children):
-                        if p.tag == "Fill":
-                            self.emit_fill(p, ctx, c, False)
-                        elif p.tag == "Stroke":
-                            self.emit_stroke(p, ctx, c)
+                    self.emit_contents(c, ctx)
                 n += 1
             else:
                 n += self._emit_groups([x for x in c.children if self.is_element(x)], f'{gv}.property("ADBE Vectors Group")', ctx,
@@ -1426,7 +1530,8 @@ class Converter:
     @staticmethod
     def is_element(c):
         return is_a(c.tag, "Component") and not is_a(c.tag, "Animation") and not c.tag.startswith("ScriptInput") and c.tag not in (
-            "StateMachine", "LayoutComponentStyle", "Fill", "Stroke", "ClippingShape", "DataBindContext", "Constraint") \
+            "StateMachine", "LayoutComponentStyle", "Fill", "Stroke", "ClippingShape", "LayerMask", "DataBindContext",
+            "Constraint") \
             and not is_a(c.tag, "Constraint") and c.tag not in ("Skin", "Tendon", "Weight", "CubicWeight")
 
     def replay_subtree(self, el, parent, ctx, why):
@@ -1455,6 +1560,14 @@ class Converter:
         return None
 
     def emit_element(self, el, parent, ctx):
+        v = self._emit_element(el, parent, ctx)
+        if isinstance(v, str) and el.id not in self._hidden_done and self.mask_hidden(el):
+            self.W(f"{v}.enabled = false;")
+            self.rep.add(ctx.artboard.name, "converted", el, "LayerMask source (not drawn by Rive): layer switched off, "
+                                                             "its copy is the track matte")
+        return v
+
+    def _emit_element(self, el, parent, ctx):
         tag = el.tag
         ab = ctx.artboard.name
         why = self.needs_replay(el)
@@ -1660,7 +1773,8 @@ class Converter:
         return out
 
     def emit_binds(self, el, targets, ctx, extra=None):
-        """targets = {rive property name: (js property accessor, template with %s = the control expression)};
+        """targets = {rive property name: (js property accessor, template with %s = the control expression), or a list
+        of them};
         extra = [(element, targets)] whose bindings chain after el's on the same AE properties"""
         ab = ctx.artboard.name
         by_acc = {}
@@ -1669,14 +1783,15 @@ class Converter:
             if prop not in targets:
                 self.rep.add(ab, "unsupported", el, f"binding of '{prop}' ({d['kind']}): no AE target")
                 continue
-            acc, tpl = targets[prop]
-            if "%s" not in tpl:
-                tpl = "%s"
-            expr = tpl % d["expr"]
-            if d["kind"] == "boolean" and prop in ("opacity", "isVisible"):
-                # a Property object is always truthy in an expression: compare its value; the element's own opacity stays
-                expr = f'value * (({d["expr"]}) == 1 ? 1 : 0)'
-            by_acc.setdefault(acc, []).append(expr)
+            tgs = targets[prop]
+            for acc, tpl in (tgs if isinstance(tgs, list) else [tgs]):
+                if "%s" not in tpl:
+                    tpl = "%s"
+                expr = tpl % d["expr"]
+                if d["kind"] == "boolean" and prop in ("opacity", "isVisible"):
+                    # a Property object is always truthy in an expression: compare its value; the element's own opacity stays
+                    expr = f'value * (({d["expr"]}) == 1 ? 1 : 0)'
+                by_acc.setdefault(acc, []).append(expr)
             self.rep.add(ab, "converted", el, f"'{prop}' bound to ViewModel '{d['name']}' → expression")
         for acc, exprs in by_acc.items():
             if len(exprs) == 1:
@@ -1939,18 +2054,25 @@ class Converter:
     def emit_node(self, el, parent, ctx, placeholder=False):
         J = self.W
         clip = el.find("ClippingShape") if not placeholder else None
+        kw = {"mask": self.layer_mask_of(el, ctx) if not placeholder else None,
+              "hidden": not placeholder and self.mask_hidden(el)}
+        if kw["hidden"]:
+            self._hidden_done.add(el.id)
+        if clip is None and (kw["mask"] is not None or kw["hidden"]):
+            # a masked node / a hidden mask source: one precomp layer (the track matte's user, or switched off)
+            return self.emit_clipped(el, None, parent, ctx, None, **kw)
         if clip is not None:
             src = self.p.by_id.get(clip.get("sourceId"))
             if src is not None and is_a(src.tag, "Shape") and src.parent is el and not RIG.has_skin(src):
                 # the clip source is one of the node's own children: the precomp carries a Stencil Alpha copy of it,
                 # and the parent comp sees one precomp layer (no outer null nor matte; audit F6)
-                return self.emit_clipped(el, None, parent, ctx, clip, stencil=True)
+                return self.emit_clipped(el, None, parent, ctx, clip, stencil=True, **kw)
         if clip is not None and self.layout == "industry" and el.id not in self._rig_targets(ctx.artboard):
             src = self.p.by_id.get(clip.get("sourceId"))
             if src is not None and not any(e is src for e in el.iter()):
                 # the clip source lives elsewhere: the null would only hold the node's transform, which the precomp's
                 # root null already carries — no outer null (it was left with no child)
-                return self.emit_clipped(el, None, parent, ctx, clip)
+                return self.emit_clipped(el, None, parent, ctx, clip, **kw)
         var = J.var("nul")
         label = ("[script] " if placeholder else "") + el.name
         J(f'var {var} = {ctx.comp}.layers.addNull(); {var}.name = {js(label)}; {var}.label = {4 if placeholder else 3};')
@@ -1960,7 +2082,7 @@ class Converter:
         self.base_transform(var, el, ctx)
         clip = el.find("ClippingShape")
         if clip is not None:
-            return self.emit_clipped(el, var, parent, ctx, clip)
+            return self.emit_clipped(el, var, parent, ctx, clip, **kw)
         # Rive: a group's opacity is multiplied into every descendant (rive docs transforms) = AE per-layer opacity
         # with the propagateOpacity expression; no group compositing.
         if el.tag == "Solo":
@@ -1978,11 +2100,14 @@ class Converter:
         J(f"{var}.moveToBeginning();")
         return var
 
-    def emit_clipped(self, el, nul, parent, ctx, clip, stencil=False):
+    def emit_clipped(self, el, nul, parent, ctx, clip, stencil=False, mask=None, hidden=False, matte_for=None):
         """Node with a ClippingShape: its subtree goes into a precomp built in the PARENT's space (a root null inside
         carries the node's transform + keys), matted by a copy of the clip source. A collapsed precomp with a track
         matte is rasterised at its comp size (measured), so the precomp is not collapsed: its canvas is the artboard
-        for a top-level node, 3x the artboard (centred) for a deeper one."""
+        for a top-level node, 3x the artboard (centred) for a deeper one.
+        Also: a node with a LayerMask (`mask`: its precomp gets the source's copy as track matte), a LayerMask source
+        Rive does not draw (`hidden`: its precomp is switched off) and that copy itself (`matte_for`: the masked
+        element; a source that is not a Node — a shape, a text… — is emitted whole inside the precomp)."""
         J = self.W
         ab = ctx.artboard
         src = self.p.by_id.get(clip.get("sourceId")) if clip is not None else None
@@ -1992,8 +2117,11 @@ class Converter:
         cw, ch = (3 * w, 3 * h) if big else (w, h)
         offx, offy = (w, h) if big else (0.0, 0.0)
         dur = self.duration_of(ab, ctx.anim)
-        sname = el.name + (" (clipped)" if clip is not None else " (group)")
-        stag = "rive:" + (el.id or sub) + "|" + (ctx.anim.id if ctx.anim else "") + "|clip"
+        sname = el.name + (" (clipped)" if clip is not None else " (matte)" if matte_for is not None else
+                           " (masked)" if mask is not None else " (group)")
+        stag = ("rive:" + (matte_for.id + "+matte" if matte_for is not None else el.id or sub) + "|"
+                + (ctx.anim.id if ctx.anim else "") + "|clip")
+        inline = matte_for is not None and el.tag != "Node"
         self.mark(stag, sub, sname)
         J(f"//<head {sub}>")
         J("try {")
@@ -2002,12 +2130,21 @@ class Converter:
         root = J.var("root")
         J(f'var {root} = {sub}.layers.addNull(); {root}.name = {js(el.name)}; {root}.label = 3;')
         J(f'tr({root}, "ADBE Anchor Point").setValue([{js(-offx)}, {js(-offy)}]); tr({root}, "ADBE Opacity").setValue(100);')
-        self.base_transform(root, el, subctx)
+        if inline:                                # identity: the element carries its own transform (a new null sits at
+            J(f'tr({root}, "ADBE Position").setValue([0, 0]);')   # the comp centre, which offset the copy)
+        else:
+            self.base_transform(root, el, subctx)
         J(f'resetProp(tr({root}, "ADBE Opacity"), 100); {root}.blendingMode = BlendingMode.NORMAL;')
         J(f'tagNew({sub}, 0, "head", null);')
         J(f'}} catch (eC) {{ log({js("comp FAILED: " + sname)} + ": " + eC.toString() + " line " + eC.line); }}')
         J("//</head>")
-        self.emit_children(el, root, subctx)
+        if inline:
+            etag = self.tag_of(el)
+            J(f"//<el {etag} {sub} {root}>")
+            v = self.emit_element(el, root, subctx)
+            J(f"//</el {etag} {v if isinstance(v, str) else '__none'}>")
+        else:
+            self.emit_children(el, root, subctx)
         if stencil:
             stag = "rive:" + (el.id or "") + "+clip"
             J(f"//<el {stag} {sub} ->")
@@ -2020,16 +2157,27 @@ class Converter:
         if parent:
             J(f"{lv}.parent = {parent};")
         J(f'resetTf({lv}, {js(offx)}, {js(offy)}, 0, 0);')
-        op = el.num("opacity", 1)
-        if op != 1:
-            J(f'tr({lv}, "ADBE Opacity").setValue({js(op * 100)});')
-        ko = ctx.keys(el.id, "opacity")
-        if ko:
-            J(f'keys(tr({lv}, "ADBE Opacity"), {ctx.rows(ko, lambda v: v * 100)});')
-        self.emit_binds(el, {"opacity": (f'tr({lv}, "ADBE Opacity")', "%s * 100")}, ctx)
-        bm = blend_name(el.get("blendModeValue"))
-        if bm and bm != "srcOver":
-            J(f'{lv}.blendingMode = BLEND[{js(bm)}];')
+        if not inline:                            # an inlined element carries its own opacity and blend mode
+            op = el.num("opacity", 1)
+            if op != 1:
+                J(f'tr({lv}, "ADBE Opacity").setValue({js(op * 100)});')
+            ko = ctx.keys(el.id, "opacity")
+            if ko:
+                J(f'keys(tr({lv}, "ADBE Opacity"), {ctx.rows(ko, lambda v: v * 100)});')
+            self.emit_binds(el, {"opacity": (f'tr({lv}, "ADBE Opacity")', "%s * 100")}, ctx)
+            bm = blend_name(el.get("blendModeValue"))
+            if bm and bm != "srcOver":
+                J(f'{lv}.blendingMode = BLEND[{js(bm)}];')
+        if hidden:
+            J(f"{lv}.enabled = false;")
+            self.rep.add(ab.name, "converted", el, "LayerMask source (not drawn by Rive): its precomp switched off, "
+                                                   "a copy is the track matte")
+        if mask is not None:
+            if clip is not None and not stencil:
+                self.rep.add(ab.name, "approx", el, "ClippingShape and LayerMask on one node: AE gives a layer one track "
+                                                    "matte, the LayerMask is left out")
+            else:
+                self.apply_layer_mask(el, lv, parent, ctx, mask)
         if clip is None:
             if nul:
                 J(f"{nul}.moveToBeginning();")
@@ -2580,13 +2728,7 @@ fn fs_main(in: VSOut) -> @location(0) vec4<f32> {{
         else:
             # the group carries the element's name (AE's default "Groupe 1" told nothing; audit F35) — pull maps groups by rank
             J(f'var g = gr.addProperty("ADBE Vector Group"); g.name = {js(el.name or "Shape")}; var gc = g.property("ADBE Vectors Group");')
-            self.emit_paths(el, ctx, skinned)
-            # paints: Rive draws the LATER paint on top, AE the item HIGHER in the group (added earlier) -> reversed order
-            for c in reversed(paints):
-                if c.tag == "Fill":
-                    self.emit_fill(c, ctx, el, as_matte)
-                else:
-                    self.emit_stroke(c, ctx, el)
+            self.emit_contents(el, ctx, as_matte, skip=feathered, skinned=skinned)
         fst = [c for c in el.children if c.tag == "Stroke" and c.find("Feather") is not None]
         if fst and not as_matte and not any(c.tag == "Fill" for c in el.children):
             # a feathered stroke alone on its shape (a glowing outline): the layer is blurred instead
@@ -2596,7 +2738,7 @@ fn fs_main(in: VSOut) -> @location(0) vec4<f32> {{
         if as_matte and not any(c.tag in ("Fill", "Stroke") for c in el.children):
             # a paint-less clip source (Rive clips by geometry, draws nothing): the matte needs an opaque fill
             J('var fl = gc.addProperty("ADBE Vector Graphic - Fill"); fl.property("ADBE Vector Fill Color").setValue([1,1,1]); fl.property("ADBE Vector Fill Opacity").setValue(100);')
-        grads = [] if native or as_matte else [c for c in paints if self.gradient_of(c) is not None]
+        grads = [] if native or as_matte else grad_paints
         if grads:
             # no gradient presets (rml2ae/presets) or a skinned shape: a layer-level gradient, exact only when it is
             # the shape's one paint (a Ramp / matted PNG colours every pixel of the layer)
@@ -2632,49 +2774,29 @@ fn fs_main(in: VSOut) -> @location(0) vec4<f32> {{
                 self.layer_of[el.id] = var
         return var
 
-    def emit_paths(self, el, ctx, skinned=False):
-        """the shape's paths into the current group contents (gc)"""
-        for c in el.children:
-            if is_a(c.tag, "Path"):
-                if skinned:
-                    self.emit_baked_path(c, ctx, el)
-                else:
-                    self.emit_path(c, ctx, el)
-
     def emit_native_paints(self, var, el, ctx, paints):
-        """Paints with gradients as native Gradient Fill / Stroke. A group holds one gradient paint (it comes from a
-        preset, rml2ae/ffx.py) and the solid paints between gradients share a group; every group carries the shape's
-        paths. Rive draws the later paint on top, AE the higher group: runs in reverse order."""
+        """Paints with gradients as native Gradient Fill / Stroke: one vector group per paint, each holding a copy of
+        the shape's paths (a gradient group comes from a preset, rml2ae/ffx.py). Rive draws the later paint on top, AE
+        the higher group: groups in reverse paint order."""
         J = self.W
-        runs = []
-        for c in paints:
-            if self.gradient_of(c) is not None or not runs or self.gradient_of(runs[-1][0]) is not None:
-                runs.append([c])
-            else:
-                runs[-1].append(c)
         base = el.name or "Shape"
-        for k, run in enumerate(reversed(runs)):
+        for k, c in enumerate(reversed(paints)):
             name = base if k == 0 else f"{base} {k + 1}"
-            gd = self.gradient_of(run[0])
+            shift = stroke_shift(c, el) if c.tag == "Stroke" else 0.0
+            gd = self.gradient_of(c)
             if gd is None:
                 J(f'var g = gr.addProperty("ADBE Vector Group"); g.name = {js(name)}; var gc = g.property("ADBE Vectors Group");')
-                self.emit_paths(el, ctx)
-                for c in reversed(run):
-                    if c.tag == "Fill":
-                        self.emit_fill(c, ctx, el, False)
-                    else:
-                        self.emit_stroke(c, ctx, el)
-                continue
-            kind = "fill" if run[0].tag == "Fill" else "stroke"
-            path = self.gradient_preset(gd, kind, ctx, el)
-            J(f'var gc = gradGroup({var}, {js(path)}, {js(FFX.TEMPLATE_GROUP[kind])}, {js(name)});')
-            self.emit_paths(el, ctx)
-            J(f'var {"fl" if kind == "fill" else "st"} = gradPaint(gc);')
-            self.emit_grad_props(gd, kind, ctx, el)
-            if kind == "fill":
-                self.emit_fill(run[0], ctx, el, False, grad=True)
             else:
-                self.emit_stroke(run[0], ctx, el, grad=True)
+                kind = "fill" if c.tag == "Fill" else "stroke"
+                path = self.gradient_preset(gd, kind, ctx, el)
+                J(f'var gc = gradGroup({var}, {js(path)}, {js(FFX.TEMPLATE_GROUP[kind])}, {js(name)});')
+            for p in el.children:
+                if is_a(p.tag, "Path"):
+                    self.emit_path(p, ctx, el)
+            if c.tag == "Fill":
+                self.emit_fill(c, ctx, el, False, grad=gd)
+            else:
+                self.emit_stroke(c, ctx, el, shift, grad=gd)
 
     def gradient_preset(self, gd, kind, ctx, el):
         """the .ffx preset carrying gd's colours (static: AE cannot key them from a script)"""
@@ -2689,12 +2811,10 @@ fn fs_main(in: VSOut) -> @location(0) vec4<f32> {{
         self.rep.add(ab, "converted", el, f"{gd.tag} ({len(stops)} stops) → native Gradient {kind.capitalize()} (points keyable)")
         return path
 
-    def emit_grad_props(self, gd, kind, ctx, el):
-        """type, start/end points (shape content coordinates, as Rive's) and opacity of the gradient paint in fl/st"""
+    def emit_grad_props(self, gd, v, kind, ctx):
+        """type, start/end points (shape content coordinates, as Rive's) and opacity of the gradient paint v (fl / st)"""
         J = self.W
-        v = "fl" if kind == "fill" else "st"
-        radial = gd.tag == "RadialGradient"
-        J(f'{v}.property("ADBE Vector Grad Type").setValue({2 if radial else 1});')
+        J(f'{v}.property("ADBE Vector Grad Type").setValue({2 if gd.tag == "RadialGradient" else 1});')
         for pt, (px, py) in (("Start Pt", ("startX", "startY")), ("End Pt", ("endX", "endY"))):
             x, y = gd.num(px), gd.num(py)
             J(f'{v}.property("ADBE Vector Grad {pt}").setValue({js([x, y])});')
@@ -2710,6 +2830,43 @@ fn fs_main(in: VSOut) -> @location(0) vec4<f32> {{
         ko = ctx.keys(gd.id, "opacity")
         if ko:
             J(f'keys({v}.property("{op}"), {ctx.rows(ko, lambda x: x * 100)});')
+
+    def emit_contents(self, el, ctx, as_matte=False, skip=(), skinned=False):
+        """a Shape's paths and paints into the vector group `gc`. Rive draws the LATER paint on top, AE the item
+        HIGHER in the group (added earlier): paints in reversed order. A Stroke drawn inside / outside its paths needs
+        Offset Paths, which would move every path of the group for every paint: each paint then gets its own group
+        holding a copy of the paths (paint order kept, the other paints untouched)."""
+        J = self.W
+        paints = [c for c in reversed(el.children) if (c.tag == "Fill" and c not in skip) or c.tag == "Stroke"]
+        shifted = [p for p in paints if p.tag == "Stroke" and stroke_shift(p, el)]
+
+        def paths():
+            for c in el.children:
+                if is_a(c.tag, "Path"):
+                    if skinned:
+                        self.emit_baked_path(c, ctx, el)
+                    else:
+                        self.emit_path(c, ctx, el)
+
+        def paint(c, shift=0.0):
+            if c.tag == "Fill":
+                self.emit_fill(c, ctx, el, as_matte)
+            else:
+                self.emit_stroke(c, ctx, el, shift)
+        if not shifted or skinned or as_matte:
+            if shifted:
+                self.rep.add(ctx.artboard.name, "approx", el,
+                             f"stroke {shifted[0].get('position')} on a {'skinned' if skinned else 'matte'} shape: centred")
+            paths()
+            for c in paints:
+                paint(c)
+            return
+        J('var gcs = gc;')
+        for c in paints:
+            J(f'var pg = gcs.addProperty("ADBE Vector Group"); pg.name = {js(c.name or c.tag)}; gc = pg.property("ADBE Vectors Group");')
+            paths()
+            paint(c, stroke_shift(c, el) if c in shifted else 0.0)
+        J('gc = gcs;')
 
     def emit_baked_path(self, c, ctx, shape):
         """Path of a skinned shape: one path keyframe per frame, in artboard space (skin or plain world transform)."""
@@ -2940,16 +3097,17 @@ fn fs_main(in: VSOut) -> @location(0) vec4<f32> {{
             return ([1, 1, 1], 1.0, None, None)
         return ([0, 0, 0], 1.0, None, None)
 
-    def emit_fill(self, c, ctx, el, as_matte, grad=False):
-        """a Fill into gc; grad: fl is already the group's Gradient Fill (colours and opacity set from the gradient)"""
+    def emit_fill(self, c, ctx, el, as_matte, grad=None):
+        """a Fill into gc; grad: the gradient of the group's Gradient Fill (from a preset), moved below the paths"""
         J = self.W
         rgb, a, kc, ko = self.paint_color(c, ctx, el)
         if as_matte:
             a = 1.0
         rule = 2 if c.get("fillRule") == "evenOdd" else 1
-        if grad:
+        if grad is not None:
             kc = None
-            J(f'fl.property("ADBE Vector Fill Rule").setValue({rule});')
+            J(f'var fl = gradPaint(gc); fl.property("ADBE Vector Fill Rule").setValue({rule});')
+            self.emit_grad_props(grad, "fl", "fill", ctx)
         else:
             J('var fl = gc.addProperty("ADBE Vector Graphic - Fill");')
             J(f'fl.property("ADBE Vector Fill Color").setValue({js(rgb)}); fl.property("ADBE Vector Fill Opacity").setValue({js(a * 100)}); fl.property("ADBE Vector Fill Rule").setValue({rule});')
@@ -2962,13 +3120,28 @@ fn fs_main(in: VSOut) -> @location(0) vec4<f32> {{
         if sc is not None:
             self.emit_binds(sc, {"colorValue": ('fl.property("ADBE Vector Fill Color")', "%s")}, ctx)
 
-    def emit_stroke(self, c, ctx, el, grad=False):
-        """a Stroke into gc; grad: st is already the group's Gradient Stroke (colours and opacity from the gradient)"""
+    def emit_stroke(self, c, ctx, el, shift=0.0, grad=None):
+        """shift: Offset Paths amount per unit of width (Stroke.position inside / outside, see emit_contents); grad:
+        the gradient of the group's Gradient Stroke (from a preset), moved below the paths and the offset"""
         J = self.W
         ab = ctx.artboard.name
         rgb, a, kc, ko = self.paint_color(c, ctx, el)
-        if grad:
+        kt = ctx.keys(c.id, "thickness")
+        off_acc = 'off.property("ADBE Vector Offset Amount")'
+        if shift:
+            join = {"miter": 1, "round": 2, "bevel": 3}.get(c.get("join", "miter"), 1)
+            J('var off = gc.addProperty("ADBE Vector Filter - Offset"); off.name = "Stroke position";')
+            J(f'{off_acc}.setValue({js(round(c.num("thickness", 1) * shift, 6))}); off.property("ADBE Vector Offset Line Join").setValue({join});')
+            if kt:
+                J(f'keys({off_acc}, {ctx.rows(kt, lambda v: v * shift)});')
+            if any(is_a(p.tag, "Path") and p.get("isClosed", "true") == "false" for p in el.children):
+                self.rep.add(ab, "approx", el, f"stroke {c.get('position')} on an open path: the path is offset sideways")
+            self.rep.add(ab, "converted", el, f"stroke {c.get('position')} → centred stroke on the paths offset by "
+                                              f"{'-' if shift < 0 else '+'}width/2 (Offset Paths)")
+        if grad is not None:
             kc = None
+            J('var st = gradPaint(gc);')
+            self.emit_grad_props(grad, "st", "stroke", ctx)
         else:
             J('var st = gc.addProperty("ADBE Vector Graphic - Stroke");')
             J(f'st.property("ADBE Vector Stroke Color").setValue({js(rgb)}); st.property("ADBE Vector Stroke Opacity").setValue({js(a * 100)});')
@@ -2978,7 +3151,6 @@ fn fs_main(in: VSOut) -> @location(0) vec4<f32> {{
         J(f'st.property("ADBE Vector Stroke Line Cap").setValue({cap}); st.property("ADBE Vector Stroke Line Join").setValue({join});')
         if kc:
             J(f'keys(st.property("ADBE Vector Stroke Color"), {kc}); keys(st.property("ADBE Vector Stroke Opacity"), {ko});')
-        kt = ctx.keys(c.id, "thickness")
         if kt:
             J(f'keys(st.property("ADBE Vector Stroke Width"), {ctx.rows(kt)});')
         dp = c.find("DashPath")
@@ -3011,7 +3183,9 @@ fn fs_main(in: VSOut) -> @location(0) vec4<f32> {{
             self.warn(ab, "approx", el, "Feather on a stroke: not reproduced (add a Gaussian blur on the layer if wanted)")
         if c.get("isVisible") == "false":
             J('st.property("ADBE Vector Stroke Opacity").setValue(0);')
-        self.emit_binds(c, {"isVisible": ('st.property("ADBE Vector Stroke Opacity")', "%s"), "thickness": ('st.property("ADBE Vector Stroke Width")', "%s")}, ctx)
+        th = ('st.property("ADBE Vector Stroke Width")', "%s")
+        self.emit_binds(c, {"isVisible": ('st.property("ADBE Vector Stroke Opacity")', "%s"),
+                            "thickness": [th, (off_acc, f"(%s) * {shift!r}")] if shift else th}, ctx)
         sc = c.find("SolidColor")
         if sc is not None:
             self.emit_binds(sc, {"colorValue": ('st.property("ADBE Vector Stroke Color")', "%s")}, ctx)
