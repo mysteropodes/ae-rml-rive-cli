@@ -120,11 +120,10 @@ sub-groups through their (animated) transforms, and a path operation applies to 
 | Masks (add, subtract, intersect, lighten, darken, difference), keyed paths | `ClippingShape` (even-odd tricks for subtract/difference) | exact |
 | Keyed mask opacity | Path collapses to a point where opacity is under 50 % | approx |
 | Open masks | Ignored (After Effects only cuts with closed masks) | exact |
-| Track mattes (alpha, inverted, with visible matte layer, pre-comp as matte) | Clip by the matte's geometry; a matte stroke is converted to an outline path first | exact |
+| Track mattes (alpha, luma, inverted, text, image, gradient, pre-comp, with or without the matte's eye on) | `LayerMask` on the matted layer's node (`maskModeValue` 0-3 = alpha, inverted alpha, luma, inverted luma): the matte layer is drawn as it is (paints, opacity, in/out, effects) in a « · matte source » node that Rive hides (`sourceDraws` false) unless its eye is on | exact (unverified against AE) |
+| Track mattes with `--clip-mattes` (runtimes older than `LayerMask`) | Clip by the matte's geometry; a matte stroke is converted to an outline path first; luma treated as alpha; text or image mattes not converted | exact / approx |
 | Stencil / silhouette blend modes | The layer's geometry cuts every layer below, including below a collapsed pre-comp | exact |
 | Set Matte effect | Clip in composition space from the source layer | exact |
-| Luma mattes | Treated as alpha | approx |
-| Text or image used as a matte | Not converted | no |
 
 ### Footage, audio, 3D
 
@@ -206,7 +205,7 @@ comment is empty or already a tag. Afterwards:
 
 ## Known limits
 
-- **Layer styles, lights, text/image mattes, per-character 3D, depth of field**: not converted.
+- **Layer styles, lights, per-character 3D, depth of field**: not converted (text/image mattes: only with `--clip-mattes`).
 - **Effects without a library implementation**: kept as comments; see `effects_todo.json`.
 - **Random generators** (wiggle, noise, random order, Wiggly selector, Wiggle Paths): structure is reproduced, the
   random draws differ.

@@ -100,6 +100,7 @@ try {
     if (!(it instanceof CompItem) || !it.comment || it.comment.indexOf("rive:") != 0) continue;
     var parts = it.comment.split("|");
     if (parts.length < 2 || parts[1] == "seq" || parts[1] == "looped" || parts[1] == "stepped") continue;
+    if (parts[0].indexOf("+matte") > 0) continue;                    // a LayerMask's matte: a copy of its source
     var layers = [], LL = [];
     for (var j0 = 1; j0 <= it.numLayers; j0++) LL.push(it.layer(j0));   // tidyWrap adds layers: iterate a snapshot
     for (var j = 0; j < LL.length; j++) {

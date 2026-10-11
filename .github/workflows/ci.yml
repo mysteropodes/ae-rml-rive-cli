@@ -52,6 +52,8 @@ jobs:
         run: python -m rml2ae.tests.test_pull_contents
       - name: aeapp helpers (frame wait, app name, colour check, dialog watch)
         run: python -m rml2ae.tests.test_aeapp
+      - name: track mattes <-> Rive LayerMask, both ways
+        run: python -m rml2ae.tests.test_layer_mask
       - name: ae2rml binds the second layer of map effects (Displacement Map)
         run: |
           python -m rml2ae.tests.test_map_layer
@@ -114,6 +116,9 @@ jobs:
         run: |
           python -m rml2ae.ae2rml examples/demo.aep out/demo --verify | tee out-verify.txt
           grep -q "rive --verify: ok" out-verify.txt
+      # the LayerMask case rml2ae reads (maskFlags as ae2rml writes it) loads in the Rive CLI
+      - name: Verify the LayerMask case with the Rive CLI
+        run: rive rml2ae/tests/cases/layer_mask --verify
 
   fxlib:
     name: fxlib vs After Effects references
