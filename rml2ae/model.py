@@ -6,6 +6,7 @@ keeps every element (tag, attributes, children, id), and indexes: objects by id,
 (keys per (object id, property key)), state machines, view models.
 """
 import json
+import math
 import os
 import re
 import xml.etree.ElementTree as ET
@@ -126,8 +127,114 @@ def interp_of(kf):
     return NUMERIC_INTERP.get(raw, raw)
 
 
+EASINGS = {"easein": 0, "easeout": 1, "easeinout": 2}
+
+
+def _solve_x(x, x1, x2):
+    """parameter t of a cubic bezier (0, x1, x2, 1) whose x is `x` (monotonic for x1, x2 in [0, 1])"""
+    lo, hi = 0.0, 1.0
+    for _ in range(40):
+        t = (lo + hi) / 2
+        if 3 * (1 - t) ** 2 * t * x1 + 3 * (1 - t) * t * t * x2 + t ** 3 < x:
+            lo = t
+        else:
+            hi = t
+    return (lo + hi) / 2
+
+
+def elastic_progress(f, easing, amplitude, period):
+    """ElasticInterpolator.transform (rive-runtime elastic_ease.cpp): progress of an elastic segment at f in [0, 1];
+    easing 0 = in, 1 = out, 2 = in-out; a period of 0 is read as 0.5"""
+    period = period or 0.5
+    s = period / 4 if amplitude < 1 else period / (2 * math.pi) * math.asin(1 / amplitude)
+
+    def amp(time):
+        if amplitude < 1 and abs(time) < abs(s):
+            lt = abs(time) / abs(s)
+            return amplitude * lt + (1 - lt)
+        return amplitude
+
+    w = 2 * math.pi / period
+    if easing == 0:
+        t = f - 1
+        return -(amp(t) * 2 ** (10 * t) * math.sin((-t - s) * w))
+    if easing == 2:
+        t = f * 2 - 1
+        if t < 0:
+            return -0.5 * amp(t) * 2 ** (10 * t) * math.sin((-t - s) * w)
+        return 0.5 * (amp(t) * 2 ** (-10 * t) * math.sin((t - s) * w)) + 1
+    if easing == 1:
+        return amp(f) * 2 ** (-10 * f) * math.sin((f - s) * w) + 1
+    return f
+
+
+def segment_value(v0, v1, f, interp, ease):
+    """value of a Rive key segment v0 -> v1 at progress f in [0, 1] (the interpolator of its FIRST key, as the runtime
+    reads it): hold, linear, cubic (CubicEaseInterpolator), cubicValue (CubicValueInterpolator: y1 / y2 are values,
+    not progress), elastic (ease = (easing, amplitude, period))"""
+    if interp == "hold":
+        return v0
+    if interp == "cubic" and ease:
+        t = _solve_x(f, ease[0], ease[2])
+        p = 3 * (1 - t) ** 2 * t * ease[1] + 3 * (1 - t) * t * t * ease[3] + t ** 3
+        return v0 + (v1 - v0) * p
+    if interp == "cubicValue" and ease:
+        t = _solve_x(f, ease[0], ease[2])
+        return (1 - t) ** 3 * v0 + 3 * (1 - t) ** 2 * t * ease[1] + 3 * (1 - t) * t * t * ease[3] + t ** 3 * v1
+    if interp == "elastic" and ease:
+        return v0 + (v1 - v0) * elastic_progress(f, *ease)
+    return v0 + (v1 - v0) * f
+
+
+def bake_keys(lst):
+    """Rive keys -> keys After Effects can carry: hold, linear and cubic kept; a CubicValueInterpolator between two
+    different values is the AE bezier of the same handles (exact: its y1 / y2 normalised to the segment); an elastic
+    segment, or a CubicValueInterpolator bump between equal values (no AE ease reaches a value outside its keys),
+    becomes one linear key per frame on the runtime's curve (exact at every frame). `ae pull` folds them back."""
+    out = []
+    for i, (f, v, interp, ease) in enumerate(lst):
+        if interp not in ("cubicValue", "elastic"):
+            out.append((f, v, interp, ease))
+            continue
+        nxt = lst[i + 1] if i + 1 < len(lst) else None
+        if nxt is None or not isinstance(v, (int, float)) or not isinstance(nxt[1], (int, float)):
+            out.append((f, v, "linear", None))
+            continue
+        f1, v1 = nxt[0], nxt[1]
+        if interp == "cubicValue" and abs(v1 - v) > 1e-9:
+            dv = v1 - v
+            out.append((f, v, "cubic", (ease[0], (ease[1] - v) / dv, ease[2], (ease[3] - v) / dv)))
+            continue
+        out.append((f, v, "linear", None))
+        for g in range(int(f) + 1, int(math.ceil(f1))):
+            if g > f:
+                out.append((g, segment_value(v, v1, (g - f) / (f1 - f), interp, ease), "linear", None))
+    return out
+
+
+def interpolator_of(kf):
+    """(interp, ease) from a non-hold key's interpolator child: None when it has none (linear), ("?", tag) when the
+    interpolator is not one rml2ae reproduces. Omitted attributes are the runtime defaults (measured: an empty
+    <CubicEaseInterpolator/> eases like 0.42, 0, 0.58, 1; ElasticInterpolator: out, amplitude 1, period 1)."""
+    ci = kf.find("CubicEaseInterpolator")
+    if ci is not None:
+        return "cubic", (ci.num("x1", 0.42), ci.num("y1", 0.0), ci.num("x2", 0.58), ci.num("y2", 1.0))
+    cv = kf.find("CubicValueInterpolator")
+    if cv is not None:
+        return "cubicValue", (cv.num("x1", 0.42), cv.num("y1", 0.0), cv.num("x2", 0.58), cv.num("y2", 1.0))
+    el = kf.find("ElasticInterpolator")
+    if el is not None:
+        raw = (el.get("easingValue") or "1").strip()
+        easing = EASINGS.get(raw.lower(), None) if not raw.isdigit() else int(raw)
+        return "elastic", (1 if easing not in (0, 1, 2) else easing, el.num("amplitude", 1.0), el.num("period", 1.0))
+    if kf.children:
+        return "?", kf.children[0].tag
+    return None
+
+
 class Animation:
-    """A LinearAnimation: keys[(object id, property key)] = [(frame, value, interp, ease)]."""
+    """A LinearAnimation: keys[(object id, property key)] = [(frame, value, interp, ease)], After Effects-ready
+    (bake_keys); raw_keys the same with the Rive interpolators as written (cubicValue, elastic)."""
 
     def __init__(self, el):
         self.el = el
@@ -149,19 +256,16 @@ class Animation:
                     frame = int(kf.num("frame", 0))
                     interp = interp_of(kf)
                     ease = None
-                    ci = kf.find("CubicEaseInterpolator")
                     if interp != "hold":
                         # the runtime: a non-hold key eases through its interpolator child, else it is linear
-                        if ci is not None:
-                            interp = "cubic"
-                            # omitted attributes are the runtime defaults (measured: an empty <CubicEaseInterpolator/>
-                            # eases like 0.42, 0, 0.58, 1)
-                            ease = (ci.num("x1", 0.42), ci.num("y1", 0.0), ci.num("x2", 0.58), ci.num("y2", 1.0))
-                        elif kf.children:
+                        got = interpolator_of(kf)
+                        if got is None:
+                            interp = "linear"
+                        elif got[0] == "?" or (got[0] != "cubic" and kf.tag != "KeyFrameDouble"):
                             self.unsupported.append((oid, pk, kf.children[0].tag))
                             interp = "linear"
                         else:
-                            interp = "linear"
+                            interp, ease = got
                     if kf.tag == "KeyFrameDouble":
                         value = kf.num("value")
                     elif kf.tag == "KeyFrameColor":
@@ -182,6 +286,11 @@ class Animation:
             for f, v, i, e in lst:
                 last[f] = (v, i, e)
             self.keys[k] = [(f,) + last[f] for f in sorted(last)]
+        self.raw_keys = self.keys
+        self.keys = {k: bake_keys(lst) for k, lst in self.raw_keys.items()}
+        # (object id, property key, interpolator) of the segments bake_keys rewrote, for the report
+        self.baked = [(o, pk, i) for (o, pk), lst in self.raw_keys.items() for i in sorted({k[2] for k in lst[:-1]})
+                      if i in ("cubicValue", "elastic")]
 
     def keys_of(self, oid):
         """{property name: key list} for one object."""

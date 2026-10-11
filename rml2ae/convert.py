@@ -197,6 +197,7 @@ class ChainAnimation:
         self.speed = 1.0
         self.quantize = False
         self.unsupported = [u for a in states for u in a.unsupported]
+        self.baked = [b for a in states for b in a.baked]
         self.windows = []                       # (animation id, start frame, end frame)
         o = 0
         for a in states:
@@ -851,6 +852,11 @@ class Converter:
         if anim and anim.unsupported:
             for oid, pk, other in anim.unsupported[:20]:
                 self.rep.add(ab.name, "approx", self.p.by_id.get(oid), f"{other} on {prop_name(pk)}: interpolated linearly")
+        for oid, pk, interp in (getattr(anim, "baked", None) or [])[:20]:
+            how = ("bezier keys (exact); a bump between equal values one key per frame (ae pull folds them back)"
+                   if interp == "cubicValue"
+                   else "one key per frame on the Rive curve (exact at every frame; ae pull folds them back)")
+            self.rep.add(ab.name, "converted", self.p.by_id.get(oid), f"{interp} ease on {prop_name(pk)}: {how}")
         J(f'tagNew({var}, 0, "head", null);')
         J(f'}} catch (eC) {{ log({js("comp FAILED: " + name)} + ": " + eC.toString() + " line " + eC.line); }}')
         J("//</head>")

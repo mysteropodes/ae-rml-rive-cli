@@ -3,7 +3,8 @@
 Scope (v1): the transform of every layer that rml2ae tagged with a Rive id (`comment` = "rive:<id>", inside a comp
 tagged "rive:<artboard>|<animation>" or "…|clip") — x, y, rotation, scaleX, scaleY, opacity, hidden flag —
 as static attributes when the property has no animation in AE, as keyframes of that animation otherwise
-(AE bezier eases are turned back into Rive CubicEaseInterpolator; linear and hold are kept as such).
+(AE bezier eases are turned back into Rive CubicEaseInterpolator; linear and hold are kept as such; the keys rml2ae
+baked one per frame for an elastic or CubicValueInterpolator segment fold back into it while AE still holds them).
 Static values are read from the artboard's first animation comp only (the element exists once, it is drawn in every
 animation comp); keyframes from each animation comp. A single AE key on a property the RML animation does not key
 is a value carried from a previous state, not an edit: ignored.
@@ -20,7 +21,7 @@ import re
 import subprocess
 
 from .jsx import js, TIDY_JSX, TIDY_PULL_JSX
-from .model import Project
+from .model import Project, segment_value
 
 PROPS = {"x": 13, "y": 14, "rotation": 15, "scaleX": 16, "scaleY": 17, "opacity": 18}
 EPS = {"x": 0.01, "y": 0.01, "rotation": 0.0005, "scaleX": 0.0005, "scaleY": 0.0005, "opacity": 0.002}
@@ -209,16 +210,55 @@ def same_keys(a, b, eps):
             ia = ib                    # the last key's interpolation leads nowhere
         if abs(fa - fb) > 0.01 or abs(va - vb) > eps or ia != ib:
             return False
-        if ia == "cubic" and any(abs(x - y) > 0.01 for x, y in zip(ea or (0, 0, 0, 0), eb or (0, 0, 0, 0))):
+        if ia in ("cubic", "cubicValue", "elastic") and any(abs(x - y) > 0.01 for x, y in zip(ea or (0, 0, 0, 0), eb or (0, 0, 0, 0))):
             return False
     return True
 
 
+def fold_baked(new, raw, eps):
+    """Keys read back from AE -> the Rive interpolators rml2ae baked into one linear key per frame (model.bake_keys:
+    elastic, a CubicValueInterpolator bump): a segment f0 -> f1 of the RML whose two keys are still in AE with one
+    linear key per frame between them, all on that interpolator's curve through the keys' current values, is one key
+    again, with its interpolator. A segment edited in AE (a key moved, a value changed) stays as the AE keys."""
+    out = list(new)
+    tol = eps * 5
+
+    def at(frame):
+        return next((i for i, k in enumerate(out) if abs(k[0] - frame) < 0.01), None)
+
+    for k in range(len(raw) - 2, -1, -1):                 # last segment first: folding shifts the later indices
+        f0, _v, interp, ease = raw[k]
+        f1 = raw[k + 1][0]
+        if interp not in ("elastic", "cubicValue") or not ease:
+            continue
+        i0, i1 = at(f0), at(f1)
+        if i0 is None or i1 is None or i1 <= i0:
+            continue
+        a, b = out[i0], out[i1]
+        if interp == "cubicValue" and abs(b[1] - a[1]) > 1e-9:
+            continue                                     # built as an exact bezier: read back as a cubic ease
+        inner = out[i0 + 1:i1]
+        frames = [g for g in range(int(f0) + 1, int(math.ceil(f1))) if g > f0]
+        if len(inner) != len(frames) or any(abs(x[0] - g) > 0.01 for x, g in zip(inner, frames)):
+            continue
+        if any(x[2] != "linear" for x in [a] + inner):
+            continue
+        if any(abs(x[1] - segment_value(a[1], b[1], (x[0] - f0) / (f1 - f0), interp, ease)) > tol for x in inner):
+            continue
+        out[i0:i1] = [(a[0], a[1], interp, ease)]
+    return out
+
+
 def key_xml(frame, v, interp, ease):
     f = int(round(frame))
-    if interp == "cubic" and ease:
-        return (f'<KeyFrameDouble value="{fmt(v)}" frame="{f}" interpolationType="cubic">'
-                f'<CubicEaseInterpolator x1="{fmt(ease[0])}" y1="{fmt(ease[1])}" x2="{fmt(ease[2])}" y2="{fmt(ease[3])}"/></KeyFrameDouble>')
+    if interp in ("cubic", "cubicValue") and ease:
+        tag = "CubicEaseInterpolator" if interp == "cubic" else "CubicValueInterpolator"
+        return (f'<KeyFrameDouble value="{fmt(v)}" frame="{f}" interpolationType="{interp}">'
+                f'<{tag} x1="{fmt(ease[0])}" y1="{fmt(ease[1])}" x2="{fmt(ease[2])}" y2="{fmt(ease[3])}"/></KeyFrameDouble>')
+    if interp == "elastic" and ease:
+        return (f'<KeyFrameDouble value="{fmt(v)}" frame="{f}" interpolationType="elastic">'
+                f'<ElasticInterpolator easingValue="{int(ease[0])}" amplitude="{fmt(ease[1])}" period="{fmt(ease[2])}"/>'
+                f'</KeyFrameDouble>')
     return f'<KeyFrameDouble value="{fmt(v)}" frame="{f}" interpolationType="{interp}"/>'
 
 
@@ -486,6 +526,7 @@ def apply(project_dir, out_dir, dry=False, only_comp=None):
                         old = [(fr, v, i, e) for fr, v, i, e in (rml_keys or [])]
                         default = 1.0 if prop in ("scaleX", "scaleY", "opacity") else 0.0
                         if not same_keys(new, old, EPS[prop]) and not same_motion(new, old, EPS[prop], el.num(prop, default)):
+                            new = fold_baked(new, anim.raw_keys.get((oid, PROPS[prop])) or [], EPS[prop])
                             if not dry:
                                 f.set_keys(anim_id, oid, PROPS[prop], new)
                             changes.append(f"{ab.name} / {anim.name}: {el.name} ({oid}) {prop}: {len(new)} key(s) {'replaced' if old else 'added'}")

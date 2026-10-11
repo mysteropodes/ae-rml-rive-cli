@@ -52,6 +52,8 @@ jobs:
         run: python -m rml2ae.tests.test_aeapp
       - name: track mattes <-> Rive LayerMask, both ways
         run: python -m rml2ae.tests.test_layer_mask
+      - name: elastic and cubic value eases <-> AE keys, both ways
+        run: python -m rml2ae.tests.test_easings
       - name: inside / outside strokes <-> Offset Paths, both ways
         run: python -m rml2ae.tests.test_stroke_position
       - name: ae2rml binds the second layer of map effects (Displacement Map)
@@ -119,6 +121,9 @@ jobs:
       # the LayerMask case rml2ae reads (maskFlags as ae2rml writes it) loads in the Rive CLI
       - name: Verify the LayerMask case with the Rive CLI
         run: rive rml2ae/tests/cases/layer_mask --verify
+      # the elastic / cubic value case rml2ae bakes (and ae pull writes back) loads in the Rive CLI
+      - name: Verify the easings case with the Rive CLI
+        run: rive rml2ae/tests/cases/easings --verify
       # Stroke position="inside" / "outside" as rml2ae reads it loads in the Rive CLI
       - name: Verify the Stroke position case with the Rive CLI
         run: rive rml2ae/tests/cases/stroke_position --verify
