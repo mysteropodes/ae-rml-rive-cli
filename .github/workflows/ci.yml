@@ -56,6 +56,8 @@ jobs:
         run: python -m rml2ae.tests.test_aeapp
       - name: track mattes <-> Rive LayerMask, both ways
         run: python -m rml2ae.tests.test_layer_mask
+      - name: layer styles, Curves and the Stroke effect -> Rive
+        run: python -m rml2ae.tests.test_layer_styles
       - name: inside / outside strokes <-> Offset Paths, both ways
         run: python -m rml2ae.tests.test_stroke_position
       - name: gradient presets (.ffx) keep a coherent RIFX
@@ -125,6 +127,11 @@ jobs:
       # the LayerMask case rml2ae reads (maskFlags as ae2rml writes it) loads in the Rive CLI
       - name: Verify the LayerMask case with the Rive CLI
         run: rive rml2ae/tests/cases/layer_mask --verify
+      # inner Feather, Stroke.position, keyed TrimPath on a mask path: the layer-style test's project loads
+      - name: Verify the layer styles case with the Rive CLI
+        run: |
+          python -m rml2ae.tests.test_layer_styles out/styles
+          rive out/styles --verify
       # what `ae pull` writes for layers, groups and paints added in AE loads in the Rive CLI
       - name: Verify a pull of added layers with the Rive CLI
         run: |
@@ -181,6 +188,7 @@ jobs:
           if ($LASTEXITCODE -ne 0) { exit 1 }
           if (-not (Select-String -Path out/demo/build/ae2rml/report.md -Pattern "unsupported: 0" -Quiet)) { exit 1 }
       - run: python -m rml2ae.tests.test_map_layer
+      - run: python -m rml2ae.tests.test_layer_styles
       - run: python -m rml2ae.tests.sim_incremental
       # includes the modal-dialog probe (PowerShell + C#) against a real message box shown by the test itself
       - run: python -m rml2ae.tests.test_aeapp
