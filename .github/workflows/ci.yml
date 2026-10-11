@@ -66,6 +66,8 @@ jobs:
         run: python -m rml2ae.tests.test_state_machine
       - name: Luau script inputs <-> AE effect controls (build and ae pull)
         run: python -m rml2ae.tests.test_script_inputs
+      - name: Flex layouts solved by AE expressions (Node.js)
+        run: python -m rml2ae.tests.test_layout
       - name: gradient presets (.ffx) keep a coherent RIFX
         run: python -m rml2ae.tests.test_ffx
       - name: ae2rml binds the second layer of map effects (Displacement Map)
@@ -148,6 +150,10 @@ jobs:
         run: rive rml2ae/tests/cases/stroke_position --verify
       - name: Verify the state machine case with the Rive CLI
         run: rive rml2ae/tests/cases/state_machine --verify
+      - name: Layouts solved by rml2ae vs the Rive runtime (screenshots)
+        run: |
+          rive rml2ae/tests/cases/layout --verify
+          python tools/layout_check.py rml2ae/tests/cases/layout rml2ae/tests/cases/layout_text rml2ae/tests/cases/features
   fxlib:
     name: fxlib vs After Effects references
     runs-on: ubuntu-latest

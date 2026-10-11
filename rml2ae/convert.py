@@ -4,6 +4,7 @@ One comp per (artboard, animation) — the animation the artboard's default stat
 a chain of exit-time states becomes a sequence comp. Nested artboards are precomps (time-remapped when the parent
 scrubs them). Nodes are nulls, shapes are shape layers, images footage, texts text layers with animators.
 """
+import json
 import math
 import os
 import re
@@ -16,6 +17,7 @@ from . import riveshader as RS
 from . import rig as RIG
 from . import statemachine as SMX
 from . import ffx as FFX
+from . import layout as LAY
 
 ASCENT = 0.968          # Rive: first baseline = box top + ascent * size (Montserrat hhea, measured); per-font below
 BLOCK_H = 1.164         # measured: bounds height of a one-line text = lineHeight*(n-1) + 1.164*size (see guidelines §5)
@@ -264,6 +266,7 @@ class Converter:
     def __init__(self, project: Project, out_dir, fps=None, main=None, keep_project=False, replay=True, log=print, replace=False,
                  layout="industry"):
         self.p = project
+        self._layouts = {}
         self.layout = layout          # 'industry': shapes grouped in shape layers, no identity nulls; 'raw': one layer per element
         self._fold = {}               # leaf id -> the Node whose transform its layer carries (industry layout)
         self.offsets = {}             # element id -> [dx, dy] of dissolved nodes carried in its layer position (ae pull)
@@ -943,6 +946,8 @@ class Converter:
                     J(f'var bg = {var}.layers.addSolid({js([r, g, b])}, "Background", {int(w)}, {int(h)}, 1); bg.name = "Background"; tr(bg, "ADBE Opacity").setValue({js(a * 100)});')
                     # the artboard fill can be data-bound (isVisible / opacity), like any paint
                     self.emit_binds(bg, {"isVisible": ('tr(bg, "ADBE Opacity")', "%s"), "opacity": ('tr(bg, "ADBE Opacity")', "%s * 100")}, ctx)
+        if self.layout_of(ab)[0] is not None:
+            self.emit_layout_ctrl(ab, ctx)
         if anim and anim.unsupported:
             for oid, pk, other in anim.unsupported[:20]:
                 self.rep.add(ab.name, "approx", self.p.by_id.get(oid), f"{other} on {prop_name(pk)}: interpolated linearly")
@@ -1708,12 +1713,14 @@ class Converter:
                 else:
                     self.rep.add(ab, "unsupported", el, f"{tag} (Luau {sname}): placeholder null only (run without --no-replay to render it)")
             return nul
+        if is_a(tag, "LayoutComponent") and self.layout_of(ctx.artboard)[0] is not None:
+            return self.emit_node(el, parent, ctx, layout=True)
         if is_a(tag, "LayoutComponent"):
             style = self.p.by_id.get(el.get("styleId"))
             flex = style is not None and any(k for k in style.attrs if k not in ("name", "id"))
             if flex and self.replay:
-                return self.replay_subtree(el, parent, ctx, "flex layout (resolved by the Rive runtime only)")
-            self.rep.add(ab, "approx" if flex else "converted", el, "flex layout: static node, children at their declared x/y" if flex else "layout without flex style → static node")
+                return self.replay_subtree(el, parent, ctx, "flex layout (" + str(self.layout_of(ctx.artboard)[2]) + ")")
+            self.rep.add(ab, "approx" if flex else "converted", el, f"flex layout ({self.layout_of(ctx.artboard)[2]}): static node, children at their declared x/y" if flex else "layout without flex style → static node")
             return self.emit_node(el, parent, ctx)
         if self.layout == "industry" and tag == "Node" and self._node_groupable(el, root=True):
             return self.emit_merged(el, parent, ctx)
@@ -2176,7 +2183,7 @@ class Converter:
         return out
 
     # ---- Node
-    def emit_node(self, el, parent, ctx, placeholder=False):
+    def emit_node(self, el, parent, ctx, placeholder=False, layout=False):
         J = self.W
         clip = el.find("ClippingShape") if not placeholder else None
         kw = {"mask": self.layer_mask_of(el, ctx) if not placeholder else None,
@@ -2208,6 +2215,8 @@ class Converter:
         clip = el.find("ClippingShape")
         if clip is not None:
             return self.emit_clipped(el, var, parent, ctx, clip, **kw)
+        if layout:
+            self.emit_layout_node(el, var, ctx)
         # Rive: a group's opacity is multiplied into every descendant (rive docs transforms) = AE per-layer opacity
         # with the propagateOpacity expression; no group compositing.
         if el.tag == "Solo":
@@ -2224,6 +2233,120 @@ class Converter:
         self.emit_children(el, var, ctx)
         J(f"{var}.moveToBeginning();")
         return var
+
+    # ---- flex layouts: solved again by the layers' expressions (rml2ae/layout.py), editable from a controller null
+    LAYOUT_CTRL = "Layout \u00b7 "
+
+    def layout_of(self, ab):
+        """(T, index, reason, effects) for the artboard; T is None when the solver does not cover its layouts"""
+        key = id(ab)
+        if key not in self._layouts:
+            T, index, why = LAY.tree(self.p, ab)
+            eff = {}
+            if T is not None:
+                names, seen = [], {}
+                for n in T["n"]:
+                    nm = n["nm"]
+                    seen[nm] = seen.get(nm, 0) + 1
+                    names.append(nm if seen[nm] == 1 else f"{nm} {seen[nm]}")
+                for i, n in enumerate(T["n"]):
+                    s = n.get("s")
+                    if s is None:
+                        continue
+                    ks = []
+                    if i:
+                        ks += [k for k, on in (("Width", s["sw"] == 0), ("Height", s["sh"] == 0)) if on]
+                    if n["k"]:
+                        ks += ["Gap", "Padding Left", "Padding Top", "Padding Right", "Padding Bottom"]
+                    for k in ks:
+                        eff[f"{i}|{k}"] = f"{names[i]} \u00b7 {k}"
+            self._layouts[key] = (T, index, why, eff)
+        return self._layouts[key]
+
+    def emit_layout_ctrl(self, ab, ctx):
+        """the 'Layout · <artboard>' null: a slider per editable value of the layouts (keyed when Rive keys it)"""
+        J = self.W
+        T, index, _why, eff = self.layout_of(ab)
+        nodes = [ab] + LAY.layout_nodes(ab)
+        J(f'var LYC = {ctx.comp}.layers.addNull(); LYC.name = {js(self.LAYOUT_CTRL + ab.name)}; LYC.label = 9;')
+        J(f'LYC.comment = {js("rive:" + (ab.id or "") + "+layout")}; LYC.enabled = false;')
+        props = {"Width": ("width", None), "Height": ("height", None), "Padding Left": ("paddingLeft", "borderLeft"),
+                 "Padding Top": ("paddingTop", "borderTop"), "Padding Right": ("paddingRight", "borderRight"),
+                 "Padding Bottom": ("paddingBottom", "borderBottom")}
+        for k, name in eff.items():
+            i, key = k.split("|")
+            i = int(i)
+            n, el = T["n"][i], nodes[i]
+            s = n["s"]
+            row = s["d"] >= 2
+            if key == "Gap":
+                v, owner, pn = (s["gx"] if row else s["gy"]), LAY.style_of(self.p, el), ("gapHorizontal" if row else "gapVertical")
+            elif key in ("Width", "Height"):
+                v, owner, pn = n["w" if key == "Width" else "h"], el, props[key][0]
+            else:
+                v, owner, pn = s["p"][("Padding Left", "Padding Top", "Padding Right", "Padding Bottom").index(key)], LAY.style_of(self.p, el), props[key][0]
+            J(f'var lys = slider(LYC, {js(name)}, {js(v)});')
+            ks = ctx.keys(owner.id if owner is not None else None, pn)
+            if ks:
+                J(f'keys(lys, {ctx.rows(ks)});')
+        self.rep.add(ab.name, "converted", ab, f"flex layouts ({len(nodes) - 1} LayoutComponent) → solved by expressions; "
+                     f"{len(eff)} slider(s) on '{self.LAYOUT_CTRL}{ab.name}' (sizes, gaps, paddings)")
+        anim = [n.name for n in nodes if (LAY.style_of(self.p, n) is not None and LAY.style_of(self.p, n).get("animationStyleType") not in (None, "", "0", "none"))]
+        if anim:
+            self.rep.add(ab.name, "approx", ab, f"layout transitions ({', '.join(anim[:5])}): the boxes jump to their new place")
+        J('LYC.moveToBeginning();')
+
+    def layout_expr(self, ab, tail):
+        T, _index, _why, eff = self.layout_of(ab)
+        solver = "\n".join(line.strip() for line in LAY.SOLVER_JS.strip().splitlines())
+        return (solver + f"\nvar T = {json.dumps(T, separators=(',', ':'))}; var E = {json.dumps(eff, separators=(',', ':'))};\n"
+                f"var LC = null; try {{ LC = thisComp.layer({js(self.LAYOUT_CTRL + ab.name)}); }} catch (e) {{}}\n"
+                "function G(i, k, d) { var n = E[i + '|' + k]; if (!n || !LC) return d; "
+                "try { return LC.effect(n)(1).value; } catch (e) { return d; } }\n"
+                "var R = rlay(T, G);\n" + tail)
+
+    def layout_sized(self, shape, ctx):
+        """the solver index of the layout that sizes this Shape's parametric paths, or None"""
+        if shape is None or ctx is None:
+            return None
+        T, index, _why, _eff = self.layout_of(ctx.artboard)
+        lay = LAY.sizing_layout(self.p, shape) if T is not None else None
+        return index.get(id(lay)) if lay is not None else None
+
+    def emit_layout_node(self, el, var, ctx):
+        """a LayoutComponent's null: its place from the layout expression (x / y and their keys stay its own, added on
+        top, as Rive composes them); its Fill / Stroke on a rectangle the solved size, under its children"""
+        J = self.W
+        ab = ctx.artboard
+        _T, index, _why, _eff = self.layout_of(ab)
+        i = index[id(el)]
+        J(f'tr({var}, "ADBE Position_0").expression = {js(self.layout_expr(ab, f"value + R[{i}][0];"))};')
+        J(f'tr({var}, "ADBE Position_1").expression = {js(self.layout_expr(ab, f"value + R[{i}][1];"))};')
+        paints = [c for c in el.children if c.tag in ("Fill", "Stroke")]
+        if paints:
+            st = LAY.style_of(self.p, el)
+            radii = [st.num(k) for k in ("cornerRadiusTL", "cornerRadiusTR", "cornerRadiusBR", "cornerRadiusBL")] if st is not None else [0]
+            if st is not None and st.get("linkCornerRadius") in ("true", "1"):
+                radii = [radii[0]]
+            if max(radii) - min(radii) > 1e-6:
+                self.rep.add(ab.name, "approx", el, f"layout corner radii {radii}: one roundness ({max(radii):g}) for the four corners")
+            J('var lyb = ' + ctx.comp + '.layers.addShape(); lyb.name = ' + js(el.name + " (box)") + '; lyb.parent = ' + var + ';')
+            J(f'lyb.comment = {js("rive:" + (el.id or "") + "+box")}; tr(lyb, "ADBE Anchor Point").setValue([0, 0]); tr(lyb, "ADBE Position").setValue([0, 0]);')
+            J(f'var gr = lyb.property("ADBE Root Vectors Group"); var g = gr.addProperty("ADBE Vector Group"); g.name = {js(el.name)}; var gc = g.property("ADBE Vectors Group");')
+            J('var lyr = gc.addProperty("ADBE Vector Shape - Rect");')
+            J(f'lyr.property("ADBE Vector Rect Size").expression = {js(self.layout_expr(ab, f"[R[{i}][2], R[{i}][3]];"))};')
+            J('lyr.property("ADBE Vector Rect Position").expression = "thisProperty.propertyGroup(1).property(\\"ADBE Vector Rect Size\\").value / 2";')
+            if max(radii) > 0:
+                J(f'lyr.property("ADBE Vector Rect Roundness").setValue({js(max(radii))});')
+            for c in reversed(paints):
+                if c.tag == "Fill":
+                    self.emit_fill(c, ctx, el, False)
+                else:
+                    self.emit_stroke(c, ctx, el, 0.0)
+            if abs(el.num("opacity", 1) - 1) > 1e-9 or ctx.keys(el.id, "opacity"):
+                J('tr(lyb, "ADBE Opacity").expression = "thisLayer.parent.transform.opacity";')
+        self.rep.add(ab.name, "converted", el, "LayoutComponent → null placed by the layout expression"
+                     + (", its paints on a rectangle the solved size" if paints else ""))
 
     def emit_clipped(self, el, nul, parent, ctx, clip, stencil=False, mask=None, hidden=False, matte_for=None):
         """Node with a ClippingShape: its subtree goes into a precomp built in the PARENT's space (a root null inside
@@ -3071,7 +3194,24 @@ fn fs_main(in: VSOut) -> @location(0) vec4<f32> {{
         w, h = c.num("width"), c.num("height")
         ox, oy = c.num("originX", 0.5), c.num("originY", 0.5)
         cx, cy = x + (0.5 - ox) * w, y + (0.5 - oy) * h         # AE parametric paths are centred on their position
-        if t == "Rectangle":
+        li = self.layout_sized(shape, ctx)
+        if li is not None and t in ("Rectangle", "Ellipse"):
+            # the layout sizes it (Rive: ParametricPath::controlSize); its x / y and origin stay
+            ab_el = ctx.artboard
+            v = "rc" if t == "Rectangle" else "ell"
+            part = "Rect" if t == "Rectangle" else "Ellipse"
+            J(f'var {v} = gc.addProperty("ADBE Vector Shape - {part}"); {v}.name = {js(c.name)};')
+            J(f'{v}.property("ADBE Vector {part} Size").expression = {js(self.layout_expr(ab_el, f"[R[{li}][2], R[{li}][3]];"))};')
+            J(f'{v}.property("ADBE Vector {part} Position").expression = {js(self.layout_expr(ab_el, f"[{js(x)} + {js(0.5 - ox)} * R[{li}][2], {js(y)} + {js(0.5 - oy)} * R[{li}][3]];"))};')
+            r = c.num("cornerRadiusTL", 0) or c.num("cornerRadius", 0)
+            if r and t == "Rectangle":
+                J(f'rc.property("ADBE Vector Rect Roundness").setValue({js(r)});')
+            self.rep.add(ab, "converted", c, f"{t} in a layout → sized by the layout expression")
+        elif li is not None and t in ("Polygon", "Star", "Triangle"):
+            self.rep.add(ab, "approx", c, f"{t} in a layout: Rive sizes it to the layout, AE keeps its own size")
+        if li is not None and t in ("Rectangle", "Ellipse"):
+            pass
+        elif t == "Rectangle":
             J(f'var rc = gc.addProperty("ADBE Vector Shape - Rect"); rc.name = {js(c.name)}; rc.property("ADBE Vector Rect Size").setValue([{js(w)}, {js(h)}]); rc.property("ADBE Vector Rect Position").setValue([{js(cx)}, {js(cy)}]);')
             r = c.num("cornerRadiusTL", 0) or c.num("cornerRadius", 0)
             if r:

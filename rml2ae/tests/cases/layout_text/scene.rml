@@ -1,0 +1,25 @@
+<Rive version="1" kind="fragment">
+  <!-- A Text inside a layout row, between two boxes: it takes no place in the row, it sits at its x / y from the
+       layout's corner (CI: the runtime's screenshot matches the solver's, which leaves text out of the layout). -->
+  <Artboard styleId="0:2" width="800" height="300" name="T" id="0:1">
+    <LayoutComponentStyle name="AS" id="0:2"/>
+    <Fill name="Bg"><SolidColor colorValue="FFFFFFFF" name="C"/></Fill>
+    <LayoutComponent x="20" y="20" width="10" height="10" styleId="0:11" name="Row" id="0:10">
+      <LayoutComponentStyle flexDirectionValue="row" layoutWidthScaleType="hug" layoutHeightScaleType="hug" gapHorizontal="10" name="RS" id="0:11"/>
+      <Fill name="F"><SolidColor colorValue="FFDDDDDD" name="C"/></Fill>
+      <LayoutComponent width="50" height="50" styleId="0:13" name="B1" id="0:12">
+        <LayoutComponentStyle name="B1S" id="0:13"/>
+        <Fill name="F"><SolidColor colorValue="FFAA3333" name="C"/></Fill>
+      </LayoutComponent>
+      <Text sizingValue="autoWidth" name="Label" id="0:14">
+        <TextStylePaint fontSize="40" fontAssetId="0:108" name="Style" id="0:15"><Fill name="Fill"><SolidColor colorValue="FF182241" name="C"/></Fill></TextStylePaint>
+        <TextValueRun styleId="0:15" text="Hello" name="Run" id="0:16"/>
+      </Text>
+      <LayoutComponent width="50" height="50" styleId="0:18" name="B2" id="0:17">
+        <LayoutComponentStyle name="B2S" id="0:18"/>
+        <Fill name="F"><SolidColor colorValue="FF3333AA" name="C"/></Fill>
+      </LayoutComponent>
+    </LayoutComponent>
+  </Artboard>
+  <FontAsset file="Montserrat-Bold.ttf" name="Montserrat-Bold" id="0:108"/>
+</Rive>
