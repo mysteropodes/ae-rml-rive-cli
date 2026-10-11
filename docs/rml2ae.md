@@ -114,11 +114,12 @@ Remaining nulls are animated controllers (cameras, three-copy RGB split and simi
 | `blendModeValue` | Blend mode (by name or numeric value). |
 | `ScriptedDrawable` with `ScriptInputArtboard` | The input artboard placed as a precomp (the script's own rendering is not applied unless replayed, see below). |
 | Bones and skins | Bones become nulls (forward kinematics by parenting). Skinned paths are baked per frame. |
+| `LayoutComponent` + `LayoutComponentStyle` (flex) | Each LayoutComponent a null whose position expression solves the artboard's layout again (rml2ae/layout.py, the Yoga subset Rive uses: row / column and reversed, gaps, padding, border, margin, fixed / fill / hug sizes, the nine alignments and space between); its x / y and their keys stay on top, as Rive composes them. A `Layout · <artboard>` null carries a slider per fixed size, gap and padding (keyed when Rive keys them): edit one and the boxes follow. The layout's Fill / Stroke draw a rectangle (corner radius from the style) sized by the same solve, under its children. Wrap, grid, absolute position, percent units, min / max, aspect ratio, clipped layouts and nested artboard layouts keep the CLI replay. CI compares the Rive runtime's screenshot with a copy placed by the solver (`tools/layout_check.py`). |
 | State machine with inputs, blend states or Any State transitions (first layer) | The artboard comp, driven by a controller null `State Machine · <name>`: one effect control per input (Checkbox for a boolean or a trigger, Slider for a number), keyable. One precomp per (state, animation) above a "Base pose" layer; an expression on the controller replays the layer frame by frame from 0 with the Rive runtime rules (conditions, Any State first, trigger used once, exit time, mix duration in ms or %, blend 1D and direct weights) and the precomps take their Time Remap and opacity from it. A guide text layer shows the current state. Key the inputs to play an interaction. |
 
 ### Not converted
 
-Events, and state machine layers after the first (a note goes in the report). A `LayoutComponent` with a flex style is replayed through the Rive CLI like a Luau script (pixel-exact, not editable): Yoga resolves it in the runtime only, and the CLI exposes no resolved positions to read back. Anything not converted is listed in `<name>.ae-report.md`.
+Events, and state machine layers after the first (a note goes in the report). A flex layout outside the solved subset (see above) is replayed through the Rive CLI like a Luau script (pixel-exact, not editable); the reason goes in the report. Anything not converted is listed in `<name>.ae-report.md`.
 
 ## ViewModels, data binding and Luau
 
@@ -286,7 +287,7 @@ Measured against After Effects 2026 with the Montserrat typeface; useful when wr
 
 - Bezier ease interpolators other than CSS-style cubic ones become linear.
 - Keyed gradient stop colours or positions keep their first values on native gradients (a lone two-stop gradient a Ramp renders exactly keeps its keys). Skinned shapes and the artboard background still use a Ramp or a PNG matte.
-- Flex layouts are replayed as a PNG sequence (not editable in AE). Events and state machine layers after the first are not converted.
+- Flex layouts outside the solved subset are replayed as a PNG sequence; text, images and nested artboards inside a layout sit at their x / y (they do not size it). Layout transitions (`animationStyleType`) jump instead of animating. Events and state machine layers after the first are not converted.
 - Luau-scripted content is replayed as a PNG sequence; only its script inputs are editable (effect controls).
 - A state machine plays from keyed inputs, not from pointer listeners; listeners are not converted.
 - Without the Rive Shader plugin, shaders are approximated by native effects and only the common patterns are recognised.
