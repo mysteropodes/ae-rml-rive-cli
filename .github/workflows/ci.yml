@@ -151,8 +151,7 @@ jobs:
       - name: Layouts solved by rml2ae vs the Rive runtime (screenshots)
         run: |
           rive rml2ae/tests/cases/layout --verify
-          python tools/layout_check.py rml2ae/tests/cases/layout rml2ae/tests/cases/features
-          python tools/layout_check.py rml2ae/tests/cases/layout_text || echo "DIAG (temporary): text in a layout row differs"
+          python tools/layout_check.py rml2ae/tests/cases/layout rml2ae/tests/cases/layout_text rml2ae/tests/cases/features
   fxlib:
     name: fxlib vs After Effects references
     runs-on: ubuntu-latest

@@ -1,6 +1,6 @@
 <Rive version="1" kind="fragment">
-  <!-- A Text inside a layout row, between two boxes: does it take a place in the row? CI compares the runtime with
-       rml2ae's solver (which places text at its x / y, outside the layout). -->
+  <!-- A Text inside a layout row, between two boxes: it takes no place in the row, it sits at its x / y from the
+       layout's corner (CI: the runtime's screenshot matches the solver's, which leaves text out of the layout). -->
   <Artboard styleId="0:2" width="800" height="300" name="T" id="0:1">
     <LayoutComponentStyle name="AS" id="0:2"/>
     <Fill name="Bg"><SolidColor colorValue="FFFFFFFF" name="C"/></Fill>
