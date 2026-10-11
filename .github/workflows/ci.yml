@@ -132,13 +132,6 @@ jobs:
         run: rive rml2ae/tests/cases/stroke_position --verify
       - name: Verify the state machine case with the Rive CLI
         run: rive rml2ae/tests/cases/state_machine --verify
-      - name: DIAG (temporary) layout screenshots
-        if: always()
-        run: |
-          rive rml2ae/tests/cases/flex_layout --screenshot=/tmp/flex.png 2>&1 | tail -5 || true
-          python tools/bbox_colors.py /tmp/flex.png || true
-          for d in rml2ae/tests/cases/flex_probe*; do echo "=== $d"; rive $d --screenshot=/tmp/p.png 2>&1 | tail -3; python tools/bbox_colors.py /tmp/p.png || true; done
-
   fxlib:
     name: fxlib vs After Effects references
     runs-on: ubuntu-latest

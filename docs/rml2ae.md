@@ -114,10 +114,11 @@ Remaining nulls are animated controllers (cameras, three-copy RGB split and simi
 | `blendModeValue` | Blend mode (by name or numeric value). |
 | `ScriptedDrawable` with `ScriptInputArtboard` | The input artboard placed as a precomp (the script's own rendering is not applied unless replayed, see below). |
 | Bones and skins | Bones become nulls (forward kinematics by parenting). Skinned paths are baked per frame. |
+| State machine with inputs, blend states or Any State transitions (first layer) | The artboard comp, driven by a controller null `State Machine · <name>`: one effect control per input (Checkbox for a boolean or a trigger, Slider for a number), keyable. One precomp per (state, animation) above a "Base pose" layer; an expression on the controller replays the layer frame by frame from 0 with the Rive runtime rules (conditions, Any State first, trigger used once, exit time, mix duration in ms or %, blend 1D and direct weights) and the precomps take their Time Remap and opacity from it. A guide text layer shows the current state. Key the inputs to play an interaction. |
 
 ### Not converted
 
-`LayoutComponent` (flex layout), state machines with inputs, events and blend states (the entry state's animation is played; a note goes in the report). Anything not converted is listed in `<name>.ae-report.md`.
+Events, and state machine layers after the first (a note goes in the report). A `LayoutComponent` with a flex style is replayed through the Rive CLI like a Luau script (pixel-exact, not editable): Yoga resolves it in the runtime only, and the CLI exposes no resolved positions to read back. Anything not converted is listed in `<name>.ae-report.md`.
 
 ## ViewModels, data binding and Luau
 
@@ -126,7 +127,8 @@ Remaining nulls are animated controllers (cameras, three-copy RGB split and simi
 | Linked artboard `Fill` (`isVisible`, `opacity`) | A "Background" solid with an expression. |
 | `ViewModel` + default instance | A comp `VM · <name>`: a `ViewModel` null with a Slider (number), Checkbox (boolean), Color Control (colour) and a guide text layer (string). Values are those of the default instance. |
 | `DataBindContext` (source path ids to property key) | An expression on the AE property: x, y, rotation, scale, opacity, isVisible, fill or stroke colour, thickness, trim, text source, text-animator strength. Converters and nested paths give the raw value plus a note. |
-| `ScriptedDrawable` / `ScriptedLayout` without an input artboard | **Replay through the Rive CLI**: a temporary copy of the project keeps only the element and its ancestors, is rendered twice (black and white background), un-matted into straight alpha, and the PNG sequence is imported at the comp's frame rate and placed in world space. `--no-replay` disables it. A cache lives in `build/rml2ae/replay/`. |
+| `ScriptInputNumber` / `ScriptInputBoolean` / `ScriptInputColor` on a script | Effect controls `Luau: <name>` on the script's null (Slider, Checkbox, Color Control; input keys become AE keys). `ae pull` writes edited unkeyed values back to `propertyValue`, and the next build replays the script with them. |
+| `ScriptedDrawable` / `ScriptedLayout` without an input artboard | **Replay through the Rive CLI**: a temporary copy of the project keeps only the element and its ancestors, is rendered twice (black and white background), un-matted into straight alpha, and the PNG sequence is imported at the comp's frame rate and placed in world space. `--no-replay` disables it. A cache lives in `build/rml2ae/replay/`, keyed by the isolated RML, the script and shader sources and the frame rate, so a changed input re-renders. |
 | Script with `ScriptInputArtboard` + `context:shader("x")` | If the Rive Shader plugin is installed, the shader runs as is (see below). Otherwise `x.wgsl` is recognised from the fields of its `struct Params` (grain, wobble, displace, vignette, tick) and approximated with native effects (Noise, `wiggle()`, Turbulent Displace, masked vignette) in a comp `<artboard> + FX`, then `+ FX (stepped)` with Posterize Time when the script steps its own clock. Values come from the ViewModel, then from the `num(vm, "x", default)` calls in the Luau. |
 
 Textures produced by another pass of a script (the same artboard instanced with different ViewModel values) are declared in `ae_passes.json`; rml2ae then clones the comp tree per pass with its own `VM · <name> [pass]` copy and retargets the binding expressions.
@@ -272,11 +274,12 @@ Measured against After Effects 2026 with the Montserrat typeface; useful when wr
 
 - Bezier ease interpolators other than CSS-style cubic ones become linear.
 - Keyed gradient stop colours or positions keep their first values on native gradients (a lone two-stop gradient a Ramp renders exactly keeps its keys). Skinned shapes and the artboard background still use a Ramp or a PNG matte.
-- Flex layouts, state machines with inputs and events, and blend states are not converted; only the entry state's animation is built.
-- Luau-scripted content is replayed as a PNG sequence (not editable in AE).
+- Flex layouts are replayed as a PNG sequence (not editable in AE). Events and state machine layers after the first are not converted.
+- Luau-scripted content is replayed as a PNG sequence; only its script inputs are editable (effect controls).
+- A state machine plays from keyed inputs, not from pointer listeners; listeners are not converted.
 - Without the Rive Shader plugin, shaders are approximated by native effects and only the common patterns are recognised.
 - Inner shadows and AE layer styles cannot be written.
-- `ae pull` covers transforms, keys, eases and visibility only.
+- `ae pull` covers transforms, keys, eases, visibility and unkeyed Luau script inputs.
 - Text metrics depend on fonts installed in macOS and on the constants above.
 - One After Effects at a time: the `ae` command acts on the AE that is open.
 - Every conversion writes a report; read `<name>.ae-report.md` after each build to see what is `exact`, `approx` or `unsupported` before trusting pixel parity.

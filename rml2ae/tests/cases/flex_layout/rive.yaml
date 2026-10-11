@@ -1,5 +1,0 @@
-name: flex_layout
-main: Cards
-logs:
-  file: build/rive.log
-  problems: build/problems.log
