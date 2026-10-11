@@ -48,12 +48,20 @@ jobs:
         run: pip install -e ".[ae2rml]"
       - name: rml2ae incremental rebuild (dry run, no After Effects)
         run: python -m rml2ae.tests.sim_incremental
+      - name: ae pull of shape contents (colours, thickness, paths) from a hand-written dump
+        run: python -m rml2ae.tests.test_pull_contents
+      - name: ae pull of what was added in AE (layers, groups, paths, paints) from a hand-written dump
+        run: python -m rml2ae.tests.test_pull_added
       - name: aeapp helpers (frame wait, app name, colour check, dialog watch)
         run: python -m rml2ae.tests.test_aeapp
       - name: track mattes <-> Rive LayerMask, both ways
         run: python -m rml2ae.tests.test_layer_mask
       - name: layer styles, Curves and the Stroke effect -> Rive
         run: python -m rml2ae.tests.test_layer_styles
+      - name: inside / outside strokes <-> Offset Paths, both ways
+        run: python -m rml2ae.tests.test_stroke_position
+      - name: gradient presets (.ffx) keep a coherent RIFX
+        run: python -m rml2ae.tests.test_ffx
       - name: ae2rml binds the second layer of map effects (Displacement Map)
         run: |
           python -m rml2ae.tests.test_map_layer
@@ -124,6 +132,14 @@ jobs:
         run: |
           python -m rml2ae.tests.test_layer_styles out/styles
           rive out/styles --verify
+      # what `ae pull` writes for layers, groups and paints added in AE loads in the Rive CLI
+      - name: Verify a pull of added layers with the Rive CLI
+        run: |
+          python -m rml2ae.tests.test_pull_added --out out/pull_added
+          rive out/pull_added --verify
+      # Stroke position="inside" / "outside" as rml2ae reads it loads in the Rive CLI
+      - name: Verify the Stroke position case with the Rive CLI
+        run: rive rml2ae/tests/cases/stroke_position --verify
 
   fxlib:
     name: fxlib vs After Effects references

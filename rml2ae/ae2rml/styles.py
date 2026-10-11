@@ -31,8 +31,8 @@ STYLE_BLEND = {1: "srcOver", 4: "darken", 5: "multiply", 6: "colorBurn", 10: "li
                25: "exclusion", 27: "hue", 28: "saturation", 29: "color", 30: "luminosity"}
 STYLE_BLEND_NEAREST = {2: "srcOver", 7: "colorBurn", 8: "darken", 14: "lighten", 19: "colorDodge", 20: "overlay",
                        21: "overlay", 22: "hardLight", 32: "difference", 33: "colorDodge"}
-# frameFX/style (1 Outside, 2 Inside, 3 Center) -> rive StrokePosition (0 inside, 1 center, 2 outside)
-STROKE_POSITION = {1: 2, 2: 0, 3: 1}
+# frameFX/style (1 Outside, 2 Inside, 3 Center) -> Rive Stroke.position, by name as rml2ae reads it
+STROKE_POSITION = {1: "outside", 2: "inside", 3: "center"}
 ABOVE = ("frameFX", "innerShadow", "innerGlow", "solidFill", "gradientFill")      # top first
 BELOW = ("outerGlow", "dropShadow")                                                   # top first
 NOT_CONVERTED = {"bevelEmboss": "Bevel and Emboss", "chromeFX": "Satin", "patternFill": "Pattern Overlay"}
@@ -269,7 +269,7 @@ class LayerStyles:
         col = self._color(g, prefix, [1, 0, 0, 1])
         size = tonum(self.style_value(g, prefix, "size", 3.0))
         pos = int(tonum(self.style_value(g, prefix, "style", 1)))
-        rpos = STROKE_POSITION.get(pos, 2)
+        rpos = STROKE_POSITION.get(pos, "outside")
         dropped = []
 
         def paint(e):
@@ -288,7 +288,7 @@ class LayerStyles:
         if dropped:
             self.note("approx", clean(g.name), "Stroke style follows the layer's fills only, not its strokes")
         self.note("converted", clean(g.name), f"Stroke style → {size:g} px stroke "
-                                              f"{({0: 'inside', 1: 'centred on', 2: 'outside'})[rpos]} the shapes")
+                                              f"{'centred on' if rpos == 'center' else rpos} the shapes")
         return wrap
 
     # ---------------------------------------------------------------- gradient overlay

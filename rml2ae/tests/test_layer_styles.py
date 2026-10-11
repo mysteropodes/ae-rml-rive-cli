@@ -131,9 +131,9 @@ def check(out):
     fe = paint(by_name(p, "Card · inner shadow"), "Feather")
     assert fe.get("inner") == "true" and fe.num("offsetY") > 0, fe.attrs
     assert paint(by_name(p, "Card · inner glow"), "Feather").get("inner") == "true"
-    # Stroke style, Center -> Rive StrokePosition 1 (inside 0, center 1, outside 2)
+    # Stroke style, Center -> Rive Stroke position "center"
     st = paint(by_name(p, "Card · stroke"), "Stroke")
-    assert st.get("position") == "1" and abs(st.num("thickness") - 6) < 1e-6, st.attrs
+    assert st.get("position") == "center" and abs(st.num("thickness") - 6) < 1e-6, st.attrs
     assert not any(e.tag == "Fill" for e in by_name(p, "Card · stroke").iter())
     # Color Overlay at 30 %: the colour on a copy, the layer's own paint untouched
     assert paint(by_name(p, "Card · color overlay"), "SolidColor").get("colorValue") == "4DFF0000"
@@ -154,7 +154,7 @@ def check(out):
     # a text layer: the stroke goes in the text style, the shadow is a feathered copy
     title = by_name(p, "Title")
     assert [c.name for c in title.children] == ["Title · stroke", "Title", "Title · shadow"]
-    assert paint(by_name(p, "Title · stroke"), "Stroke").get("position") == "2"
+    assert paint(by_name(p, "Title · stroke"), "Stroke").get("position") == "outside"
     # Bevel and Emboss: reported, nothing else
     rep = open(os.path.join(out, "build", "ae2rml", "report.md"), encoding="utf-8").read()
     assert "Bevel and Emboss is not converted" in rep

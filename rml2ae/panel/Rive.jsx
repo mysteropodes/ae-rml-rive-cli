@@ -70,6 +70,9 @@
     try { $.evalFile(File(jsx)); } catch (e) { say("dump error: " + e.toString()); return; }
     var out = sh(base + " --apply 2>&1");
     plog("pull: " + out);
+    // layers added in AE became new RML elements: their layers take the new ids (rml2ae/pulladd.py)
+    var tags = File(dir + "/build/rml2ae/_pull_tags.jsx");
+    if (tags.exists) { try { $.evalFile(tags); tags.remove(); out += "\nadded layers tagged in AE"; } catch (eT) { out += "\ntagging the added layers failed: " + eT.toString(); } }
     say(out.replace(/\s+$/, ""));
   });
   viewer.onClick = guarded(function () {

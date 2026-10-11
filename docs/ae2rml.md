@@ -95,6 +95,7 @@ Legend: **exact** = reproduced to anti-aliasing noise; **approx** = reproduced w
 | Group skew | Exact rotation-scale-rotation on two nodes | exact |
 | Taper | Outline converted to a fill with a Luau taper script | exact |
 | Zig Zag, Offset Paths, Pucker & Bloat, Twist | Luau `ScriptedPathEffect` placed in each paint, parameters keyed as script inputs | exact |
+| Offset Paths of ±half the stroke width right before a stroke (closed paths, one copy) | `Stroke` with `position` inside or outside on the original paths, no Luau (the sign follows the path's winding: a positive amount moves a clockwise path outwards) | exact |
 | Wiggle Paths | Same structure; the random draws differ (After Effects' generator is not public) | approx |
 
 Paint semantics follow After Effects: a paint draws every path above it in its group, including paths of

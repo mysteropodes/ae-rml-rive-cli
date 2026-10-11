@@ -1,0 +1,5 @@
+name: stroke_position
+main: Strokes
+logs:
+  file: build/rive.log
+  problems: build/problems.log
