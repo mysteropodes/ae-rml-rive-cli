@@ -8,7 +8,7 @@ import math
 import os
 import re
 
-from .model import Project, Animation, El, argb, blend_name, is_a, prop_name
+from .model import Project, Animation, El, argb, blend_name, is_a, layer_mask_flags, prop_name
 from .jsx import Writer, js, PRELUDE, TIDY_JSX, TIDY_BUILD_JSX
 from .report import Report
 from . import replay as RP
@@ -18,6 +18,7 @@ from . import rig as RIG
 ASCENT = 0.968          # Rive: first baseline = box top + ascent * size (Montserrat hhea, measured); per-font below
 BLOCK_H = 1.164         # measured: bounds height of a one-line text = lineHeight*(n-1) + 1.164*size (see guidelines §5)
 AE_BOX_BASELINE = 0.743 # measured (Montserrat, AE 2026): first baseline of a box text = box top + 0.743*size
+MASK_WORDS = {0: "alpha", 1: "inverted alpha", 2: "luma", 3: "inverted luma"}   # LayerMask modes, AE's words
 
 
 def bezier_progress(x, x1, y1, x2, y2):
@@ -246,6 +247,8 @@ class Converter:
         self.log_fn = log
         self.vm_props = {}        # ViewModel property id -> dict(vm, name, kind, value, expr)
         self.layer_of = {}        # element id -> js layer var (per comp; refreshed as comps are built)
+        self._copying = set()     # LayerMask sources being emitted as a matte copy
+        self._hidden_done = set()  # LayerMask sources hidden by their own precomp (emit_node)
         self.all_animations = False
         self.loop_duration = 10.0 # seconds a looping main artboard is unrolled to (--duration)
         self.top_name = None      # name of the comp to render (wrapper "(looped)" / "(stepped)" when created)
@@ -999,7 +1002,7 @@ class Converter:
     # Shape / Node a vector group with its own transform and keys), no null for a node that does nothing
     def _shape_groupable(self, el):
         """a Shape that can live as a vector group inside a shared shape layer"""
-        if not is_a(el.tag, "Shape") or el.ae or self.needs_replay(el) or RIG.has_skin(el):
+        if not is_a(el.tag, "Shape") or el.ae or self.needs_replay(el) or RIG.has_skin(el) or self._clip_or_mask(el):
             return False
         if (el.get("blendModeValue") or "srcOver") != "srcOver" or int(el.num("drawableFlags", 0)) & 1:
             return False
@@ -1010,6 +1013,84 @@ class Converter:
             elif not is_a(c.tag, "Path"):
                 return False              # clip, bind, nested node…
         return any(c.tag in ("Fill", "Stroke") for c in el.children)
+
+    # ---- LayerMask (Rive's raster mask: alpha / luminance of another subtree) -> a native track matte
+    AE_MATTES = {0: "ALPHA", 1: "ALPHA_INVERTED", 2: "LUMA", 3: "LUMA_INVERTED"}
+
+    @staticmethod
+    def _encloses(container, inner):
+        e = inner
+        while e is not None:
+            if e is container:
+                return True
+            e = e.parent
+        return False
+
+    def mask_sources(self):
+        """LayerMask source id -> True when Rive hides it (a visible mask with sourceDraws false uses it). A
+        self-referential mask (its source and the masked subtree overlap) does nothing: the runtime draws both inline"""
+        ms = self.__dict__.get("_mask_srcs")
+        if ms is None:
+            ms = self._mask_srcs = {}
+            for e in list(self.p.by_id.values()):
+                for lm in e.children:
+                    if lm.tag != "LayerMask":
+                        continue
+                    _mode, vis, draws = layer_mask_flags(lm)
+                    src = self.p.by_id.get(lm.get("sourceId"))
+                    if not vis or src is None or self._encloses(src, e) or self._encloses(e, src):
+                        continue
+                    ms[src.id] = ms.get(src.id, False) or not draws
+        return ms
+
+    def mask_hidden(self, el):
+        """el is a LayerMask source Rive does not draw (outside the matte copy being emitted)"""
+        return el.id is not None and el.id not in self._copying and self.mask_sources().get(el.id, False)
+
+    def layer_mask_of(self, el, ctx):
+        """el's LayerMask that does something (visible, a source outside el's subtree and not above it), else None"""
+        for lm in el.findall("LayerMask"):
+            _mode, vis, _draws = layer_mask_flags(lm)
+            src = self.p.by_id.get(lm.get("sourceId"))
+            if not vis:
+                self.rep.add(ctx.artboard.name, "converted", el, "LayerMask switched off (isVisible false): not matted")
+            elif src is None or not is_a(src.tag, "Node"):
+                self.rep.add(ctx.artboard.name, "unsupported", el, "LayerMask source not found / not a node")
+            elif self._encloses(src, el) or self._encloses(el, src):
+                self.rep.add(ctx.artboard.name, "converted", el, f"LayerMask source '{src.name}' overlaps the masked "
+                                                                 "subtree: the runtime ignores it, not matted")
+            else:
+                return lm
+        return None
+
+    def apply_layer_mask(self, el, lv, parent, ctx, mask):
+        """LayerMask -> AE track matte: a copy of the source (its own precomp, painted as it is: alpha and luminance
+        are the source's pixels) in the source's space, set as the track matte of el's precomp layer"""
+        J = self.W
+        ab = ctx.artboard
+        mode, _vis, _draws = layer_mask_flags(mask)
+        src = self.p.by_id.get(mask.get("sourceId"))
+        if src.id in self._copying:
+            self.rep.add(ab.name, "approx", el, f"LayerMask source '{src.name}' is masked by its own user: left out")
+            return
+        host = self.matte_space(src, el.parent, parent, ctx, ab)
+        saved = (dict(self.layer_of), dict(self.group_map))
+        self._copying.add(src.id)
+        try:
+            mv = self.emit_clipped(src, None, host, ctx, None, matte_for=el)
+        finally:
+            self._copying.discard(src.id)
+            self.layer_of.clear(); self.layer_of.update(saved[0])          # the copy must not stand for the source
+            self.group_map.clear(); self.group_map.update(saved[1])
+        J(f'{mv}.comment = {js("rive:" + (el.id or "") + "+matte")};')      # belongs to this element, not to the source
+        J(f"{lv}.setTrackMatte({mv}, TrackMatteType.{self.AE_MATTES[mode]});")
+        self.rep.add(ab.name, "converted", el, f"LayerMask ({MASK_WORDS[mode]}) of '{src.name}' → precomp + "
+                                               f"{MASK_WORDS[mode]} track matte (a copy of the source)")
+
+    def _clip_or_mask(self, el):
+        """a clip, a mask or a mask source: the element needs its own layer (never merged into a shared shape layer)"""
+        return (el.find("ClippingShape") is not None or el.find("LayerMask") is not None
+                or (el.id is not None and el.id in self.mask_sources()))
 
     def _matte_groupable(self, el):
         """a clip source Node: only nodes and shapes made of paths (paints do not matter, Rive clips by geometry)"""
@@ -1026,7 +1107,7 @@ class Converter:
 
     def _node_groupable(self, el, root=False):
         """a plain Node whose whole subtree can be one shape layer (the root may carry bindings: they go on the layer)"""
-        if el.tag != "Node" or el.ae or self.needs_replay(el) or el.find("ClippingShape") is not None:
+        if el.tag != "Node" or el.ae or self.needs_replay(el) or self._clip_or_mask(el):
             return False
         if (el.get("blendModeValue") or "srcOver") != "srcOver" or int(el.num("drawableFlags", 0)) & 1:
             return False
@@ -1049,7 +1130,7 @@ class Converter:
 
     def _identity_node(self, el):
         """a Node that changes nothing (no transform, no keys, no clip, no binding): no null for it in AE"""
-        if el.tag != "Node" or el.ae or el.find("ClippingShape") is not None:
+        if el.tag != "Node" or el.ae or self._clip_or_mask(el):
             return False
         if any(c.tag == "DataBindContext" for c in el.children) or int(el.num("drawableFlags", 0)) & 1:
             return False
@@ -1068,7 +1149,7 @@ class Converter:
         """a Node holding ONE static leaf (shape / text / image, no rotation or scale of its own): the leaf's layer takes
         the node's transform and keys, its offset going into the anchor point — no null (T(p)R S T(c) = a layer at p
         with anchor −c, exact)"""
-        if el.tag != "Node" or el.ae or el.find("ClippingShape") is not None or int(el.num("drawableFlags", 0)) & 1:
+        if el.tag != "Node" or el.ae or self._clip_or_mask(el) or int(el.num("drawableFlags", 0)) & 1:
             return None
         if (el.get("blendModeValue") or "srcOver") != "srcOver":
             return None
@@ -1081,7 +1162,7 @@ class Converter:
             return None
         if is_a(c.tag, "Shape") and (RIG.has_skin(c) or any(self.gradient_of(x) is not None for x in c.children if x.tag in ("Fill", "Stroke"))):
             return None
-        if any(x.tag == "DataBindContext" for x in c.children) or c.find("ClippingShape") is not None:
+        if any(x.tag == "DataBindContext" for x in c.children) or self._clip_or_mask(c):
             return None
         if abs(c.num("rotation")) > 1e-9 or abs(c.num("scaleX", 1) - 1) > 1e-9 or abs(c.num("scaleY", 1) - 1) > 1e-9:
             return None
@@ -1095,7 +1176,7 @@ class Converter:
         """a Node that only groups ONE child, with a static translation and/or opacity bindings (film-test's 'Set',
         'photo pass', 'text pass'): no null — the child's layer takes the translation in its position (values, keys
         and bindings) and the node's opacity bindings chained on its own opacity (exact: no rotation / scale above)."""
-        if el.tag != "Node" or el.ae or el.find("ClippingShape") is not None or int(el.num("drawableFlags", 0)) & 1:
+        if el.tag != "Node" or el.ae or self._clip_or_mask(el) or int(el.num("drawableFlags", 0)) & 1:
             return None
         if (el.get("blendModeValue") or "srcOver") != "srcOver":
             return None
@@ -1116,7 +1197,7 @@ class Converter:
         c = kids[0]
         if c.tag not in ("Node",) and not (is_a(c.tag, "Shape") or is_a(c.tag, "Text") or is_a(c.tag, "Image")):
             return None
-        if c.ae or self.needs_replay(c) or c.find("ClippingShape") is not None or (is_a(c.tag, "Shape") and RIG.has_skin(c)):
+        if c.ae or self.needs_replay(c) or self._clip_or_mask(c) or (is_a(c.tag, "Shape") and RIG.has_skin(c)):
             return None
         if is_a(c.tag, "Image") and c.find("Mesh") is not None:
             return None                           # emit_mesh places corner-pinned rows itself (no base_transform)
@@ -1425,7 +1506,8 @@ class Converter:
     @staticmethod
     def is_element(c):
         return is_a(c.tag, "Component") and not is_a(c.tag, "Animation") and not c.tag.startswith("ScriptInput") and c.tag not in (
-            "StateMachine", "LayoutComponentStyle", "Fill", "Stroke", "ClippingShape", "DataBindContext", "Constraint") \
+            "StateMachine", "LayoutComponentStyle", "Fill", "Stroke", "ClippingShape", "LayerMask", "DataBindContext",
+            "Constraint") \
             and not is_a(c.tag, "Constraint") and c.tag not in ("Skin", "Tendon", "Weight", "CubicWeight")
 
     def replay_subtree(self, el, parent, ctx, why):
@@ -1454,6 +1536,14 @@ class Converter:
         return None
 
     def emit_element(self, el, parent, ctx):
+        v = self._emit_element(el, parent, ctx)
+        if isinstance(v, str) and el.id not in self._hidden_done and self.mask_hidden(el):
+            self.W(f"{v}.enabled = false;")
+            self.rep.add(ctx.artboard.name, "converted", el, "LayerMask source (not drawn by Rive): layer switched off, "
+                                                             "its copy is the track matte")
+        return v
+
+    def _emit_element(self, el, parent, ctx):
         tag = el.tag
         ab = ctx.artboard.name
         why = self.needs_replay(el)
@@ -1938,18 +2028,25 @@ class Converter:
     def emit_node(self, el, parent, ctx, placeholder=False):
         J = self.W
         clip = el.find("ClippingShape") if not placeholder else None
+        kw = {"mask": self.layer_mask_of(el, ctx) if not placeholder else None,
+              "hidden": not placeholder and self.mask_hidden(el)}
+        if kw["hidden"]:
+            self._hidden_done.add(el.id)
+        if clip is None and (kw["mask"] is not None or kw["hidden"]):
+            # a masked node / a hidden mask source: one precomp layer (the track matte's user, or switched off)
+            return self.emit_clipped(el, None, parent, ctx, None, **kw)
         if clip is not None:
             src = self.p.by_id.get(clip.get("sourceId"))
             if src is not None and is_a(src.tag, "Shape") and src.parent is el and not RIG.has_skin(src):
                 # the clip source is one of the node's own children: the precomp carries a Stencil Alpha copy of it,
                 # and the parent comp sees one precomp layer (no outer null nor matte; audit F6)
-                return self.emit_clipped(el, None, parent, ctx, clip, stencil=True)
+                return self.emit_clipped(el, None, parent, ctx, clip, stencil=True, **kw)
         if clip is not None and self.layout == "industry" and el.id not in self._rig_targets(ctx.artboard):
             src = self.p.by_id.get(clip.get("sourceId"))
             if src is not None and not any(e is src for e in el.iter()):
                 # the clip source lives elsewhere: the null would only hold the node's transform, which the precomp's
                 # root null already carries — no outer null (it was left with no child)
-                return self.emit_clipped(el, None, parent, ctx, clip)
+                return self.emit_clipped(el, None, parent, ctx, clip, **kw)
         var = J.var("nul")
         label = ("[script] " if placeholder else "") + el.name
         J(f'var {var} = {ctx.comp}.layers.addNull(); {var}.name = {js(label)}; {var}.label = {4 if placeholder else 3};')
@@ -1959,7 +2056,7 @@ class Converter:
         self.base_transform(var, el, ctx)
         clip = el.find("ClippingShape")
         if clip is not None:
-            return self.emit_clipped(el, var, parent, ctx, clip)
+            return self.emit_clipped(el, var, parent, ctx, clip, **kw)
         # Rive: a group's opacity is multiplied into every descendant (rive docs transforms) = AE per-layer opacity
         # with the propagateOpacity expression; no group compositing.
         if el.tag == "Solo":
@@ -1977,11 +2074,14 @@ class Converter:
         J(f"{var}.moveToBeginning();")
         return var
 
-    def emit_clipped(self, el, nul, parent, ctx, clip, stencil=False):
+    def emit_clipped(self, el, nul, parent, ctx, clip, stencil=False, mask=None, hidden=False, matte_for=None):
         """Node with a ClippingShape: its subtree goes into a precomp built in the PARENT's space (a root null inside
         carries the node's transform + keys), matted by a copy of the clip source. A collapsed precomp with a track
         matte is rasterised at its comp size (measured), so the precomp is not collapsed: its canvas is the artboard
-        for a top-level node, 3x the artboard (centred) for a deeper one."""
+        for a top-level node, 3x the artboard (centred) for a deeper one.
+        Also: a node with a LayerMask (`mask`: its precomp gets the source's copy as track matte), a LayerMask source
+        Rive does not draw (`hidden`: its precomp is switched off) and that copy itself (`matte_for`: the masked
+        element; a source that is not a Node — a shape, a text… — is emitted whole inside the precomp)."""
         J = self.W
         ab = ctx.artboard
         src = self.p.by_id.get(clip.get("sourceId")) if clip is not None else None
@@ -1991,8 +2091,11 @@ class Converter:
         cw, ch = (3 * w, 3 * h) if big else (w, h)
         offx, offy = (w, h) if big else (0.0, 0.0)
         dur = self.duration_of(ab, ctx.anim)
-        sname = el.name + (" (clipped)" if clip is not None else " (group)")
-        stag = "rive:" + (el.id or sub) + "|" + (ctx.anim.id if ctx.anim else "") + "|clip"
+        sname = el.name + (" (clipped)" if clip is not None else " (matte)" if matte_for is not None else
+                           " (masked)" if mask is not None else " (group)")
+        stag = ("rive:" + (matte_for.id + "+matte" if matte_for is not None else el.id or sub) + "|"
+                + (ctx.anim.id if ctx.anim else "") + "|clip")
+        inline = matte_for is not None and el.tag != "Node"
         self.mark(stag, sub, sname)
         J(f"//<head {sub}>")
         J("try {")
@@ -2001,12 +2104,21 @@ class Converter:
         root = J.var("root")
         J(f'var {root} = {sub}.layers.addNull(); {root}.name = {js(el.name)}; {root}.label = 3;')
         J(f'tr({root}, "ADBE Anchor Point").setValue([{js(-offx)}, {js(-offy)}]); tr({root}, "ADBE Opacity").setValue(100);')
-        self.base_transform(root, el, subctx)
+        if inline:                                # identity: the element carries its own transform (a new null sits at
+            J(f'tr({root}, "ADBE Position").setValue([0, 0]);')   # the comp centre, which offset the copy)
+        else:
+            self.base_transform(root, el, subctx)
         J(f'resetProp(tr({root}, "ADBE Opacity"), 100); {root}.blendingMode = BlendingMode.NORMAL;')
         J(f'tagNew({sub}, 0, "head", null);')
         J(f'}} catch (eC) {{ log({js("comp FAILED: " + sname)} + ": " + eC.toString() + " line " + eC.line); }}')
         J("//</head>")
-        self.emit_children(el, root, subctx)
+        if inline:
+            etag = self.tag_of(el)
+            J(f"//<el {etag} {sub} {root}>")
+            v = self.emit_element(el, root, subctx)
+            J(f"//</el {etag} {v if isinstance(v, str) else '__none'}>")
+        else:
+            self.emit_children(el, root, subctx)
         if stencil:
             stag = "rive:" + (el.id or "") + "+clip"
             J(f"//<el {stag} {sub} ->")
@@ -2019,16 +2131,27 @@ class Converter:
         if parent:
             J(f"{lv}.parent = {parent};")
         J(f'resetTf({lv}, {js(offx)}, {js(offy)}, 0, 0);')
-        op = el.num("opacity", 1)
-        if op != 1:
-            J(f'tr({lv}, "ADBE Opacity").setValue({js(op * 100)});')
-        ko = ctx.keys(el.id, "opacity")
-        if ko:
-            J(f'keys(tr({lv}, "ADBE Opacity"), {ctx.rows(ko, lambda v: v * 100)});')
-        self.emit_binds(el, {"opacity": (f'tr({lv}, "ADBE Opacity")', "%s * 100")}, ctx)
-        bm = blend_name(el.get("blendModeValue"))
-        if bm and bm != "srcOver":
-            J(f'{lv}.blendingMode = BLEND[{js(bm)}];')
+        if not inline:                            # an inlined element carries its own opacity and blend mode
+            op = el.num("opacity", 1)
+            if op != 1:
+                J(f'tr({lv}, "ADBE Opacity").setValue({js(op * 100)});')
+            ko = ctx.keys(el.id, "opacity")
+            if ko:
+                J(f'keys(tr({lv}, "ADBE Opacity"), {ctx.rows(ko, lambda v: v * 100)});')
+            self.emit_binds(el, {"opacity": (f'tr({lv}, "ADBE Opacity")', "%s * 100")}, ctx)
+            bm = blend_name(el.get("blendModeValue"))
+            if bm and bm != "srcOver":
+                J(f'{lv}.blendingMode = BLEND[{js(bm)}];')
+        if hidden:
+            J(f"{lv}.enabled = false;")
+            self.rep.add(ab.name, "converted", el, "LayerMask source (not drawn by Rive): its precomp switched off, "
+                                                   "a copy is the track matte")
+        if mask is not None:
+            if clip is not None and not stencil:
+                self.rep.add(ab.name, "approx", el, "ClippingShape and LayerMask on one node: AE gives a layer one track "
+                                                    "matte, the LayerMask is left out")
+            else:
+                self.apply_layer_mask(el, lv, parent, ctx, mask)
         if clip is None:
             if nul:
                 J(f"{nul}.moveToBeginning();")

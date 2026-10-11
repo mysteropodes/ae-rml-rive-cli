@@ -1,0 +1,63 @@
+<Rive version="1" kind="fragment">
+  <!-- LayerMask cases: rml2ae turns them into native AE track mattes; CI verifies them with the Rive CLI -->
+  <Artboard width="800" height="400" clip="true" defaultStateMachineId="0:90" name="Masks" id="0:1">
+    <Fill name="Background">
+      <SolidColor colorValue="FF20242C" name="Color"/>
+    </Fill>
+    <!-- 1. luma matte, source hidden (maskFlags 6 = luminance | isVisible): a sliding black-to-white ramp -->
+    <Node x="200" y="200" name="Photo" id="0:10">
+      <LayerMask sourceId="0:20" maskFlags="6" name="Track matte (luma)" id="0:11"/>
+      <Shape name="Photo fill" id="0:12">
+        <Rectangle width="300" height="300" name="Rectangle" id="0:13"/>
+        <Fill name="Fill" id="0:14">
+          <SolidColor colorValue="FFF27333" name="Color" id="0:15"/>
+        </Fill>
+      </Shape>
+    </Node>
+    <Node x="200" y="200" name="Ramp" id="0:20">
+      <Shape name="Ramp shape" id="0:21">
+        <Rectangle width="300" height="300" name="Rectangle" id="0:22"/>
+        <Fill name="Fill" id="0:23">
+          <LinearGradient startX="-150" startY="0" endX="150" endY="0" name="Ramp" id="0:24">
+            <GradientStop position="0" colorValue="FF000000" id="0:25"/>
+            <GradientStop position="1" colorValue="FFFFFFFF" id="0:26"/>
+          </LinearGradient>
+        </Fill>
+      </Shape>
+    </Node>
+    <!-- 2. inverted alpha matte, source drawn (maskFlags 13 = invertedAlpha | isVisible | sourceDraws), a Shape -->
+    <Node x="600" y="200" name="Card" id="0:30">
+      <LayerMask sourceId="0:40" maskFlags="13" name="Track matte (inverted alpha)" id="0:31"/>
+      <Shape name="Card fill" id="0:32">
+        <Rectangle width="300" height="300" cornerRadiusTL="24" name="Rectangle" id="0:33"/>
+        <Fill name="Fill" id="0:34">
+          <SolidColor colorValue="FF33BF99" name="Color" id="0:35"/>
+        </Fill>
+      </Shape>
+    </Node>
+    <Shape x="600" y="200" name="Hole" id="0:40">
+      <Ellipse width="160" height="160" name="Ellipse" id="0:41"/>
+      <Fill name="Fill" id="0:42">
+        <SolidColor colorValue="80FFFFFF" name="Color" id="0:43"/>
+      </Fill>
+    </Shape>
+    <LinearAnimation fps="25" duration="50" loopValue="loop" name="Masks" id="0:80">
+      <KeyedObject objectId="0:20">
+        <KeyedProperty propertyKey="13">
+          <KeyFrameDouble value="100" frame="0" interpolationType="linear"/>
+          <KeyFrameDouble value="300" frame="50" interpolationType="hold"/>
+        </KeyedProperty>
+      </KeyedObject>
+    </LinearAnimation>
+    <StateMachine name="State Machine 1" id="0:90">
+      <StateMachineLayer name="Layer 1" id="0:91">
+        <AnyState x="200" y="-120"/>
+        <ExitState x="400" y="-120"/>
+        <EntryState x="0" y="0">
+          <StateTransition stateToId="0:92"/>
+        </EntryState>
+        <AnimationState x="200" y="0" animationId="0:80" id="0:92"/>
+      </StateMachineLayer>
+    </StateMachine>
+  </Artboard>
+</Rive>

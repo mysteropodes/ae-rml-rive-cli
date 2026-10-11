@@ -102,6 +102,7 @@ Remaining nulls are animated controllers (cameras, three-copy RGB split and simi
 | `NestedArtboard` | A precomp (collapsed if the artboard does not clip). `NestedRemapAnimation.time` (0..1) becomes a keyed Time Remap; `NestedSimpleAnimation` becomes a played precomp. |
 | `Node` (x, y, rotation in radians, scale, opacity) | A null (or folded/grouped, see above). Children are parented. Opacity is propagated by expression (`value * parent.opacity/100`) when not grouped. |
 | `Node` + `ClippingShape` | A precomp of the subtree (in the parent's space, 3x canvas for deep nodes) with a copy of the clip as alpha track matte. |
+| `Node` + `LayerMask` | The same precomp, with a copy of the mask source (its own precomp, painted as it is, in the source's space) as track matte of the mode's type: alpha, alpha inverted, luma, luma inverted. A source Rive does not draw (`sourceDraws` false) becomes a precomp switched off. Read as `maskFlags` or as `maskModeValue` / `isVisible` / `sourceDraws`. A node with both a clip and a mask keeps the clip only (AE: one track matte per layer). |
 | `Shape` + `PointsPath` (Straight, CubicDetached, Mirrored, Asymmetric), `Rectangle`, `Ellipse`, `Polygon`, `Star`, `Triangle` | Shape layer, one group per `Shape`. Keyed vertices become path keys. |
 | `Fill` / `Stroke` + `SolidColor` (keyed colour), cap/join/thickness, `fillRule`, `TrimPath`, `DashPath` | Fill, Stroke, Trim Paths, Dashes. |
 | Gradients | Two stops: Gradient Ramp. More stops, or any gradient with alpha: a gradient PNG with a matte (the Ramp has no alpha). |
