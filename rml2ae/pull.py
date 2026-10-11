@@ -1,6 +1,6 @@
 """`ae pull`: what you changed in After Effects goes back into scene.rml.
 
-Scope (v1): the transform of every layer that rml2ae tagged with a Rive id (`comment` = "rive:<id>", inside a comp
+Scope: the transform of every layer that rml2ae tagged with a Rive id (`comment` = "rive:<id>", inside a comp
 tagged "rive:<artboard>|<animation>" or "…|clip") — x, y, rotation, scaleX, scaleY, opacity, hidden flag —
 as static attributes when the property has no animation in AE, as keyframes of that animation otherwise
 (AE bezier eases are turned back into Rive CubicEaseInterpolator; linear and hold are kept as such; the keys rml2ae
@@ -8,6 +8,7 @@ baked one per frame for an elastic or CubicValueInterpolator segment fold back i
 Static values are read from the artboard's first animation comp only (the element exists once, it is drawn in every
 animation comp); keyframes from each animation comp. A single AE key on a property the RML animation does not key
 is a value carried from a previous state, not an edit: ignored.
+Shape contents (fill / stroke colour, stroke thickness, paths) are read from the same dump: pullshape.py.
 
 The RML is edited in place as text (attributes and <KeyedProperty> blocks only, nothing else moves), then checked
 with `rive <project> --verify`; the build manifest is updated so the next incremental build does not rebuild the
@@ -21,7 +22,7 @@ import re
 import subprocess
 
 from .jsx import js, TIDY_JSX, TIDY_PULL_JSX
-from .model import Project, segment_value
+from .model import Project, is_a, segment_value
 
 PROPS = {"x": 13, "y": 14, "rotation": 15, "scaleX": 16, "scaleY": 17, "opacity": 18}
 EPS = {"x": 0.01, "y": 0.01, "rotation": 0.0005, "scaleX": 0.0005, "scaleY": 0.0005, "opacity": 0.002}
@@ -34,20 +35,43 @@ function num(v) { return (isNaN(v) || !isFinite(v)) ? "0" : String(Math.round(v 
 function prop(L, name) { return L.property("ADBE Transform Group").property(name); }
 function itype(t) { return t == KeyframeInterpolationType.HOLD ? "h" : (t == KeyframeInterpolationType.LINEAR ? "l" : "b"); }
 function ease(arr) { var o = []; for (var i = 0; i < arr.length; i++) o.push("[" + num(arr[i].speed) + "," + num(arr[i].influence) + "]"); return "[" + o.join(",") + "]"; }
+function pts(a) { var o = []; for (var i = 0; i < a.length; i++) o.push("[" + num(a[i][0]) + "," + num(a[i][1]) + "]"); return "[" + o.join(",") + "]"; }
+// a value: number, array (every component: colours have 4) or path (Shape: vertices and tangents in the group's space)
+function val(v) {
+  if (v instanceof Shape) return "{\"vs\":" + pts(v.vertices) + ",\"in\":" + pts(v.inTangents) + ",\"out\":" + pts(v.outTangents) + ",\"c\":" + (v.closed ? "true" : "false") + "}";
+  if (v instanceof Array) { var o = []; for (var i = 0; i < v.length; i++) o.push(num(v[i])); return "[" + o.join(",") + "]"; }
+  return num(v);
+}
 function dumpProp(p) {
   var pv = p.value; try { pv = p.valueAtTime(0, true); } catch (e9) {}     // pre-expression (opacity carries an expression)
-  var out = "{\"v\":" + (pv instanceof Array ? "[" + num(pv[0]) + "," + num(pv[1]) + "]" : num(pv));
+  var out = "{\"v\":" + val(pv);
   if (p.numKeys > 0) {
     var ks = [];
     for (var i = 1; i <= p.numKeys; i++) {
-      var v = p.keyValue(i);
-      ks.push("{\"t\":" + num(p.keyTime(i)) + ",\"v\":" + (v instanceof Array ? "[" + num(v[0]) + "," + num(v[1]) + "]" : num(v)) +
+      ks.push("{\"t\":" + num(p.keyTime(i)) + ",\"v\":" + val(p.keyValue(i)) +
               ",\"i\":" + q(itype(p.keyInInterpolationType(i))) + ",\"o\":" + q(itype(p.keyOutInterpolationType(i))) +
               ",\"ie\":" + ease(p.keyInTemporalEase(i)) + ",\"oe\":" + ease(p.keyOutTemporalEase(i)) + "}");
     }
     out += ",\"k\":[" + ks.join(",") + "]";
   }
+  try { if (p.expressionEnabled && p.expression) out += ",\"x\":true"; } catch (eX) {}     // driven (data binding): not an edit
   return out + "}";
+}
+// the contents of a vector group, in AE order: paths, fills, strokes (and anything else by match name)
+function dumpItems(gc) {
+  var out = [];
+  for (var i = 1; i <= gc.numProperties; i++) {
+    var it = gc.property(i), mn = it.matchName;
+    if (mn == "ADBE Vector Group") continue;
+    if (mn == "ADBE Vector Shape - Group") out.push("{\"m\":\"path\",\"p\":" + dumpProp(it.property("ADBE Vector Shape")) + "}");
+    else if (mn == "ADBE Vector Shape - Rect") out.push("{\"m\":\"rect\",\"size\":" + dumpProp(it.property("ADBE Vector Rect Size")) + ",\"pos\":" + dumpProp(it.property("ADBE Vector Rect Position")) + "}");
+    else if (mn == "ADBE Vector Shape - Ellipse") out.push("{\"m\":\"ellipse\",\"size\":" + dumpProp(it.property("ADBE Vector Ellipse Size")) + ",\"pos\":" + dumpProp(it.property("ADBE Vector Ellipse Position")) + "}");
+    else if (mn == "ADBE Vector Shape - Star") out.push("{\"m\":\"star\"}");
+    else if (mn == "ADBE Vector Graphic - Fill") out.push("{\"m\":\"fill\",\"c\":" + dumpProp(it.property("ADBE Vector Fill Color")) + ",\"o\":" + dumpProp(it.property("ADBE Vector Fill Opacity")) + "}");
+    else if (mn == "ADBE Vector Graphic - Stroke") out.push("{\"m\":\"stroke\",\"c\":" + dumpProp(it.property("ADBE Vector Stroke Color")) + ",\"o\":" + dumpProp(it.property("ADBE Vector Stroke Opacity")) + ",\"w\":" + dumpProp(it.property("ADBE Vector Stroke Width")) + "}");
+    else out.push("{\"m\":" + q(mn) + "}");
+  }
+  return "[" + out.join(",") + "]";
 }
 // vector groups of a shape layer (rml2ae's industry layout: a group per Rive Node / Shape), by rank among groups
 function dumpGroups(container, path, out) {
@@ -60,7 +84,7 @@ function dumpGroups(container, path, out) {
     var t = g.property("ADBE Vector Transform Group");
     out.push("{\"path\":[" + p2.join(",") + "],\"enabled\":" + (g.enabled ? "true" : "false") + ",\"p\":" + dumpProp(t.property("ADBE Vector Position")) +
              ",\"r\":" + dumpProp(t.property("ADBE Vector Rotation")) + ",\"s\":" + dumpProp(t.property("ADBE Vector Scale")) +
-             ",\"o\":" + dumpProp(t.property("ADBE Vector Group Opacity")) + "}");
+             ",\"o\":" + dumpProp(t.property("ADBE Vector Group Opacity")) + ",\"items\":" + dumpItems(g.property("ADBE Vectors Group")) + "}");
     dumpGroups(g.property("ADBE Vectors Group"), p2, out);
   }
 }
@@ -95,7 +119,8 @@ try {
       if (sepd) rec += ",\"px\":" + dumpProp(prop(L, "ADBE Position_0")) + ",\"py\":" + dumpProp(prop(L, "ADBE Position_1"));
       else rec += ",\"p\":" + dumpProp(prop(L, "ADBE Position"));
       rec += ",\"r\":" + dumpProp(prop(L, "ADBE Rotate Z")) + ",\"s\":" + dumpProp(prop(L, "ADBE Scale")) + ",\"o\":" + dumpProp(prop(L, "ADBE Opacity"));
-      rec += ",\"tag\":" + q(c) + ",\"run\":" + (isRun ? "true" : "false");
+      rec += ",\"tag\":" + q(c) + ",\"run\":" + (isRun ? "true" : "false")
+      if (tm || L.name.indexOf("(matte)") >= 0) rec += ",\"matte\":true";     // a clip's geometry: its paints are not the element's
       var tch = TIDY[it.id + ":" + L.id];
       var top = TIDY["op:" + it.id + ":" + L.id];       // the opacity of a lifted precomp's node, carried by this layer
       if (top && top.length && top[0][0].indexOf("rive:") == 0) rec += ",\"opid\":" + q(top[0][0].substr(5).split("+")[0]);
@@ -291,7 +316,7 @@ class RmlText:
         self.changed = True
         return True
 
-    def set_keys(self, anim_id, oid, pk, keys):
+    def set_keys(self, anim_id, oid, pk, keys, kxml=None):
         pat = r'<LinearAnimation\b[^<>]*?\sid="' + re.escape(anim_id) + r'"[^<>]*>'
         m = re.search(pat, self.text)
         if not m:
@@ -305,7 +330,7 @@ class RmlText:
             m = re.search(pat, self.text)
         end = self.text.index("</LinearAnimation>", m.end())
         block = self.text[m.end():end]
-        body = "".join(key_xml(*k) for k in keys)
+        body = "".join((kxml or key_xml)(*k) for k in keys)
         kp = f'<KeyedProperty propertyKey="{pk}">{body}</KeyedProperty>' if keys else ""
         ko = re.search(r'<KeyedObject objectId="' + re.escape(oid) + r'">', block)
         if ko is None:
@@ -322,6 +347,105 @@ class RmlText:
             else:                                   # the object has no keyed property left: drop it
                 block = block[:ko.start()] + block[ko_end + len("</KeyedObject>"):]
         self.text = self.text[:m.end()] + block + self.text[end:]
+        self.changed = True
+        return True
+
+    # ---- elements without an id (a Fill, its SolidColor, a path, its vertices): addressed from their nearest ancestor
+    # that has one, by rank among element children (the model's El tree has the same children, comments aside)
+    _TAG = re.compile(r'<!--.*?-->|<\?.*?\?>|<(/?)([A-Za-z_][\w:.-]*)((?:[^<>"]|"[^"]*")*?)(/?)>', re.S)
+
+    def _element(self, pos):
+        """the element whose start tag is at `pos` -> (start, start-tag end, end, self-closing)"""
+        m = self._TAG.match(self.text, pos)
+        if m.group(4):
+            return (pos, m.end(), m.end(), True)
+        depth = 0
+        for t in self._TAG.finditer(self.text, m.end()):
+            if t.group(2) is None:
+                continue
+            if t.group(1):
+                if depth == 0:
+                    return (pos, m.end(), t.end(), False)
+                depth -= 1
+            elif not t.group(4):
+                depth += 1
+        raise ValueError("unclosed element at %d" % pos)
+
+    def _children(self, span):
+        out = []
+        if span[3]:
+            return out
+        pos = span[1]
+        while True:
+            t = self._TAG.search(self.text, pos)
+            if t is None or t.group(1):
+                return out
+            if t.group(2) is None:
+                pos = t.end()
+                continue
+            c = self._element(t.start())
+            out.append(c)
+            pos = c[2]
+
+    def span(self, el):
+        """(start, start-tag end, end, self-closing) of a model element in this text, or None"""
+        chain = []
+        while el is not None and not el.id:
+            if el.parent is None:
+                return None
+            chain.append(el.parent.children.index(el))
+            el = el.parent
+        if el is None:
+            return None
+        m = re.search(r'<\w+\b[^<>]*?\sid="' + re.escape(el.id) + r'"', self.text)
+        if not m:
+            return None
+        sp = self._element(m.start())
+        for k in reversed(chain):
+            kids = self._children(sp)
+            if k >= len(kids):
+                return None
+            sp = kids[k]
+        return sp
+
+    def set_attr_el(self, el, name, value):
+        """set (or drop, value None) one attribute of a model element, with or without an id; the model follows"""
+        sp = self.span(el)
+        if sp is None:
+            return False
+        head = self.text[sp[0]:sp[1]]
+        m = re.match(r'<[\w:.-]+', head)
+        tail = "/>" if sp[3] else ">"
+        attrs = head[m.end():len(head) - len(tail)]
+        if re.search(r'\s' + name + r'="', attrs):
+            if value is None:
+                attrs = re.sub(r'\s' + name + r'="[^"]*"', "", attrs)
+            else:
+                attrs = re.sub(r'(\s' + name + r'=")[^"]*(")', lambda mm: mm.group(1) + value + mm.group(2), attrs)
+        elif value is not None:
+            attrs = attrs.rstrip() + f' {name}="{value}"'
+        else:
+            return False
+        self.text = self.text[:sp[0]] + m.group(0) + attrs + tail + self.text[sp[1]:]
+        if value is None:
+            el.attrs.pop(name, None)
+        else:
+            el.attrs[name] = value
+        self.changed = True
+        return True
+
+    def replace_children(self, el, xml):
+        """the element's children (and text) replaced by `xml`"""
+        sp = self.span(el)
+        if sp is None:
+            return False
+        if sp[3]:
+            head = self.text[sp[0]:sp[1] - 2].rstrip()
+            tag = re.match(r'<([\w:.-]+)', head).group(1)
+            self.text = self.text[:sp[0]] + head + ">" + xml + f"</{tag}>" + self.text[sp[2]:]
+        else:
+            close = self.text.rindex("</", sp[1], sp[2])
+            self.text = self.text[:sp[1]] + xml + self.text[close:]
         self.changed = True
         return True
 
@@ -441,6 +565,12 @@ def apply(project_dir, out_dir, dry=False, only_comp=None):
     offsets = side.get("offsets") or {}           # translation of dissolved nodes carried by a layer (audit F14)
     if chains:
         comps = split_chains(comps, chains, proj)
+    from .pullshape import Contents
+    top = [max([0] + [int(n) for f in files.values() for n in re.findall(r'\sid="0:(\d+)"', f.text)])]
+
+    def new_id():                                 # an element keyed for the first time needs an id
+        top[0] += 1
+        return f"0:{top[0]}"
     for ab in proj.artboards:
         chain, _, _ = proj.entry_chain(ab)
         first_anim = chain[0].id if chain else None
@@ -557,13 +687,37 @@ def apply(project_dir, out_dir, dry=False, only_comp=None):
                             f.set_attr(oid, "drawableFlags", str(nf) if nf else None)
                         changes.append(f"{ab.name}: {el.name} ({oid}) {'shown' if L['enabled'] else 'hidden'}")
                         pulled_ids.add(oid)
+            # shape contents: fill / stroke colour, stroke thickness, paths (pullshape.py)
+            cont = Contents(ab, anim, [a for a in proj.animations.values() if a.el.parent is ab], file_of, new_id,
+                            changes, pulled_ids, dry)
+            done = set()
+            for L in comp["layers"]:
+                if L.get("run") or L.get("matte"):
+                    continue
+                gids = group_ids.get(L.get("tag") or ("rive:" + L["id"]), {})
+                found = []
+                el = proj.by_id.get(L.get("id"))
+                if el is not None and is_a(el.tag, "Shape") and not gids:
+                    found += [(el, g, True) for g in L.get("groups") or [] if g["path"] == [1]]
+                for g in L.get("groups") or []:
+                    gel = proj.by_id.get(gids.get(tuple(g["path"])))
+                    if gel is not None and is_a(gel.tag, "Shape"):
+                        found.append((gel, g, False))
+                for sh, g, dedicated in found:
+                    if sh.id in done or "items" not in g:
+                        continue
+                    done.add(sh.id)
+                    cont.shape(sh, g["items"], dedicated, first_with.get(L["id"], first_anim) == anim_id, bool(comp.get("window")))
     if dry or not changes:
         return changes
     for f in files.values():
         f.save()
-    v = subprocess.run(["rive", project_dir, "--verify"], capture_output=True, text=True)
-    if v.returncode != 0:
-        changes.append("WARNING rive --verify failed after the pull:\n" + (v.stdout + v.stderr)[-800:])
+    try:
+        v = subprocess.run(["rive", project_dir, "--verify"], capture_output=True, text=True)
+        if v.returncode != 0:
+            changes.append("WARNING rive --verify failed after the pull:\n" + (v.stdout + v.stderr)[-800:])
+    except FileNotFoundError:
+        changes.append("WARNING rive not found: the pulled RML was not verified")
     # the manifest now describes what AE already has for these elements: no rebuild of them at the next incremental build
     mpath = os.path.join(out_dir, proj.name + ".manifest.json")
     if os.path.exists(mpath):
