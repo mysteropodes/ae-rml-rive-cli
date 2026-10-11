@@ -14,6 +14,7 @@ from .report import Report
 from . import replay as RP
 from . import riveshader as RS
 from . import rig as RIG
+from . import ffx as FFX
 
 ASCENT = 0.968          # Rive: first baseline = box top + ascent * size (Montserrat hhea, measured); per-font below
 BLOCK_H = 1.164         # measured: bounds height of a one-line text = lineHeight*(n-1) + 1.164*size (see guidelines §5)
@@ -2715,9 +2716,19 @@ fn fs_main(in: VSOut) -> @location(0) vec4<f32> {{
         if parent and not skinned:
             J(f"{var}.parent = {parent};")
         J(f'var gr = {var}.property("ADBE Root Vectors Group");')
-        # the group carries the element's name (AE's default "Groupe 1" told nothing; audit F35) — pull maps groups by rank
-        J(f'var g = gr.addProperty("ADBE Vector Group"); g.name = {js(el.name or "Shape")}; var gc = g.property("ADBE Vectors Group");')
-        self.emit_contents(el, ctx, as_matte, skip=feathered, skinned=skinned)
+        paints = [c for c in el.children if (c.tag == "Fill" and c not in feathered) or c.tag == "Stroke"]
+        grad_paints = [c for c in paints if self.gradient_of(c) is not None]
+        # native gradients (presets): exact for any stops, alpha and transform, but their colours cannot be keyed from
+        # a script — a lone 2-stop gradient whose colours are keyed keeps the keyable Gradient Ramp when it is exact
+        ramp_keys = (len(paints) == 1 and grad_paints and self.keyed_stops(self.gradient_of(paints[0]), ctx)
+                     and self.ramp_ok(self.gradient_of(paints[0]), el))
+        native = not as_matte and not skinned and bool(grad_paints) and not ramp_keys and FFX.available()
+        if native:
+            self.emit_native_paints(var, el, ctx, paints)
+        else:
+            # the group carries the element's name (AE's default "Groupe 1" told nothing; audit F35) — pull maps groups by rank
+            J(f'var g = gr.addProperty("ADBE Vector Group"); g.name = {js(el.name or "Shape")}; var gc = g.property("ADBE Vectors Group");')
+            self.emit_contents(el, ctx, as_matte, skip=feathered, skinned=skinned)
         fst = [c for c in el.children if c.tag == "Stroke" and c.find("Feather") is not None]
         if fst and not as_matte and not any(c.tag == "Fill" for c in el.children):
             # a feathered stroke alone on its shape (a glowing outline): the layer is blurred instead
@@ -2727,12 +2738,16 @@ fn fs_main(in: VSOut) -> @location(0) vec4<f32> {{
         if as_matte and not any(c.tag in ("Fill", "Stroke") for c in el.children):
             # a paint-less clip source (Rive clips by geometry, draws nothing): the matte needs an opaque fill
             J('var fl = gc.addProperty("ADBE Vector Graphic - Fill"); fl.property("ADBE Vector Fill Color").setValue([1,1,1]); fl.property("ADBE Vector Fill Opacity").setValue(100);')
-        grads = [c for c in el.children if c.tag == "Fill" and self.gradient_of(c) is not None]
+        grads = [] if native or as_matte else grad_paints
         if grads:
-            # effect points on a shape layer are content coordinates + the layer position (measured in AE 2026)
-            self.emit_gradient(var, self.gradient_of(grads[0]), ctx, el, offset=((0.0, 0.0) if skinned else (el.num("x"), el.num("y"))))
-            if len(grads) > 1:
-                self.rep.add(ab, "approx", el, f"{len(grads)} gradient fills on one shape: only the first is a gradient")
+            # no gradient presets (rml2ae/presets) or a skinned shape: a layer-level gradient, exact only when it is
+            # the shape's one paint (a Ramp / matted PNG colours every pixel of the layer)
+            if len(paints) == 1:
+                # effect points on a shape layer are content coordinates + the layer position (measured in AE 2026)
+                self.emit_gradient(var, self.gradient_of(grads[0]), ctx, el, offset=((0.0, 0.0) if skinned else (el.num("x"), el.num("y"))))
+            else:
+                self.rep.add(ab, "approx", el, f"{len(grads)} gradient paint(s) among {len(paints)} paints without gradient presets: "
+                             "drawn in their middle stop colour")
         if skinned:
             # world-space geometry baked per frame: the layer stays at identity, unparented
             J(f'resetTf({var}, 0, 0, 0, 0);')
@@ -2758,6 +2773,63 @@ fn fs_main(in: VSOut) -> @location(0) vec4<f32> {{
             if el.id:
                 self.layer_of[el.id] = var
         return var
+
+    def emit_native_paints(self, var, el, ctx, paints):
+        """Paints with gradients as native Gradient Fill / Stroke: one vector group per paint, each holding a copy of
+        the shape's paths (a gradient group comes from a preset, rml2ae/ffx.py). Rive draws the later paint on top, AE
+        the higher group: groups in reverse paint order."""
+        J = self.W
+        base = el.name or "Shape"
+        for k, c in enumerate(reversed(paints)):
+            name = base if k == 0 else f"{base} {k + 1}"
+            shift = stroke_shift(c, el) if c.tag == "Stroke" else 0.0
+            gd = self.gradient_of(c)
+            if gd is None:
+                J(f'var g = gr.addProperty("ADBE Vector Group"); g.name = {js(name)}; var gc = g.property("ADBE Vectors Group");')
+            else:
+                kind = "fill" if c.tag == "Fill" else "stroke"
+                path = self.gradient_preset(gd, kind, ctx, el)
+                J(f'var gc = gradGroup({var}, {js(path)}, {js(FFX.TEMPLATE_GROUP[kind])}, {js(name)});')
+            for p in el.children:
+                if is_a(p.tag, "Path"):
+                    self.emit_path(p, ctx, el)
+            if c.tag == "Fill":
+                self.emit_fill(c, ctx, el, False, grad=gd)
+            else:
+                self.emit_stroke(c, ctx, el, shift, grad=gd)
+
+    def gradient_preset(self, gd, kind, ctx, el):
+        """the .ffx preset carrying gd's colours (static: AE cannot key them from a script)"""
+        ab = ctx.artboard.name
+        stops = [(st.num("position"), argb(st.get("colorValue"))) for st in gd.findall("GradientStop")]
+        if self.keyed_stops(gd, ctx):
+            self.rep.add(ab, "approx", el, "gradient stops keyed: their first values are kept (AE gradient colours cannot be keyed from a script)")
+        self._grad_n = getattr(self, "_grad_n", 0) + 1
+        tag = re.sub(r"[^A-Za-z0-9]+", "_", gd.id or f"{gd.name}{self._grad_n}")
+        path = os.path.join(self.out_dir, f"{self.p.name}_gradient_{tag}.ffx")
+        FFX.write_preset(kind, stops, path)
+        self.rep.add(ab, "converted", el, f"{gd.tag} ({len(stops)} stops) → native Gradient {kind.capitalize()} (points keyable)")
+        return path
+
+    def emit_grad_props(self, gd, v, kind, ctx):
+        """type, start/end points (shape content coordinates, as Rive's) and opacity of the gradient paint v (fl / st)"""
+        J = self.W
+        J(f'{v}.property("ADBE Vector Grad Type").setValue({2 if gd.tag == "RadialGradient" else 1});')
+        for pt, (px, py) in (("Start Pt", ("startX", "startY")), ("End Pt", ("endX", "endY"))):
+            x, y = gd.num(px), gd.num(py)
+            J(f'{v}.property("ADBE Vector Grad {pt}").setValue({js([x, y])});')
+            kx, ky = ctx.keys(gd.id, px), ctx.keys(gd.id, py)
+            if kx or ky:
+                kx = kx or [(0, x, "hold", None)]
+                ky = ky or [(0, y, "hold", None)]
+                J(f'keys({v}.property("ADBE Vector Grad {pt}"), {ctx.rows2(kx, ky, lambda a, b: [a, b])});')
+        op = "ADBE Vector Fill Opacity" if kind == "fill" else "ADBE Vector Stroke Opacity"
+        o = gd.num("opacity", 1)
+        if abs(o - 1) > 1e-6:
+            J(f'{v}.property("{op}").setValue({js(o * 100)});')
+        ko = ctx.keys(gd.id, "opacity")
+        if ko:
+            J(f'keys({v}.property("{op}"), {ctx.rows(ko, lambda x: x * 100)});')
 
     def emit_contents(self, el, ctx, as_matte=False, skip=(), skinned=False):
         """a Shape's paths and paints into the vector group `gc`. Rive draws the LATER paint on top, AE the item
@@ -2913,6 +2985,19 @@ fn fs_main(in: VSOut) -> @location(0) vec4<f32> {{
                 return gd
         return None
 
+    def ramp_ok(self, gd, el):
+        """a Gradient Ramp effect renders gd exactly: two opaque stops (a Ramp has no alpha) on a shape neither parented,
+        rotated nor scaled (Ramp points are COMP coordinates, untouched by the layer's parent: measured, a parented
+        shape's ramp stayed where the unparented one would be)"""
+        stops = gd.findall("GradientStop")
+        alpha_grad = any(argb(st.get("colorValue"))[3] < 0.999 for st in stops)
+        parented = el.parent is not None and el.parent.tag != "Artboard"
+        plain = abs(el.num("rotation")) < 1e-6 and abs(el.num("scaleX", 1) - 1) < 1e-6 and abs(el.num("scaleY", 1) - 1) < 1e-6
+        return len(stops) <= 2 and not alpha_grad and not parented and plain
+
+    def keyed_stops(self, gd, ctx):
+        return any(ctx.keys(st.id, "colorValue") or ctx.keys(st.id, "position") for st in gd.findall("GradientStop"))
+
     def emit_gradient(self, layer_var, gd, ctx, el, offset=(0.0, 0.0)):
         """Gradient paint -> Gradient Ramp effect (2 stops, keyable) or a PNG matted by the shape (more stops)."""
         J = self.W
@@ -2921,12 +3006,7 @@ fn fs_main(in: VSOut) -> @location(0) vec4<f32> {{
         radial = gd.tag == "RadialGradient"
         ox, oy = offset
         sx, sy, ex, ey = gd.num("startX") + ox, gd.num("startY") + oy, gd.num("endX") + ox, gd.num("endY") + oy
-        alpha_grad = any(argb(st.get("colorValue"))[3] < 0.999 for st in stops)
-        # Ramp effect points are COMP coordinates, untouched by the layer's parent (measured: a parented shape's ramp
-        # stayed where the unparented one would be) -> only an unparented, unrotated, unscaled shape can use a Ramp
-        parented = el.parent is not None and el.parent.tag != "Artboard"
-        plain = abs(el.num("rotation")) < 1e-6 and abs(el.num("scaleX", 1) - 1) < 1e-6 and abs(el.num("scaleY", 1) - 1) < 1e-6
-        if len(stops) <= 2 and not alpha_grad and not parented and plain:      # a Ramp has no alpha: transparent stops go through the PNG
+        if self.ramp_ok(gd, el):
             c0 = argb(stops[0].get("colorValue")) if stops else (0, 0, 0, 1)
             c1 = argb(stops[-1].get("colorValue")) if len(stops) > 1 else c0
             p0, p1 = (stops[0].num("position") if stops else 0.0), (stops[-1].num("position") if len(stops) > 1 else 1.0)
@@ -3007,17 +3087,30 @@ fn fs_main(in: VSOut) -> @location(0) vec4<f32> {{
             return ([r, g, b], a, None, None)
         gd = self.gradient_of(paint)
         if gd is not None:
-            return ([1, 1, 1], 1.0, None, None)          # white carrier: the gradient is an effect on the layer (emit_gradient)
+            if sum(1 for c in el.children if c.tag in ("Fill", "Stroke")) <= 1:
+                return ([1, 1, 1], 1.0, None, None)      # white carrier: the gradient is an effect on the layer (emit_gradient)
+            # a gradient among other paints with no native gradient (no presets): its middle stop's colour
+            stops = sorted(gd.findall("GradientStop"), key=lambda st: st.num("position"))
+            if stops:
+                r, g, b, a = argb(stops[len(stops) // 2].get("colorValue"))
+                return ([r, g, b], a, None, None)
+            return ([1, 1, 1], 1.0, None, None)
         return ([0, 0, 0], 1.0, None, None)
 
-    def emit_fill(self, c, ctx, el, as_matte):
+    def emit_fill(self, c, ctx, el, as_matte, grad=None):
+        """a Fill into gc; grad: the gradient of the group's Gradient Fill (from a preset), moved below the paths"""
         J = self.W
         rgb, a, kc, ko = self.paint_color(c, ctx, el)
         if as_matte:
             a = 1.0
         rule = 2 if c.get("fillRule") == "evenOdd" else 1
-        J('var fl = gc.addProperty("ADBE Vector Graphic - Fill");')
-        J(f'fl.property("ADBE Vector Fill Color").setValue({js(rgb)}); fl.property("ADBE Vector Fill Opacity").setValue({js(a * 100)}); fl.property("ADBE Vector Fill Rule").setValue({rule});')
+        if grad is not None:
+            kc = None
+            J(f'var fl = gradPaint(gc); fl.property("ADBE Vector Fill Rule").setValue({rule});')
+            self.emit_grad_props(grad, "fl", "fill", ctx)
+        else:
+            J('var fl = gc.addProperty("ADBE Vector Graphic - Fill");')
+            J(f'fl.property("ADBE Vector Fill Color").setValue({js(rgb)}); fl.property("ADBE Vector Fill Opacity").setValue({js(a * 100)}); fl.property("ADBE Vector Fill Rule").setValue({rule});')
         if kc:
             J(f'keys(fl.property("ADBE Vector Fill Color"), {kc}); keys(fl.property("ADBE Vector Fill Opacity"), {ko});')
         if c.get("isVisible") == "false":
@@ -3027,8 +3120,9 @@ fn fs_main(in: VSOut) -> @location(0) vec4<f32> {{
         if sc is not None:
             self.emit_binds(sc, {"colorValue": ('fl.property("ADBE Vector Fill Color")', "%s")}, ctx)
 
-    def emit_stroke(self, c, ctx, el, shift=0.0):
-        """shift: Offset Paths amount per unit of width (Stroke.position inside / outside, see emit_contents)"""
+    def emit_stroke(self, c, ctx, el, shift=0.0, grad=None):
+        """shift: Offset Paths amount per unit of width (Stroke.position inside / outside, see emit_contents); grad:
+        the gradient of the group's Gradient Stroke (from a preset), moved below the paths and the offset"""
         J = self.W
         ab = ctx.artboard.name
         rgb, a, kc, ko = self.paint_color(c, ctx, el)
@@ -3044,8 +3138,13 @@ fn fs_main(in: VSOut) -> @location(0) vec4<f32> {{
                 self.rep.add(ab, "approx", el, f"stroke {c.get('position')} on an open path: the path is offset sideways")
             self.rep.add(ab, "converted", el, f"stroke {c.get('position')} → centred stroke on the paths offset by "
                                               f"{'-' if shift < 0 else '+'}width/2 (Offset Paths)")
-        J('var st = gc.addProperty("ADBE Vector Graphic - Stroke");')
-        J(f'st.property("ADBE Vector Stroke Color").setValue({js(rgb)}); st.property("ADBE Vector Stroke Opacity").setValue({js(a * 100)});')
+        if grad is not None:
+            kc = None
+            J('var st = gradPaint(gc);')
+            self.emit_grad_props(grad, "st", "stroke", ctx)
+        else:
+            J('var st = gc.addProperty("ADBE Vector Graphic - Stroke");')
+            J(f'st.property("ADBE Vector Stroke Color").setValue({js(rgb)}); st.property("ADBE Vector Stroke Opacity").setValue({js(a * 100)});')
         J(f'st.property("ADBE Vector Stroke Width").setValue({js(c.num("thickness", 1))});')
         cap = {"butt": 1, "round": 2, "square": 3}.get(c.get("cap", "butt"), 1)
         join = {"miter": 1, "round": 2, "bevel": 3}.get(c.get("join", "miter"), 1)

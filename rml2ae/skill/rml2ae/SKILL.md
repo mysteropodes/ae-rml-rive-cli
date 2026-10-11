@@ -19,7 +19,7 @@ author and iterate in the Rive viewer (`rive <project>`), send to AE at mileston
   image sequences unless `--no-replay`). Tell the user what was approximated; do not claim pixel parity blindly.
 - The RML is the source of truth. Edits made inside AE are only kept if they are on layers rml2ae did not rebuild:
   `ae build --replace` rebuilds only elements whose RML changed (a layer keeps its effects/masks when its element is
-  unchanged). To bring AE transform/keyframe edits back into the RML: `ae pull --dry` then `ae pull`.
+  unchanged). To bring AE transform, colour, stroke, path and keyframe edits, and layers / groups / paints added in AE, back into the RML: `ae pull --dry` then `ae pull`.
 
 ## Commands
 ```
@@ -27,7 +27,7 @@ ae doctor <project>                      environment check
 ae build <project> [--main <Artboard>] [--no-replay] [--fps N]      new AE project + build/rml2ae/<name>.aep
 ae build <project> --replace [--full]    update the OPEN AE project incrementally (--full: rebuild everything)
 ae watch <project>                       incremental update whenever scene.rml / assets change
-ae pull <project> [--dry]                AE edits (x/y/rotation/scale/opacity/hidden, keys + eases) → scene.rml
+ae pull <project> [--dry]                AE edits (x/y/rotation/scale/opacity/hidden, fill/stroke colour, thickness, paths, keys + eases, added layers/groups/paints) → scene.rml
 ae render <project> [--range a-b] [--out file.mp4 | dir]            aerender (PNG sequence / mp4 via ffmpeg)
 ae screenshot <project> --advance t [--out file.png]
 ae diff <project> --times t1 t2 ...      AE frames vs `rive --screenshot`, side by side
@@ -36,7 +36,7 @@ ae diff <project> --times t1 t2 ...      AE frames vs `rive --screenshot`, side 
 ## How the conversion maps (what to expect in AE)
 - artboard → comp per animation played by the default state machine's entry state; exit-time chains → a sequence comp;
   loops → a "(looped)" comp. NestedArtboard → precomp + Time Remap. Clipped node → precomp + alpha matte.
-- Shapes → shape layers (paths, fills, strokes, dashes, trim, gradients: 2 stops = Gradient Ramp, more = PNG matte).
+- Shapes → shape layers (paths, fills, strokes, dashes, trim, gradients: native Gradient Fill/Stroke through generated .ffx presets).
   Text → text layers (box text, runs, animators). Images → footage (+ mesh strips). Bones → nulls (FK by parenting),
   skinned paths baked per frame. ViewModels → a "VM · <name>" control comp, data binds → expressions.
 - Every layer carries its Rive id in `comment` (`rive:0:287`); comps are tagged the same way. Do not rename those.

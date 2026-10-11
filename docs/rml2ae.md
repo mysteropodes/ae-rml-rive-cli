@@ -57,7 +57,7 @@ Options of `python -m rml2ae <project>`:
 | `--run` | Execute the generated script in the open After Effects. |
 | `--shots t1 t2 …` | Compare AE and Rive frames at the given times. |
 
-Outputs are `<name>.jsx`, `<name>.ae-report.md` (what was converted, approximated or left out) and helper PNGs (mesh rows, gradient mattes).
+Outputs are `<name>.jsx`, `<name>.ae-report.md` (what was converted, approximated or left out) gradient presets (`.ffx`) and helper PNGs (mesh rows, gradient mattes).
 
 ## Requirements
 
@@ -76,7 +76,7 @@ Outputs are `<name>.jsx`, `<name>.ae-report.md` (what was converted, approximate
 With `industry`:
 
 - **One shape layer per group.** A `Node` whose subtree contains only simple shapes becomes a single shape layer. The node's transform and keys live on the layer. Each sub-node and shape inside is a **vector group** with its own keyed transform, and group opacity is native (no opacity expression). Neighbouring isolated shapes, and neighbouring groups made only of shapes, share one layer named `Parent · A…B`. A group whose position is keyed keeps its own layer: there X and Y stay separated, so `ae pull` reads its eases back exactly.
-- Kept as separate layers: gradients (Gradient Ramp at layer level), feathered shapes, blend modes, clips, internal data bindings, skins and bones.
+- Kept as separate layers: gradients (native Gradient Fill / Stroke, one vector group per paint), feathered shapes, blend modes, clips, internal data bindings, skins and bones.
 - **No useless nulls.** An identity node (no transform, no keys, no clip, no binding) creates no null. A node that carries a single static leaf (shape, text or image without its own rotation or scale) is folded: the leaf takes the node's animation and bindings, and the node's offset moves into the anchor point (exact).
 - `ae pull` reads groups too, through `<project>.groups.json` (group path inside its layer to Rive id), and divides the opacity of a folded node by that of its leaf. Keys rewritten identically (2D position of a group, constant x, per-frame baking) are no longer detected as edits: values are compared, not keys.
 
@@ -106,7 +106,7 @@ Remaining nulls are animated controllers (cameras, three-copy RGB split and simi
 | `Shape` + `PointsPath` (Straight, CubicDetached, Mirrored, Asymmetric), `Rectangle`, `Ellipse`, `Polygon`, `Star`, `Triangle` | Shape layer, one group per `Shape`. Keyed vertices become path keys. |
 | `Fill` / `Stroke` + `SolidColor` (keyed colour), cap/join/thickness, `fillRule`, `TrimPath`, `DashPath` | Fill, Stroke, Trim Paths, Dashes. |
 | `Stroke` `position` inside / outside | AE strokes are always centred: each paint of the Shape gets its own vector group with a copy of the paths, and the stroke's paths are moved by Offset Paths of ±width/2 (keyed and bound with the width, line join from the stroke). `ae2rml` reads that back as the same position. On an open path the offset goes sideways (approx). |
-| Gradients | Two stops: Gradient Ramp. More stops, or any gradient with alpha: a gradient PNG with a matte (the Ramp has no alpha). |
+| Gradients (fill and stroke) | Native Gradient Fill / Gradient Stroke, any number of stops, alpha included; start/end points and opacity keyable. Each paint of the shape gets its own vector group holding a copy of the paths, so paint order is kept. A lone two-stop gradient whose colours are keyed stays a Gradient Ramp (keyable colours) when a Ramp is exact. |
 | `Image` (+ regular keyed `Mesh`) | Image layer (anchor = origin). A mesh becomes one strip per row plus Corner Pin. |
 | `Text` + `TextStylePaint` + `TextValueRun` + `FontAsset` | Text layer (PostScript name read from the TTF, size, leading, tracking, justification, paragraph box). |
 | `TextModifierGroup` + `TextModifierRange` | Text animator (Position, Rotation, Opacity, Scale) with a selector (units, index or %, Start/End); `strength` maps to Amount. |
@@ -190,16 +190,34 @@ A dry test that needs no AE: `python3 -m rml2ae.tests.sim_incremental`.
 
 Edits you make in the open AE project return to `scene.rml`:
 
-- Scope: the transform of each layer tagged `rive:<id>`: x, y, rotation, scaleX, scaleY, opacity and the hidden (eye) flag.
+- Scope: the transform of each layer tagged `rive:<id>`: x, y, rotation, scaleX, scaleY, opacity and the hidden (eye) flag; and the contents of its shapes (below).
 - As an attribute when the property has no keys in AE; as keys of the comp's animation otherwise. AE eases are converted back to `CubicEaseInterpolator` by exact inversion of the build mapping; linear and hold are kept.
 - Static values are read from the comp of the artboard's first animation; keys are read in each animation comp.
 - A single key on a property that is not keyed in the RML is treated as a value carried over from an earlier state, and ignored.
 - Ignored: matte layers, `[skinned]` layers, clipped precomps and auxiliary `+` layers.
 - Groups (industry layout) are read through `<project>.groups.json`.
+- Shape contents, read by rank inside each shape's group as the build wrote them (one AE path per Rive path, in order; the paints in reverse order):
+  - fill and stroke **colour** (`SolidColor.colorValue`, alpha from the AE fill / stroke opacity, except on a paint hidden by `isVisible="false"`, which AE shows at 0 %). Keyed colours become `KeyFrameColor`, linear or hold. A `SolidColor` keyed for the first time gets an id;
+  - stroke **thickness**, static or keyed;
+  - **Rectangle / Ellipse**: width, height and position (the origin is taken back out of AE's centred position);
+  - **paths** (`PointsPath`): vertices and tangents. The vertex type follows the tangents (straight, mirrored, asymmetric, detached). A static path is rewritten whole, so it may gain or lose vertices if none of them is animated. Path keys become keys on each vertex property; the vertex count must stay the RML's. AE path keys carry no ease from the build: where AE says linear on a frame the RML eased, the RML's ease stays.
+  - A path or a paint **added** in AE to a shape: the shape's own ones are found in order (same kind, same geometry or colour), the new ones are written at their rank (paths in AE order, paints reversed). When that does not work out (one deleted, or one added while another changed colour), that part is not pulled and the list says so. Mattes, gradient fills and properties driven by an expression (data binding) are not read.
+- Groups are matched by name (the build names each vector group after its element), so a group added or moved among its siblings does not shift the others; a level where a group was renamed or deleted falls back to ranks.
+
+### What you add in AE
+
+- **A layer** added to an animation comp (or a copy of a built layer: Duplicate keeps the comment, the copy is the one with the higher layer id) becomes a new element:
+  - a null → `Node`; a solid → `Shape` (`Rectangle` + `Fill`); a shape layer → a `Shape` when it holds one plain vector group (identity transform, anchor point 0, as the build makes a shape), else a `Node` with one element per vector group (a group of paths and paints a `Shape`, a group of groups a `Node`);
+  - paths, rectangles (roundness → `cornerRadiusTL`), ellipses, fills and strokes (cap, join) as above, keys included; the layer and group transforms, keyed in the comp's animation when AE keys them; an anchor point goes into the children's coordinates;
+  - its parent: the AE parent layer's element when it is a node, the artboard when unparented. Parented to a shape (Rive hangs nothing from a shape), it becomes the shape's sibling with the shape's transform composed, when the shape is static and unrotated;
+  - its place: the RML child order follows the AE stack (Rive draws the first child on top);
+  - not pulled, and listed: text, footage, precomp and adjustment layers, cameras, lights, 3D layers, track matte layers; on a pulled layer, its effects, masks, track matte, blend mode and in / out points;
+  - the AE layer is then tagged with its new id (`build/rml2ae/_pull_tags.jsx`, run by `ae pull` and by the panel), and the manifest marks it stale: the next `ae build` replaces it, in place, by what the RML now says (a layer of its own, or inside a run of shapes or a grouped node). A layer added in another comp than the artboard's first animation is still in every animation of the artboard in Rive (the list says so).
+- **A vector group** added to a layer the build grouped (a node of shapes, a run of sibling shapes): a new `Shape` or `Node` among its siblings, at its rank. A group added beside a shape's own group (a layer of one shape) has no place in Rive: listed, not pulled.
 
 The RML is rewritten as text (attributes and `<KeyedProperty>` blocks only), then checked with `rive --verify`. The manifest is marked up to date for the pulled elements, so the next `build --replace` does not rebuild them and their AE effects stay.
 
-Not pulled: colours, strokes, paths or text edited in AE; keys that fall between frames (rounded to the animation's frame grid); layers added in AE (they stay in AE and never reach the RML).
+Not pulled: gradients, Polygon / Star / Triangle shapes, skinned paths, cap / join / dashes / trim of an existing stroke, text edited in AE; keys that fall between frames (rounded to the animation's frame grid); layers or groups deleted in AE.
 
 ## The After Effects panel
 
@@ -234,7 +252,8 @@ Rive has no effects (shadows, blurs). Declare them as XML comments immediately b
 
 Related rules measured while converting vector boards:
 
-- Gradient Ramp points are in comp coordinates and ignore parenting, so a Ramp is used only on a shape that is neither parented nor rotated; otherwise a gradient PNG with a matte is used (also for any gradient with alpha).
+- Shape gradient colours cannot be written by a script (measured in AE 2026: touching `ADBE Vector Grad Colors` raises a modal error that try/catch does not catch). rml2ae writes one animation preset per gradient (`<name>_gradient_<id>.ffx`, a copy of a template in `rml2ae/presets` with its gradient XML replaced) and applies it with `applyPreset`; points, type, opacity and stroke settings are then set by the script.
+- Gradient Ramp points are in comp coordinates and ignore parenting, so a Ramp is used only on a shape that is neither parented nor rotated; otherwise a gradient PNG with a matte is used (also for any gradient with alpha). This is the path for skinned shapes, the artboard background, and any gradient when the presets are missing; a gradient that is not its shape's only paint is then drawn in its middle stop colour.
 - Rive draws the **last** paint of a shape on top; AE draws the **topmost** item of the group on top. Paints are therefore added in reverse order.
 - A clipping source without a paint (Rive clips by geometry) receives a white fill so it can serve as a matte.
 - A JPEG file named `.png` cannot be imported by AE.
@@ -264,12 +283,12 @@ Measured against After Effects 2026 with the Montserrat typeface; useful when wr
 ## Known limits
 
 - Bezier ease interpolators other than CSS-style cubic ones become linear.
-- Gradients with more than two stops, or with alpha, are baked as PNG mattes rather than native gradients.
+- Keyed gradient stop colours or positions keep their first values on native gradients (a lone two-stop gradient a Ramp renders exactly keeps its keys). Skinned shapes and the artboard background still use a Ramp or a PNG matte.
 - Flex layouts, state machines with inputs and events, and blend states are not converted; only the entry state's animation is built.
 - Luau-scripted content is replayed as a PNG sequence (not editable in AE).
 - Without the Rive Shader plugin, shaders are approximated by native effects and only the common patterns are recognised.
 - Inner shadows and AE layer styles cannot be written.
-- `ae pull` covers transforms, keys, eases and visibility only.
+- `ae pull` covers transforms, keys, eases, visibility, colours, strokes, paths, and layers / groups / paths / paints added in AE (see above); deletions, text and gradients are not pulled.
 - Text metrics depend on fonts installed in macOS and on the constants above.
 - One After Effects at a time: the `ae` command acts on the AE that is open.
 - Every conversion writes a report; read `<name>.ae-report.md` after each build to see what is `exact`, `approx` or `unsupported` before trusting pixel parity.
