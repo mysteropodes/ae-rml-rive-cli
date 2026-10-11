@@ -58,6 +58,8 @@ jobs:
         run: python -m rml2ae.tests.test_stroke_position
       - name: state machines with inputs play in AE from keyable inputs (expressions run in Node.js)
         run: python -m rml2ae.tests.test_state_machine
+      - name: Luau script inputs <-> AE effect controls (build and ae pull)
+        run: python -m rml2ae.tests.test_script_inputs
       - name: gradient presets (.ffx) keep a coherent RIFX
         run: python -m rml2ae.tests.test_ffx
       - name: ae2rml binds the second layer of map effects (Displacement Map)

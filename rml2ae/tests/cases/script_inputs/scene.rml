@@ -1,0 +1,19 @@
+<Rive version="1" kind="fragment">
+  <!-- A Luau-drawn element: rml2ae replays its drawing and puts its inputs on its layer as effect controls -->
+  <Artboard width="400" height="400" name="Sparkles" id="0:1">
+    <ScriptedDrawable x="200" y="200" scriptAssetId="0:9" name="Sparkles" id="0:10">
+      <ScriptInputNumber propertyValue="12" name="count" id="0:11"/>
+      <ScriptInputBoolean propertyValue="true" name="spin"/>
+      <ScriptInputColor propertyValue="FFFFC800" name="tint"/>
+    </ScriptedDrawable>
+    <LinearAnimation fps="30" duration="30" loopValue="loop" name="Twinkle" id="0:20">
+      <KeyedObject objectId="0:11">
+        <KeyedProperty propertyKey="243">
+          <KeyFrameDouble value="12" frame="0" interpolationType="linear"/>
+          <KeyFrameDouble value="24" frame="30" interpolationType="linear"/>
+        </KeyedProperty>
+      </KeyedObject>
+    </LinearAnimation>
+  </Artboard>
+  <ScriptAsset file="sparkles.luau" name="sparkles" id="0:9"/>
+</Rive>

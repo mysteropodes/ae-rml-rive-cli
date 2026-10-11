@@ -251,6 +251,15 @@ class ChainAnimation:
         return raw
 
 
+def script_color(v):
+    """ScriptInputColor.propertyValue (an int ARGB, or hex as colours are written in RML) -> (r, g, b, a)"""
+    v = (v or "").strip()
+    if v.lstrip("-").isdigit():
+        n = int(v) & 0xFFFFFFFF
+        return ((n >> 16) & 255) / 255, ((n >> 8) & 255) / 255, (n & 255) / 255, ((n >> 24) & 255) / 255
+    return argb(v, (1.0, 1.0, 1.0, 1.0))
+
+
 class Converter:
     def __init__(self, project: Project, out_dir, fps=None, main=None, keep_project=False, replay=True, log=print, replace=False,
                  layout="industry"):
@@ -1683,6 +1692,7 @@ class Converter:
             if fxm is not None and any(c.name in ("fxSource", "source") for c in inputs):
                 return self.emit_fxlib(el, fxm, parent, ctx)
             nul = self.emit_node(el, parent, ctx, placeholder=True)
+            self.emit_script_inputs(el, nul, ctx)
             for inp in inputs:
                 sub = self.p.by_id.get(inp.get("artboardId"))
                 if sub is None:
@@ -1886,6 +1896,36 @@ class Converter:
                 # as `value` (assigning them one after the other kept only the last; audit F22)
                 chain = "var v = value; " + " ".join(f"v = {re.sub(r'(?<![A-Za-z0-9_.])value(?![A-Za-z0-9_])', 'v', e)};" for e in exprs) + " v"
                 self.W(f"{acc}.expression = {js(chain)};")
+
+    SCRIPT_INPUT_PREFIX = "Luau: "
+
+    def emit_script_inputs(self, el, var, ctx):
+        """the script's number, boolean and colour inputs as effect controls on its layer ('Luau: <name>'), keyed like
+        the Rive input: `ae pull` writes their values back to the RML, and the next build replays the script with them"""
+        if not isinstance(var, str):
+            return
+        J = self.W
+        done = []
+        for c in el.children:
+            nm = js(self.SCRIPT_INPUT_PREFIX + c.name)
+            if c.tag == "ScriptInputNumber":
+                J(f'var si = slider({var}, {nm}, {js(c.num("propertyValue", 0))});')
+                ks = ctx.keys(c.id, "propertyValue") if c.id else None
+                if ks:
+                    J(f'keys(si, {ctx.rows(ks)});')
+            elif c.tag == "ScriptInputBoolean":
+                J(f'var sb = {var}.property("ADBE Effect Parade").addProperty("ADBE Checkbox Control"); sb.name = {nm}; '
+                  f'sb.property("ADBE Checkbox Control-0001").setValue({1 if c.get("propertyValue") == "true" else 0});')
+            elif c.tag == "ScriptInputColor":
+                r, g, b, _a = script_color(c.get("propertyValue"))
+                J(f'var sc = {var}.property("ADBE Effect Parade").addProperty("ADBE Color Control"); sc.name = {nm}; '
+                  f'sc.property("ADBE Color Control-0001").setValue({js([r, g, b])});')
+            else:
+                continue
+            done.append(c.name)
+        if done:
+            self.rep.add(ctx.artboard.name, "converted", el, "script inputs as effect controls on its layer (" + ", ".join(done)
+                         + "): edit them in AE, `ae pull` writes them to the RML and the next build replays the script with them")
 
     def emit_replay(self, el, nul, ctx, sname):
         """Scripted element -> PNG sequence rendered by the CLI (element + ancestors only), placed in world space."""
