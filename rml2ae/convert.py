@@ -103,6 +103,33 @@ def kind_of(interp, ease):
     return ("l", 0, 0, 0, 0)
 
 
+# Rive Stroke.position (key 470): AE strokes are always centred, so an inside / outside stroke is drawn on its paths
+# moved by half its width with Offset Paths (AE: a positive amount moves a clockwise path outwards)
+STROKE_POSITIONS = {"center": 0, "inside": -1, "outside": 1}
+
+
+def path_winding(p):
+    """(|area|, clockwise on screen) of a Rive path as rml2ae draws it in AE: parametric paths (Rectangle, Ellipse,
+    Polygon, Star, Triangle) run clockwise; a PointsPath by the shoelace of its vertices (y down)"""
+    if p.tag == "PointsPath":
+        pts = [(v.num("x"), v.num("y")) for v in p.children if is_a(v.tag, "Vertex")]
+        a = sum(x0 * y1 - x1 * y0 for (x0, y0), (x1, y1) in zip(pts, pts[1:] + pts[:1])) / 2 if len(pts) > 2 else 0.0
+        return abs(a), a >= 0
+    return abs(p.num("width") * p.num("height")), True
+
+
+def stroke_shift(stroke, shape):
+    """Offset Paths amount per unit of stroke width for a Stroke drawn inside / outside its paths (0: centred).
+    The sign follows the winding of the shape's largest path (holes wound the other way move the same side)."""
+    pos = str(stroke.get("position", "center"))
+    side = STROKE_POSITIONS.get(pos, 0)
+    if not side:
+        return 0.0
+    paths = [path_winding(c) for c in shape.children if is_a(c.tag, "Path")]
+    cw = max(paths)[1] if paths else True
+    return 0.5 * side * (1 if cw else -1)
+
+
 class Ctx:
     """What the element emitters need: the comp, the animation, the frame scale, the artboard."""
 
@@ -1415,17 +1442,13 @@ class Converter:
             self._group_transform(gv, c, ctx)
             if is_a(c.tag, "Shape"):
                 J(f'var gc = {gv}.property("ADBE Vectors Group");')
-                for p in c.children:
-                    if is_a(p.tag, "Path"):
-                        self.emit_path(p, ctx, c)
                 if matte:           # a clip: the geometry, filled opaque
+                    for p in c.children:
+                        if is_a(p.tag, "Path"):
+                            self.emit_path(p, ctx, c)
                     J('var fl = gc.addProperty("ADBE Vector Graphic - Fill"); fl.property("ADBE Vector Fill Color").setValue([1,1,1]); fl.property("ADBE Vector Fill Opacity").setValue(100);')
                 else:
-                    for p in reversed(c.children):
-                        if p.tag == "Fill":
-                            self.emit_fill(p, ctx, c, False)
-                        elif p.tag == "Stroke":
-                            self.emit_stroke(p, ctx, c)
+                    self.emit_contents(c, ctx)
                 n += 1
             else:
                 n += self._emit_groups([x for x in c.children if self.is_element(x)], f'{gv}.property("ADBE Vectors Group")', ctx,
@@ -1755,7 +1778,8 @@ class Converter:
         return out
 
     def emit_binds(self, el, targets, ctx, extra=None):
-        """targets = {rive property name: (js property accessor, template with %s = the control expression)};
+        """targets = {rive property name: (js property accessor, template with %s = the control expression), or a list
+        of them};
         extra = [(element, targets)] whose bindings chain after el's on the same AE properties"""
         ab = ctx.artboard.name
         by_acc = {}
@@ -1764,14 +1788,15 @@ class Converter:
             if prop not in targets:
                 self.rep.add(ab, "unsupported", el, f"binding of '{prop}' ({d['kind']}): no AE target")
                 continue
-            acc, tpl = targets[prop]
-            if "%s" not in tpl:
-                tpl = "%s"
-            expr = tpl % d["expr"]
-            if d["kind"] == "boolean" and prop in ("opacity", "isVisible"):
-                # a Property object is always truthy in an expression: compare its value; the element's own opacity stays
-                expr = f'value * (({d["expr"]}) == 1 ? 1 : 0)'
-            by_acc.setdefault(acc, []).append(expr)
+            tgs = targets[prop]
+            for acc, tpl in (tgs if isinstance(tgs, list) else [tgs]):
+                if "%s" not in tpl:
+                    tpl = "%s"
+                expr = tpl % d["expr"]
+                if d["kind"] == "boolean" and prop in ("opacity", "isVisible"):
+                    # a Property object is always truthy in an expression: compare its value; the element's own opacity stays
+                    expr = f'value * (({d["expr"]}) == 1 ? 1 : 0)'
+                by_acc.setdefault(acc, []).append(expr)
             self.rep.add(ab, "converted", el, f"'{prop}' bound to ViewModel '{d['name']}' → expression")
         for acc, exprs in by_acc.items():
             if len(exprs) == 1:
@@ -2698,19 +2723,7 @@ fn fs_main(in: VSOut) -> @location(0) vec4<f32> {{
         J(f'var gr = {var}.property("ADBE Root Vectors Group");')
         # the group carries the element's name (AE's default "Groupe 1" told nothing; audit F35) — pull maps groups by rank
         J(f'var g = gr.addProperty("ADBE Vector Group"); g.name = {js(el.name or "Shape")}; var gc = g.property("ADBE Vectors Group");')
-        # paths
-        for c in el.children:
-            if is_a(c.tag, "Path"):
-                if skinned:
-                    self.emit_baked_path(c, ctx, el)
-                else:
-                    self.emit_path(c, ctx, el)
-        # paints: Rive draws the LATER paint on top, AE the item HIGHER in the group (added earlier) -> reversed order
-        for c in reversed(el.children):
-            if c.tag == "Fill" and c not in feathered:
-                self.emit_fill(c, ctx, el, as_matte)
-            elif c.tag == "Stroke":
-                self.emit_stroke(c, ctx, el)
+        self.emit_contents(el, ctx, as_matte, skip=feathered, skinned=skinned)
         fst = [c for c in el.children if c.tag == "Stroke" and c.find("Feather") is not None]
         if fst and not as_matte and not any(c.tag == "Fill" for c in el.children):
             # a feathered stroke alone on its shape (a glowing outline): the layer is blurred instead
@@ -2751,6 +2764,43 @@ fn fs_main(in: VSOut) -> @location(0) vec4<f32> {{
             if el.id:
                 self.layer_of[el.id] = var
         return var
+
+    def emit_contents(self, el, ctx, as_matte=False, skip=(), skinned=False):
+        """a Shape's paths and paints into the vector group `gc`. Rive draws the LATER paint on top, AE the item
+        HIGHER in the group (added earlier): paints in reversed order. A Stroke drawn inside / outside its paths needs
+        Offset Paths, which would move every path of the group for every paint: each paint then gets its own group
+        holding a copy of the paths (paint order kept, the other paints untouched)."""
+        J = self.W
+        paints = [c for c in reversed(el.children) if (c.tag == "Fill" and c not in skip) or c.tag == "Stroke"]
+        shifted = [p for p in paints if p.tag == "Stroke" and stroke_shift(p, el)]
+
+        def paths():
+            for c in el.children:
+                if is_a(c.tag, "Path"):
+                    if skinned:
+                        self.emit_baked_path(c, ctx, el)
+                    else:
+                        self.emit_path(c, ctx, el)
+
+        def paint(c, shift=0.0):
+            if c.tag == "Fill":
+                self.emit_fill(c, ctx, el, as_matte)
+            else:
+                self.emit_stroke(c, ctx, el, shift)
+        if not shifted or skinned or as_matte:
+            if shifted:
+                self.rep.add(ctx.artboard.name, "approx", el,
+                             f"stroke {shifted[0].get('position')} on a {'skinned' if skinned else 'matte'} shape: centred")
+            paths()
+            for c in paints:
+                paint(c)
+            return
+        J('var gcs = gc;')
+        for c in paints:
+            J(f'var pg = gcs.addProperty("ADBE Vector Group"); pg.name = {js(c.name or c.tag)}; gc = pg.property("ADBE Vectors Group");')
+            paths()
+            paint(c, stroke_shift(c, el) if c in shifted else 0.0)
+        J('gc = gcs;')
 
     def emit_baked_path(self, c, ctx, shape):
         """Path of a skinned shape: one path keyframe per frame, in artboard space (skin or plain world transform)."""
@@ -2983,10 +3033,23 @@ fn fs_main(in: VSOut) -> @location(0) vec4<f32> {{
         if sc is not None:
             self.emit_binds(sc, {"colorValue": ('fl.property("ADBE Vector Fill Color")', "%s")}, ctx)
 
-    def emit_stroke(self, c, ctx, el):
+    def emit_stroke(self, c, ctx, el, shift=0.0):
+        """shift: Offset Paths amount per unit of width (Stroke.position inside / outside, see emit_contents)"""
         J = self.W
         ab = ctx.artboard.name
         rgb, a, kc, ko = self.paint_color(c, ctx, el)
+        kt = ctx.keys(c.id, "thickness")
+        off_acc = 'off.property("ADBE Vector Offset Amount")'
+        if shift:
+            join = {"miter": 1, "round": 2, "bevel": 3}.get(c.get("join", "miter"), 1)
+            J('var off = gc.addProperty("ADBE Vector Filter - Offset"); off.name = "Stroke position";')
+            J(f'{off_acc}.setValue({js(round(c.num("thickness", 1) * shift, 6))}); off.property("ADBE Vector Offset Line Join").setValue({join});')
+            if kt:
+                J(f'keys({off_acc}, {ctx.rows(kt, lambda v: v * shift)});')
+            if any(is_a(p.tag, "Path") and p.get("isClosed", "true") == "false" for p in el.children):
+                self.rep.add(ab, "approx", el, f"stroke {c.get('position')} on an open path: the path is offset sideways")
+            self.rep.add(ab, "converted", el, f"stroke {c.get('position')} → centred stroke on the paths offset by "
+                                              f"{'-' if shift < 0 else '+'}width/2 (Offset Paths)")
         J('var st = gc.addProperty("ADBE Vector Graphic - Stroke");')
         J(f'st.property("ADBE Vector Stroke Color").setValue({js(rgb)}); st.property("ADBE Vector Stroke Opacity").setValue({js(a * 100)});')
         J(f'st.property("ADBE Vector Stroke Width").setValue({js(c.num("thickness", 1))});')
@@ -2995,7 +3058,6 @@ fn fs_main(in: VSOut) -> @location(0) vec4<f32> {{
         J(f'st.property("ADBE Vector Stroke Line Cap").setValue({cap}); st.property("ADBE Vector Stroke Line Join").setValue({join});')
         if kc:
             J(f'keys(st.property("ADBE Vector Stroke Color"), {kc}); keys(st.property("ADBE Vector Stroke Opacity"), {ko});')
-        kt = ctx.keys(c.id, "thickness")
         if kt:
             J(f'keys(st.property("ADBE Vector Stroke Width"), {ctx.rows(kt)});')
         dp = c.find("DashPath")
@@ -3028,7 +3090,9 @@ fn fs_main(in: VSOut) -> @location(0) vec4<f32> {{
             self.warn(ab, "approx", el, "Feather on a stroke: not reproduced (add a Gaussian blur on the layer if wanted)")
         if c.get("isVisible") == "false":
             J('st.property("ADBE Vector Stroke Opacity").setValue(0);')
-        self.emit_binds(c, {"isVisible": ('st.property("ADBE Vector Stroke Opacity")', "%s"), "thickness": ('st.property("ADBE Vector Stroke Width")', "%s")}, ctx)
+        th = ('st.property("ADBE Vector Stroke Width")', "%s")
+        self.emit_binds(c, {"isVisible": ('st.property("ADBE Vector Stroke Opacity")', "%s"),
+                            "thickness": [th, (off_acc, f"(%s) * {shift!r}")] if shift else th}, ctx)
         sc = c.find("SolidColor")
         if sc is not None:
             self.emit_binds(sc, {"colorValue": ('st.property("ADBE Vector Stroke Color")', "%s")}, ctx)
