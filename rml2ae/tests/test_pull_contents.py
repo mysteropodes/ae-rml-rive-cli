@@ -1,4 +1,4 @@
-"""`ae pull` of shape contents (fill / stroke colour, stroke thickness, paths), checked on a hand-written AE dump
+"""`ae pull` of shape contents (fill / stroke colour, stroke thickness, paths, paths and paints added), checked on a hand-written AE dump
 (no After Effects needed):
 
     python -m rml2ae.tests.test_pull_contents
@@ -180,15 +180,36 @@ def grouped_shape():
 
 
 def mismatch_reported():
-    """a paint added in AE: that kind is not pulled, a line says why; the rest still is"""
+    """a paint added in AE while another one changed colour: which one is new is unclear, that kind is not pulled and a
+    line says why; the rest still is"""
     dump = untouched()
     items = layer(dump, "0:10")["groups"][0]["items"]
     items.append(fill([0, 0, 0]))
+    items[2] = fill([1, 1, 0])
     items[1]["w"] = prop(9)
     changes, text = run(dump)
-    assert any("fills not pulled: 2 in AE, 1 in the RML" in c for c in changes), changes
+    assert any("paints not pulled" in c or "fills not pulled: 2 in AE, 1 in the RML" in c for c in changes), changes
     assert '<Stroke thickness="9" name="S">' in text
     assert 'colorValue="FF2266FF"' in text
+
+
+def added_contents():
+    """a fill and an ellipse added in AE to an existing shape: the existing ones found in order, the new ones written at
+    their rank (paints reversed); pulled again: nothing more"""
+    dump = untouched()
+    items = layer(dump, "0:10")["groups"][0]["items"]
+    items.insert(1, {"m": "ellipse", "size": prop([10, 10]), "pos": prop([5, 5]), "n": "Dot"})
+    items.append(dict(fill([0, 0, 0]), n="Shadow"))
+    items.insert(2, dict(stroke([1, 1, 1], 2), n="Glow"))
+    changes, text = run(dump)
+    m = re.search(r'<Shape x="100" y="100" name="Box" id="0:10">(.*?)</Shape>', text, re.S)
+    body = m.group(1)
+    order = re.findall(r'<(Rectangle|Ellipse|Fill|Stroke) [^>]*name="([^"]+)"', body)
+    assert order == [("Rectangle", "R"), ("Ellipse", "Dot"), ("Fill", "Shadow"), ("Fill", "F"), ("Stroke", "S"), ("Stroke", "Glow")], order
+    assert re.search(r'<Ellipse width="10" height="10" x="5" y="5" name="Dot" id="0:\d+"/>', body), body
+    assert any("fill 'Shadow' added in AE" in c for c in changes), changes
+    again, text2 = run(dump, text)
+    assert again == [] and text2 == text, again
 
 
 def matte_and_driven_ignored():
@@ -204,7 +225,8 @@ def matte_and_driven_ignored():
 
 
 def main():
-    for t in (element_spans, untouched_is_quiet, static_edits, keyed_edits, grouped_shape, mismatch_reported, matte_and_driven_ignored):
+    for t in (element_spans, untouched_is_quiet, static_edits, keyed_edits, grouped_shape, mismatch_reported, added_contents,
+              matte_and_driven_ignored):
         t()
         print("ok", t.__name__)
 

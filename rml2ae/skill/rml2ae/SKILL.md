@@ -19,7 +19,7 @@ author and iterate in the Rive viewer (`rive <project>`), send to AE at mileston
   image sequences unless `--no-replay`). Tell the user what was approximated; do not claim pixel parity blindly.
 - The RML is the source of truth. Edits made inside AE are only kept if they are on layers rml2ae did not rebuild:
   `ae build --replace` rebuilds only elements whose RML changed (a layer keeps its effects/masks when its element is
-  unchanged). To bring AE transform, colour, stroke, path and keyframe edits back into the RML: `ae pull --dry` then `ae pull`.
+  unchanged). To bring AE transform, colour, stroke, path and keyframe edits, and layers / groups / paints added in AE, back into the RML: `ae pull --dry` then `ae pull`.
 
 ## Commands
 ```
@@ -27,7 +27,7 @@ ae doctor <project>                      environment check
 ae build <project> [--main <Artboard>] [--no-replay] [--fps N]      new AE project + build/rml2ae/<name>.aep
 ae build <project> --replace [--full]    update the OPEN AE project incrementally (--full: rebuild everything)
 ae watch <project>                       incremental update whenever scene.rml / assets change
-ae pull <project> [--dry]                AE edits (x/y/rotation/scale/opacity/hidden, fill/stroke colour, thickness, paths, keys + eases) → scene.rml
+ae pull <project> [--dry]                AE edits (x/y/rotation/scale/opacity/hidden, fill/stroke colour, thickness, paths, keys + eases, added layers/groups/paints) → scene.rml
 ae render <project> [--range a-b] [--out file.mp4 | dir]            aerender (PNG sequence / mp4 via ffmpeg)
 ae screenshot <project> --advance t [--out file.png]
 ae diff <project> --times t1 t2 ...      AE frames vs `rive --screenshot`, side by side
