@@ -44,6 +44,7 @@
           <LayoutComponentStyle marginTop="5" name="Line 2 style" id="0:31"/>
           <Fill name="Fill"><SolidColor colorValue="FF0099EE" name="Color"/></Fill>
         </LayoutComponent>
+        <Shape x="4" y="4" name="Frame"><Rectangle originX="0" originY="0" width="10" height="10" name="R"/><Fill name="F"><SolidColor colorValue="FF112233" name="C"/></Fill></Shape>
       </LayoutComponent>
     </LayoutComponent>
     <LayoutComponent width="100" height="60" styleId="0:41" name="Footer" id="0:40">

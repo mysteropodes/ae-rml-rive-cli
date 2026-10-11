@@ -9,7 +9,9 @@ What the Rive runtime does, as measured on CI screenshots (rive --screenshot):
 - a LayoutComponent without a style ignores its width / height: it is sized by its layout children (0 for a leaf);
 - a child's x / y are added on top of the position the layout gives it; non-layout children (shapes, texts...) sit at
   their x / y from the layout's top-left corner;
-- a LayoutComponent's own Fill / Stroke paint its box, behind its children.
+- a LayoutComponent's own Fill / Stroke paint its box, behind its children;
+- a Rectangle / Ellipse whose Shape sits directly in a LayoutComponent with a style takes that layout's size (its x / y
+  and origin stay); in one without a style it keeps its own size.
 
 Anything outside the subset (wrap, grid, absolute position, percent units, min / max, aspect ratio, nested artboard
 layouts...) returns a reason: the converter then keeps the CLI replay for the artboard's layouts.
@@ -83,6 +85,14 @@ def _style_reason(st):
             return f"style attribute {k}"
         if v not in ok and not (ok == ("0",) and _num(v) == 0):
             return f"{k}={v}"
+    return None
+
+
+def sizing_layout(project, shape):
+    """the LayoutComponent that sizes the parametric paths of this Shape (its parent, when it has a style), or None"""
+    p = shape.parent
+    if p is not None and is_a(p.tag, "LayoutComponent") and p.tag != "Artboard" and style_of(project, p) is not None:
+        return p
     return None
 
 
@@ -191,6 +201,7 @@ function rlay(T, G) {
     for (j = 0; j < n; j++) {
       var c = k[j], cq = Q[c];
       var ml = row ? cq.m[0] : cq.m[1], mt = row ? cq.m[2] : cq.m[3], cl = row ? cq.m[1] : cq.m[0], ct = row ? cq.m[3] : cq.m[2];
+      if (rev) { var sw = ml; ml = mt; mt = sw; }   // margins are physical: in reverse the leading one is right / bottom
       var mp = pos + ml; pos = mp + ms[j] + mt + gap;
       var fc = ic - cs[j] - cl - ct, ca = fill[j] ? 0 : A[1];
       var cp = cl + (ca == 1 ? fc / 2 : ca == 2 ? fc : 0);
@@ -264,6 +275,16 @@ def flatten(src, dst):
                         el.remove(p)
                         shp.append(p)
                     el.append(shp)              # last child: drawn under the others
+            for el, (r, st) in zip(lcs, places):
+                if st is None:
+                    continue
+                for shp in el:
+                    if shp.tag != "Shape":
+                        continue
+                    for pp in shp:
+                        if pp.tag in ("Rectangle", "Ellipse", "Triangle", "Polygon", "Star"):
+                            pp.set("width", repr(r[2]))
+                            pp.set("height", repr(r[3]))
         for el in list(root.iter("LayoutComponentStyle")):
             parents[el].remove(el)
         tree_.write(path, encoding="unicode")

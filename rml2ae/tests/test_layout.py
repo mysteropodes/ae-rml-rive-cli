@@ -33,8 +33,8 @@ EXPECTED = {
     "Header": [40, 40, 720, 80], "Logo": [10, 10, 60, 60], "Title": [80, 19.5, 520, 41], "Button": [610, 20, 100, 40],
     "Cards": [40, 140, 720, 200], "Card 1": [0, 0, 150, 200], "Card 2": [290, 40, 150, 120], "Card 3": [580, 55, 140, 90],
     "Line 1": [50, 10, 80, 30], "Line 2": [10, 50, 120, 30],
-    "Footer": [40, 360, 720, 60], "F1": [660, 5, 50, 50], "F2": [565, 5, 80, 30],
-    "Stack": [40, 440, 200, 150], "S1": [90, 70, 100, 30], "S2": [130, 10, 60, 40],
+    "Footer": [40, 360, 720, 60], "F1": [660, 5, 50, 50], "F2": [570, 5, 80, 30],
+    "Stack": [40, 440, 200, 150], "S1": [90, 70, 100, 30], "S2": [130, 20, 60, 40],
 }
 
 MOCK = r"""
@@ -115,6 +115,8 @@ def check():
     assert "Card 3 · Width" not in sliders and sliders["Card 3 · Gap"] == 5     # hug
     exprs = expressions(text)
     assert sorted(exprs) == sorted(EXPECTED), sorted(exprs)
+    # a parametric path in a styled layout takes the layout's size (Rive's controlSize): the button's dot, card 3's frame
+    assert text.count('"ADBE Vector Ellipse Size").expression') == 1 and text.count('"ADBE Vector Rect Size").expression') >= 2
     bad = [e for e in conv.rep.entries if e[1] == "unsupported"]
     assert not bad, bad
     if shutil.which("node") is None:

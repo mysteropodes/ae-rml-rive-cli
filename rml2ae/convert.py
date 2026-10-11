@@ -2305,6 +2305,14 @@ class Converter:
                 "try { return LC.effect(n)(1).value; } catch (e) { return d; } }\n"
                 "var R = rlay(T, G);\n" + tail)
 
+    def layout_sized(self, shape, ctx):
+        """the solver index of the layout that sizes this Shape's parametric paths, or None"""
+        if shape is None or ctx is None:
+            return None
+        T, index, _why, _eff = self.layout_of(ctx.artboard)
+        lay = LAY.sizing_layout(self.p, shape) if T is not None else None
+        return index.get(id(lay)) if lay is not None else None
+
     def emit_layout_node(self, el, var, ctx):
         """a LayoutComponent's null: its place from the layout expression (x / y and their keys stay its own, added on
         top, as Rive composes them); its Fill / Stroke on a rectangle the solved size, under its children"""
@@ -3186,7 +3194,24 @@ fn fs_main(in: VSOut) -> @location(0) vec4<f32> {{
         w, h = c.num("width"), c.num("height")
         ox, oy = c.num("originX", 0.5), c.num("originY", 0.5)
         cx, cy = x + (0.5 - ox) * w, y + (0.5 - oy) * h         # AE parametric paths are centred on their position
-        if t == "Rectangle":
+        li = self.layout_sized(shape, ctx)
+        if li is not None and t in ("Rectangle", "Ellipse"):
+            # the layout sizes it (Rive: ParametricPath::controlSize); its x / y and origin stay
+            ab_el = ctx.artboard
+            v = "rc" if t == "Rectangle" else "ell"
+            part = "Rect" if t == "Rectangle" else "Ellipse"
+            J(f'var {v} = gc.addProperty("ADBE Vector Shape - {part}"); {v}.name = {js(c.name)};')
+            J(f'{v}.property("ADBE Vector {part} Size").expression = {js(self.layout_expr(ab_el, f"[R[{li}][2], R[{li}][3]];"))};')
+            J(f'{v}.property("ADBE Vector {part} Position").expression = {js(self.layout_expr(ab_el, f"[{js(x)} + {js(0.5 - ox)} * R[{li}][2], {js(y)} + {js(0.5 - oy)} * R[{li}][3]];"))};')
+            r = c.num("cornerRadiusTL", 0) or c.num("cornerRadius", 0)
+            if r and t == "Rectangle":
+                J(f'rc.property("ADBE Vector Rect Roundness").setValue({js(r)});')
+            self.rep.add(ab, "converted", c, f"{t} in a layout → sized by the layout expression")
+        elif li is not None and t in ("Polygon", "Star", "Triangle"):
+            self.rep.add(ab, "approx", c, f"{t} in a layout: Rive sizes it to the layout, AE keeps its own size")
+        if li is not None and t in ("Rectangle", "Ellipse"):
+            pass
+        elif t == "Rectangle":
             J(f'var rc = gc.addProperty("ADBE Vector Shape - Rect"); rc.name = {js(c.name)}; rc.property("ADBE Vector Rect Size").setValue([{js(w)}, {js(h)}]); rc.property("ADBE Vector Rect Position").setValue([{js(cx)}, {js(cy)}]);')
             r = c.num("cornerRadiusTL", 0) or c.num("cornerRadius", 0)
             if r:
