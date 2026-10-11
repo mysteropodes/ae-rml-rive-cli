@@ -101,7 +101,7 @@ def build(project, artboard):
         key = st.id or f"#{len(states)}"
         st_idx[key] = len(states)
         st_idx[id(st)] = len(states)
-        entry = {"name": st.get("name") or st.tag, "kind": "entry", "speed": st.num("speed", 1) or 1.0,
+        entry = {"name": st.get("name") or {"EntryState": "Entry", "ExitState": "Exit"}.get(st.tag, st.tag), "kind": "entry", "speed": st.num("speed", 1) or 1.0,
                  "anims": [], "input": -1, "tr": []}
         if st.tag == "EntryState":
             entry["kind"] = "entry"
@@ -117,6 +117,8 @@ def build(project, artboard):
         elif is_a(st.tag, "BlendState1D"):
             entry["kind"] = "blend1d"
             entry["input"] = in_idx.get(st.get("inputId"), -1)
+            if not st.get("name"):
+                entry["name"] = "Blend" + (f" ({inputs[entry['input']]['name']})" if entry["input"] >= 0 else "")
             if st.tag != "BlendState1DInput":
                 notes.append(f"blend state '{entry['name']}' reads a ViewModel property: driven by its first animation value")
             for b in st.findall("BlendAnimation1D"):
@@ -128,6 +130,8 @@ def build(project, artboard):
             entry["anims"].sort(key=lambda d: d["value"])
         elif st.tag == "BlendStateDirect":
             entry["kind"] = "direct"
+            if not st.get("name"):
+                entry["name"] = "Blend (direct)"
             for b in st.findall("BlendAnimationDirect"):
                 a = project.animations.get(b.get("animationId"))
                 if a is not None:

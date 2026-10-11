@@ -64,7 +64,7 @@
           </StateTransition>
         </AnyState>
         <ExitState x="600" y="0"/>
-        <AnimationState x="200" y="0" animationId="0:20" name="Idle" id="0:61">
+        <AnimationState x="200" y="0" animationId="0:20" id="0:61">
           <StateTransition stateToId="0:62" duration="200">
             <TransitionBoolCondition inputId="0:51" opValue="equal"/>
           </StateTransition>
@@ -72,15 +72,15 @@
             <TransitionNumberCondition inputId="0:53" opValue="greaterThan" value="60"/>
           </StateTransition>
         </AnimationState>
-        <AnimationState x="400" y="0" animationId="0:21" name="Hover" id="0:62">
+        <AnimationState x="400" y="0" animationId="0:21" id="0:62">
           <StateTransition stateToId="0:61" duration="200">
             <TransitionBoolCondition inputId="0:51" opValue="notEqual"/>
           </StateTransition>
         </AnimationState>
-        <AnimationState x="400" y="200" animationId="0:22" name="Press" id="0:63">
-          <StateTransition stateToId="0:61" enableExitTime="true" exitTimeIsPercentage="true" exitTime="100"/>
+        <AnimationState x="400" y="200" animationId="0:22" id="0:63">
+          <StateTransition stateToId="0:61" enableExitTime="true" exitTimeIsPercetange="true" exitTime="100"/>
         </AnimationState>
-        <BlendState1DInput x="200" y="-200" inputId="0:53" name="Slide" id="0:71">
+        <BlendState1DInput x="200" y="-200" inputId="0:53" id="0:71">
           <BlendAnimation1D animationId="0:23" value="60"/>
           <BlendAnimation1D animationId="0:24" value="100"/>
           <StateTransition stateToId="0:61">
