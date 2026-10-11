@@ -1,0 +1,72 @@
+<Rive version="1" kind="fragment">
+  <!-- Interpolators After Effects has no ease for: rml2ae bakes them (one key per frame, exact), ae pull folds them
+       back; CI verifies the file with the Rive CLI -->
+  <Artboard width="800" height="400" clip="true" defaultStateMachineId="0:90" name="Easings" id="0:1">
+    <Fill name="Background">
+      <SolidColor colorValue="FF20242C" name="Color"/>
+    </Fill>
+    <Node x="100" y="100" name="Ball" id="0:10">
+      <Shape name="Ball shape" id="0:11">
+        <Ellipse width="60" height="60" name="Ellipse" id="0:12"/>
+        <Fill name="Fill" id="0:13">
+          <SolidColor colorValue="FFF27333" name="Color" id="0:14"/>
+        </Fill>
+      </Shape>
+    </Node>
+    <Node x="100" y="300" name="Bar" id="0:20">
+      <Shape name="Bar shape" id="0:21">
+        <Rectangle width="120" height="20" name="Rectangle" id="0:22"/>
+        <Fill name="Fill" id="0:23">
+          <SolidColor colorValue="FF33BF99" name="Color" id="0:24"/>
+        </Fill>
+      </Shape>
+    </Node>
+    <LinearAnimation fps="30" duration="60" loopValue="loop" name="Easings" id="0:80">
+      <KeyedObject objectId="0:10">
+        <!-- x: elastic out (defaults: amplitude 1, period 1 -> written explicitly here), then elastic in-out with
+             an amplitude below 1, then an elastic in with an amplitude above 1 -->
+        <KeyedProperty propertyKey="13">
+          <KeyFrameDouble value="100" frame="0" interpolationType="elastic">
+            <ElasticInterpolator easingValue="1" amplitude="1" period="0.3"/>
+          </KeyFrameDouble>
+          <KeyFrameDouble value="500" frame="20" interpolationType="elastic">
+            <ElasticInterpolator easingValue="2" amplitude="0.6" period="0.4"/>
+          </KeyFrameDouble>
+          <KeyFrameDouble value="300" frame="40" interpolationType="elastic">
+            <ElasticInterpolator easingValue="0" amplitude="1.5" period="0.5"/>
+          </KeyFrameDouble>
+          <KeyFrameDouble value="700" frame="60" interpolationType="hold"/>
+        </KeyedProperty>
+        <!-- y: a value bump between two equal values (CubicValueInterpolator), then a cubic value ease -->
+        <KeyedProperty propertyKey="14">
+          <KeyFrameDouble value="100" frame="0" interpolationType="cubicValue">
+            <CubicValueInterpolator x1="0.3" y1="20" x2="0.7" y2="20"/>
+          </KeyFrameDouble>
+          <KeyFrameDouble value="100" frame="30" interpolationType="cubicValue">
+            <CubicValueInterpolator x1="0.2" y1="300" x2="0.6" y2="150"/>
+          </KeyFrameDouble>
+          <KeyFrameDouble value="200" frame="60" interpolationType="hold"/>
+        </KeyedProperty>
+      </KeyedObject>
+      <KeyedObject objectId="0:20">
+        <!-- rotation: a plain CubicEaseInterpolator next to the others (unchanged path) -->
+        <KeyedProperty propertyKey="15">
+          <KeyFrameDouble value="0" frame="0" interpolationType="cubic">
+            <CubicEaseInterpolator x1="0.42" y1="0" x2="0.58" y2="1"/>
+          </KeyFrameDouble>
+          <KeyFrameDouble value="3.1416" frame="60" interpolationType="hold"/>
+        </KeyedProperty>
+      </KeyedObject>
+    </LinearAnimation>
+    <StateMachine name="State Machine 1" id="0:90">
+      <StateMachineLayer name="Layer 1" id="0:91">
+        <AnyState x="200" y="-120"/>
+        <ExitState x="400" y="-120"/>
+        <EntryState x="0" y="0">
+          <StateTransition stateToId="0:92"/>
+        </EntryState>
+        <AnimationState x="200" y="0" animationId="0:80" id="0:92"/>
+      </StateMachineLayer>
+    </StateMachine>
+  </Artboard>
+</Rive>

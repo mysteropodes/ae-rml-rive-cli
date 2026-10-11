@@ -109,7 +109,7 @@ Remaining nulls are animated controllers (cameras, three-copy RGB split and simi
 | `Image` (+ regular keyed `Mesh`) | Image layer (anchor = origin). A mesh becomes one strip per row plus Corner Pin. |
 | `Text` + `TextStylePaint` + `TextValueRun` + `FontAsset` | Text layer (PostScript name read from the TTF, size, leading, tracking, justification, paragraph box). |
 | `TextModifierGroup` + `TextModifierRange` | Text animator (Position, Rotation, Opacity, Scale) with a selector (units, index or %, Start/End); `strength` maps to Amount. |
-| `LinearAnimation` (hold, linear, cubic `CubicEaseInterpolator`) | AE keys. A CSS-style ease becomes `KeyframeEase(speed, influence)` on both keys of the segment. Other interpolators become linear (approximate). |
+| `LinearAnimation` (hold, linear, `CubicEaseInterpolator`, `CubicValueInterpolator`, `ElasticInterpolator`) | AE keys. A CSS-style ease becomes `KeyframeEase(speed, influence)` on both keys of the segment. A `CubicValueInterpolator` between two different values is the same bezier in AE (exact). An elastic segment (in, out, in-out, any amplitude and period), or a value bump between two equal values, becomes one linear key per frame on the curve the Rive runtime computes: exact at every frame, and `ae pull` folds those keys back into the interpolator. Scripted interpolators become linear (approximate). |
 | `blendModeValue` | Blend mode (by name or numeric value). |
 | `ScriptedDrawable` with `ScriptInputArtboard` | The input artboard placed as a precomp (the script's own rendering is not applied unless replayed, see below). |
 | Bones and skins | Bones become nulls (forward kinematics by parenting). Skinned paths are baked per frame. |
@@ -190,7 +190,7 @@ A dry test that needs no AE: `python3 -m rml2ae.tests.sim_incremental`.
 Edits you make in the open AE project return to `scene.rml`:
 
 - Scope: the transform of each layer tagged `rive:<id>`: x, y, rotation, scaleX, scaleY, opacity and the hidden (eye) flag.
-- As an attribute when the property has no keys in AE; as keys of the comp's animation otherwise. AE eases are converted back to `CubicEaseInterpolator` by exact inversion of the build mapping; linear and hold are kept.
+- As an attribute when the property has no keys in AE; as keys of the comp's animation otherwise. AE eases are converted back to `CubicEaseInterpolator` by exact inversion of the build mapping; linear and hold are kept. The per-frame keys of an elastic or bump segment become the original `ElasticInterpolator` / `CubicValueInterpolator` again as long as they still follow its curve through the segment's two keys; once you edit inside the segment, its AE keys are written as they are.
 - Static values are read from the comp of the artboard's first animation; keys are read in each animation comp.
 - A single key on a property that is not keyed in the RML is treated as a value carried over from an earlier state, and ignored.
 - Ignored: matte layers, `[skinned]` layers, clipped precomps and auxiliary `+` layers.
@@ -262,7 +262,7 @@ Measured against After Effects 2026 with the Montserrat typeface; useful when wr
 
 ## Known limits
 
-- Bezier ease interpolators other than CSS-style cubic ones become linear.
+- Scripted interpolators become linear; elastic and value-bump segments on colours too.
 - Gradients with more than two stops, or with alpha, are baked as PNG mattes rather than native gradients.
 - Flex layouts, state machines with inputs and events, and blend states are not converted; only the entry state's animation is built.
 - Luau-scripted content is replayed as a PNG sequence (not editable in AE).
