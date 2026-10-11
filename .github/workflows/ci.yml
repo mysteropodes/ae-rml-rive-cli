@@ -50,6 +50,8 @@ jobs:
         run: python -m rml2ae.tests.sim_incremental
       - name: ae pull of shape contents (colours, thickness, paths) from a hand-written dump
         run: python -m rml2ae.tests.test_pull_contents
+      - name: ae pull of what was added in AE (layers, groups, paths, paints) from a hand-written dump
+        run: python -m rml2ae.tests.test_pull_added
       - name: aeapp helpers (frame wait, app name, colour check, dialog watch)
         run: python -m rml2ae.tests.test_aeapp
       - name: track mattes <-> Rive LayerMask, both ways
@@ -119,6 +121,11 @@ jobs:
       # the LayerMask case rml2ae reads (maskFlags as ae2rml writes it) loads in the Rive CLI
       - name: Verify the LayerMask case with the Rive CLI
         run: rive rml2ae/tests/cases/layer_mask --verify
+      # what `ae pull` writes for layers, groups and paints added in AE loads in the Rive CLI
+      - name: Verify a pull of added layers with the Rive CLI
+        run: |
+          python -m rml2ae.tests.test_pull_added --out out/pull_added
+          rive out/pull_added --verify
 
   fxlib:
     name: fxlib vs After Effects references
