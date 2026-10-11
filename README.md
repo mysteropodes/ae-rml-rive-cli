@@ -93,7 +93,7 @@ rive create out/from_editor --from-remote-file # the other way: a file of your a
 # Rive -> After Effects (After Effects open, "Allow Scripts to Write Files" on)
 ae doctor out/demo
 ae build out/demo                              # builds / updates the comps in the open project
-ae pull out/demo                               # brings AE edits (transforms, keys) back into scene.rml
+ae pull out/demo                               # brings AE edits (transforms, colours, strokes, paths, keys) back into scene.rml
 
 # review notes in the Rive Viewer
 python3 review-kit/review_install.py out/demo

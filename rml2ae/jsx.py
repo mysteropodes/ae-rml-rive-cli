@@ -162,6 +162,37 @@ function resetTf(layer, ax, ay, x, y) {
   tr(layer, "ADBE Anchor Point").setValue([ax, ay]); tr(layer, "ADBE Position").setValue([x, y]);
   tr(layer, "ADBE Rotate Z").setValue(0); tr(layer, "ADBE Scale").setValue([100, 100]);
 }
+// a gradient paint: its colours are not scriptable, so rml2ae writes a preset per gradient (rml2ae/ffx.py) holding a
+// group (template name tpl) with one placeholder path and the Gradient Fill/Stroke. Applied at the end of the layer's
+// contents; the placeholder path is removed. Returns the group's contents (Vectors Group).
+function gradGroup(L, path, tpl, name) {
+  var root = L.property("ADBE Root Vectors Group"), n0 = root.numProperties, comp = L.containingComp;
+  for (var i = 1; i <= comp.numLayers; i++) comp.layer(i).selected = false;
+  L.selected = true;
+  L.applyPreset(new File(path));
+  L.selected = false;
+  if (root.numProperties != n0 + 1) throw new Error("gradient preset not applied: " + path);
+  var g = null;
+  for (var j = root.numProperties; j >= 1; j--) { if (root.property(j).name == tpl) { g = root.property(j); break; } }
+  if (!g) g = root.property(root.numProperties);
+  if (g.propertyIndex != root.numProperties) g.moveTo(root.numProperties);
+  g = root.property(root.numProperties);
+  g.name = name;
+  var gc = g.property("ADBE Vectors Group");
+  for (var k = gc.numProperties; k >= 1; k--) { if (gc.property(k).matchName.indexOf("ADBE Vector Shape") == 0) gc.property(k).remove(); }
+  return gc;
+}
+// the gradient paint of a group, moved below the paths added after it (a paint draws the paths above it)
+function gradPaint(gc) {
+  for (var i = 1; i <= gc.numProperties; i++) {
+    var p = gc.property(i);
+    if (p.matchName == "ADBE Vector Graphic - G-Fill" || p.matchName == "ADBE Vector Graphic - G-Stroke") {
+      if (i != gc.numProperties) { p.moveTo(gc.numProperties); p = gc.property(gc.numProperties); }
+      return p;
+    }
+  }
+  throw new Error("gradient preset: no gradient paint");
+}
 // the Rive Shader plugin (rml2ae/plugin) runs .wgsl post-process shaders as is when it is installed
 var RIVE_SHADER = (function () { try { for (var i = 0; i < app.effects.length; i++) { if (app.effects[i].matchName == "RIVE RiveShader") return true; } } catch (e) {} return false; })();
 // ---- passes for the Rive Shader plugin: clone a comp tree bound to a ViewModel copy with overridden values

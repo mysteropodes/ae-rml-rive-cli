@@ -36,6 +36,7 @@ rml2ae = [
   "ae2rml/fxlib/*.json",
   "ae2rml/luau/*.luau",
   "panel/*.jsx",
+  "presets/*.ffx",
   "tests/cases/features/*",
 ]
 
