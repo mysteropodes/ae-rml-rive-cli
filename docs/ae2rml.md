@@ -77,7 +77,7 @@ Legend: **exact** = reproduced to anti-aliasing noise; **approx** = reproduced w
 | Keyframes | Hold, linear and bezier (influence + speed) become exact cubic ease interpolators; curved spatial paths, keys before time 0 and negative stretch are sampled then reduced. Keys that fall between frames are moved to neighbouring frames with the curve cut exactly | exact |
 | Blend modes | Rive names; modes without an equivalent map to the closest of the same family and are reported | approx |
 | Solo | A soloed layer only hides the others when it has an image; soloed audio or guide layers leave everything visible, as in After Effects | exact |
-| Lights | Ignored (reported) | no |
+| Lights (Classic 3D: parallel, spot, point, ambient) | Shading baked into the colours of each 3D layer that accepts lights, keyed per frame when it changes: ambient + Lambert diffuse + Blinn-Phong highlight (Metal mixes its colour), spot cone and feather, the three falloff modes. The model matches After Effects 2026 renders within 1.5 levels per pixel; Rive gets one value per layer, taken at its anchor, so a spot or point light does not vary across the layer. No shadows; a still image takes the shading of the first frame | approx |
 | Layer styles on vector layers (shape, text, solid): Drop Shadow, Outer Glow, Inner Shadow, Inner Glow, Color Overlay, Gradient Overlay, Stroke | Copies of the layer's shapes above or below it, in Photoshop's stacking order: feathered copies for shadows and glows (Spread as a stroke, inner ones with Rive's inner `Feather`), a recoloured copy for overlays (gradient across the layer's bounds), fills turned into a `Stroke` at the style's position (inside, centre, outside). Animated style parameters use their first value; noise, choke and Fill Opacity are not reproduced. See [Layer styles](#layer-styles) | approx |
 | Bevel and Emboss, Satin, Pattern Overlay; any style on footage or a pre-comp | Reported | no |
 
@@ -113,7 +113,7 @@ sub-groups through their (animated) transforms, and a path operation applies to 
 | Wiggly selector, random order, smooth up/down | Strengths baked per character | approx |
 | Text on a path | `TextFollowPathModifier` on an unpainted shape | exact |
 | Animated tracking, per-character colour and offset | Per-character runs / translations | exact |
-| Per-character 3D | Not converted | no |
+| Per-character 3D (animators with Z position, X / Y rotation, Z anchor) | One `TextModifierGroup` per character, keyed per frame: the 2D affine closest to how the camera sees that character's own plane (position, turn, foreshortening). The perspective inside one glyph and the shear of combined X / Y turns are lost; paragraph text keeps the one-plane projection | approx |
 
 ### Masks, mattes, blending
 
@@ -139,7 +139,8 @@ sub-groups through their (animated) transforms, and a path operation applies to 
 | Video | Exported as an image sequence (only shown frames); start time, stretch, remap and loops honoured; colour effects baked per displayed frame. Use `--media-scale` / `--media-fps` to limit size | exact (heavy) |
 | Audio | `AudioAsset` + `AudioEvent` at the entry point (WAV, MP3, FLAC; other formats converted to WAV with ffmpeg), trimmed to the part After Effects plays; the sound of videos is extracted separately | exact |
 | 3D layers and cameras | Projection by the active camera (default camera, one-node, two-node, parented). Shapes, solids, text: exact (Luau projection). Images, videos, sequences: exact (16x16 mesh). Pre-comps: rendered flat to a canvas then mapped. Masks, 3D track mattes, "orient towards camera", depth ordering (keyed draw rules when it changes) | exact / approx |
-| 3D approximations | Stroke width is not foreshortened; no depth of field; no per-character 3D; no 3D inside a collapsed pre-comp | approx |
+| Depth of field | A `Feather` on the vector paints of each 3D layer, keyed from its distance to the focus: σ = 0.04 × the thin lens' circle of confusion (aperture × \|depth − focus\| / depth × zoom / focus × blur level), measured on After Effects 2026 renders (Classic 3D blurs little: 1-2 px for a layer 500 px off focus). One blur per layer, at its anchor; footage and pre-comps are not blurred | approx |
+| 3D approximations | Stroke width is not foreshortened; no 3D inside a collapsed pre-comp; renderers other than Classic 3D are drawn with its rules | approx |
 | Corner Pin on an ordinary layer | Same homography | exact |
 | Transform adjustment layer | Animated nodes around all layers below, identity outside its duration | exact |
 
@@ -220,7 +221,8 @@ comment is empty or already a tag. Afterwards:
 
 ## Known limits
 
-- **Lights, per-character 3D, depth of field**: not converted (text/image mattes: only with `--clip-mattes`).
+- **Lights, depth of field, per-character 3D**: approximated (see the tables above): one shading and one blur per
+  layer, no shadows, no perspective inside a single glyph.
 - **Layer styles**: approximate on vector layers (see [Layer styles](#layer-styles)); Bevel and Emboss, Satin, Pattern
   Overlay and styles on footage or pre-comps are reported, not converted.
 - **Effects without a library implementation**: kept as comments; see `effects_todo.json`.
