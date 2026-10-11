@@ -34,6 +34,9 @@ from .util import IdPool, Report, argb, clean, copy_font, find_footage, fmt, fon
 AE_BOX_BASELINE = 0.743     # measured by rml2ae (Montserrat, AE 2026): first baseline of a box text = top + 0.743*size
 CONTROL_FX = {"ADBE Slider Control", "ADBE Color Control", "ADBE Checkbox Control", "ADBE Angle Control",
               "ADBE Point Control", "ADBE Point3D Control", "ADBE Layer Control", "ADBE Dropdown Control"}
+# text animator transform properties that per-character 3D bakes per character (Rive modifiers are 2D)
+PC3D_PROPS = ("ADBE Text Position 3D", "ADBE Text Anchor Point 3D", "ADBE Text Scale 3D", "ADBE Text Rotation",
+              "ADBE Text Rotation X", "ADBE Text Rotation Y")
 BLUR_FX = {"ADBE Gaussian Blur 2", "ADBE Gaussian Blur", "ADBE Box Blur2", "ADBE Box Blur"}
 COLOR_FX = {"ADBE Fill", "ADBE Tint", "ADBE Invert", "ADBE Exposure2", "ADBE Easy Levels2",
             "ADBE Color Balance (HLS)", "ADBE Brightness & Contrast 2", "ADBE HUE SATURATION"}
@@ -1227,11 +1230,16 @@ class CompBuild:
                 try:
                     dof = L.property("ADBE Camera Options Group").property("ADBE Camera Depth of Field")
                     if dof is not None and tonum(dof.value) > 0.5:
-                        self.conv.report.add(self.scope, "approx", clean(L.name), "depth of field (blur) is not rendered")
+                        self.conv.report.add(self.scope, "converted", clean(L.name), "depth of field → a Feather on the "
+                                             "vector paints of each 3D layer, keyed from its distance to the focus")
                 except Exception:
                     pass
             elif kind == "LightLayer":
-                self.conv.report.add(self.scope, "unsupported", clean(L.name), "light: not converted (no shading in Rive)")
+                self.conv.report.add(self.scope, "converted", clean(L.name), "light → shading baked into the colours of "
+                                     "the 3D layers that accept lights")
+                if getattr(self.comp, "renderer", "ADBE Advanced 3d") not in ("ADBE Advanced 3d", None):
+                    self.conv.report.add(self.scope, "approx", clean(L.name), f"renderer {self.comp.renderer}: lights "
+                                         "shaded with Classic 3D's rules")
             elif getattr(L, "adjustment_layer", False) and getattr(L, "enabled", True):
                 self.adjust(LayerBuild(self, L))
             if self.is_audio(L):
@@ -1754,6 +1762,7 @@ class LayerBuild:
             self.emit_drawables(own)
             self.wipe_matte(own)                  # Linear Wipe on a solid used as a matte: the wiped geometry
             self.plane(plan)                      # a 3D matte clips through its projection too
+            self.per_char_3d()
             self.make_matte_source(own)
             return
         op = self.prop(self.tprop("ADBE Opacity"), "opacity")
@@ -1793,6 +1802,7 @@ class LayerBuild:
             self.opacity_window(target, op, in_f, out_f, need_in, need_out)
         self.emit_drawables(draw_into)
         self.plane(plan)
+        self.per_char_3d()
         if masks:
             self.masks(masks, content_node, holder)
         for fx in plan["ramps"]:
@@ -1801,6 +1811,7 @@ class LayerBuild:
             self.apply_colors(plan["colors"])
         for fx in plan.get("blurs", []):
             self.blur(fx)
+        self.depth_of_field()
         for fx in plan.get("shadows", []):
             self.drop_shadow(fx, draw_into)
         for fx in plan.get("glows", []):
@@ -1920,8 +1931,6 @@ class LayerBuild:
             if d3 and any(p.tag == "Stroke" for p in paints):
                 self.note("approx", self.name, "3D: stroke thickness is not foreshortened (the outline is projected, "
                                                "the width stays uniform)")
-            if d3 and type(L).__name__ == "TextLayer" and getattr(L, "three_d_per_char", False):
-                self.note("approx", self.name, "per-character 3D: the text is projected as one plane")
         holder = getattr(self, "_draw_holder", None)
         for d in list(others):
             if d.tag in ("Image", "Solo") and holder is not None and d in holder.children:
@@ -2457,6 +2466,7 @@ class LayerBuild:
                 self.note("approx", self.name, "font size changes between source-text keys: first size kept")
         self._text_keyed = animated_text or len(runs) > 1
         self._text_font = (self._font_ps(doc), size, align)
+        self._text_lay = (txt, lead, bshift, bool(getattr(doc, "box_text", False) and doc.box_text_size))
         anims = L.text.property("ADBE Text Animators") if L.text is not None else None
         if anims is not None:
             self.text_animators(el, anims, txt, doc)
@@ -2670,6 +2680,11 @@ class LayerBuild:
                 count["lines"] = n
         except Exception:
             pass
+        # per-character 3D with a 3D animator property (z offset, X / Y rotation, z scale or anchor): every character
+        # turns in its own plane, which Rive's 2D modifiers cannot do by range. All transform properties of all
+        # animators then go to per_char_3d(), which bakes each character's projection per frame
+        bake3d = self._pc3d_wanted(items)
+        self._pc3d = [] if bake3d else None
         glyph_jobs = []
         for ai, a in enumerate(items):
             aname = clean(a.name)
@@ -2679,8 +2694,12 @@ class LayerBuild:
             g = E("TextModifierGroup", id=self.id("anim", ai), name=aname)
             done, skipped = [], []
             tracking = None
+            t3d = {}
             for mn, p in props.items():
                 ap = self.prop(p, f"{aname} {clean(p.name)}")
+                if bake3d and mn in PC3D_PROPS:
+                    t3d[mn] = ap
+                    continue
                 if mn == "ADBE Text Position 3D":
                     g.set("modifyTranslation", True)
                     self.put(g, "x", ap, 0, force=True)
@@ -2718,6 +2737,8 @@ class LayerBuild:
                     skipped.append(clean(p.name))
             if skipped:
                 self.note("unsupported", f"{self.name} · {aname}", f"text animator properties not in Rive: {', '.join(skipped)}")
+            if t3d:
+                self._pc3d.append((aname, sg, t3d, count))
             bake = self._needs_bake(sg)
             if tracking is not None or (done and bake):
                 strengths = self._unit_strengths(sg, txt, count)
@@ -3102,6 +3123,183 @@ class LayerBuild:
             el.add(g)
         self.note("converted", f"{self.name} · {aname}", f"tracking amount → per-character translation ({n} characters, "
                                                           "baked per frame)")
+
+    # ---------------------------------------------------------------- per-character 3D
+    def _pc3d_wanted(self, items):
+        """per-character 3D is on and an animator moves characters out of the layer's plane"""
+        L = self.L
+        if not (getattr(L, "three_d_per_char", False) and three.is3d(L)):
+            return False
+        from .shapes import _stored
+        for a in items:
+            pg = a.property("ADBE Text Animator Properties")
+            for p in (pg.properties if pg is not None else []):
+                mn = getattr(p, "match_name", "")
+                if mn not in ("ADBE Text Position 3D", "ADBE Text Anchor Point 3D", "ADBE Text Rotation X",
+                              "ADBE Text Rotation Y") or not _stored(p):
+                    continue
+                ap = self.prop(p, clean(p.name))
+                if ap.animated:
+                    return True
+                v = ap.static(None, 0)
+                v = v if isinstance(v, list) else [v]
+                if mn.endswith("3D"):
+                    if len(v) > 2 and abs(tonum(v[2])) > 1e-6:
+                        return True
+                elif abs(tonum(v[0])) > 1e-6:
+                    return True
+        return False
+
+    def _char_layout(self):
+        """[(x, y, advance)] of each character (newlines left out) in layer space: the pivot Rive turns a glyph about
+        (the middle of its advance, on its baseline), point text laid out as AE does (shaped, kerning included)"""
+        ps, size, align = getattr(self, "_text_font", (None, 0, "left"))
+        lay = getattr(self, "_text_lay", None)
+        if not ps or lay is None or lay[3]:
+            return None
+        txt, lead, bshift, _box = lay
+        measure = self.conv.font_asset(ps)[2][2]
+        path = os.path.join(self.conv.out_dir, self.conv.font_asset(ps)[1])
+        just = {"center": 0.5, "right": 1.0}.get(align, 0.0)
+        out = []
+        for li, line in enumerate(txt.split("\n")):
+            adv = [measure(c, size) for c in line]
+            try:
+                import uharfbuzz as hb
+                hfont = hb.Font(hb.Face(hb.Blob.from_file_path(path)))
+                buf = hb.Buffer()
+                buf.add_str(line)
+                buf.guess_segment_properties()
+                hb.shape(hfont, buf, {"kern": True})
+                pos = [q.x_advance / hfont.face.upem * size for q in buf.glyph_positions]
+                if len(pos) == len(line):
+                    adv = pos
+            except Exception:
+                pass
+            x = -just * sum(adv)
+            for a in adv:
+                out.append((x + a / 2.0, li * lead - bshift, a))
+                x += a
+        return out
+
+    def per_char_3d(self):
+        """per-character 3D -> one TextModifierGroup per character (translation, rotation, scale keyed per frame): the
+        2D affine closest to how the camera sees that character's own plane, fitted on its glyph box and expressed in
+        the layer's plane (which ae_project then puts in perspective). Exact for the position and the turn of each
+        character; what is lost is the perspective inside one glyph and the shear of combined X / Y turns."""
+        jobs = getattr(self, "_pc3d", None)
+        if not jobs:
+            return
+        L, tl, cb, eng = self.L, self.tl, self.cb, self.conv.engine
+        el = next((e for d in self.drawables for e in d.iter() if e.tag == "Text"), None)
+        lay = self._char_layout()
+        if el is None or not lay:
+            self.note("approx", self.name, "per-character 3D: paragraph text or no font metrics — the text is projected "
+                                           "as one plane, characters keep their 2D animation only")
+            return
+        txt = self._text_lay[0]
+        n = len(lay)
+        strengths = []
+        for aname, sg, props, count in jobs:
+            st = self._unit_strengths(sg, txt, count)
+            if st is None:
+                self.note("approx", f"{self.name} · {aname}", "per-character 3D: too many characters × frames to bake")
+                return
+            strengths.append(st)
+        size = getattr(self, "_text_font", (None, 0, ""))[1] or 12.0
+        pr = eng.projector(cb.comp, None)
+        f0 = max(0, int(math.floor(float(L.in_point) * tl.fps + 1e-6)))
+        f1 = min(tl.nframes, int(math.ceil(float(L.out_point) * tl.fps - 1e-6)))
+        if f1 < f0:
+            return
+        from py_aep.resolvers.transform import build_local_matrix
+        import numpy as np
+
+        def val(ap, t, d):
+            v = unwrap(ap.at(t)) if ap.animated else ap.static(None, d)
+            return v
+        tracks = [{k: [] for k in ("x", "y", "rotation", "scaleX", "scaleY")} for _ in range(n)]
+        prev_rot = [None] * n
+        last = [None] * n
+        sheared = 0
+        for f in range(f0, f1 + 1):
+            t = f / tl.fps
+            Hi = three.h_inv(pr.homography(L, t))
+            W = pr.world(L, t)
+            cam = pr.camera(t)
+            vals = []
+            for aname, sg, props, count in jobs:
+                g = {mn: val(ap, t, None) for mn, ap in props.items()}
+                vals.append(g)
+            for k, (ox, oy, adv) in enumerate(lay):
+                pos, anc, sc = [0.0, 0.0, 0.0], [0.0, 0.0, 0.0], [100.0, 100.0, 100.0]
+                rx = ry = rz = 0.0
+                for j, g in enumerate(vals):
+                    w = strengths[j][f][k]
+                    if w == 0:
+                        continue
+                    for mn, v in g.items():
+                        if v is None:
+                            continue
+                        v = v if isinstance(v, list) else [v]
+                        v = [tonum(x) for x in v] + [0.0] * 3
+                        if mn == "ADBE Text Position 3D":
+                            pos = [pos[i] + w * v[i] for i in range(3)]
+                        elif mn == "ADBE Text Anchor Point 3D":
+                            anc = [anc[i] + w * v[i] for i in range(3)]
+                        elif mn == "ADBE Text Scale 3D":
+                            sc = [sc[i] + w * ((v[i] if i < 2 or v[2] else 100.0) - 100.0) for i in range(3)]
+                        elif mn == "ADBE Text Rotation":
+                            rz += w * v[0]
+                        elif mn == "ADBE Text Rotation X":
+                            rx += w * v[0]
+                        elif mn == "ADBE Text Rotation Y":
+                            ry += w * v[0]
+                M = W @ build_local_matrix([ox + pos[0], oy + pos[1], pos[2]], anc, sc, rz, rotate_x=rx, rotate_y=ry)
+                src, dst = [], []
+                if Hi is not None:
+                    for gx in (-adv / 2.0, 0.0, adv / 2.0):
+                        for gy in (0.0, -0.35 * size, -0.7 * size):
+                            q = pr.project(M.transform_point([gx, gy, 0.0]), t, cam)
+                            r = three.h_apply(Hi, *q) if q is not None else None
+                            if r is not None:
+                                src.append((gx, gy, 1.0))
+                                dst.append(r)
+                if len(src) < 3:
+                    if last[k] is None:
+                        continue
+                    x, y, rot, sx, sy = last[k]
+                else:
+                    sol = np.linalg.lstsq(np.array(src), np.array(dst), rcond=None)[0]
+                    a, b, c, d, e, ff = sol[0][0], sol[0][1], sol[1][0], sol[1][1], sol[2][0], sol[2][1]
+                    sx = math.hypot(a, b)
+                    rot = math.atan2(b, a)
+                    sy = (a * d - b * c) / sx if sx > 1e-12 else 0.0
+                    if sx > 1e-9 and abs(a * c + b * d) / (sx * max(math.hypot(c, d), 1e-9)) > 0.05:
+                        sheared += 1
+                    if prev_rot[k] is not None:
+                        rot = geom.unwrap(prev_rot[k], rot)
+                    prev_rot[k] = rot
+                    x, y = e - ox, ff - oy
+                    last[k] = (x, y, rot, sx, sy)
+                for name, v in (("x", x), ("y", y), ("rotation", rot), ("scaleX", sx), ("scaleY", sy)):
+                    tracks[k][name].append((f, v))
+        for k in range(n):
+            if not tracks[k]["x"]:
+                continue
+            g = E("TextModifierGroup", id=self.id("pc3d", k), name=f"3D character {k + 1}", modifyTranslation=True,
+                  modifyRotation=True, modifyScale=True)
+            for name, dense in tracks[k].items():
+                self.put_dense(g, name, dense)
+            g.add(E("TextModifierRange", id=self.id("pc3d", k, "r"), name=f"char {k + 1}", unitsValue="characters",
+                    typeValue="unitIndex", modeValue="add", modifyFrom=float(k), falloffFrom=float(k),
+                    falloffTo=float(k + 1), modifyTo=float(k + 1)))
+            el.add(g)
+        self.note("converted", self.name, f"per-character 3D → each of the {n} characters projected in its own plane "
+                                          f"(position, turn and foreshortening keyed per frame)")
+        if sheared:
+            self.note("approx", self.name, "per-character 3D: combined X / Y turns shear a character, Rive's text "
+                                           "modifiers cannot (closest rotation and scale kept)")
 
     def text_expr_selector(self, s, ai, si, units_of, mode_of, count):
         """AE Expression Selector -> one TextModifierRange per unit (by unit index), its strength keyed per frame from
@@ -3824,9 +4022,53 @@ class LayerBuild:
             self.todo(fx, adjustment=False)
         # colour effects of the precomp layers above this comp (outermost last): a Hue/Saturation on an FX pack's
         # precomp recolours everything inside (broadcast-test: Bubble_29 pink)
+        self.lighting(plan)
         plan["colors"] += list(self.cb.inherited_colors)
         self._color_plan = plan["colors"]
         return plan
+
+    def lighting(self, plan):
+        """Classic 3D lights on a 3D layer -> a colour transform (rgb · A + B, keyed per frame when it changes) baked
+        into the layer's colours like a colour effect: exact for parallel and ambient lights on a flat layer; point
+        and spot lights are evaluated at the layer's anchor (AE varies them across the layer); no shadows"""
+        L, tl, cb = self.L, self.tl, self.cb
+        if not three.is3d(L):
+            return
+        pr = self.conv.engine.projector(cb.comp, None)
+        lt = getattr(pr, "lighting", None)
+        if lt is None:
+            lt = pr.lighting = three.Lighting(pr)
+        if not lt.lights:
+            return
+        anc_p = self.tprop("ADBE Anchor Point")
+        frames = []
+        for f in range(tl.nframes + 1):
+            t = f / tl.fps
+            av = unwrap(self.conv.engine.value(anc_p, L, cb.comp, t)) if anc_p is not None else [0.0, 0.0]
+            av = av if isinstance(av, list) else [0.0, 0.0]
+            sh = lt.shade(L, t, (tonum(av[0]), tonum(av[1])))
+            frames.append(sh or ([1.0, 1.0, 1.0], [0.0, 0.0, 0.0]))
+        if all(max(abs(a - 1) for a in A) < 1e-6 and max(abs(b) for b in B) < 1e-6 for A, B in frames):
+            if not any(lt.material(L, 0.0)["accepts"] for _ in (0,)):
+                self.note("converted", self.name, "lights: 'Accepts Lights' off, drawn unlit as in AE")
+            return
+        varies = any(max(abs(x - y) for x, y in zip(fr[0] + fr[1], frames[0][0] + frames[0][1])) > 1e-4 for fr in frames)
+        fps, N = tl.fps, tl.nframes
+
+        def fn(rgb, t):
+            A, B = frames[min(N, max(0, int(round(t * fps))))]
+            return [rgb[c] * A[c] + B[c] for c in range(3)]
+        tag = type("Lights", (), {"name": "Lights", "match_name": "ae2rml lights"})()
+        plan["colors"].append((tag, fn))
+        if varies:
+            self._fx_animated = True
+        kinds = sorted({{4412: "parallel", 4413: "spot", 4414: "point", 4415: "ambient"}.get(
+            int(getattr(x.light_type, "value", x.light_type)), "other") for x in lt.lights})
+        A0, B0 = frames[0]
+        self.note("approx", self.name, f"lights ({', '.join(kinds)}) → colours shaded as AE's Classic 3D at the layer's "
+                                       f"anchor (×{sum(A0) / 3:.2f}{f' +{sum(B0) / 3:.2f}' if sum(B0) > 1e-3 else ''} at "
+                                       f"frame 0{', keyed per frame' if varies else ''}; no shadows, no variation across "
+                                       f"the layer)")
 
     def _raster_content(self, src=None, depth=0):
         """the layer draws pixels (footage / image sequence / video), directly or inside its precomp"""
@@ -4217,6 +4459,51 @@ class LayerBuild:
                                                f"(strength = {k:.3g} × {'radius' if box else 'blurriness'})")
         if evenodd:
             self.note("approx", clean(fx.name), "even-odd shapes: their feathered fills use the clockwise rule")
+
+    def depth_of_field(self):
+        """the camera's depth of field on a 3D layer -> a Feather on each vector paint, its strength keyed from the
+        circle of confusion at the layer's anchor (one blur for the whole layer: a plane seen at an angle is blurred
+        evenly). Pixels (footage, precomps) are not blurred."""
+        L, tl, cb = self.L, self.tl, self.cb
+        if not three.is3d(L) or not self.drawables:
+            return
+        pr = self.conv.engine.projector(cb.comp, None)
+        if not pr.cams:
+            return
+        f0 = max(0, int(math.floor(float(L.in_point) * tl.fps + 1e-6)))
+        f1 = min(tl.nframes, int(math.ceil(float(L.out_point) * tl.fps - 1e-6)))
+        anc_p = self.tprop("ADBE Anchor Point")
+        dense = []
+        for f in range(f0, f1 + 1):
+            t = f / tl.fps
+            av = unwrap(self.conv.engine.value(anc_p, L, cb.comp, t)) if anc_p is not None else [0.0, 0.0]
+            av = av if isinstance(av, list) else [0.0, 0.0]
+            if pr.active_camera(t) is None and dense:
+                dense.append((f, dense[-1][1]))     # past the camera's out point (the layer's last frame): held
+                continue
+            dense.append((f, 2.0 * pr.dof_sigma(L, t, (tonum(av[0]), tonum(av[1])))))
+        if not dense or max(v for _, v in dense) < 0.05:
+            return
+        paints = [e for d in self.drawables if d.tag not in ("Image", "NestedArtboard", "Solo", "ScriptedDrawable")
+                  for e in d.iter() if e.tag in ("Fill", "Stroke")]
+        if not paints:
+            self.note("approx", self.name, "depth of field: pixels (footage, precomp) are not blurred in Rive")
+            return
+        done = 0
+        for e in paints:
+            if any(c.tag == "Feather" for c in e.children):
+                self.note("approx", self.name, "depth of field: a paint already blurred by an effect keeps that blur only")
+                continue
+            fe = E("Feather", id=self.conv.ids.new(), name="Depth of field")
+            e.add(fe)
+            self.put_dense(fe, "strength", [(f, max(v, 0.0)) for f, v in dense])
+            if e.tag == "Fill":
+                e.set("fillRule", "clockwise")
+            done += 1
+        if done:
+            lo, hi = min(v for _, v in dense) / 2, max(v for _, v in dense) / 2
+            self.note("approx", self.name, f"depth of field → Feather on {done} paint(s), keyed from the camera's focus "
+                                           f"(σ {lo:.3g}–{hi:.3g} px at the anchor; one blur for the whole layer)")
 
     SHADOW_SOFT_K = 0.43        # measured: AE Drop Shadow softness ≈ 4.6 σ ; Rive Feather strength = 2 σ
 

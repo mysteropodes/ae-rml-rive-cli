@@ -54,6 +54,8 @@ jobs:
         run: python -m rml2ae.tests.test_layer_mask
       - name: inside / outside strokes <-> Offset Paths, both ways
         run: python -m rml2ae.tests.test_stroke_position
+      - name: lights, depth of field and per-character 3D (light model vs After Effects renders)
+        run: python -m rml2ae.tests.test_lights_dof_3d
       - name: ae2rml binds the second layer of map effects (Displacement Map)
         run: |
           python -m rml2ae.tests.test_map_layer

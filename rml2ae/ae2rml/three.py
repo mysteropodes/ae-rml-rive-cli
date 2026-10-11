@@ -16,6 +16,12 @@ from py_aep.resolvers.transform import (Mat4, _look_at_rotation, _rotate_x, _rot
 from .aexpr import tonum, unwrap
 
 
+# depth of field: Gaussian σ (comp px) per pixel of thin-lens circle of confusion. Measured on After Effects 2026
+# renders (Classic 3D, aerender, shape and solid layers 200 to 2,000 px off the focus plane, aperture ×1 to ×4):
+# σ ≈ 0.036-0.05 × the circle of confusion — Classic 3D blurs far less than a real lens would (σ = c / 4)
+DOF_K = 0.04
+
+
 def is3d(L):
     return bool(getattr(L, "three_d_layer", False)) and type(L).__name__ not in ("CameraLayer", "LightLayer")
 
@@ -147,6 +153,41 @@ class Projector:
             pos = pw.transform_point(pos)
             rot = _rotation_only(pw) @ rot
         return rot, pos, zoom
+
+    def camera_option(self, cam, mn, t, default):
+        try:
+            p = cam.property("ADBE Camera Options Group").property(mn)
+        except Exception:
+            p = None
+        if p is None:
+            return default
+        try:
+            return tonum(unwrap(self.engine.value(p, cam, self.comp, t, parent_env=self.env)))
+        except Exception:
+            return default
+
+    def dof(self, t):
+        """the active camera's depth of field at t: (focus distance, aperture, blur level / 100, zoom), or None"""
+        cam = self.active_camera(t)
+        if cam is None or self.camera_option(cam, "ADBE Camera Depth of Field", t, 0.0) < 0.5:
+            return None
+        zoom = self.camera(t)[2]
+        return (self.camera_option(cam, "ADBE Camera Focus Distance", t, zoom),
+                self.camera_option(cam, "ADBE Camera Aperture", t, 0.0),
+                self.camera_option(cam, "ADBE Camera Blur Level", t, 100.0) / 100.0, zoom)
+
+    def dof_sigma(self, L, t, p=(0.0, 0.0)):
+        """depth-of-field blur at the layer point p, as a Gaussian σ in comp pixels: the thin lens' circle of
+        confusion seen through the camera — aperture × |depth − focus| / depth, scaled from the focus plane to the
+        image by zoom / focus, times the blur level. 0 without depth of field"""
+        d = self.dof(t)
+        if d is None:
+            return 0.0
+        focus, aperture, level, zoom = d
+        z = self.depth(L, t, p)
+        if z <= 1e-6 or focus <= 1e-6:
+            return 0.0
+        return level * aperture * abs(z - focus) / z * zoom / focus * DOF_K
 
     def to_camera(self, X, cam):
         R, C, _zoom = cam
@@ -309,3 +350,163 @@ def h_path(p, H):
         ni.append((a[0] - q[0], a[1] - q[1]))
         no.append((b[0] - q[0], b[1] - q[1]))
     return (nv, ni, no, c)
+
+
+# ---------------------------------------------------------------- Classic 3D lights
+# AE light types (LightLayer.light_type)
+PARALLEL, SPOT, POINT, AMBIENT = 4412, 4413, 4414, 4415
+
+
+def _norm(v):
+    n = math.sqrt(sum(x * x for x in v))
+    return [x / n for x in v] if n > 1e-12 else [0.0, 0.0, 0.0]
+
+
+def _dot(a, b):
+    return sum(x * y for x, y in zip(a, b))
+
+
+def _smooth(x):
+    x = max(0.0, min(1.0, x))
+    return x * x * (3 - 2 * x)
+
+
+class Lighting:
+    """After Effects' Classic 3D shading of one flat layer point, as a colour transform rgb -> rgb · A + B:
+    Σ ambient lights × Ambient + Σ other lights × Diffuse × cos(normal, light) (Lambert), plus a Blinn-Phong
+    highlight × Specular Intensity whose colour goes from the light's (Metal 0 %) to the layer's (Metal 100 %); spot
+    cones, their feather and the falloff modes attenuate both. Every term was measured against After Effects 2026
+    renders (24 cases, all within one 8-bit level). Shadows are not computed."""
+
+    def __init__(self, pr):
+        self.pr = pr
+        self.lights = [L for L in pr.comp.layers if type(L).__name__ == "LightLayer" and getattr(L, "enabled", True)]
+
+    def active(self, t):
+        return [L for L in self.lights if float(L.in_point) <= t < float(L.out_point)]
+
+    def _opt(self, L, group, mn, t, default):
+        try:
+            p = L.property(group).property(mn)
+        except Exception:
+            p = None
+        if p is None:
+            return default
+        try:
+            return unwrap(self.pr.engine.value(p, L, self.pr.comp, t, parent_env=self.pr.env))
+        except Exception:
+            return default
+
+    def material(self, L, t):
+        g = "ADBE Material Options Group"
+        f = lambda mn, d: tonum(self._opt(L, g, mn, t, d))
+        return {"accepts": f("ADBE Accepts Lights", 1.0) >= 0.5, "ambient": f("ADBE Ambient Coefficient", 100.0) / 100,
+                "diffuse": f("ADBE Diffuse Coefficient", 50.0) / 100, "specular": f("ADBE Specular Coefficient", 50.0) / 100,
+                "shininess": f("ADBE Shininess Coefficient", 5.0) / 100, "metal": f("ADBE Metal Coefficient", 100.0) / 100}
+
+    def light(self, Lt, t):
+        pr = self.pr
+        g = "ADBE Light Options Group"
+        o = lambda mn, d: self._opt(Lt, g, mn, t, d)
+        col = o("ADBE Light Color", [1.0, 1.0, 1.0])
+        col = [tonum(x) for x in (col if isinstance(col, list) else [1, 1, 1])[:3]]
+        try:
+            kind = int(getattr(Lt.light_type, "value", Lt.light_type))
+        except Exception:
+            kind = SPOT
+        pos = pr.position(Lt, t)
+        poi = _v(pr.value(Lt, "ADBE Anchor Point", t, [0, 0, 0]), 3)
+        ori = _v(pr.value(Lt, "ADBE Orientation", t, [0, 0, 0]), 3)
+        rx, ry, rz = (tonum(pr.value(Lt, f"ADBE Rotate {a}", t, 0.0)) for a in ("X", "Y", "Z"))
+        rot = Mat4.identity()
+        if _auto_orient(Lt) == 4214:
+            rot = _look_at_rotation(pos, poi)
+        rot = rot @ _rotate_x(ori[0]) @ _rotate_y(ori[1]) @ _rotate_z(ori[2]) @ _rotate_x(rx) @ _rotate_y(ry) @ _rotate_z(rz)
+        if Lt.parent is not None:
+            pw = pr.world(Lt.parent, t)
+            pos = pw.transform_point(pos)
+            rot = _rotation_only(pw) @ rot
+        return {"kind": kind, "intensity": tonum(o("ADBE Light Intensity", 100.0)) / 100.0, "color": col,
+                "pos": pos, "dir": _norm(rot.transform_vector([0.0, 0.0, 1.0])),
+                "cone": tonum(o("ADBE Light Cone Angle", 90.0)), "feather": tonum(o("ADBE Light Cone Feather 2", 50.0)) / 100,
+                "falloff": int(tonum(o("ADBE Light Falloff Type", 1.0))), "radius": tonum(o("ADBE Light Falloff Start", 500.0)),
+                "distance": tonum(o("ADBE Light Falloff Distance", 500.0))}
+
+    def shade(self, L, t, p=(0.0, 0.0)):
+        """(A, B) per channel at the layer point p, or None when AE draws the layer unlit (no light on, or the layer
+        does not accept lights)"""
+        lights = self.active(t)
+        if not lights:
+            return None
+        m = self.material(L, t)
+        if not m["accepts"]:
+            return None
+        pr = self.pr
+        W = pr.world(L, t)
+        P = W.transform_point([p[0], p[1], 0.0])
+        N = _norm([W[0][2], W[1][2], W[2][2]])
+        _R, C, _z = pr.camera(t)
+        V = _norm([C[i] - P[i] for i in range(3)])
+        if _dot(N, V) < 0:
+            N = [-x for x in N]                     # both faces take light: the one the camera sees
+        A, S = [0.0, 0.0, 0.0], [0.0, 0.0, 0.0]
+        for Lt in lights:
+            li = self.light(Lt, t)
+            k = li["intensity"]
+            if li["kind"] == AMBIENT:
+                for c in range(3):
+                    A[c] += k * li["color"][c] * m["ambient"]
+                continue
+            if li["kind"] == PARALLEL:
+                Lv = [-x for x in li["dir"]]
+                att = 1.0
+            else:
+                d = [li["pos"][i] - P[i] for i in range(3)]
+                dist = math.sqrt(_dot(d, d)) or 1e-9
+                Lv = [x / dist for x in d]
+                att = falloff(li["falloff"], dist, li["radius"], li["distance"])
+                if li["kind"] == SPOT:
+                    att *= spot_cone(math.degrees(math.acos(max(-1.0, min(1.0, -_dot(Lv, li["dir"]))))),
+                                     li["cone"], li["feather"])
+            if att <= 0:
+                continue
+            ndl = _dot(N, Lv)
+            if ndl <= 0:
+                continue
+            dif = k * att * m["diffuse"] * ndl
+            Hv = _norm([Lv[i] + V[i] for i in range(3)])
+            spec = k * att * m["specular"] * max(0.0, _dot(N, Hv)) ** shininess_exponent(m["shininess"])
+            for c in range(3):
+                A[c] += dif * li["color"][c]
+                S[c] += spec * li["color"][c]
+        mt = m["metal"]
+        return [A[c] + S[c] * mt for c in range(3)], [S[c] * (1 - mt) for c in range(3)]
+
+
+def shininess_exponent(s):
+    """Blinn-Phong exponent of a Specular Shininess fraction: the percentage itself (measured: 5 % and 50 % fit
+    exponents 5 and 50 across the layer)"""
+    return max(1.0, s * 100.0)
+
+
+def falloff(kind, dist, radius, distance):
+    """light falloff: 1 None, 2 Smooth (full up to the radius, then down to 0 over the falloff distance),
+    3 Inverse Square Clamped (full inside the radius, then (radius / distance)²)"""
+    if kind == 2:
+        return 1.0 - _smooth((dist - radius) / max(distance, 1e-9)) if dist > radius else 1.0
+    if kind == 3:
+        return min(1.0, (radius / dist) ** 2) if dist > 1e-9 else 1.0
+    return 1.0
+
+
+def spot_cone(angle, cone, feather):
+    """spot light: full inside the cone's half angle shrunk by the feather, 0 outside it, a smoothstep of the
+    cosine in between (measured: AE 2026, cone 60°, feather 50 %, within 0.005)"""
+    half = math.radians(cone / 2.0)
+    inner = half * (1.0 - feather)
+    a = math.radians(angle)
+    if a <= inner:
+        return 1.0
+    if a >= half:
+        return 0.0
+    return _smooth((math.cos(a) - math.cos(half)) / max(math.cos(inner) - math.cos(half), 1e-12))
