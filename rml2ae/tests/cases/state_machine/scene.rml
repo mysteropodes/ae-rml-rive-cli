@@ -1,0 +1,94 @@
+<Rive version="1" kind="fragment">
+  <!-- A state machine with inputs: rml2ae builds a controller null whose effect controls are the inputs, and the
+       states follow them by expression. CI verifies the case with the Rive CLI. -->
+  <Artboard width="400" height="400" defaultStateMachineId="0:50" name="Button" id="0:1">
+    <Fill name="Background">
+      <SolidColor colorValue="FF20242C" name="Color"/>
+    </Fill>
+    <Shape x="200" y="200" name="Disc" id="0:10">
+      <Ellipse width="120" height="120" name="Ellipse" id="0:11"/>
+      <Fill name="Fill" id="0:12">
+        <SolidColor colorValue="FF3388FF" name="Color" id="0:13"/>
+      </Fill>
+    </Shape>
+    <LinearAnimation fps="30" duration="60" loopValue="loop" name="Idle" id="0:20">
+      <KeyedObject objectId="0:10">
+        <KeyedProperty propertyKey="16">
+          <KeyFrameDouble value="1" frame="0" interpolationType="linear"/>
+          <KeyFrameDouble value="1.1" frame="30" interpolationType="linear"/>
+          <KeyFrameDouble value="1" frame="60" interpolationType="linear"/>
+        </KeyedProperty>
+      </KeyedObject>
+    </LinearAnimation>
+    <LinearAnimation fps="30" duration="15" loopValue="oneShot" name="Hover" id="0:21">
+      <KeyedObject objectId="0:13">
+        <KeyedProperty propertyKey="37">
+          <KeyFrameColor value="FF3388FF" frame="0" interpolationType="linear"/>
+          <KeyFrameColor value="FFFFAA33" frame="15" interpolationType="linear"/>
+        </KeyedProperty>
+      </KeyedObject>
+    </LinearAnimation>
+    <LinearAnimation fps="30" duration="10" loopValue="oneShot" name="Press" id="0:22">
+      <KeyedObject objectId="0:10">
+        <KeyedProperty propertyKey="17">
+          <KeyFrameDouble value="1" frame="0" interpolationType="linear"/>
+          <KeyFrameDouble value="0.8" frame="10" interpolationType="linear"/>
+        </KeyedProperty>
+      </KeyedObject>
+    </LinearAnimation>
+    <LinearAnimation fps="30" duration="1" loopValue="oneShot" name="Left" id="0:23">
+      <KeyedObject objectId="0:10">
+        <KeyedProperty propertyKey="13">
+          <KeyFrameDouble value="100" frame="0" interpolationType="linear"/>
+        </KeyedProperty>
+      </KeyedObject>
+    </LinearAnimation>
+    <LinearAnimation fps="30" duration="1" loopValue="oneShot" name="Right" id="0:24">
+      <KeyedObject objectId="0:10">
+        <KeyedProperty propertyKey="13">
+          <KeyFrameDouble value="300" frame="0" interpolationType="linear"/>
+        </KeyedProperty>
+      </KeyedObject>
+    </LinearAnimation>
+    <StateMachine name="Button SM" id="0:50">
+      <StateMachineBool name="hover" value="false" id="0:51"/>
+      <StateMachineTrigger name="press" id="0:52"/>
+      <StateMachineNumber name="level" value="50" id="0:53"/>
+      <StateMachineLayer name="Main" id="0:60">
+        <EntryState x="0" y="0">
+          <StateTransition stateToId="0:61"/>
+        </EntryState>
+        <AnyState x="0" y="200">
+          <StateTransition stateToId="0:63" duration="100">
+            <TransitionTriggerCondition inputId="0:52"/>
+          </StateTransition>
+        </AnyState>
+        <ExitState x="600" y="0"/>
+        <AnimationState x="200" y="0" animationId="0:20" name="Idle" id="0:61">
+          <StateTransition stateToId="0:62" duration="200">
+            <TransitionBoolCondition inputId="0:51" opValue="equal"/>
+          </StateTransition>
+        </AnimationState>
+        <AnimationState x="400" y="0" animationId="0:21" name="Hover" id="0:62">
+          <StateTransition stateToId="0:61" duration="200">
+            <TransitionBoolCondition inputId="0:51" opValue="notEqual"/>
+          </StateTransition>
+        </AnimationState>
+        <AnimationState x="400" y="200" animationId="0:22" name="Press" id="0:63">
+          <StateTransition stateToId="0:61" enableExitTime="true" exitTimeIsPercentage="true" exitTime="100"/>
+        </AnimationState>
+      </StateMachineLayer>
+      <StateMachineLayer name="Position" id="0:70">
+        <EntryState x="0" y="0">
+          <StateTransition stateToId="0:71"/>
+        </EntryState>
+        <AnyState x="0" y="200"/>
+        <ExitState x="600" y="0"/>
+        <BlendState1DInput x="200" y="0" inputId="0:53" name="Slide" id="0:71">
+          <BlendAnimation1D animationId="0:23" value="0"/>
+          <BlendAnimation1D animationId="0:24" value="100"/>
+        </BlendState1DInput>
+      </StateMachineLayer>
+    </StateMachine>
+  </Artboard>
+</Rive>

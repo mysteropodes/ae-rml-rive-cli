@@ -1,0 +1,32 @@
+<Rive version="1" kind="fragment">
+  <!-- Flex layouts: rml2ae places each LayoutComponent where the Rive runtime resolves it (rive inspect), as plain
+       editable layers. CI verifies the case with the Rive CLI. -->
+  <Artboard styleId="0:2" width="800" height="600" name="Cards" id="0:1">
+    <LayoutComponentStyle name="Artboard Style" id="0:2"/>
+    <Fill name="Background">
+      <SolidColor colorValue="FFF3F0E8" name="Color"/>
+    </Fill>
+    <LayoutComponent x="40" y="40" width="720" height="200" styleId="0:11" name="Row" id="0:10">
+      <LayoutComponentStyle flexDirectionValue="row" gapHorizontal="20" paddingLeft="10" paddingTop="10" paddingRight="10" paddingBottom="10" name="Row style" id="0:11"/>
+      <Fill name="Fill"><SolidColor colorValue="FFDDDDDD" name="Color"/></Fill>
+      <LayoutComponent width="100" height="100" name="A" id="0:12">
+        <Shape name="A box"><Rectangle originX="0" originY="0" width="100" height="100" name="R"/><Fill name="F"><SolidColor colorValue="FF33AA33" name="C"/></Fill></Shape>
+      </LayoutComponent>
+      <LayoutComponent width="150" height="60" name="B" id="0:13">
+        <Shape name="B box"><Rectangle originX="0" originY="0" width="150" height="60" name="R"/><Fill name="F"><SolidColor colorValue="FFAA3333" name="C"/></Fill></Shape>
+      </LayoutComponent>
+      <LayoutComponent width="80" height="140" name="C" id="0:14">
+        <Shape name="C box"><Rectangle originX="0" originY="0" width="80" height="140" name="R"/><Fill name="F"><SolidColor colorValue="FF3333AA" name="C"/></Fill></Shape>
+      </LayoutComponent>
+    </LayoutComponent>
+    <LayoutComponent x="40" y="300" width="300" height="260" styleId="0:21" name="Column" id="0:20">
+      <LayoutComponentStyle flexDirectionValue="column" gapVertical="10" paddingLeft="20" paddingTop="20" name="Column style" id="0:21"/>
+      <LayoutComponent width="200" height="50" name="D" id="0:22">
+        <Shape name="D box"><Rectangle originX="0" originY="0" width="200" height="50" name="R"/><Fill name="F"><SolidColor colorValue="FF888833" name="C"/></Fill></Shape>
+      </LayoutComponent>
+      <LayoutComponent width="120" height="50" name="E" id="0:23">
+        <Shape name="E box"><Rectangle originX="0" originY="0" width="120" height="50" name="R"/><Fill name="F"><SolidColor colorValue="FF338888" name="C"/></Fill></Shape>
+      </LayoutComponent>
+    </LayoutComponent>
+  </Artboard>
+</Rive>
