@@ -11,7 +11,8 @@
                                         headless render with aerender (PNG sequence; .mp4 through ffmpeg)
   ae screenshot <project> --advance t [--comp X] [--out file.png]
   ae diff <project> --times t1 t2 ...   AE frames vs `rive --screenshot`, side by side
-  ae pull <project> [--dry] [--comp X]  what you changed in the OPEN AE project (transforms, keys, eases, hidden)
+  ae pull <project> [--dry] [--comp X]  what you changed in the OPEN AE project (transforms, keys, eases, hidden,
+                                        colours, paths, layers / groups / paints added)
                                         goes back into scene.rml; --dry only lists it
   ae import <file.aep> <project> [--comp X] [--fps N] [--once] [--no-bg] [--verify] [--shot t …]
                                         the other way: an After Effects project -> a Rive CLI project (ae2rml, no AE
@@ -309,6 +310,9 @@ def cmd_pull(args, flags):
     print(("would change (--dry):" if "dry" in flags else "pulled into the RML:"))
     for c in changes:
         print("  " + c)
+    from rml2ae.pull import TAGS_JSX
+    if "apply" in flags and os.path.exists(os.path.join(out_dir, TAGS_JSX)):
+        print(f"layers added in AE: {os.path.join(out_dir, TAGS_JSX)} tags them with their new ids (the panel runs it)")
     return 0
 
 

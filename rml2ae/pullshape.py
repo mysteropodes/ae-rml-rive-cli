@@ -138,6 +138,23 @@ def tangents(tag, get):
     return [0.0, 0.0], [0.0, 0.0]
 
 
+def path_interps(ks):
+    """interpolation per AE path key: hold, linear, or the influence of a bezier ease (speed not used: shape units)"""
+    interp = []
+    for k, nk in zip(ks, ks[1:] + [None]):
+        if nk is None:
+            interp.append(("linear", None))
+        elif k["o"] == "h":
+            interp.append(("hold", None))
+        elif k["o"] == "l" and nk["i"] == "l":
+            interp.append(("linear", None))
+        else:
+            x1 = k["oe"][0][1] / 100.0 if k["oe"] else 0.0
+            x2 = 1 - (nk["ie"][0][1] / 100.0 if nk["ie"] else 0.0)
+            interp.append(("cubic", (round(x1, 4), 0.0, round(x2, 4), 1.0)) if abs(x1) + abs(1 - x2) > 0.02 else ("linear", None))
+    return interp
+
+
 def ae_shape(s):
     return s["vs"], s["in"], s["out"]
 
@@ -151,8 +168,9 @@ def same_shape(a, b):
 class Contents:
     """Pulls the contents of Rive Shapes for one comp (one animation) into the RML texts."""
 
-    def __init__(self, ab, anim, anims, file_of, new_id, changes, pulled_ids, dry):
+    def __init__(self, ab, anim, anims, file_of, new_id, changes, pulled_ids, dry, adder=None):
         self.ab, self.anim, self.anims, self.file_of, self.new_id = ab, anim, anims, file_of, new_id
+        self.adder = adder                          # pulladd.Adder: paths and paints added in AE
         self.changes, self.pulled, self.dry = changes, pulled_ids, dry
         self.window = False
         self.static_ok = False
@@ -238,26 +256,131 @@ class Contents:
         self.static_ok, self.window = static_ok, window
         kids = shape.children
         paths = [c for c in kids if c.tag in PATH_TAGS]
-        ae_paths = [it for it in items if it["m"] in AE_PATHS]
+        ae_paths = [(q, it) for q, it in enumerate(items) if it["m"] in AE_PATHS]
+        pairs = None
         if len(paths) == len(ae_paths):
-            for p, it in zip(paths, ae_paths):
-                self.path(shape, p, it)
-        elif ae_paths or paths:
+            pairs = list(zip(paths, ae_paths))
+        elif self.adder is not None and len(ae_paths) > len(paths):
+            pairs = self.match(paths, ae_paths, self.same_path)          # paths added in AE: the others in order
+        if pairs is None:
             self.note(shape, f"paths not pulled: {len(ae_paths)} in AE, {len(paths)} in the RML")
+        else:
+            for p, (_q, it) in pairs:
+                self.path(shape, p, it)
+            if len(pairs) < len(ae_paths):
+                self.adder.extra_items(shape, self.anim, self.path_extras(shape, paths, ae_paths, pairs), "path")
         fills = [c for c in kids if c.tag == "Fill"
                  and not (dedicated and c.find("Feather") is not None and not self.gradient(c))]
         strokes = [c for c in kids if c.tag == "Stroke"]
-        for kind, rive, label in (("fill", fills, "fill"), ("stroke", strokes, "stroke")):
-            ae = [it for it in items if it["m"] == kind]
-            if len(ae) != len(rive):
-                self.note(shape, f"{label}s not pulled: {len(ae)} in AE, {len(rive)} in the RML")
+        paints = [c for c in kids if c in fills or c in strokes]           # Rive order: AE lists them reversed
+        ae_paints = [(q, it) for q, it in enumerate(items) if it["m"] in ("fill", "stroke")]
+        same = all(len([1 for _q, it in ae_paints if it["m"] == k]) == len(r) for k, r in (("fill", fills), ("stroke", strokes)))
+        pairs = None
+        if same:
+            pairs = []
+            for kind, rive in (("fill", fills), ("stroke", strokes)):
+                pairs += list(zip(reversed(rive), [x for x in ae_paints if x[1]["m"] == kind]))
+        elif self.adder is not None and len(ae_paints) > len(paints):
+            pairs = self.match(paints[::-1], ae_paints, self.same_paint)    # paints added in AE
+        extra = pairs is not None
+        if pairs is None:                           # by kind: the kind whose count changed is not pulled
+            pairs = []
+            for kind, rive, label in (("fill", fills, "fill"), ("stroke", strokes, "stroke")):
+                ae = [x for x in ae_paints if x[1]["m"] == kind]
+                if len(ae) != len(rive):
+                    self.note(shape, f"{label}s not pulled: {len(ae)} in AE, {len(rive)} in the RML")
+                else:
+                    pairs += list(zip(reversed(rive), ae))
+        for paint, (_q, it) in pairs:
+            rive = fills if paint.tag == "Fill" else strokes
+            label = "fill" if paint.tag == "Fill" else "stroke"
+            lab = label + (f" {rive.index(paint) + 1}" if len(rive) > 1 else "")
+            self.paint(shape, paint, it, lab)
+            if paint.tag == "Stroke":
+                self.double(paint, "thickness", it.get("w"), None, default=1.0, shape=shape, label=lab + " thickness")
+        if extra and len(pairs) < len(ae_paints):
+            self.adder.extra_items(shape, self.anim, self.paint_extras(shape, paints, ae_paints, pairs), "paint")
+
+    # ---- paths / paints added in AE: the RML's ones are found in order, the others are new
+    @staticmethod
+    def match(rive, ae, same):
+        """greedy, in order: each RML item to the next AE item that is the same -> [(element, (index, item))], or None"""
+        out, j = [], 0
+        for r in rive:
+            while j < len(ae) and not same(r, ae[j][1]):
+                j += 1
+            if j == len(ae):
+                return None
+            out.append((r, ae[j]))
+            j += 1
+        return out
+
+    def at0(self, el, name, default=0.0):
+        k = self.rml_keys(el, pkey(el.tag, name))
+        return _value(k, 0) if k else el.num(name, default)
+
+    def same_path(self, p, it):
+        m = it["m"]
+        v = it["p"]["v"] if m == "path" else None
+        if p.tag == "PointsPath":
+            return m == "path" and v is not None and same_shape(ae_shape(v), self.rml_points(p, 0))
+        if p.tag in ("Rectangle", "Ellipse"):
+            if m != ("rect" if p.tag == "Rectangle" else "ellipse"):
+                return False
+            w, h = self.at0(p, "width"), self.at0(p, "height")
+            cx = self.at0(p, "x") + (0.5 - p.num("originX", 0.5)) * w
+            cy = self.at0(p, "y") + (0.5 - p.num("originY", 0.5)) * h
+            size, pos = it["size"]["v"], it["pos"]["v"]
+            return all(abs(a - b) <= PEPS for a, b in ((size[0], w), (size[1], h), (pos[0], cx), (pos[1], cy)))
+        return m == ("star" if p.tag in ("Polygon", "Star") else "path")
+
+    def same_paint(self, paint, it):
+        if it["m"] != ("fill" if paint.tag == "Fill" else "stroke"):
+            return False
+        sc = paint.find("SolidColor")
+        if sc is None:
+            return True                             # a gradient: a white carrier in AE
+        c, o = it.get("c"), it.get("o")
+        if c is None or c.get("x"):
+            return True
+        k = self.rml_keys(sc, pkey("SolidColor", "colorValue"))
+        r, g, b, a = (k[0][1] if k else argb(sc.get("colorValue")))
+        v = c["v"]
+        if any(abs(x - y) > 1.5 / 255 for x, y in zip(v[:3], (r, g, b))):
+            return False
+        if paint.get("isVisible") == "false" or o is None or o.get("x"):
+            return True
+        return abs(o["v"] / 100.0 - a) <= 1.5 / 255
+
+    @staticmethod
+    def path_extras(shape, paths, ae_paths, pairs):
+        """new AE paths -> [(AE index, item, place, order)]: the RML keeps the AE order of paths"""
+        by_q = {q: p for p, (q, _it) in pairs}
+        paints = [c for c in shape.children if c.tag in ("Fill", "Stroke")]
+        out = []
+        for q, it in ae_paths:
+            if q in by_q:
                 continue
-            for paint, it in zip(reversed(rive), ae):
-                n = sum(1 for c in rive if c is not paint and rive.index(c) < rive.index(paint))
-                lab = label + (f" {n + 1}" if len(rive) > 1 else "")
-                self.paint(shape, paint, it, lab)
-                if kind == "stroke":
-                    self.double(paint, "thickness", it.get("w"), None, default=1.0, shape=shape, label=lab + " thickness")
+            below = [by_q[k] for k in sorted(by_q) if k > q]
+            above = [by_q[k] for k in sorted(by_q, reverse=True) if k < q]
+            spec = (("before", below[0]) if below else ("after", above[0]) if above else
+                    ("before", paints[0]) if paints else ("end", shape))
+            out.append((q, it, spec, q))
+        return out
+
+    @staticmethod
+    def paint_extras(shape, paints, ae_paints, pairs):
+        """new AE paints -> [(AE index, item, place, order)]: reversed, the later Rive paint is the higher AE item"""
+        by_q = {q: p for p, (q, _it) in pairs}
+        out = []
+        for q, it in ae_paints:
+            if q in by_q:
+                continue
+            below = [by_q[k] for k in sorted(by_q) if k > q]
+            above = [by_q[k] for k in sorted(by_q, reverse=True) if k < q]
+            spec = ("after", below[0]) if below else ("before", above[0]) if above else ("end", shape)
+            out.append((q, it, spec, -q))
+        return out
 
     @staticmethod
     def gradient(paint):
@@ -415,19 +538,7 @@ class Contents:
             if not all(fits(v.tag, k["v"]["in"][j], k["v"]["out"][j]) for k in ks):
                 self.note(shape, f"{pp.name}: path keys not pulled (vertex {j + 1} would need another type than {v.tag})")
                 return
-        # interpolation per AE key: hold, linear, or the influence of a bezier ease (speed not used: shape units)
-        interp = []
-        for a, (k, nk) in enumerate(zip(ks, ks[1:] + [None])):
-            if nk is None:
-                interp.append(("linear", None))
-            elif k["o"] == "h":
-                interp.append(("hold", None))
-            elif k["o"] == "l" and nk["i"] == "l":
-                interp.append(("linear", None))
-            else:
-                x1 = k["oe"][0][1] / 100.0 if k["oe"] else 0.0
-                x2 = 1 - (nk["ie"][0][1] / 100.0 if nk["ie"] else 0.0)
-                interp.append(("cubic", (round(x1, 4), 0.0, round(x2, 4), 1.0)) if abs(x1) + abs(1 - x2) > 0.02 else ("linear", None))
+        interp = path_interps(ks)
         written = 0
         for j, v in enumerate(verts):
             prev = None
