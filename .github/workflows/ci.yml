@@ -122,16 +122,23 @@ jobs:
       # Stroke position="inside" / "outside" as rml2ae reads it loads in the Rive CLI
       - name: Verify the Stroke position case with the Rive CLI
         run: rive rml2ae/tests/cases/stroke_position --verify
-      - name: DIAG (temporary) rive schema / docs / inspect
+      - name: DIAG (temporary) rive schema / docs / screenshot
         if: always()
         run: |
-          for t in StateTransition TransitionNumberCondition TransitionBoolCondition StateMachineNumber BlendState1DInput BlendAnimation1D LayoutComponentStyle LayoutComponent; do echo "=== schema $t"; rive schema $t --all || true; done
-          rive docs --list </dev/null || true
-          rive docs layout </dev/null || true
-          rive docs --search "state machine" </dev/null | head -50 || true
-          for c in state_machine flex_layout features; do echo "=== verify $c"; rive rml2ae/tests/cases/$c --verify || true; echo "=== inspect $c"; rive inspect rml2ae/tests/cases/$c > /tmp/inspect_$c.json || true; head -c 30000 /tmp/inspect_$c.json; echo; done
-          rive rml2ae/tests/cases/flex_layout --screenshot=/tmp/flex.png || true
-          ls -la /tmp/*.png || true
+          for t in StateTransition TransitionNumberCondition TransitionBoolCondition BlendState1DInput BlendAnimation1D BlendAnimationDirect LayoutComponentStyle; do echo "=== schema $t"; rive schema $t </dev/null 2>&1 | head -120 || true; done
+          echo "=== docs list"; rive docs --list </dev/null 2>&1 | head -80 || true
+          for c in state_machine flex_layout; do echo "=== verify $c"; rive rml2ae/tests/cases/$c --verify 2>&1 | tail -20 || true; done
+          echo "=== screenshot"; rive rml2ae/tests/cases/flex_layout --screenshot=/tmp/flex.png --advance=0.1 2>&1 | tail -20 || true
+          python -c "from PIL import Image; im=Image.open('/tmp/flex.png').convert('RGB'); print(im.size); w,h=im.size; print([im.getpixel((x,140)) for x in range(0,w,20)])" || true
+      - name: DIAG (temporary) rive docs layout
+        if: always()
+        run: rive docs layout </dev/null 2>&1 | head -400 || true
+      - name: DIAG (temporary) rive docs state machines
+        if: always()
+        run: |
+          rive docs --search "BlendState" </dev/null 2>&1 | head -60 || true
+          rive docs --search "opValue" </dev/null 2>&1 | head -60 || true
+          rive docs --search "TransitionTriggerCondition" </dev/null 2>&1 | head -60 || true
 
   fxlib:
     name: fxlib vs After Effects references
