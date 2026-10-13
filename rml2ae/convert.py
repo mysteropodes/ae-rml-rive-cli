@@ -10,7 +10,7 @@ import os
 import re
 
 from .model import Project, Animation, El, argb, blend_name, is_a, layer_mask_flags, prop_name
-from .jsx import Writer, js, PRELUDE, TIDY_JSX, TIDY_BUILD_JSX
+from .jsx import Writer, js, PRELUDE, TIDY_JSX, TIDY_BUILD_JSX, MONTAGE_JSX
 from .report import Report
 from . import replay as RP
 from . import riveshader as RS
@@ -262,6 +262,21 @@ def script_color(v):
     return argb(v, (1.0, 1.0, 1.0, 1.0))
 
 
+def parse_cuts(spec):
+    """--cuts "0:Intro,7.1:Chorus,12.5" -> [(0.0, "Intro"), (7.1, "Chorus"), (12.5, "")] (start of each shot, in seconds)"""
+    out = []
+    for chunk in (spec or "").split(","):
+        chunk = chunk.strip()
+        if not chunk:
+            continue
+        t, _, name = chunk.partition(":")
+        try:
+            out.append((float(t), name.strip()))
+        except ValueError:
+            raise SystemExit(f'--cuts: "{chunk}" is not "second" or "second:name"')
+    return out
+
+
 class Converter:
     def __init__(self, project: Project, out_dir, fps=None, main=None, keep_project=False, replay=True, log=print, replace=False,
                  layout="industry"):
@@ -291,6 +306,10 @@ class Converter:
         self._copying = set()     # LayerMask sources being emitted as a matte copy
         self._hidden_done = set()  # LayerMask sources hidden by their own precomp (emit_node)
         self.all_animations = False
+        self.montage = True       # a Montage comp of one comp per shot of the film, each shot in its own folder
+        self.cuts = None          # [(start s, name)] given with --cuts; None = shots found in the RML
+        self.top_ctx = None       # Ctx of the main artboard's animation (shot detection)
+        self.top_states = []      # [(start s, end s, name)] of the main artboard's state sequence
         self.loop_duration = 10.0 # seconds a looping main artboard is unrolled to (--duration)
         self.top_name = None      # name of the comp to render (wrapper "(looped)" / "(stepped)" when created)
         self.vm_comps = {}        # ViewModel id -> comp name
@@ -572,7 +591,7 @@ class Converter:
     def convert(self):
         J = self.W
         J(PRELUDE.replace("__LOG__", js(self.log)).replace("__FPS__", js(float(self.fps))))
-        J(TIDY_JSX + TIDY_BUILD_JSX)
+        J(TIDY_JSX + TIDY_BUILD_JSX + MONTAGE_JSX)
         J(f"var KEEP = {js(self.keep)};")
         J("try {")
         J("if (!KEEP) {")
@@ -594,6 +613,8 @@ class Converter:
         J('try { app.project.expressionEngine = "javascript-1.0"; } catch (e) {}')
         J(f'var ROOTF = folder(null, {js(self.p.name + " (rml2ae)")});')
         J('var FOOT = folder(ROOTF, "Footage"); var COMPS = folder(ROOTF, "Artboards"); var SUBS = folder(ROOTF, "Nested");')
+        # the previous build's montage goes first: its shot comps would otherwise be lifted by the tidy pass
+        J('try { montageClear(ROOTF, SUBS, FOOT); } catch (eM) { log("montage clear FAILED: " + eM.toString() + " line " + eM.line); }')
         self.import_assets()
         self.build_viewmodels()
         main_ab = self.main_artboard()
@@ -618,6 +639,8 @@ class Converter:
         if self.layout == "industry":
             # nulls that do nothing are dissolved (their children keep their world transform; ae pull rebuilds them)
             J('try { var __td = tidyProject(ROOTF); log("tidy: " + __td + " static null(s) dissolved, " + TIDY_LIFTED + " one-layer precomp(s) lifted"); } catch (eT) { log("tidy FAILED: " + eT.toString() + " line " + eT.line); }')
+        if self.montage:
+            self.emit_montage(top, main_ab)
         J("app.endUndoGroup();")
         J(f'if (!KEEP) {{ app.project.save(new File({js(self.aep)})); log("saved " + app.project.file.fsName); }}')
         J('else if (app.project.file) { app.project.save(); log("saved " + app.project.file.fsName); }')
@@ -779,6 +802,8 @@ class Converter:
             blend = link["blend"] if i + 1 < len(chain) else 0.0
             end = t + d * link["exit"]
             J(f'var {lv} = {var}.layers.add({c}); {lv}.name = {js(a.name)}; {lv}.startTime = {js(t)}; {lv}.outPoint = {js(min(t + d, end + blend))};')
+            if top:
+                self.top_states.append((t, min(t + d, end + blend), a.name))
             if i > 0 and links[i - 1]["blend"] > 0:
                 b0 = links[i - 1]["blend"]
                 J(f'keys(tr({lv}, "ADBE Opacity"), {js([[t * self.fps, 0, "l", 0, 0, 0, 0], [(t + b0) * self.fps, 100, "h", 0, 0, 0, 0]])});')
@@ -871,6 +896,54 @@ class Converter:
                      "what the previous state left)")
         return var
 
+    # ------------------------------------------------------------------ montage
+    def film_shots(self, ab):
+        """The film's shots as [(start s, end s or None, name)]: the --cuts when given, else the states of a sequence,
+        else the elements at the top of the main artboard that are seen during part of its animation only (a film
+        switches its shots by opacity) and follow one another without overlapping. Elements holding a nested artboard
+        are preferred: a title or a flash over a shot is not a shot. Fewer than two -> no montage."""
+        if self.cuts:
+            return [(t, None, n) for t, n in sorted(self.cuts)]
+        if len(self.top_states) >= 2:
+            return list(self.top_states)
+        ctx = self.top_ctx
+        if ctx is None or ctx.anim is None:
+            return []
+        cands = []
+
+        def walk(container):
+            for c in container.children:
+                if not self.is_element(c):
+                    continue
+                w = self.visible_window([c], ctx)
+                if w is None:
+                    if c.tag == "Node":       # a root node over the whole film: its children may be the shots
+                        walk(c)
+                    continue
+                nested = any(e.tag == "NestedArtboard" for e in c.iter())
+                cands.append((w[0], w[1], c.name or c.tag, nested))
+        walk(ab)
+        if any(n for *_, n in cands):
+            cands = [x for x in cands if x[3]]
+        shots, end = [], None
+        for t0, t1, name, _n in sorted(cands, key=lambda x: (x[0], x[0] - x[1])):
+            if end is None or t0 >= end - 0.5 / self.fps:
+                shots.append((t0, t1, name))
+                end = t1
+        return shots if len(shots) >= 2 else []
+
+    def emit_montage(self, top, ab):
+        shots = self.film_shots(ab)
+        if not shots:
+            return
+        J = self.W
+        J(f'try {{ var __mt = buildMontage({top}, {js([[a, b, n] for a, b, n in shots])}, ROOTF, SUBS, FOOT); log("montage: " + __mt + " shot(s)"); }} '
+          f'catch (eMt) {{ log("montage FAILED: " + eMt.toString() + " line " + eMt.line); }}')
+        src = "--cuts" if self.cuts else ("the state sequence" if len(self.top_states) >= 2 else "the opacity cuts")
+        self.rep.add(ab.name, "converted", ab, f"{len(shots)} shots (from {src}) → comp '{self.top_name} · Montage', one comp per "
+                     f"shot in Shots/, with the nested comps and footage only that shot uses: "
+                     + ", ".join(f"{n} {a:.2f}s" for a, _b, n in shots[:30]))
+
     def duration_of(self, ab, anim, depth=0):
         """Seconds an (artboard, animation) comp must last: its animation, or the longest nested content it shows."""
         key = (ab.id, anim.id if anim else None)
@@ -931,6 +1004,8 @@ class Converter:
         if top:
             J(f"selfTest({var});")
         ctx = Ctx(self, var, ab, anim, carry)
+        if top:
+            self.top_ctx = ctx
         # background fill
         bg = ab.find("Fill")
         if bg is not None and self.gradient_of(bg) is not None:

@@ -1,6 +1,6 @@
 """rml2ae — convert a Rive CLI project to an After Effects script.
 
-  python3 -m rml2ae <project_dir> [--out <dir>] [--fps N] [--main <Artboard>] [--keep-project] [--no-replay] [--all-animations] [--duration S] [--incremental] [--layout industry|raw]
+  python3 -m rml2ae <project_dir> [--out <dir>] [--fps N] [--main <Artboard>] [--keep-project] [--no-replay] [--all-animations] [--duration S] [--incremental] [--layout industry|raw] [--cuts "0:Intro,7.1:Chorus"] [--no-montage]
   python3 -m rml2ae <project_dir> --run                    # also execute in AE 2026 (only when allowed)
   python3 -m rml2ae <project_dir> --shots 1.0 2.5 ...      # AE frames vs `rive --screenshot`, side by side
 
@@ -12,7 +12,7 @@ import os
 import sys
 
 from .model import Project
-from .convert import Converter
+from .convert import Converter, parse_cuts
 from . import run as runner
 
 
@@ -23,7 +23,7 @@ def main(argv):
     rest = list(argv)
     while i < len(rest):
         a = rest[i]
-        if a in ("--out", "--fps", "--main", "--duration", "--layout"):
+        if a in ("--out", "--fps", "--main", "--duration", "--layout", "--cuts"):
             flags[a[2:]] = rest[i + 1]
             args = [x for x in args if x != rest[i + 1]]
             i += 2
@@ -52,6 +52,9 @@ def main(argv):
                      layout=flags.get("layout", "industry"))
     conv.incremental_mode = incremental
     conv.all_animations = "all-animations" in flags
+    conv.montage = "no-montage" not in flags
+    if "cuts" in flags:
+        conv.cuts = parse_cuts(flags["cuts"])
     if "duration" in flags:
         conv.loop_duration = float(flags["duration"])
     jsx_text = conv.convert()
