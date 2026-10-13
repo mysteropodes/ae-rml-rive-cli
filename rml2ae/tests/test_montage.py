@@ -3,8 +3,9 @@
   rml2ae: tests/cases/montage (three nested artboards cut by their holders' opacity, a title over the second one) ->
           three shots found, the title left out; --cuts replaces them, --no-montage drops the montage.
   JSX:    buildMontage / montageClear run in Node.js against a small After Effects project mock: each shot comp shows
-          the main comp through its window, the Montage lays them end to end (shot 1 on top), what one shot uses
-          alone moves into its folder and what two shots or the time between shots use stays put; a rebuild clears
+          the main comp through its window under a Camera null, the Montage lays them end to end (shot 1 on top, a
+          colour every other shot, a marker naming each), what one shot uses alone moves into its folder (Nested /
+          Footage) and what two shots or the time between shots use stays put; a rebuild clears
           the previous montage and gives the same project.
 
     python -m rml2ae.tests.test_montage
@@ -42,8 +43,12 @@ FootageItem.prototype = Object.create(Item.prototype);
 function Layer(src, comp) {
   this.source = src; this.name = src ? src.name : "shape"; this.comp = comp; this._start = 0;
   this.inPoint = 0; this.outPoint = src && src.duration ? src.duration : comp.duration;
-  this.timeRemapEnabled = false; this.stretch = 100;
+  this.timeRemapEnabled = false; this.stretch = 100; this.parent = null; this.label = 0; this.markers = [];
+  var self = this;
+  this.property = function (n) { if (n != "ADBE Marker") throw new Error("property " + n);
+    return { setValueAtTime: function (t, m) { self.markers.push([t, m.comment]); } }; };
 }
+function MarkerValue(c) { this.comment = c; }
 Object.defineProperty(Layer.prototype, "startTime", {
   get: function () { return this._start; },
   set: function (v) { var d = v - this._start; this._start = v; this.inPoint += d; this.outPoint += d; }
@@ -53,7 +58,8 @@ function CompItem(name, w, h, pa, dur, fps) {
   Item.call(this, name); this.width = w; this.height = h; this.pixelAspect = pa; this.duration = dur;
   this.frameDuration = 1 / fps; this.bgColor = [0, 0, 0]; this._layers = [];
   var self = this;
-  this.layers = { add: function (src) { var L = new Layer(src, self); self._layers.unshift(L); return L; } };
+  this.layers = { add: function (src) { var L = new Layer(src, self); self._layers.unshift(L); return L; },
+                  addNull: function (d) { var L = new Layer(null, self); L.outPoint = d; L.isNull = true; self._layers.unshift(L); return L; } };
 }
 CompItem.prototype = Object.create(Item.prototype);
 Object.defineProperty(CompItem.prototype, "numLayers", { get: function () { return this._layers.length; } });
@@ -86,10 +92,14 @@ function snapshot() {
   var mt = ITEMS.filter(function (it) { return it.comment == "rml2ae:montage"; });
   var shots = ITEMS.filter(function (it) { return it.comment && it.comment.indexOf("rml2ae:shot:") == 0; });
   return {
-    montage: mt.map(function (m) { return { name: m.name, duration: m.duration, layers: m._layers.map(function (L) { return [L.name, L.startTime, L.inPoint, L.outPoint]; }) }; }),
-    shots: shots.map(function (s) { return { name: s.name, comment: s.comment, folder: where(s), parent: where(s.parentFolder), duration: s.duration,
-                                             layer: [s._layers[0].source.name, s._layers[0].startTime] }; }),
-    folders: { imgA: where(imgA), imgS: where(imgS), bg: where(bgS), A: where(A), B: where(B), C: where(C), Bin: where(Bin), top: where(top) },
+    montage: mt.map(function (m) { return { name: m.name, duration: m.duration, layers: m._layers.map(function (L) {
+      return [L.name, L.startTime, L.inPoint, L.outPoint, L.label, L.markers]; }) }; }),
+    shots: shots.map(function (s) {
+      var film = s._layers.filter(function (L) { return L.source; })[0], cam = s._layers.filter(function (L) { return L.isNull; })[0];
+      return { name: s.name, comment: s.comment, folder: where(s), parent: where(s.parentFolder), duration: s.duration, layers: s._layers.length,
+               layer: [film.source.name, film.startTime], camera: [cam.name, cam.outPoint, film.parent === cam] }; }),
+    folders: { imgA: where(imgA), imgS: where(imgS), bg: where(bgS), A: where(A), B: where(B), C: where(C), Bin: where(Bin), top: where(top),
+               A_in: where(A.parentFolder), imgA_in: where(imgA.parentFolder), Bin_in: where(Bin.parentFolder) },
     items: ITEMS.length
   };
 }
@@ -152,18 +162,24 @@ def main():
     assert mt["name"] == "Film · Montage" and mt["duration"] == 6
     assert [L[0] for L in mt["layers"]] == ["Shot 01 · Opening", "Shot 02 · Chase", "Shot 03 · Ending"]
     assert [L[1] for L in mt["layers"]] == [0, 2, 4] and [L[3] - L[2] for L in mt["layers"]] == [2, 2, 2]
+    assert [L[4] for L in mt["layers"]] == [9, 11, 9]                       # a colour every other shot
+    assert all(L[5] == [[L[1], L[0]]] for L in mt["layers"]), mt["layers"]  # a marker naming the shot at its start
     for s, t0 in zip(first["shots"], (0, 2, 4)):
         assert s["folder"] == s["name"] and s["parent"] == "Shots" and s["duration"] == 2, s
         assert s["layer"] == ["Film", -t0], s                  # the main comp, seen through the shot's window
+        assert s["camera"] == ["Camera", 2, True] and s["layers"] == 2, s   # under a Camera null
     f = first["folders"]
-    assert f["A"] == "Shot 01 · Opening" and f["imgA"] == "Shot 01 · Opening", f
-    assert f["B"] == "Shot 02 · Chase" and f["Bin"] == "Shot 02 · Chase", f
-    assert f["C"] == "Shot 03 · Ending", f
+    assert (f["A"], f["A_in"]) == ("Nested", "Shot 01 · Opening"), f       # split as the build is
+    assert (f["imgA"], f["imgA_in"]) == ("Footage", "Shot 01 · Opening"), f
+    assert f["B"] == "Nested" and (f["Bin"], f["Bin_in"]) == ("Nested", "Shot 02 · Chase"), f
+    assert f["C"] == "Nested", f
     assert f["imgS"] == "Footage" and f["bg"] == "Solids" and f["top"] == "film (rml2ae)", f   # shared / not ours
     cleared = out["cleared"]
     assert not cleared["montage"] and not cleared["shots"], cleared
-    assert cleared["folders"] == {"imgA": "Footage", "imgS": "Footage", "bg": "Solids", "A": "Nested", "B": "Nested",
-                                  "C": "Nested", "Bin": "Nested", "top": "film (rml2ae)"}, cleared["folders"]
+    assert {k: v for k, v in cleared["folders"].items() if not k.endswith("_in")} == {
+        "imgA": "Footage", "imgS": "Footage", "bg": "Solids", "A": "Nested", "B": "Nested", "C": "Nested", "Bin": "Nested",
+        "top": "film (rml2ae)"}, cleared["folders"]
+    assert cleared["folders"]["A_in"] == "film (rml2ae)", cleared["folders"]       # back in the build's own folders
     assert out["second"] == first, (out["second"], first)       # a rebuild gives the same project
     print("montage: ok")
 

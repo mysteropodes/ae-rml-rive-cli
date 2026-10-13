@@ -742,8 +742,9 @@ function tidyUnwrap(w) {
 
 # ---- montage: the film cut into shots, for compositing shot by shot (and for storyboard tools that read an edit comp,
 # one layer per shot, in the order of their in points). Each shot is a comp showing the main comp through the shot's
-# window (pixel-identical, `ae pull` keeps reading the main comp); the "Montage" comp lays them end to end. Each shot
-# has its own folder under Shots/, holding the nested comps and footage that only this shot uses (moving an item
+# window, under a Camera null to frame the shot (pixel-identical at rest; `ae pull` keeps reading the main comp). The
+# "Montage" comp lays them end to end, a colour every other shot and a marker naming each. Each shot has its own
+# folder under Shots/ with what only this shot uses, split in Nested and Footage as the build is (moving an item
 # between folders never changes a render).
 MONTAGE_JSX = r"""
 function montageIsIn(it, folderItem) {
@@ -796,10 +797,15 @@ function buildMontage(top, shots, root, nested, foot) {
     var F = app.project.items.addFolder(name); F.parentFolder = SH;
     var sc = app.project.items.addComp(name, top.width, top.height, top.pixelAspect, t1 - t0, fps);
     sc.parentFolder = F; sc.comment = "rml2ae:shot:" + num; sc.bgColor = top.bgColor;
+    // the film under a Camera null: framing a shot (pan, zoom, shake) never touches the film itself
     var L = sc.layers.add(top); L.startTime = -t0;
+    var cam = sc.layers.addNull(sc.duration); cam.name = "Camera"; cam.label = 9; cam.comment = "rml2ae:camera";
+    L.parent = cam;
     var ml = mt.layers.add(sc); ml.name = name; ml.startTime = t0; ml.moveToEnd();   // shot 1 on top, in timeline order
+    ml.label = made.length % 2 ? 11 : 9;                                               // every other shot: the cuts read at a glance
+    ml.property("ADBE Marker").setValueAtTime(t0, new MarkerValue(name));
     var set = {}; montageUses(top, t0, t1, set, {}, 0);
-    made.push([F, set, t0, t1]);
+    made.push([F, set, t0, t1, {}]);
   }
   // what each shot uses alone moves into its folder; what two shots, or the time between shots, use stays put
   var count = {}, other = {}, id, i;
@@ -814,7 +820,11 @@ function buildMontage(top, shots, root, nested, foot) {
     for (id in made[k][1]) {
       var it = made[k][1][id];
       if (count[id] != 1 || other[id] || it.id == top.id || !it.parentFolder) continue;
-      if (it.parentFolder.id == nested.id || it.parentFolder.id == foot.id) it.parentFolder = made[k][0];
+      if (it.parentFolder.id != nested.id && it.parentFolder.id != foot.id) continue;
+      // inside the shot's folder, the same split as the build's: nested comps apart from footage
+      var sub = it instanceof CompItem ? "Nested" : "Footage";
+      if (!made[k][4][sub]) { made[k][4][sub] = app.project.items.addFolder(sub); made[k][4][sub].parentFolder = made[k][0]; }
+      it.parentFolder = made[k][4][sub];
     }
   }
   return made.length;
