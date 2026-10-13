@@ -739,3 +739,94 @@ function tidyUnwrap(w) {
   w.comp.time = w.t;
 }
 """
+
+# ---- montage: the film cut into shots, for compositing shot by shot (and for storyboard tools that read an edit comp,
+# one layer per shot, in the order of their in points). Each shot is a comp showing the main comp through the shot's
+# window, under a Camera null to frame the shot (pixel-identical at rest; `ae pull` keeps reading the main comp). The
+# "Montage" comp lays them end to end, a colour every other shot and a marker naming each. Each shot has its own
+# folder under Shots/ with what only this shot uses, split in Nested and Footage as the build is (moving an item
+# between folders never changes a render).
+MONTAGE_JSX = r"""
+function montageIsIn(it, folderItem) {
+  var f = it.parentFolder;
+  for (var d = 0; d < 30 && f && f !== app.project.rootFolder; d++) { if (f.id == folderItem.id) return true; f = f.parentFolder; }
+  return false;
+}
+// undo the previous build's montage: its comps go, what was moved into a shot folder goes back to Nested / Footage
+function montageClear(root, nested, foot) {
+  var shots = null, i, it;
+  for (i = 1; i <= app.project.numItems; i++) { it = app.project.item(i); if (it instanceof FolderItem && it.name == "Shots" && it.parentFolder.id == root.id) shots = it; }
+  for (i = app.project.numItems; i >= 1; i--) {
+    it = app.project.item(i);
+    if (it instanceof CompItem && it.comment && (it.comment.indexOf("rml2ae:shot:") == 0 || it.comment == "rml2ae:montage")) it.remove();
+  }
+  if (!shots) return;
+  var back = [];
+  for (i = 1; i <= app.project.numItems; i++) { it = app.project.item(i); if (!(it instanceof FolderItem) && montageIsIn(it, shots)) back.push(it); }
+  for (i = 0; i < back.length; i++) back[i].parentFolder = back[i] instanceof CompItem ? nested : foot;
+  shots.remove();
+}
+// every source shown by `comp` between t0 and t1 (comp seconds), nested comps included: set[id] = item
+function montageUses(comp, t0, t1, set, seen, depth) {
+  var key = comp.id + ":" + t0 + ":" + t1;
+  if (depth > 16 || seen[key]) return;
+  seen[key] = true;
+  for (var i = 1; i <= comp.numLayers; i++) {
+    var L = comp.layer(i), s = L.source;
+    if (!s || L.outPoint <= t0 + 1e-6 || L.inPoint >= t1 - 1e-6) continue;
+    set[s.id] = s;
+    if (!(s instanceof CompItem)) continue;
+    var a = -1e9, b = 1e9;                                        // time remapped or stretched: the whole source
+    if (!L.timeRemapEnabled && Math.abs(L.stretch - 100) < 1e-6) { a = Math.max(t0, L.inPoint) - L.startTime; b = Math.min(t1, L.outPoint) - L.startTime; }
+    montageUses(s, a, b, set, seen, depth + 1);
+  }
+}
+// shots = [[start s, end s or null (= next start / comp end), name]]; returns the number of shot comps made
+function buildMontage(top, shots, root, nested, foot) {
+  var fps = 1 / top.frameDuration, n = shots.length, pad = n >= 100 ? 3 : 2, made = [], k;
+  var SH = folder(root, "Shots");
+  var mt = app.project.items.addComp(top.name + " · Montage", top.width, top.height, top.pixelAspect, top.duration, fps);
+  mt.parentFolder = root; mt.comment = "rml2ae:montage"; mt.bgColor = top.bgColor;
+  for (k = 0; k < n; k++) {
+    var t0 = Math.max(0, shots[k][0]);
+    var t1 = shots[k][1] != null ? shots[k][1] : (k + 1 < n ? shots[k + 1][0] : top.duration);
+    t1 = Math.min(t1, top.duration);
+    if (t1 - t0 < top.frameDuration / 2) continue;
+    var num = String(made.length + 1); while (num.length < pad) num = "0" + num;
+    var name = "Shot " + num + (shots[k][2] ? " · " + shots[k][2] : "");
+    var F = app.project.items.addFolder(name); F.parentFolder = SH;
+    var sc = app.project.items.addComp(name, top.width, top.height, top.pixelAspect, t1 - t0, fps);
+    sc.parentFolder = F; sc.comment = "rml2ae:shot:" + num; sc.bgColor = top.bgColor;
+    // the film under a Camera null: framing a shot (pan, zoom, shake) never touches the film itself
+    var L = sc.layers.add(top); L.startTime = -t0;
+    var cam = sc.layers.addNull(sc.duration); cam.name = "Camera"; cam.label = 9; cam.comment = "rml2ae:camera";
+    L.parent = cam;
+    var ml = mt.layers.add(sc); ml.name = name; ml.startTime = t0; ml.moveToEnd();   // shot 1 on top, in timeline order
+    ml.label = made.length % 2 ? 11 : 9;                                               // every other shot: the cuts read at a glance
+    ml.property("ADBE Marker").setValueAtTime(t0, new MarkerValue(name));
+    var set = {}; montageUses(top, t0, t1, set, {}, 0);
+    made.push([F, set, t0, t1, {}]);
+  }
+  // what each shot uses alone moves into its folder; what two shots, or the time between shots, use stays put
+  var count = {}, other = {}, id, i;
+  for (k = 0; k < made.length; k++) for (id in made[k][1]) count[id] = (count[id] || 0) + 1;
+  var spans = made.slice(0).sort(function (a, b) { return a[2] - b[2]; }), t = 0;
+  for (k = 0; k <= spans.length; k++) {
+    var e = k < spans.length ? spans[k][2] : top.duration;
+    if (e - t > top.frameDuration / 2) montageUses(top, t, e, other, {}, 0);
+    if (k < spans.length) t = Math.max(t, spans[k][3]);
+  }
+  for (k = 0; k < made.length; k++) {
+    for (id in made[k][1]) {
+      var it = made[k][1][id];
+      if (count[id] != 1 || other[id] || it.id == top.id || !it.parentFolder) continue;
+      if (it.parentFolder.id != nested.id && it.parentFolder.id != foot.id) continue;
+      // inside the shot's folder, the same split as the build's: nested comps apart from footage
+      var sub = it instanceof CompItem ? "Nested" : "Footage";
+      if (!made[k][4][sub]) { made[k][4][sub] = app.project.items.addFolder(sub); made[k][4][sub].parentFolder = made[k][0]; }
+      it.parentFolder = made[k][4][sub];
+    }
+  }
+  return made.length;
+}
+"""

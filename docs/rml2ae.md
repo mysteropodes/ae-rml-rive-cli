@@ -54,6 +54,8 @@ Options of `python -m rml2ae <project>`:
 | `--no-replay` | Do not replay Luau-scripted content through the Rive CLI. |
 | `--all-animations` | Build a comp for every animation, not only the ones the state machine plays. |
 | `--duration S` | Duration in seconds for looped content. |
+| `--cuts "0:Intro,7.1:Chorus"` | Start of each shot (seconds, optional name) for the Montage comp, instead of the shots found in the RML. |
+| `--no-montage` | No Montage comp and no Shots folder. |
 | `--run` | Execute the generated script in the open After Effects. |
 | `--shots t1 t2 …` | Compare AE and Rive frames at the given times. |
 
@@ -88,6 +90,29 @@ With `industry`:
 Measured on a 72 s film (19 shots): nulls 1 456 → 267, shape layers 1 443 → 1 102, comps 362 → 196, project items 3 848 → 734. 16 of 19 frames identical to the previous build within 2/255, two differ on 0.004 % and 0.007 % of pixels (anti-aliasing); at the 19th (40 s) the previous build was wrong (74 % of pixels off from the Rive render, a double clip precomp hid the scene) and the lifted one matches Rive (0.3 %). A dry `ae pull` on the untouched project lists 16 changes, all of them already listed with the previous build (it listed 204).
 
 Remaining nulls are animated controllers (cameras, three-copy RGB split and similar).
+
+### Montage: one comp per shot
+
+When the main artboard is a film, the build also makes a **Montage** comp with one comp per shot, so the film can be composited shot by shot and read by tools that expect an edit comp (one layer per shot in the order of their in points, such as storyboard scripts).
+
+- **Shots.** The elements at the top of the main artboard (or under a root node that spans the whole film) that are seen during part of the animation only and follow one another without overlapping. If some of them hold a nested artboard, only those count, so a title or a flash over a shot is not a shot. A sequence of states (one comp per animation) gives one shot per state. `--cuts "0:Intro,7.1:Chorus,12.5"` sets the cuts by hand. Fewer than two shots means no montage.
+- **Shot comps.** `Shot 01 · <name>` shows the main comp through the shot's window, parented to a `Camera` null: moving, scaling or shaking that null frames the shot without touching the film. At rest the shot is pixel-identical to the film, and `ae pull` keeps reading the main comp. `<main comp> · Montage` lays the shot comps end to end, shot 1 on top, one label colour every other shot and a marker naming each at its start.
+- **Folders.** Each shot has a folder `Shots/Shot 01 · <name>/` holding its comp and, in `Nested` and `Footage` sub-folders, the nested comps and footage that only this shot uses. Anything that two shots, or the time between shots, use stays in the build's `Nested` or `Footage`. Moving an item between folders never changes a render.
+
+```
+<film> (rml2ae)/
+├── <main comp>              the whole film (ae pull reads it)
+├── <main comp> · Montage    one layer per shot
+├── Shots/
+│   ├── Shot 01 · Opening/
+│   │   ├── Shot 01 · Opening    Camera null > the film, seen through the shot
+│   │   ├── Nested/              comps only this shot uses
+│   │   └── Footage/             images, sequences, sounds only this shot uses
+│   └── Shot 02 · …
+├── Artboards/  Nested/  Footage/    what is shared
+└── rml2ae tidy
+```
+- **Rebuilds.** Each build clears the previous montage first (its items go back to `Nested` / `Footage`), before the tidy pass, then makes a new one. The comps are tagged `rml2ae:montage` and `rml2ae:shot:NN` in their comment, so `ae pull` ignores them.
 
 **Feather** (Rive CLI 1.3: `Feather` in a `Fill`, `fillRule="clockwise"`) becomes a solid of the fill colour cut by a per-path mask, with a mask feather of 1.25 x the feather strength and no expansion (measured: 0.09% mean difference on an offset drop shadow, a glow and a moving shape). It is placed under or over the shape according to paint order. Inner feather is approximated by a mask (reported). AE's Gaussian Blur is not used here because it is not rendered by `saveFrameToPng`.
 

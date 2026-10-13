@@ -1,0 +1,93 @@
+<Rive version="1" kind="fragment">
+  <!-- A film of three shots (nested artboards cut by opacity) and a title over shot 2: rml2ae builds a Montage comp,
+       one comp per shot, each in its own folder. -->
+  <Artboard width="640" height="360" name="Film" id="0:1">
+    <Fill name="Background"><SolidColor colorValue="FF000000" name="Color"/></Fill>
+    <Node x="0" y="0" name="Opening" id="0:150">
+      <NestedArtboard artboardId="0:100" x="0" y="0" name="Opening board" id="0:151">
+        <NestedSimpleAnimation animationId="0:120" isPlaying="true" speed="1" mix="1" name="Play" id="0:152"/>
+      </NestedArtboard>
+    </Node>
+    <Node x="0" y="0" name="Chase" id="0:250">
+      <NestedArtboard artboardId="0:200" x="0" y="0" name="Chase board" id="0:251">
+        <NestedSimpleAnimation animationId="0:220" isPlaying="true" speed="1" mix="1" name="Play" id="0:252"/>
+      </NestedArtboard>
+    </Node>
+    <Node x="0" y="0" name="Ending" id="0:350">
+      <NestedArtboard artboardId="0:300" x="0" y="0" name="Ending board" id="0:351">
+        <NestedSimpleAnimation animationId="0:320" isPlaying="true" speed="1" mix="1" name="Play" id="0:352"/>
+      </NestedArtboard>
+    </Node>
+    <Shape x="320" y="60" name="Title" id="0:60">
+      <Rectangle width="300" height="40" name="Bar" id="0:61"/>
+      <Fill name="Fill"><SolidColor colorValue="FFFFCC00" name="Color"/></Fill>
+    </Shape>
+    <LinearAnimation fps="25" duration="150" loopValue="oneShot" name="Film" id="0:2">
+      <KeyedObject objectId="0:150">
+        <KeyedProperty propertyKey="18">
+          <KeyFrameDouble value="1" frame="0" interpolationType="hold"/><KeyFrameDouble value="0" frame="50" interpolationType="hold"/>
+        </KeyedProperty>
+      </KeyedObject>
+      <KeyedObject objectId="0:250">
+        <KeyedProperty propertyKey="18">
+          <KeyFrameDouble value="0" frame="0" interpolationType="hold"/><KeyFrameDouble value="1" frame="50" interpolationType="hold"/><KeyFrameDouble value="0" frame="100" interpolationType="hold"/>
+        </KeyedProperty>
+      </KeyedObject>
+      <KeyedObject objectId="0:350">
+        <KeyedProperty propertyKey="18">
+          <KeyFrameDouble value="0" frame="0" interpolationType="hold"/><KeyFrameDouble value="1" frame="100" interpolationType="hold"/>
+        </KeyedProperty>
+      </KeyedObject>
+      <KeyedObject objectId="0:60">
+        <KeyedProperty propertyKey="18">
+          <KeyFrameDouble value="0" frame="0" interpolationType="hold"/><KeyFrameDouble value="1" frame="60" interpolationType="hold"/><KeyFrameDouble value="0" frame="80" interpolationType="hold"/>
+        </KeyedProperty>
+      </KeyedObject>
+    </LinearAnimation>
+  </Artboard>
+  <Artboard width="640" height="360" name="Shot A" id="0:100">
+    <Fill name="Background"><SolidColor colorValue="FF2C3E50" name="Color"/></Fill>
+    <Shape x="100" y="180" name="Ball" id="0:110">
+      <Ellipse width="80" height="80" name="Ellipse" id="0:111"/>
+      <Fill name="Fill"><SolidColor colorValue="FFFFFFFF" name="Color"/></Fill>
+    </Shape>
+    <LinearAnimation fps="25" duration="50" loopValue="oneShot" name="Move" id="0:120">
+      <KeyedObject objectId="0:110">
+        <KeyedProperty propertyKey="13">
+          <KeyFrameDouble value="100" frame="0" interpolationType="linear"/>
+          <KeyFrameDouble value="540" frame="50" interpolationType="linear"/>
+        </KeyedProperty>
+      </KeyedObject>
+    </LinearAnimation>
+  </Artboard>
+  <Artboard width="640" height="360" name="Shot B" id="0:200">
+    <Fill name="Background"><SolidColor colorValue="FF8E44AD" name="Color"/></Fill>
+    <Shape x="200" y="180" name="Ball" id="0:210">
+      <Ellipse width="80" height="80" name="Ellipse" id="0:211"/>
+      <Fill name="Fill"><SolidColor colorValue="FFFFFFFF" name="Color"/></Fill>
+    </Shape>
+    <LinearAnimation fps="25" duration="50" loopValue="oneShot" name="Move" id="0:220">
+      <KeyedObject objectId="0:210">
+        <KeyedProperty propertyKey="13">
+          <KeyFrameDouble value="200" frame="0" interpolationType="linear"/>
+          <KeyFrameDouble value="440" frame="50" interpolationType="linear"/>
+        </KeyedProperty>
+      </KeyedObject>
+    </LinearAnimation>
+  </Artboard>
+  <Artboard width="640" height="360" name="Shot C" id="0:300">
+    <Fill name="Background"><SolidColor colorValue="FF16A085" name="Color"/></Fill>
+    <Shape x="300" y="180" name="Ball" id="0:310">
+      <Ellipse width="80" height="80" name="Ellipse" id="0:311"/>
+      <Fill name="Fill"><SolidColor colorValue="FFFFFFFF" name="Color"/></Fill>
+    </Shape>
+    <LinearAnimation fps="25" duration="50" loopValue="oneShot" name="Move" id="0:320">
+      <KeyedObject objectId="0:310">
+        <KeyedProperty propertyKey="13">
+          <KeyFrameDouble value="300" frame="0" interpolationType="linear"/>
+          <KeyFrameDouble value="340" frame="50" interpolationType="linear"/>
+        </KeyedProperty>
+      </KeyedObject>
+    </LinearAnimation>
+  </Artboard>
+</Rive>

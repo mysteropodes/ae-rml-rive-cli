@@ -68,6 +68,8 @@ jobs:
         run: python -m rml2ae.tests.test_script_inputs
       - name: Flex layouts solved by AE expressions (Node.js)
         run: python -m rml2ae.tests.test_layout
+      - name: A film's shots -> Montage comp and one folder per shot (Node.js)
+        run: python -m rml2ae.tests.test_montage
       - name: gradient presets (.ffx) keep a coherent RIFX
         run: python -m rml2ae.tests.test_ffx
       - name: ae2rml binds the second layer of map effects (Displacement Map)
@@ -150,6 +152,8 @@ jobs:
         run: rive rml2ae/tests/cases/stroke_position --verify
       - name: Verify the state machine case with the Rive CLI
         run: rive rml2ae/tests/cases/state_machine --verify
+      - name: Verify the montage case (a film of nested shots) with the Rive CLI
+        run: rive rml2ae/tests/cases/montage --verify
       - name: Layouts solved by rml2ae vs the Rive runtime (screenshots)
         run: |
           rive rml2ae/tests/cases/layout --verify

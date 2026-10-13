@@ -2,7 +2,7 @@
 
   ae doctor [<project>]                 AE running? aerender? rive? plugin Rive Shader? fonts? deps?
   ae templates                          render-settings / output-module templates of the running AE
-  ae build <project> [--main X] [--replace [--full]] [--no-replay] [--fps N]
+  ae build <project> [--main X] [--replace [--full]] [--no-replay] [--fps N] [--cuts "0:Intro,7.1:Chorus"] [--no-montage]
                                         scene.rml -> .jsx -> executed in the running AE (new project + .aep saved;
                                         --replace: update the OPEN project incrementally — only the comps whose RML
                                         changed are rebuilt, your AE edits elsewhere stay; --full replaces everything)
@@ -51,7 +51,7 @@ def parse(argv):
         a = argv[i]
         if a.startswith("--"):
             k = a[2:]
-            if k in ("main", "fps", "comp", "range", "advance", "out", "rs", "om"):
+            if k in ("main", "fps", "comp", "range", "advance", "out", "rs", "om", "cuts"):
                 flags[k] = argv[i + 1]
                 i += 2
                 continue
@@ -141,7 +141,7 @@ var f = new File({js(tmp)}); f.open("w"); f.write(out.join("\\n")); f.close();''
 
 def build(project, flags, replace=False, incremental=False):
     from rml2ae.model import Project
-    from rml2ae.convert import Converter
+    from rml2ae.convert import Converter, parse_cuts
     from rml2ae import run as runner
     if not ae_running():
         print("After Effects must be running (ExtendScript has no headless mode on macOS)")
@@ -152,6 +152,9 @@ def build(project, flags, replace=False, incremental=False):
     conv = Converter(proj, out_dir, fps=float(flags["fps"]) if "fps" in flags else None, main=flags.get("main"),
                      keep_project=replace or incremental, replay="no-replay" not in flags, replace=replace or incremental)
     conv.incremental_mode = incremental
+    conv.montage = "no-montage" not in flags
+    if "cuts" in flags:
+        conv.cuts = parse_cuts(flags["cuts"])
     text = conv.convert()
     if incremental:
         for l in conv.stats_lines():
