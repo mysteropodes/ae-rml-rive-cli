@@ -2724,6 +2724,34 @@
 }
 ]
 },
+"DataConverterStringTemplate": {
+"type": "DataConverterStringTemplate",
+"typeKey": 177,
+"extends": [
+"DataConverter"
+],
+"parent": "DataConverter",
+"properties": [
+{
+"name": "openDelimiter",
+"owner": "DataConverterStringTemplate",
+"type": "String",
+"key": 485
+},
+{
+"name": "closeDelimiter",
+"owner": "DataConverterStringTemplate",
+"type": "String",
+"key": 486
+},
+{
+"name": "name",
+"owner": "DataConverter",
+"type": "String",
+"key": 662
+}
+]
+},
 "DataConverterStringTrim": {
 "type": "DataConverterStringTrim",
 "typeKey": 532,
@@ -8486,6 +8514,12 @@
 "key": 412
 },
 {
+"name": "artboardId",
+"owner": "PaintImage",
+"type": "Id",
+"key": 487
+},
+{
 "name": "name",
 "owner": "Component",
 "type": "String",
@@ -12222,6 +12256,64 @@
 "owner": "Component",
 "type": "Id",
 "key": 5
+}
+]
+},
+"StringTemplateArgument": {
+"type": "StringTemplateArgument",
+"typeKey": 156,
+"extends": [],
+"parent": "Core",
+"properties": [
+{
+"name": "name",
+"owner": "StringTemplateArgument",
+"type": "String",
+"key": 481
+}
+]
+},
+"StringTemplateArgumentNumber": {
+"type": "StringTemplateArgumentNumber",
+"typeKey": 176,
+"extends": [
+"StringTemplateArgument"
+],
+"parent": "StringTemplateArgument",
+"properties": [
+{
+"name": "propertyValue",
+"owner": "StringTemplateArgumentNumber",
+"type": "double",
+"key": 483
+},
+{
+"name": "name",
+"owner": "StringTemplateArgument",
+"type": "String",
+"key": 481
+}
+]
+},
+"StringTemplateArgumentString": {
+"type": "StringTemplateArgumentString",
+"typeKey": 157,
+"extends": [
+"StringTemplateArgument"
+],
+"parent": "StringTemplateArgument",
+"properties": [
+{
+"name": "propertyValue",
+"owner": "StringTemplateArgumentString",
+"type": "String",
+"key": 482
+},
+{
+"name": "name",
+"owner": "StringTemplateArgument",
+"type": "String",
+"key": 481
 }
 ]
 },
@@ -17154,6 +17246,16 @@
 "padType",
 "uint"
 ],
+"485": [
+"DataConverterStringTemplate",
+"openDelimiter",
+"String"
+],
+"486": [
+"DataConverterStringTemplate",
+"closeDelimiter",
+"String"
+],
 "746": [
 "DataConverterStringTrim",
 "trimType",
@@ -18599,6 +18701,11 @@
 "imageSizeMode",
 "uint8_t"
 ],
+"487": [
+"PaintImage",
+"artboardId",
+"Id"
+],
 "20": [
 "ParametricPath",
 "width",
@@ -19173,6 +19280,21 @@
 "StraightVertex",
 "radius",
 "double"
+],
+"481": [
+"StringTemplateArgument",
+"name",
+"String"
+],
+"483": [
+"StringTemplateArgumentNumber",
+"propertyValue",
+"double"
+],
+"482": [
+"StringTemplateArgumentString",
+"propertyValue",
+"String"
 ],
 "47": [
 "Stroke",
