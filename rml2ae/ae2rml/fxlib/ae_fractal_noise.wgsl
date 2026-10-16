@@ -19,7 +19,7 @@ struct Params {
     brightness: f32,      // AE 5 Brightness
     overflow: f32,        // AE 6 Overflow (menu)
     rotation: f32,        // AE 8 Rotation (degrees)
-    uniform: f32,         // AE 9 Uniform Scaling
+    uniformScale: f32,    // AE 9 Uniform Scaling ("uniform" is a WGSL keyword: Rive rejects it)
     scale: f32,           // AE 10 Scale (%)
     scaleW: f32,          // AE 11 Scale Width (%)
     scaleH: f32,          // AE 12 Scale Height (%)
@@ -219,7 +219,7 @@ fn blendRGB(b: vec3<f32>, s: vec3<f32>, mode: i32) -> vec3<f32> {
 
 fn field(q: vec2<f32>) -> f32 {
     var sc = vec2<f32>(P.scale / 100.0 * 100.0);
-    if (P.uniform < 0.5) {
+    if (P.uniformScale < 0.5) {
         sc = vec2<f32>(P.scaleW, P.scaleH);
     }
     sc = max(sc, vec2<f32>(0.01));
