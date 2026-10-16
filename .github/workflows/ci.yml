@@ -128,6 +128,13 @@ jobs:
       - run: rive --version
       # the command names the README diagram relies on (push, create --from-rev / --from-remote-file, --rev, --publish)
       - run: rive --help || true
+      # the newest types of rml2ae/schema.json (regenerated from rive-runtime): does the installed CLI know them yet?
+      - name: Newest schema types in the installed CLI
+        run: |
+          for t in DataConverterStringTemplate StringTemplateArgumentString StringTemplateArgumentNumber PaintImage LayerMask; do
+            echo "== rive schema $t"
+            rive schema "$t" < /dev/null || echo "(unknown to this CLI)"
+          done
       - name: Convert examples/demo.aep and verify it with the Rive CLI
         run: |
           python -m rml2ae.ae2rml examples/demo.aep out/demo --verify | tee out-verify.txt
