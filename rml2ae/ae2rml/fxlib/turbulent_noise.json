@@ -49,7 +49,7 @@
   },
   {
    "ae": 9,
-   "field": "uniform",
+   "field": "uniformScale",
    "kind": "bool",
    "default": 1
   },

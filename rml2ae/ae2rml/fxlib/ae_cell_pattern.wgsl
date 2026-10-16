@@ -152,7 +152,7 @@ fn feat(c: vec2<f32>) -> vec2<f32> {
     let ix = i32(c.x);
     let iy = i32(c.y);
     let s = u32(max(P.seed, 0.0));
-    let j = vec2<f32>(unit(pcg(bitcast<u32>(ix) ^ pcg(bitcast<u32>(iy) ^ pcg(s)))), unit(pcg(bitcast<u32>(iy) * 7919u ^ pcg(bitcast<u32>(ix) ^ s))));
+    let j = vec2<f32>(unit(pcg(bitcast<u32>(ix) ^ pcg(bitcast<u32>(iy) ^ pcg(s)))), unit(pcg((bitcast<u32>(iy) * 7919u) ^ pcg(bitcast<u32>(ix) ^ s))));
     let a = 6.28318531 * (P.evolution / 360.0) * (0.5 + j.x);
     let wob = 0.15 * vec2<f32>(cos(a + j.y * 6.0), sin(a + j.x * 6.0));
     return c + vec2<f32>(0.5) + (j - vec2<f32>(0.5)) * clamp(P.disperse, 0.0, 1.5) + wob * clamp(P.disperse, 0.0, 1.5);
@@ -175,7 +175,7 @@ fn fs_main(in: VSOut) -> @location(0) vec4<f32> {
     }
     let pt = i32(round(P.pattern));
     let p = select(pt, pt - 6, pt >= 7 && pt <= 11);
-    let r = unit(pcg(bitcast<u32>(i32(id.x)) * 2654435761u ^ bitcast<u32>(i32(id.y))));
+    let r = unit(pcg((bitcast<u32>(i32(id.x)) * 2654435761u) ^ bitcast<u32>(i32(id.y))));
     var v = 1.0 - f1;
     switch p {
         case 2: { v = clamp((f2 - f1) * 2.0, 0.0, 1.0); }
