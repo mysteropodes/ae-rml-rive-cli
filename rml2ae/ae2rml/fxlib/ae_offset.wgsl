@@ -58,6 +58,9 @@ fn wrapTexel(q: vec2<i32>, org: vec2<i32>, wh: vec2<i32>) -> vec4<f32> {
 
 @fragment
 fn fs_main(in: VSOut) -> @location(0) vec4<f32> {
+    // a use of srcSamp the entry point reaches: from CLI 1.8.0 Rive leaves a sampler nothing reads out of the layout
+    // and refuses the bind group that fills it (CLI 1.6 required it), so the effect drew nothing
+    let keepSampler = textureSampleLevel(srcTex, srcSamp, vec2<f32>(0.0), 0.0);
     let ip = pixelOf(in.uv);
     let orig = textureLoad(srcTex, ip, 0);
     let org = vec2<i32>(round(P.layerRect.xy));

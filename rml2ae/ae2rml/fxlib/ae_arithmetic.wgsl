@@ -72,6 +72,9 @@ fn opOne(v: i32, k: i32, op: i32) -> i32 {
 
 @fragment
 fn fs_main(in: VSOut) -> @location(0) vec4<f32> {
+    // a use of srcSamp the entry point reaches: from CLI 1.8.0 Rive leaves a sampler nothing reads out of the layout
+    // and refuses the bind group that fills it (CLI 1.6 required it), so the effect drew nothing
+    let keepSampler = textureSampleLevel(srcTex, srcSamp, vec2<f32>(0.0), 0.0);
     let s = textureLoad(srcTex, pixelOf(in.uv), 0);
     let c = vec3<i32>(round(straight8(s) * 255.0));
     let k = vec3<i32>(round(vec3<f32>(P.rv, P.gv, P.bv)));
