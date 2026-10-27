@@ -122,7 +122,7 @@ sub-groups through their (animated) transforms, and a path operation applies to 
 | Masks (add, subtract, intersect, lighten, darken, difference), keyed paths | `ClippingShape` (even-odd tricks for subtract/difference) | exact |
 | Keyed mask opacity | Path collapses to a point where opacity is under 50 % | approx |
 | Open masks | Ignored (After Effects only cuts with closed masks) | exact |
-| Track mattes (alpha, luma, inverted, text, image, gradient, pre-comp, with or without the matte's eye on) | `LayerMask` on the matted layer's node (`maskModeValue` 0-3 = alpha, inverted alpha, luma, inverted luma): the matte layer is drawn as it is (paints, opacity, in/out, effects) in a « · matte source » node that Rive hides (`sourceDraws` false) unless its eye is on | exact (unverified against AE) |
+| Track mattes (alpha, luma, inverted, text, image, gradient, pre-comp, with or without the matte's eye on) | `LayerMask` on the matted layer's node (`maskModeValue` 0-3 = alpha, inverted alpha, luma, inverted luma): the matte layer is drawn as it is (paints, opacity, in/out, effects) in a « · matte source » node that Rive hides (`sourceDraws` false) unless its eye is on. The Rive CLI renders `LayerMask` from 1.8.0 (1.6.0 drew the matted layer unmasked) | exact (unverified against AE) |
 | Track mattes with `--clip-mattes` (runtimes older than `LayerMask`) | Clip by the matte's geometry; a matte stroke is converted to an outline path first; luma treated as alpha; text or image mattes not converted | exact / approx |
 | Stencil / silhouette blend modes | The layer's geometry cuts every layer below, including below a collapsed pre-comp | exact |
 | Set Matte effect | Clip in composition space from the source layer | exact |

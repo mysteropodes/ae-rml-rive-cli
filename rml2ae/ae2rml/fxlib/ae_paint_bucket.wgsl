@@ -112,6 +112,9 @@ fn similar(p: vec2<i32>, refc: vec4<f32>) -> bool {
 
 @fragment
 fn fs_main(in: VSOut) -> @location(0) vec4<f32> {
+    // a use of srcSamp the entry point reaches: from CLI 1.8.0 Rive leaves a sampler nothing reads out of the layout
+    // and refuses the bind group that fills it (CLI 1.6 required it), so the effect drew nothing
+    let keepSampler = textureSampleLevel(srcTex, srcSamp, vec2<f32>(0.0), 0.0);
     let dim = vec2<i32>(textureDimensions(origTex, 0));
     let ip = pixelOf(in.uv);
     let sp = clamp(vec2<i32>(floor(P.point)), vec2<i32>(0), dim - vec2<i32>(1));     // Fill Point in canvas px

@@ -2039,8 +2039,8 @@ class Converter:
                 if p["kind"] == "color":
                     c = ins.get(f)
                     hexv = (c.get("propertyValue") if c is not None else None) or ""
-                    if len(hexv) == 8:
-                        a, r, g, b = (int(hexv[k:k + 2], 16) / 255.0 for k in (0, 2, 4, 6))
+                    if len(hexv.lstrip("#")) in (6, 8):            # AARRGGBB, or RRGGBB (opaque, CLI 1.8)
+                        r, g, b, a = argb(hexv)
                         J(f'try {{ {fxe}.property({idx}).setValue({js([r, g, b, a])}); }} catch (e) {{}}')
                     continue
                 if p["kind"] == "point":

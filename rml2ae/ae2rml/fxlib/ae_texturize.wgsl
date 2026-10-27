@@ -104,6 +104,9 @@ fn lum(q: vec2<f32>) -> f32 {
 
 @fragment
 fn fs_main(in: VSOut) -> @location(0) vec4<f32> {
+    // a use of srcSamp the entry point reaches: from CLI 1.8.0 Rive leaves a sampler nothing reads out of the layout
+    // and refuses the bind group that fills it (CLI 1.6 required it), so the effect drew nothing
+    let keepSampler = textureSampleLevel(srcTex, srcSamp, vec2<f32>(0.0), 0.0);
     let s = textureLoad(srcTex, pixelOf(in.uv), 0);
     let q = layerPos(in.uv);
     let g = vec2<f32>(lum(q + vec2<f32>(1.0, 0.0)) - lum(q - vec2<f32>(1.0, 0.0)),
